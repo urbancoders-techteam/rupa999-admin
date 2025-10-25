@@ -3,22 +3,12 @@ import { paramCase } from 'change-case';
 import { useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
-import {
-  Card,
-  Table,
-  Button,
-  Tooltip,
-  TableBody,
-  Container,
-  IconButton,
-  TableContainer,
-} from '@mui/material';
+import { Card, Table, Button, TableBody, Container, TableContainer } from '@mui/material';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
 // _mock_
 import { _userList } from '../_mock/arrays';
 // components
-import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 import ConfirmDialog from '../components/confirm-dialog';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
@@ -30,7 +20,6 @@ import {
   TableNoData,
   TableEmptyRows,
   TableHeadCustom,
-  TableSelectedAction,
   TablePaginationCustom,
 } from '../components/table';
 // sections
@@ -39,8 +28,8 @@ import WithdrawDetailsToolbar from '../sections/_withdraw_details/list/WithdrawD
 
 // ----------------------------------------------------------------------
 
-
 const TABLE_HEAD = [
+  { id: 's.no.', label: 'S.No.', align: 'left' },
   { id: 'name', label: 'Name', align: 'left' },
   { id: 'Account', label: 'Account Holder Name', align: 'left' },
   { id: 'UPI', label: 'UPI Name', align: 'left' },
@@ -48,6 +37,7 @@ const TABLE_HEAD = [
   { id: 'AccountISFC', label: 'Account ISFC Code', align: 'left' },
   { id: 'UPIId', label: 'UPI Id', align: 'left' },
   { id: 'CeatedAt', label: 'Ceated At', align: 'left' },
+  { id: 'action', label: 'Action', align: 'left' },
   { id: '' },
 ];
 
@@ -174,7 +164,6 @@ export default function WithdrawDetailsPage() {
         />
 
         <Card>
-
           <WithdrawDetailsToolbar
             isFiltered={isFiltered}
             filterName={filterName}
@@ -183,25 +172,6 @@ export default function WithdrawDetailsPage() {
           />
 
           <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
-            {/* <TableSelectedAction
-              dense={dense}
-              numSelected={selected.length}
-              rowCount={tableData.length}
-              onSelectAllRows={(checked) =>
-                onSelectAllRows(
-                  checked,
-                  tableData.map((row) => row.id)
-                )
-              }
-              action={
-                <Tooltip title="Delete">
-                  <IconButton color="primary" onClick={handleOpenConfirm}>
-                    <Iconify icon="eva:trash-2-outline" />
-                  </IconButton>
-                </Tooltip>
-              }
-            /> */}
-
             <Scrollbar>
               <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
                 <TableHeadCustom
@@ -211,27 +181,26 @@ export default function WithdrawDetailsPage() {
                   rowCount={tableData.length}
                   numSelected={selected.length}
                   onSort={onSort}
-                  onSelectAllRows={(checked) =>
-                    onSelectAllRows(
-                      checked,
-                      tableData.map((row) => row.id)
-                    )
-                  }
+                  // onSelectAllRows={(checked) =>
+                  //   onSelectAllRows(
+                  //     checked,
+                  //     tableData.map((row) => row.id)
+                  //   )
+                  // }
                 />
 
                 <TableBody>
-                  {dataFiltered
-                    // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row) => (
-                      <WithdrawDetailsTableRow
-                        key={row.id}
-                        row={row}
-                        selected={selected.includes(row.id)}
-                        onSelectRow={() => onSelectRow(row.id)}
-                        onDeleteRow={() => handleDeleteRow(row.id)}
-                        onEditRow={() => handleEditRow(row.name)}
-                      />
-                    ))}
+                  {dataFiltered?.map((row,index) => (
+                    <WithdrawDetailsTableRow
+                      index={index + 1}
+                      key={row.id}
+                      row={row}
+                      selected={selected.includes(row.id)}
+                      onSelectRow={() => onSelectRow(row.id)}
+                      onDeleteRow={() => handleDeleteRow(row.id)}
+                      onEditRow={() => handleEditRow(row.name)}
+                    />
+                  ))}
 
                   <TableEmptyRows
                     height={denseHeight}

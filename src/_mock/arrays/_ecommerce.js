@@ -15,7 +15,7 @@ const PRODUCT_NAME = [
 ];
 
 export const _ecommerceSalesOverview = [...Array(3)].map((_, index) => ({
-  label: ['Total Profit', 'Total Income', 'Total Expenses'][index],
+  label: ['Total Amount', 'Total Profit', 'Profit'][index],
   amount: _mock.number.price(index) * 100,
   value: _mock.number.percent(index),
 }));

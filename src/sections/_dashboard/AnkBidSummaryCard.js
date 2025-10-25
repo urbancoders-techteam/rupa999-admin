@@ -38,7 +38,8 @@ export default function AnkBidSummaryCard({
         textAlign: 'center',
         borderRadius: '8px',
         color: theme.palette[color].darker,
-        bgcolor: theme.palette[color].lighter,
+         boxShadow: theme.shadows[9],
+        // bgcolor: theme.palette[color].lighter,
         transition: enableHoverEffect ? 'all 0.3s ease' : 'none',
         ...(enableHoverEffect && {
           '&:hover': {

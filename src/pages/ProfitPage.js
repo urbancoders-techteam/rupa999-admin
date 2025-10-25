@@ -1,10 +1,9 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Button, Card, Container } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
+import { Container } from '@mui/material';
+// import { Link as RouterLink } from 'react-router-dom';
 import { PATH_DASHBOARD } from '../routes/paths';
 import { useSettingsContext } from '../components/settings';
-import Iconify from '../components/iconify';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 import ProfitCheckingForms from '../sections/_profit/ProfitCheckingFilters';
 
@@ -18,11 +17,11 @@ const ProfitPage = () => {
 
       <Container maxWidth={themeStretch ? false : 'lg'}>
         <CustomBreadcrumbs
-          heading="User List"
+          heading="Profit Dashboard"
           links={[
             { name: 'Dashboard', href: PATH_DASHBOARD.root },
-            { name: 'Profit', href: PATH_DASHBOARD.root },
-            { name: 'Filters' },
+            { name: 'Profit Dashboard', href: PATH_DASHBOARD.root },
+            // { name: 'Filters' },
           ]}
         />
 
