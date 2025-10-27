@@ -25,16 +25,20 @@ export const GeneralDashboardPage = Loadable(lazy(() => import('../pages/General
 export const SliderImagePage = Loadable(lazy(() => import('../pages/SliderImagePage')));
 
 // DASHBOARD: User 
-export const UserListPage = Loadable(lazy(() => import('../pages/user/UserListPage')));
+export const UserListPage = Loadable(lazy(() => import('../pages/UserListPage')));
 export const WithdrawDetailsPage = Loadable(lazy(() => import('../pages/WithdrawDetailsPage')));
 
 // DASHBOARD: Profit
 export const ProfitPage = Loadable(lazy(() => import('../pages/ProfitPage')));
 
+// DASHBOARD: Gift
+export const GiftPage = Loadable(lazy(() => import('../pages/GiftPage')));
+export const GiftFormHandlePage = Loadable(lazy(() => import('../sections/_gift/pages/GiftFormHandlePage')));
+
 // BASIC PAGES
-export const Page500 = Loadable(lazy(() => import('../pages/Page500')));
-export const Page403 = Loadable(lazy(() => import('../pages/Page403')));
-export const Page404 = Loadable(lazy(() => import('../pages/Page404')));
+export const Page500 = Loadable(lazy(() => import('../pages/ErrorHandlingPages/Page500')));
+export const Page403 = Loadable(lazy(() => import('../pages/ErrorHandlingPages/Page403')));
+export const Page404 = Loadable(lazy(() => import('../pages/ErrorHandlingPages/Page404')));
 
 
 

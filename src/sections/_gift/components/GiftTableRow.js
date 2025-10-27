@@ -11,9 +11,7 @@ import {
   TableCell,
   IconButton,
   Typography,
-  styled,
 } from '@mui/material';
-import TableRowCard from '../../../components/table/MobileViewCards';
 // components
 import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
@@ -22,7 +20,7 @@ import ConfirmDialog from '../../../components/confirm-dialog';
 
 // ----------------------------------------------------------------------
 
-UserTableRow.propTypes = {
+GiftTableRow.propTypes = {
   row: PropTypes.object,
   selected: PropTypes.bool,
   onEditRow: PropTypes.func,
@@ -30,7 +28,7 @@ UserTableRow.propTypes = {
   onSelectRow: PropTypes.func,
 };
 
-export default function UserTableRow({ row, selected, onEditRow, onSelectRow, onDeleteRow }) {
+export default function GiftTableRow({ row, selected, onEditRow, onSelectRow, onDeleteRow }) {
   const { name, avatarUrl, company, role, isVerified, status } = row;
 
   const [openConfirm, setOpenConfirm] = useState(false);
@@ -53,23 +51,13 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
     setOpenPopover(null);
   };
 
-  const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:nth-of-type(even)': {
-    backgroundColor: theme.palette.action.hover,
-    borderBottom: '2px dashed #00000 !important',
-  },
-  // hide last border
-  '&:last-child td, &:last-child th, &:last-child tr': {
-     borderBottom: '2px dashed #00000 !important',
-  },
-}));
-
   return (
     <>
-      <StyledTableRow hover selected={selected}>
+      <TableRow hover selected={selected}>
         <TableCell padding="checkbox">
           <Checkbox checked={selected} onClick={onSelectRow} />
         </TableCell>
+
         <TableCell>
           <Stack direction="row" alignItems="center" spacing={2}>
             <Avatar alt={name} src={avatarUrl} />
@@ -113,7 +101,7 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
         </TableCell>
-      </StyledTableRow>
+      </TableRow>
 
       <MenuPopover
         open={openPopover}

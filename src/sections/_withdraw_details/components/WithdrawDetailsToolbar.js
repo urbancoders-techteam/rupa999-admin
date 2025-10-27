@@ -27,7 +27,7 @@ export default function WithdrawDetailsToolbar({
         xs: 'column',
         sm: 'row',
       }}
-      sx={{ px: 2.5, py: 3 }}
+      sx={{ px: {xs: 0.5, md: 2.5}, py: {xs: 0, md: 3 }}}
     >
       {/* <TextField
         fullWidth

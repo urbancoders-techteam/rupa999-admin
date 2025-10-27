@@ -22,10 +22,14 @@ import {
   Page500,
   Page403,
   Page404,
+
+  // Dashboard: Components
   SliderImagePage,
   UserListPage,
   ProfitPage,
   WithdrawDetailsPage,
+  GiftPage,
+  GiftFormHandlePage,
   //
 } from './elements';
 
@@ -90,21 +94,36 @@ export default function Router() {
               children: [
                 { element: <Navigate to="/dashboard/users/userlist" replace />, index: true },
                 { path: 'list', element: <UserListPage /> },
-                // { path: 'label/:customLabel/:mailId', element: <MailPage /> },
-                // { path: ':systemLabel', element: <MailPage /> },
-                // { path: ':systemLabel/:mailId', element: <MailPage /> },
+                // { path: 'new', element: <User /> },
+                // { path: ':id/edit', element: <User /> },
+                // { path: ':id/view', element: <User /> },
               ],
             },
             {
               path: 'withdrawdetails',
               children: [
-                { element: <Navigate to="/dashboard/users/withdrawdetails/list" replace />, index: true },
+                {
+                  element: <Navigate to="/dashboard/users/withdrawdetails/list" replace />,
+                  index: true,
+                },
                 { path: 'list', element: <WithdrawDetailsPage /> },
               ],
             },
           ],
         },
-        { path: 'profit', element: <ProfitPage /> },
+        { path: 'profit', element: <ProfitPage />, index: true },
+
+        // Gift
+        {
+          path: 'gift',
+          children: [
+            { element: <Navigate to="/dashboard/gift/list" replace />, index: true },
+            { path: 'list', element: <GiftPage /> },
+            { path: 'new', element: <GiftFormHandlePage /> },
+            { path: ':id/edit', element: <GiftFormHandlePage /> },
+            { path: ':id/view', element: <GiftFormHandlePage /> },
+          ],
+        },
       ],
     },
 

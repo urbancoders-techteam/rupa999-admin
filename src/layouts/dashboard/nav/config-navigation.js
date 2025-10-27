@@ -63,6 +63,7 @@ const navConfig = [
           // { title: 'Help and Support', path: PATH_DASHBOARD.helpsupport.list },
         ],
       },
+      { title: 'gift', path: PATH_DASHBOARD.gift.root, icon: ICONS.booking },
     ],
   },
 
