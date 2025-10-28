@@ -39,17 +39,10 @@ export const PATH_DASHBOARD = {
   home: {
     root: path(ROOTS_DASHBOARD, '/home'),
   },
-  // dashboard: {
-  //   root: path(ROOTS_DASHBOARD, '/dashboard'),
-  // },
   sliderImage: {
     root: path(ROOTS_DASHBOARD, '/slider-image'),
   },
-  // general: {
-  //   home: path(ROOTS_DASHBOARD, '/home'),
-  //   sliderImage: path(ROOTS_DASHBOARD, '/slider-image'),
-  //   analytics: path(ROOTS_DASHBOARD, '/analytics'),
-  // },
+
   users: {
     root: path(ROOTS_DASHBOARD, '/users'),
   },
@@ -75,6 +68,17 @@ export const PATH_DASHBOARD = {
     new: path(ROOTS_DASHBOARD, '/gift/new'),
     edit: (id) => path(ROOTS_DASHBOARD, `/gift/${id}/edit`),
     view: (id) => path(ROOTS_DASHBOARD, `/gift/${id}/view`),
+  },
+
+  markets: {
+    root: path(ROOTS_DASHBOARD, '/markets'),
+  },
+  marketlist: {
+    root: path(ROOTS_DASHBOARD, '/markets/marketlist'),
+    list: path(ROOTS_DASHBOARD, '/markets/marketlist/list'),
+    new: path(ROOTS_DASHBOARD, '/markets/marketlist/new'),
+    edit: (id) => path(ROOTS_DASHBOARD, `/markets/marketlist/${id}/edit`),
+    view: (id) => path(ROOTS_DASHBOARD, `/markets/marketlist/${id}/view`),
   },
   // invoice: {
   //   root: path(ROOTS_DASHBOARD, '/invoice'),

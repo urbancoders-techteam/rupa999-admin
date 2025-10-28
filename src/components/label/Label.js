@@ -24,6 +24,7 @@ const Label = forwardRef(
         component="span"
         ownerState={{ color, variant }}
         sx={{
+          fontSize: 12,
           ...(startIcon && { pl: 0.75 }),
           ...(endIcon && { pr: 0.75 }),
           ...sx,

@@ -101,6 +101,7 @@ export default function WithdrawDetailsPage() {
     (!dataFiltered.length && !!filterName) ||
     (!dataFiltered.length && !!filterRole) ||
     (!dataFiltered.length && !!filterStatus);
+    
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
   };

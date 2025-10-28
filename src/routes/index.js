@@ -30,6 +30,7 @@ import {
   WithdrawDetailsPage,
   GiftPage,
   GiftFormHandlePage,
+  MarketsListPage,
   //
 } from './elements';
 
@@ -122,6 +123,23 @@ export default function Router() {
             { path: 'new', element: <GiftFormHandlePage /> },
             { path: ':id/edit', element: <GiftFormHandlePage /> },
             { path: ':id/view', element: <GiftFormHandlePage /> },
+          ],
+        },
+
+        // Markets
+        {
+          path: 'markets',
+          children: [
+            {
+              path: 'marketlist',
+              children: [
+                { element: <Navigate to="/dashboard/markets/marketlist" replace />, index: true },
+                { path: 'list', element: <MarketsListPage /> },
+                // { path: 'new', element: <User /> },
+                // { path: ':id/edit', element: <User /> },
+                // { path: ':id/view', element: <User /> },
+              ],
+            },
           ],
         },
       ],

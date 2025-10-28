@@ -1,19 +1,19 @@
 import { Helmet } from 'react-helmet-async';
 import { paramCase } from 'change-case';
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
 import { Card, Table, Button, TableBody, Container, TableContainer, Box } from '@mui/material';
-import useResponsive from '../hooks/useResponsive';
+import useResponsive from '../../hooks/useResponsive';
 // routes
-import { PATH_DASHBOARD } from '../routes/paths';
+import { PATH_DASHBOARD } from '../../routes/paths';
 // _mock_
-import { _userDataList } from '../_mock/arrays';
+import { _marketjson } from '../../_mock/arrays/_marketjson';
 // components
-import Scrollbar from '../components/scrollbar';
-import ConfirmDialog from '../components/confirm-dialog';
-import CustomBreadcrumbs from '../components/custom-breadcrumbs';
-import { useSettingsContext } from '../components/settings';
+import Scrollbar from '../../components/scrollbar';
+import ConfirmDialog from '../../components/confirm-dialog';
+import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
+import { useSettingsContext } from '../../components/settings';
 import {
   useTable,
   getComparator,
@@ -22,30 +22,35 @@ import {
   TableEmptyRows,
   TableHeadCustom,
   TablePaginationCustom,
-} from '../components/table';
+} from '../../components/table';
+// Links
 // sections
-import WithdrawDetailsTableRow from '../sections/_withdraw_details/components/WithdrawDetailsTableRow';
-import WithdrawDetailsToolbar from '../sections/_withdraw_details/components/WithdrawDetailsToolbar';
-import WithdrawMobileViewCardLayout from '../sections/_withdraw_details/components/WithdrawMobileViewCardLayout';
+import Iconify from '../../components/iconify';
+import MarketTableRow from '../../sections/_markets/components/MarketTableRow';
+import MarketMobileViewCardLayout from '../../sections/_markets/components/MarketMobileViewCardLayout';
+import MarketToolbar from '../../sections/_markets/components/MarketToolbar';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 's.no.', label: 'S.No.', align: 'left' },
+  { id: 'action', label: 'Action', align: 'center' },
+  { id: 'id', label: 'ID', align: 'left' },
   { id: 'name', label: 'Name', align: 'left' },
-  { id: 'Account', label: 'Account Holder Name', align: 'left' },
-  { id: 'UPI', label: 'UPI Name', align: 'left' },
-  { id: 'AccountNO', label: 'Account Number', align: 'center' },
-  { id: 'AccountISFC', label: 'Account ISFC Code', align: 'left' },
-  { id: 'UPIId', label: 'UPI Id', align: 'left' },
-  { id: 'CeatedAt', label: 'Ceated At', align: 'left' },
-  { id: 'action', label: 'Action', align: 'left' },
-  { id: '' },
+  { id: 'currentStatus', label: 'Current Status', align: 'left' },
+  { id: 'gameDisabled', label: 'Game Disabled?', align: 'left' },
+  { id: 'saturdayOpen', label: 'Saturday Open', align: 'left' },
+  { id: 'sundayOpen', label: 'Sunday Open', align: 'left' },
+  { id: 'autoResult', label: 'Auto Result', align: 'left' },
+  { id: 'openTime', label: 'Open Time', align: 'left' },
+  { id: 'closeTime', label: 'Close Time', align: 'left' },
+  { id: 'openResultTime', label: 'Open Result Time', align: 'left' },
+  { id: 'closeResultTime', label: 'Close Result Time', align: 'left' },
+  { id: 'createdAt', label: 'Created At', align: 'left' },
 ];
 
 // ----------------------------------------------------------------------
 
-export default function WithdrawDetailsPage() {
+export default function MarketDetailsPage() {
   const {
     dense,
     page,
@@ -57,7 +62,6 @@ export default function WithdrawDetailsPage() {
     selected,
     setSelected,
     onSelectRow,
-    onSelectAllRows,
     //
     onSort,
     onChangeDense,
@@ -69,7 +73,7 @@ export default function WithdrawDetailsPage() {
 
   const navigate = useNavigate();
 
-  const [tableData, setTableData] = useState(_userDataList);
+  const [tableData, setTableData] = useState(_marketjson);
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
@@ -80,16 +84,23 @@ export default function WithdrawDetailsPage() {
   const [filterStatus, setFilterStatus] = useState('all');
 
   // Memoized filtered data
-  const dataFiltered = useMemo(() => applyFilter({
-    inputData: tableData,
-    comparator: getComparator(order, orderBy),
-    filterName,
-    filterRole,
-    filterStatus,
-  }), [tableData, order, orderBy, filterName, filterRole, filterStatus]);
+  const dataFiltered = useMemo(
+    () =>
+      applyFilter({
+        inputData: tableData,
+        comparator: getComparator(order, orderBy),
+        filterName,
+        filterRole,
+        filterStatus,
+      }),
+    [tableData, order, orderBy, filterName, filterRole, filterStatus]
+  );
 
   // Memoized paginated data
-  const dataInPage = useMemo(() => dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage), [dataFiltered, page, rowsPerPage]);
+  const dataInPage = useMemo(
+    () => dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+    [dataFiltered, page, rowsPerPage]
+  );
 
   const denseHeight = dense ? 52 : 72;
 
@@ -101,6 +112,7 @@ export default function WithdrawDetailsPage() {
     (!dataFiltered.length && !!filterName) ||
     (!dataFiltered.length && !!filterRole) ||
     (!dataFiltered.length && !!filterStatus);
+
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
   };
@@ -154,7 +166,7 @@ export default function WithdrawDetailsPage() {
   };
 
   const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
+    navigate(PATH_DASHBOARD.marketlist.edit(paramCase(id)));
   };
 
   const handleResetFilter = () => {
@@ -166,20 +178,30 @@ export default function WithdrawDetailsPage() {
   return (
     <>
       <Helmet>
-        <title> Withdraw : Details | Rupa999 </title>
+        <title> Market : List | Rupa999 </title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         {isMobile ? (
           <Box sx={{ position: 'sticky', top: 0, zIndex: 10, bgcolor: 'background.paper' }}>
             <CustomBreadcrumbs
-              heading="Withdraw Details"
+              heading="Market List"
               links={[
                 { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                { name: 'Withdraw Details', href: PATH_DASHBOARD.withdrawdetails.root },
+                { name: 'Market List', href: PATH_DASHBOARD.marketlist.root },
               ]}
+              action={
+                <Button
+                  component={RouterLink}
+                  to={PATH_DASHBOARD.marketlist.new}
+                  variant="contained"
+                  startIcon={<Iconify icon="eva:plus-fill" />}
+                >
+                  New Gift
+                </Button>
+              }
             />
-            <WithdrawDetailsToolbar
+            <MarketToolbar
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
@@ -190,13 +212,23 @@ export default function WithdrawDetailsPage() {
         ) : (
           <>
             <CustomBreadcrumbs
-              heading="Withdraw Details"
+              heading="Market List"
               links={[
                 { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                { name: 'Withdraw Details', href: PATH_DASHBOARD.withdrawdetails.root },
+                { name: 'Market List', href: PATH_DASHBOARD.marketlist.root },
               ]}
+              action={
+                <Button
+                  component={RouterLink}
+                  to={PATH_DASHBOARD.marketlist.new}
+                  variant="contained"
+                  startIcon={<Iconify icon="eva:plus-fill" />}
+                >
+                  New Gift
+                </Button>
+              }
             />
-            <WithdrawDetailsToolbar
+            <MarketToolbar
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
@@ -208,7 +240,7 @@ export default function WithdrawDetailsPage() {
 
         {/* Render mobile card layout for small screens, otherwise render the table */}
         {isMobile ? (
-          <WithdrawMobileViewCardLayout
+          <MarketMobileViewCardLayout
             data={dataFiltered}
             onEditRow={(id) => handleEditRow(id)}
             onDeleteRow={(id) => handleDeleteRow(id)}
@@ -233,7 +265,7 @@ export default function WithdrawDetailsPage() {
                     {dataFiltered
                       ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                       .map((row, index) => (
-                        <WithdrawDetailsTableRow
+                        <MarketTableRow
                           index={index + 1}
                           key={row.id}
                           row={row}
@@ -309,16 +341,16 @@ function applyFilter({ inputData, comparator, filterName, filterStatus, filterRo
 
   if (filterName) {
     inputData = inputData.filter(
-      (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+      (marketlist) => marketlist.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
     );
   }
 
   if (filterStatus !== 'all') {
-    inputData = inputData.filter((user) => user.status === filterStatus);
+    inputData = inputData.filter((marketlist) => marketlist.status === filterStatus);
   }
 
   if (filterRole !== 'all') {
-    inputData = inputData.filter((user) => user.role === filterRole);
+    inputData = inputData.filter((marketlist) => marketlist.role === filterRole);
   }
 
   return inputData;

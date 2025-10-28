@@ -10,7 +10,7 @@ import { useSettingsContext } from '../../components/settings';
 
 // ----------------------------------------------------------------------
 
-const SPACING = 8;
+const SPACING = 5;
 
 Main.propTypes = {
   sx: PropTypes.object,

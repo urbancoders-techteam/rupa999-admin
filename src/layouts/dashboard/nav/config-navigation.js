@@ -51,7 +51,7 @@ const navConfig = [
         icon: ICONS.user,
         children: [
           { title: 'user list', path: PATH_DASHBOARD.userlist.list },
-          { title: 'withdraw details', path: PATH_DASHBOARD.withdrawdetails.list},
+          { title: 'withdraw details', path: PATH_DASHBOARD.withdrawdetails.list },
         ],
       },
       {
@@ -59,11 +59,25 @@ const navConfig = [
         // path: PATH_DASHBOARD.setting.root,
         icon: ICONS.setting,
         children: [
-          // { title: 'change password', path: PATH_DASHBOARD.changepassword.list },
-          // { title: 'Help and Support', path: PATH_DASHBOARD.helpsupport.list },
+          { title: 'change password',
+            //  path: PATH_DASHBOARD.changepassword.list 
+            },
+          { title: 'Help and Support',
+            //  path: PATH_DASHBOARD.helpsupport.list 
+            },
         ],
       },
       { title: 'gift', path: PATH_DASHBOARD.gift.root, icon: ICONS.booking },
+
+        {
+        title: 'maskets',
+        path: PATH_DASHBOARD.markets.root,
+        icon: ICONS.user,
+        children: [
+          { title: 'Market list', path: PATH_DASHBOARD.marketlist.list },
+          // { title: 'withdraw details', path: PATH_DASHBOARD.withdrawdetails.list },
+        ],
+      },
     ],
   },
 

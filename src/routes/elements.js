@@ -35,6 +35,10 @@ export const ProfitPage = Loadable(lazy(() => import('../pages/ProfitPage')));
 export const GiftPage = Loadable(lazy(() => import('../pages/GiftPage')));
 export const GiftFormHandlePage = Loadable(lazy(() => import('../sections/_gift/pages/GiftFormHandlePage')));
 
+// DASHBOARD: Markets
+export const MarketsListPage = Loadable(lazy(() => import('../pages/markets/MarketsListPage')));
+
+
 // BASIC PAGES
 export const Page500 = Loadable(lazy(() => import('../pages/ErrorHandlingPages/Page500')));
 export const Page403 = Loadable(lazy(() => import('../pages/ErrorHandlingPages/Page403')));
