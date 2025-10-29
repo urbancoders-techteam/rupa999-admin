@@ -8,8 +8,7 @@ import { PATH_DASHBOARD } from '../../../routes/paths';
 // import { getBannerByIdAsync } from '../../../redux/services/banner';
 import CustomBreadcrumbs from '../../../components/custom-breadcrumbs/CustomBreadcrumbs';
 import LoadingScreen from '../../../components/loading-screen/LoadingScreen';
-import GiftForm from '../components/GiftForm';
-// import BannerForm from '../components/BannerForm';
+import MarketForm from './MarketForm';
 
 export default function GiftFormHandlePage() {
   const { themeStretch } = useSettingsContext();
@@ -22,8 +21,8 @@ export default function GiftFormHandlePage() {
   const editView = useMemo(() => {
     if (id && /edit/i?.test(pathname)) {
       return {
-        title: 'Gift: Edit | Rupa999',
-        heading: 'Edit Gift',
+        title: 'Market: Edit | Rupa999',
+        heading: 'Edit Market',
         user: state?.name ?? '',
         isEdit: true,
         isView: false,
@@ -31,16 +30,16 @@ export default function GiftFormHandlePage() {
     }
     if (id && /view/i?.test(pathname)) {
       return {
-        title: 'Gift: View | Rupa999',
-        heading: 'View Gift',
+        title: 'Market: View | Rupa999',
+        heading: 'View Market',
         user: state?.name ?? '',
         isEdit: false,
         isView: true,
       };
     }
     return {
-      title: 'Gift: Create | Rupa999',
-      heading: 'Create Gift',
+      title: 'Market: Create | Rupa999',
+      heading: 'Create Market',
       user: 'New',
       isEdit: false,
       isView: false,
@@ -66,19 +65,19 @@ export default function GiftFormHandlePage() {
               href: PATH_DASHBOARD.root,
             },
             {
-              name: 'Gift',
-              href: PATH_DASHBOARD.gift?.list,
+              name: 'Market List',
+              href: PATH_DASHBOARD.marketlist.list,
             },
             {
               name: editView?.heading,
-              href: PATH_DASHBOARD.gift?.list,
+              href: PATH_DASHBOARD.marketlist.list,
             },
           ]}
         />
         {/* {isLoading ? (
         <LoadingScreen />
       ) : ( */}
-        <GiftForm
+        <MarketForm
           isEdit={editView?.isEdit}
           isView={editView?.isView}
           // currentBanner={editView?.isView || editView?.isEdit ? bannerById : {}}

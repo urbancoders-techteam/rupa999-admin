@@ -75,7 +75,7 @@ const navConfig = [
         icon: ICONS.user,
         children: [
           { title: 'Market list', path: PATH_DASHBOARD.marketlist.list },
-          // { title: 'withdraw details', path: PATH_DASHBOARD.withdrawdetails.list },
+          { title: 'Pana Charts', path: PATH_DASHBOARD.panacharts.list },
         ],
       },
     ],

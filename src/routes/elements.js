@@ -37,6 +37,11 @@ export const GiftFormHandlePage = Loadable(lazy(() => import('../sections/_gift/
 
 // DASHBOARD: Markets
 export const MarketsListPage = Loadable(lazy(() => import('../pages/markets/MarketsListPage')));
+export const MarketFormHandlePage = Loadable(lazy(() => import('../sections/_markets/pages/MarketFormHandlePage')));
+
+// DASHBOARD: Markets | Pana Charts
+export const PanaChartsListPage = Loadable(lazy(() => import('../pages/markets/PanaChartsListPage')));
+// export const PanaChartFormHandlePage = Loadable(lazy(() => import('../sections/_panaChart/pages/PanaChartFormHandlePage')));
 
 
 // BASIC PAGES

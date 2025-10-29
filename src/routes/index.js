@@ -31,6 +31,8 @@ import {
   GiftPage,
   GiftFormHandlePage,
   MarketsListPage,
+  MarketFormHandlePage,
+  PanaChartsListPage,
   //
 } from './elements';
 
@@ -135,9 +137,19 @@ export default function Router() {
               children: [
                 { element: <Navigate to="/dashboard/markets/marketlist" replace />, index: true },
                 { path: 'list', element: <MarketsListPage /> },
-                // { path: 'new', element: <User /> },
-                // { path: ':id/edit', element: <User /> },
-                // { path: ':id/view', element: <User /> },
+                { path: 'new', element: <MarketFormHandlePage /> },
+                { path: ':id/edit', element: <MarketFormHandlePage /> },
+                { path: ':id/view', element: <MarketFormHandlePage /> },
+              ],
+            },
+            {
+              path: 'panacharts',
+              children: [
+                { element: <Navigate to="/dashboard/markets/panacharts" replace />, index: true },
+                { path: 'list', element: <PanaChartsListPage /> },
+                // { path: 'new', element: <MarketFormHandlePage /> },
+                // { path: ':id/edit', element: <MarketFormHandlePage /> },
+                // { path: ':id/view', element: <MarketFormHandlePage /> },
               ],
             },
           ],

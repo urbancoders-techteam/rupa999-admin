@@ -13,12 +13,7 @@ MarketToolbar.propTypes = {
   onResetFilter: PropTypes.func,
 };
 
-export default function MarketToolbar({
-  isFiltered,
-  filterName,
-  onFilterName,
-  onResetFilter,
-}) {
+export default function MarketToolbar({ isFiltered, filterName, onFilterName, onResetFilter }) {
   return (
     <Stack
       spacing={2}
@@ -27,9 +22,10 @@ export default function MarketToolbar({
         xs: 'column',
         sm: 'row',
       }}
-      sx={{ px: {xs: 0.5, md: 2.5}, py: {xs: 0, md: 3 }}}
+      sx={{ px: { xs: 1.5, md: 2.5 }, py: { xs: 1, md: 3 } }}
     >
       <TextField
+        size="small"
         fullWidth
         value={filterName}
         onChange={onFilterName}

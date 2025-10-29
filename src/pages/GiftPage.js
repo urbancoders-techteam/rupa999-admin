@@ -4,13 +4,10 @@ import { useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
 import {
-  Tab,
-  Tabs,
   Card,
   Table,
   Button,
   Tooltip,
-  Divider,
   TableBody,
   Container,
   IconButton,
@@ -80,30 +77,19 @@ export default function GiftPage() {
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
-  const [filterName, setFilterName] = useState('');
 
-  const [filterRole, setFilterRole] = useState('all');
-
-  const [filterStatus, setFilterStatus] = useState('all');
 
   const dataFiltered = applyFilter({
     inputData: tableData,
     comparator: getComparator(order, orderBy),
-    filterName,
-    filterRole,
-    filterStatus,
   });
 
   const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   const denseHeight = dense ? 52 : 72;
 
-  const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
-  const isNotFound =
-    (!dataFiltered.length && !!filterName) ||
-    (!dataFiltered.length && !!filterRole) ||
-    (!dataFiltered.length && !!filterStatus);
+  const isNotFound = !dataFiltered.length && Boolean(tableData.length)
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
@@ -111,21 +97,6 @@ export default function GiftPage() {
 
   const handleCloseConfirm = () => {
     setOpenConfirm(false);
-  };
-
-  const handleFilterStatus = (event, newValue) => {
-    setPage(0);
-    setFilterStatus(newValue);
-  };
-
-  const handleFilterName = (event) => {
-    setPage(0);
-    setFilterName(event.target.value);
-  };
-
-  const handleFilterRole = (event) => {
-    setPage(0);
-    setFilterRole(event.target.value);
   };
 
   const handleDeleteRow = (id) => {
@@ -161,12 +132,6 @@ export default function GiftPage() {
     navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
   };
 
-  const handleResetFilter = () => {
-    setFilterName('');
-    setFilterRole('all');
-    setFilterStatus('all');
-  };
-
   return (
     <>
       <Helmet>
@@ -179,7 +144,6 @@ export default function GiftPage() {
           links={[
             { name: 'Dashboard', href: PATH_DASHBOARD.root },
             { name: 'Gift List', href: PATH_DASHBOARD.gift.list },
-            // { name: 'List' },
           ]}
           action={
             <Button
