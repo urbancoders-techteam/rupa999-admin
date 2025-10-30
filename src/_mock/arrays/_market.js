@@ -1,147 +1,61 @@
-export const _marketjson = [
-  {
-    id: 57,
-    name: "KARNATAKA NIGHT",
-    currentStatus: "CLOSED NOW",
-    gameDisabled: "NO",
-    saturdayOpen: "Open",
-    sundayOpen: "Open",
-    autoResult: "Off",
-    openTime: "06:40 PM",
-    closeTime: "07:40 PM",
-    openResultTime: "06:45 PM",
-    closeResultTime: "07:45 PM",
-    createdAt: "2025-08-19 09:01:08",
-  },
-  {
-    id: 56,
-    name: "KARNATAKA DAY",
-    currentStatus: "CLOSED NOW",
-    gameDisabled: "NO",
-    saturdayOpen: "Open",
-    sundayOpen: "Open",
-    autoResult: "Off",
-    openTime: "10:10 AM",
-    closeTime: "11:10 AM",
-    openResultTime: "10:20 AM",
-    closeResultTime: "11:20 AM",
-    createdAt: "2025-08-19 08:54:47",
-  },
-  {
-    id: 52,
-    name: "MAIN BAZAR",
-    currentStatus: "OPEN NOW",
-    gameDisabled: "NO",
-    saturdayOpen: "Close",
-    sundayOpen: "Close",
-    autoResult: "On",
-    openTime: "09:50 PM",
-    closeTime: "11:55 PM",
-    openResultTime: "09:50 PM",
-    closeResultTime: "11:55 PM",
-    createdAt: "2023-06-21 11:12:13",
-  },
-  {
-    id: 50,
-    name: "RAJDHANI NIGHT",
-    currentStatus: "OPEN NOW",
-    gameDisabled: "NO",
-    saturdayOpen: "Close",
-    sundayOpen: "Close",
-    autoResult: "Off",
-    openTime: "09:30 PM",
-    closeTime: "11:40 PM",
-    openResultTime: "09:30 PM",
-    closeResultTime: "11:40 PM",
-    createdAt: "2023-06-17 06:20:00",
-  },
-  {
-    id: 49,
-    name: "KALYAN NIGHT",
-    currentStatus: "OPEN NOW",
-    gameDisabled: "NO",
-    saturdayOpen: "Close",
-    sundayOpen: "Close",
-    autoResult: "Off",
-    openTime: "09:20 PM",
-    closeTime: "11:20 PM",
-    openResultTime: "09:34 PM",
-    closeResultTime: "11:30 PM",
-    createdAt: "2023-06-17 06:18:23",
-  },
-  {
-    id: 48,
-    name: "MILAN NIGHT",
-    currentStatus: "OPEN NOW",
-    gameDisabled: "NO",
-    saturdayOpen: "Open",
-    sundayOpen: "Close",
-    autoResult: "Off",
-    openTime: "08:55 PM",
-    closeTime: "10:55 PM",
-    openResultTime: "09:05 PM",
-    closeResultTime: "11:05 PM",
-    createdAt: "2023-06-17 06:17:01",
-  },
-  {
-    id: 47,
-    name: "SUPREME NIGHT",
-    currentStatus: "OPEN NOW",
-    gameDisabled: "NO",
-    saturdayOpen: "Open",
-    sundayOpen: "Open",
-    autoResult: "Off",
-    openTime: "08:30 PM",
-    closeTime: "10:30 PM",
-    openResultTime: "08:45 PM",
-    closeResultTime: "10:45 PM",
-    createdAt: "2023-06-17 06:11:15",
-  },
-  {
-    id: 46,
-    name: "MADHUR NIGHT",
-    currentStatus: "OPEN NOW",
-    gameDisabled: "NO",
-    saturdayOpen: "Open",
-    sundayOpen: "Close",
-    autoResult: "Off",
-    openTime: "08:30 PM",
-    closeTime: "10:30 PM",
-    openResultTime: "08:30 PM",
-    closeResultTime: "10:30 PM",
-    createdAt: "2023-06-17 06:01:00",
-  },
-  {
-    id: 45,
-    name: "SRIDEVI NIGHT",
-    currentStatus: "CLOSED NOW",
-    gameDisabled: "NO",
-    saturdayOpen: "Open",
-    sundayOpen: "Open",
-    autoResult: "Off",
-    openTime: "07:00 PM",
-    closeTime: "08:00 PM",
-    openResultTime: "07:15 PM",
-    closeResultTime: "08:15 PM",
-    createdAt: "2023-06-17 05:58:48",
-  },
-  {
-    id: 44,
-    name: "KALYAN",
-    currentStatus: "CLOSED NOW",
-    gameDisabled: "NO",
-    saturdayOpen: "Open",
-    sundayOpen: "Close",
-    autoResult: "Off",
-    openTime: "03:30 PM",
-    closeTime: "05:30 PM",
-    openResultTime: "03:40 PM",
-    closeResultTime: "05:40 PM",
-    createdAt: "2023-06-17 05:55:49",
-  },
+import _mock from '../_mock';
+
+// ----------------------------------------------------------------------
+
+const COUNTRY = ['de', 'en', 'fr', 'kr', 'us'];
+
+const CATEGORY = ['CAP', 'Branded Shoes', 'Headphone', 'Cell Phone', 'Earings'];
+
+const PRODUCT_NAME = [
+  'Small Granite Computer',
+  'Small Rubber Mouse',
+  'Awesome Rubber Hat',
+  'Sleek Cotton Sausages',
+  'Rustic Wooden Chicken',
 ];
 
-export const Market_Record_Data = [
+export const _ecommerceSalesOverview = [...Array(3)].map((_, index) => ({
+  label: ['Total Amount', 'Total Profit', 'Profit'][index],
+  amount: _mock.number.price(index) * 100,
+  value: _mock.number.percent(index),
+}));
+
+export const _ecommerceBestSalesman = [...Array(5)].map((_, index) => ({
+  id: _mock.id(index),
+  name: _mock.name.fullName(index),
+  email: _mock.email(index),
+  avatar: _mock.image.avatar(index + 8),
+  category: CATEGORY[index],
+  flag: `/assets/icons/flags/ic_flag_${COUNTRY[index]}.svg`,
+  total: _mock.number.price(index),
+  rank: `Top ${index + 1}`,
+}));
+
+export const _ecommerceLatestProducts = [...Array(5)].map((_, index) => ({
+  id: _mock.id(index),
+  name: PRODUCT_NAME[index],
+  image: _mock.image.product(index),
+  price: _mock.number.price(index),
+  priceSale: index === 0 || index === 3 ? 0 : _mock.number.price(index),
+  colors: (index === 0 && ['#2EC4B6', '#E71D36', '#FF9F1C', '#011627']) ||
+    (index === 1 && ['#92140C', '#FFCF99']) ||
+    (index === 2 && ['#0CECDD', '#FFF338', '#FF67E7', '#C400FF', '#52006A', '#046582']) ||
+    (index === 3 && ['#845EC2', '#E4007C', '#2A1A5E']) || ['#090088'],
+}));
+
+export const _ecommerceNewProducts = [...Array(5)].map((_, index) => ({
+  id: _mock.id(index),
+  name: [
+    'Nike Air Max 97',
+    'Nike Zoom Gravity',
+    'Nike DBreak-Type',
+    'Kyrie Flytrap 3 EP Basketball Shoe',
+    'Nike Air Max Fusion Men',
+  ][index],
+  image: _mock.image.product(index),
+}));
+
+export const marketRecordData = [
   {
     id: 101,
     marketName: "MILAN NIGHT",

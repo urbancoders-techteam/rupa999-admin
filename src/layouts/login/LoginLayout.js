@@ -4,6 +4,8 @@ import { Typography, Stack } from '@mui/material';
 // components
 import Logo from '../../components/logo';
 import Image from '../../components/image';
+// logo 
+import loginLayoutImage from '../../assets/logo/rupa-logo.png'; 
 //
 import { StyledRoot, StyledSectionBg, StyledSection, StyledContent } from './styles';
 
@@ -29,15 +31,15 @@ export default function LoginLayout({ children, illustration, title }) {
 
       <StyledSection>
         <Typography variant="h3" sx={{ mb: 10, maxWidth: 480, textAlign: 'center' }}>
-          {title || 'Hi, Welcome back'}
+          {title || 'Hi, Welcome back to Rupa999 Admin Panel!'}
         </Typography>
 
         <Image
           disabledEffect
           visibleByDefault
           alt="auth"
-          src={illustration || '/assets/illustrations/illustration_dashboard.png'}
-          sx={{ maxWidth: 720 }}
+          src={illustration || loginLayoutImage}
+          sx={{ maxWidth: 320 }}
         />
 
         <StyledSectionBg />

@@ -87,6 +87,13 @@ export const PATH_DASHBOARD = {
     // edit: (id) => path(ROOTS_DASHBOARD, `/markets/panacharts/${id}/edit`),
     // view: (id) => path(ROOTS_DASHBOARD, `/markets/panacharts/${id}/view`),
   },
+  marketrecords: {
+    root: path(ROOTS_DASHBOARD, '/markets/marketrecords'),
+    list: path(ROOTS_DASHBOARD, '/markets/marketrecords/list'),
+    // new: path(ROOTS_DASHBOARD, '/markets/marketrecords/new'),
+    // edit: (id) => path(ROOTS_DASHBOARD, `/markets/marketrecords/${id}/edit`),
+    // view: (id) => path(ROOTS_DASHBOARD, `/markets/marketrecords/${id}/view`),
+  },
   // invoice: {
   //   root: path(ROOTS_DASHBOARD, '/invoice'),
   //   list: path(ROOTS_DASHBOARD, '/invoice/list'),

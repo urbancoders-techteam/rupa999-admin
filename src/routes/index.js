@@ -33,6 +33,7 @@ import {
   MarketsListPage,
   MarketFormHandlePage,
   PanaChartsListPage,
+  GeneralMarketRecordListPage,
   //
 } from './elements';
 
@@ -147,6 +148,16 @@ export default function Router() {
               children: [
                 { element: <Navigate to="/dashboard/markets/panacharts" replace />, index: true },
                 { path: 'list', element: <PanaChartsListPage /> },
+                // { path: 'new', element: <MarketFormHandlePage /> },
+                // { path: ':id/edit', element: <MarketFormHandlePage /> },
+                // { path: ':id/view', element: <MarketFormHandlePage /> },
+              ],
+            },
+            {
+              path: 'marketrecords',
+              children: [
+                { element: <Navigate to="/dashboard/markets/marketrecords" replace />, index: true },
+                { path: 'list', element: <GeneralMarketRecordListPage /> },
                 // { path: 'new', element: <MarketFormHandlePage /> },
                 // { path: ':id/edit', element: <MarketFormHandlePage /> },
                 // { path: ':id/view', element: <MarketFormHandlePage /> },

@@ -70,12 +70,13 @@ const navConfig = [
       { title: 'gift', path: PATH_DASHBOARD.gift.root, icon: ICONS.booking },
 
         {
-        title: 'maskets',
+        title: 'markets',
         path: PATH_DASHBOARD.markets.root,
         icon: ICONS.user,
         children: [
           { title: 'Market list', path: PATH_DASHBOARD.marketlist.list },
           { title: 'Pana Charts', path: PATH_DASHBOARD.panacharts.list },
+          { title: 'General Market Records', path: PATH_DASHBOARD.marketrecords.list },
         ],
       },
     ],

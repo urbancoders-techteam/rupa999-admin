@@ -44,6 +44,9 @@ export const PanaChartsListPage = Loadable(lazy(() => import('../pages/markets/P
 // export const PanaChartFormHandlePage = Loadable(lazy(() => import('../sections/_panaChart/pages/PanaChartFormHandlePage')));
 
 
+// DASHBOARD: Markets | Records
+export const GeneralMarketRecordListPage = Loadable(lazy(() => import('../pages/markets/GeneralMarketRecordListPage')));
+
 // BASIC PAGES
 export const Page500 = Loadable(lazy(() => import('../pages/ErrorHandlingPages/Page500')));
 export const Page403 = Loadable(lazy(() => import('../pages/ErrorHandlingPages/Page403')));

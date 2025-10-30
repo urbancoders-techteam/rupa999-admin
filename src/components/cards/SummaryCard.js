@@ -61,10 +61,10 @@ export default function SummaryCard({
         px: 3,
         py: 3,
         textAlign: 'center',
-        color: theme.palette[color].darker,
-        bgcolor: theme.palette[color].lighter,
+        // color: theme.palette[color].darker,
+        // bgcolor: theme.palette[color].lighter,
         transition: enableHoverEffect ? 'all 0.3s ease' : 'none',
-        boxShadow: 0,
+        boxShadow: theme.shadows[6],
         ...(enableHoverEffect && {
           '&:hover': {
             transform: 'translateY(-6px) scale(1.02)',
