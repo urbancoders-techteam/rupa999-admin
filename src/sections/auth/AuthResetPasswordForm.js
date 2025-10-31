@@ -78,7 +78,7 @@ export default function AdminChangePasswordForm() {
           gutterBottom
           textAlign="left"
         >
-          Enter Your New Password
+          Enter New Password
         </Typography>
 
         <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
