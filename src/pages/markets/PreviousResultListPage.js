@@ -14,15 +14,15 @@ import {
   TableContainer,
 } from '@mui/material';
 // routes
-import { PATH_DASHBOARD } from '../routes/paths';
+import { PATH_DASHBOARD } from '../../routes/paths';
 // _mock_
-import { _userList } from '../_mock/arrays';
+import { previousResults } from '../../_mock/arrays';
 // components
-import Iconify from '../components/iconify';
-import Scrollbar from '../components/scrollbar';
-import ConfirmDialog from '../components/confirm-dialog';
-import CustomBreadcrumbs from '../components/custom-breadcrumbs';
-import { useSettingsContext } from '../components/settings';
+import Iconify from '../../components/iconify';
+import Scrollbar from '../../components/scrollbar';
+import ConfirmDialog from '../../components/confirm-dialog';
+import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
+import { useSettingsContext } from '../../components/settings';
 import {
   useTable,
   getComparator,
@@ -32,24 +32,28 @@ import {
   TableHeadCustom,
   TableSelectedAction,
   TablePaginationCustom,
-} from '../components/table';
+} from '../../components/table';
 // sections
-import GiftTableRow from '../sections/_gift/components/GiftTableRow';
+import PreviousResultTableRow from '../../sections/_previous_results/components/PreviousResultTableRow';
+import PreviousResultToolbar from '../../sections/_previous_results/components/PreviousResultToolbar';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'name', label: 'Name', align: 'left' },
-  { id: 'company', label: 'Company', align: 'left' },
-  { id: 'role', label: 'Role', align: 'left' },
-  { id: 'isVerified', label: 'Verified', align: 'center' },
-  { id: 'status', label: 'Status', align: 'left' },
+  { id: 'action', label: 'Action', align: 'left' },
+  { id: 'id', label: 'ID', align: 'left' },
+  { id: 'name', label: 'Game Name', align: 'left' },
+  { id: 'resultDate', label: 'Result Date', align: 'left' },
+  { id: 'result', label: 'Result', align: 'left' },
+  { id: 'openPana', label: 'Open Pana', align: 'center' },
+  { id: 'closePana', label: 'Close Pana', align: 'center' },
+  { id: 'createdAt', label: 'Created At', align: 'left' },
   { id: '' },
 ];
 
 // ----------------------------------------------------------------------
 
-export default function GiftPage() {
+export default function PreviousResultListPage() {
   const {
     dense,
     page,
@@ -73,23 +77,25 @@ export default function GiftPage() {
 
   const navigate = useNavigate();
 
-  const [tableData, setTableData] = useState(_userList);
+  const [tableData, setTableData] = useState(previousResults);
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
-
+  const [filterName, setFilterName] = useState('');
 
   const dataFiltered = applyFilter({
     inputData: tableData,
     comparator: getComparator(order, orderBy),
+    filterName,
   });
 
   const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   const denseHeight = dense ? 52 : 72;
 
+  const isFiltered = filterName !== '';
 
-  const isNotFound = !dataFiltered.length && Boolean(tableData.length)
+  const isNotFound =  (!dataFiltered.length && !!filterName)
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
@@ -97,6 +103,12 @@ export default function GiftPage() {
 
   const handleCloseConfirm = () => {
     setOpenConfirm(false);
+  };
+
+  const handleFilterName = (event) => {
+    setPage(0);
+    setFilterName(event.target.value);
+    console.log('event.target.value :>> ', event.target.value);
   };
 
   const handleDeleteRow = (id) => {
@@ -129,35 +141,47 @@ export default function GiftPage() {
   };
 
   const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
+    navigate(PATH_DASHBOARD.previousresults.edit(paramCase(id)));
+  };
+
+  const handleResetFilter = () => {
+    setFilterName('');
   };
 
   return (
     <>
       <Helmet>
-        <title> Gift: List | Rupa999 </title>
+        <title> Previous Results: List | Rupa999 </title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <CustomBreadcrumbs
-          heading="Gift List"
+          heading="Previous Results List"
           links={[
             { name: 'Dashboard', href: PATH_DASHBOARD.root },
-            { name: 'Gift List', href: PATH_DASHBOARD.gift.list },
+            { name: 'Previous Results List', href: PATH_DASHBOARD.previousresults.list },
           ]}
           action={
             <Button
               component={RouterLink}
-              to={PATH_DASHBOARD.gift.new}
+              // to={PATH_DASHBOARD.previousresults.new}
               variant="contained"
               startIcon={<Iconify icon="eva:plus-fill" />}
             >
-              New Gift
+              New Previous Results
             </Button>
           }
         />
 
         <Card>
+          
+          <PreviousResultToolbar
+            isFiltered={isFiltered}
+            filterName={filterName}
+            onFilterName={handleFilterName}
+            onResetFilter={handleResetFilter}
+          />
+
           <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
             <TableSelectedAction
               dense={dense}
@@ -179,28 +203,21 @@ export default function GiftPage() {
             />
 
             <Scrollbar>
-              <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
+              <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
                 <TableHeadCustom
-                  sx={{paddingY: 5 }}
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
                   rowCount={tableData.length}
                   numSelected={selected.length}
                   onSort={onSort}
-                  onSelectAllRows={(checked) =>
-                    onSelectAllRows(
-                      checked,
-                      tableData.map((row) => row.id)
-                    )
-                  }
                 />
 
                 <TableBody>
                   {dataFiltered
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row) => (
-                      <GiftTableRow
+                      <PreviousResultTableRow
                         key={row.id}
                         row={row}
                         selected={selected.includes(row.id)}
@@ -275,16 +292,16 @@ function applyFilter({ inputData, comparator, filterName, filterStatus, filterRo
 
   if (filterName) {
     inputData = inputData.filter(
-      (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+      (previousresults) => previousresults.gameName.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
     );
   }
 
   if (filterStatus !== 'all') {
-    inputData = inputData.filter((user) => user.status === filterStatus);
+    inputData = inputData.filter((previousresults) => previousresults.status === filterStatus);
   }
 
   if (filterRole !== 'all') {
-    inputData = inputData.filter((user) => user.role === filterRole);
+    inputData = inputData.filter((previousresults) => previousresults.role === filterRole);
   }
 
   return inputData;

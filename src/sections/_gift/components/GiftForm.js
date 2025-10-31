@@ -85,43 +85,50 @@ export default function GiftForm({ isEdit = false, isView = false, currentUser }
   };
 
   return (
-    <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-      <Grid container spacing={3}>
-        <Card sx={{ p: 3, width: '100%' }}>
-          <Box
-            rowGap={3}
-            columnGap={2}
-            display="grid"
-            gridTemplateColumns={{
-              xs: 'repeat(1, 1fr)',
-              sm: 'repeat(2, 1fr)',
-            }}
-          >
-            <RHFTextField disabled={isView} name="userLimit" label="User Limit" />
-            <RHFTextField disabled={isView} name="amount" label="Amount" />
-          </Box>
+    <Box sx={{ mt: 5 }}>
+      <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+        <Grid container spacing={3}>
+          <Card sx={{ p: 3, width: '100%' }}>
+            <Box
+              rowGap={3}
+              columnGap={2}
+              display="grid"
+              gridTemplateColumns={{
+                xs: 'repeat(1, 1fr)',
+                sm: 'repeat(2, 1fr)',
+              }}
+            >
+              <RHFTextField disabled={isView} name="userLimit" label="User Limit" />
+              <RHFTextField disabled={isView} name="amount" label="Amount" />
+            </Box>
 
-          {isView ? (
-            <Stack alignItems="flex-end" sx={{ mt: 3 }}>
-              <LoadingButton onClick={handleBack} type="button" variant="contained">
-                Back
-              </LoadingButton>
-            </Stack>
-          ) : (
-            <Stack gap="10px" justifyContent="flex-end" flexDirection="row" sx={{ mt: 3 }}>
-              <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
-                {!isEdit ? 'Create Gift' : 'Save Changes'}
-              </LoadingButton>
-
-              {isEdit && (
-                <LoadingButton onClick={handleBack} type="button" variant="contained" color="error">
-                  Cancel
+            {isView ? (
+              <Stack alignItems="flex-end" sx={{ mt: 3 }}>
+                <LoadingButton onClick={handleBack} type="button" variant="contained">
+                  Back
                 </LoadingButton>
-              )}
-            </Stack>
-          )}
-        </Card>
-      </Grid>
-    </FormProvider>
+              </Stack>
+            ) : (
+              <Stack gap="10px" justifyContent="flex-end" flexDirection="row" sx={{ mt: 3 }}>
+                <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
+                  {!isEdit ? 'Create Gift' : 'Save Changes'}
+                </LoadingButton>
+
+                {isEdit && (
+                  <LoadingButton
+                    onClick={handleBack}
+                    type="button"
+                    variant="contained"
+                    color="error"
+                  >
+                    Cancel
+                  </LoadingButton>
+                )}
+              </Stack>
+            )}
+          </Card>
+        </Grid>
+      </FormProvider>
+    </Box>
   );
 }

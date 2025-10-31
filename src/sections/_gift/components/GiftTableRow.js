@@ -3,9 +3,7 @@ import { useState } from 'react';
 // @mui
 import {
   Stack,
-  Avatar,
   Button,
-  Checkbox,
   TableRow,
   MenuItem,
   TableCell,
@@ -29,80 +27,77 @@ GiftTableRow.propTypes = {
 };
 
 export default function GiftTableRow({ row, selected, onEditRow, onSelectRow, onDeleteRow }) {
-  const { name, avatarUrl, company, role, isVerified, status } = row;
+  const { id, limit, remaining, amount, createdAt, status, code } = row;
 
   const [openConfirm, setOpenConfirm] = useState(false);
-
   const [openPopover, setOpenPopover] = useState(null);
 
-  const handleOpenConfirm = () => {
-    setOpenConfirm(true);
-  };
+  const handleOpenConfirm = () => setOpenConfirm(true);
+  const handleCloseConfirm = () => setOpenConfirm(false);
+  const handleOpenPopover = (event) => setOpenPopover(event.currentTarget);
+  const handleClosePopover = () => setOpenPopover(null);
 
-  const handleCloseConfirm = () => {
-    setOpenConfirm(false);
-  };
-
-  const handleOpenPopover = (event) => {
-    setOpenPopover(event.currentTarget);
-  };
-
-  const handleClosePopover = () => {
-    setOpenPopover(null);
+  // dynamic color for status
+  const getStatusColor = (items) => {
+    switch (items === status) {
+      case 'active':
+        return 'success';
+      case 'pending':
+        return 'warning';
+      case 'inactive':
+        return 'default';
+      case 'completed':
+        return 'info';
+      default:
+        return 'default';
+    }
   };
 
   return (
     <>
       <TableRow hover selected={selected}>
-        <TableCell padding="checkbox">
-          <Checkbox checked={selected} onClick={onSelectRow} />
+        {/* ID */}
+        <TableCell align="left">
+          <Typography variant="subtitle2" noWrap>
+            {id}
+          </Typography>
         </TableCell>
 
-        <TableCell>
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <Avatar alt={name} src={avatarUrl} />
+        {/* Limit */}
+        <TableCell align="left">{limit}</TableCell>
 
-            <Typography variant="subtitle2" noWrap>
-              {name}
-            </Typography>
-          </Stack>
-        </TableCell>
+        {/* Remaining */}
+        <TableCell align="left">{remaining}</TableCell>
 
-        <TableCell align="left">{company}</TableCell>
+        {/* Amount */}
+        <TableCell align="left">{amount}</TableCell>
 
-        <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
-          {role}
-        </TableCell>
+        {/* Created At */}
+        <TableCell align="center">{createdAt}</TableCell>
 
-        <TableCell align="center">
-          <Iconify
-            icon={isVerified ? 'eva:checkmark-circle-fill' : 'eva:clock-outline'}
-            sx={{
-              width: 20,
-              height: 20,
-              color: 'success.main',
-              ...(!isVerified && { color: 'warning.main' }),
-            }}
-          />
-        </TableCell>
-
+        {/* Status */}
         <TableCell align="left">
           <Label
             variant="soft"
-            color={(status === 'banned' && 'error') || 'success'}
+            color={getStatusColor(status)}
             sx={{ textTransform: 'capitalize' }}
           >
             {status}
           </Label>
         </TableCell>
 
-        <TableCell align="right">
+        {/* Code */}
+        <TableCell align="left">{code}</TableCell>
+
+        {/* Action */}
+        <TableCell align="left">
           <IconButton color={openPopover ? 'inherit' : 'default'} onClick={handleOpenPopover}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
         </TableCell>
       </TableRow>
 
+      {/* Action Menu */}
       <MenuPopover
         open={openPopover}
         onClose={handleClosePopover}
@@ -131,11 +126,12 @@ export default function GiftTableRow({ row, selected, onEditRow, onSelectRow, on
         </MenuItem>
       </MenuPopover>
 
+      {/* Delete Confirmation */}
       <ConfirmDialog
         open={openConfirm}
         onClose={handleCloseConfirm}
         title="Delete"
-        content="Are you sure want to delete?"
+        content="Are you sure you want to delete this record?"
         action={
           <Button variant="contained" color="error" onClick={onDeleteRow}>
             Delete

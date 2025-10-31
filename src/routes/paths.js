@@ -62,6 +62,17 @@ export const PATH_DASHBOARD = {
     root: path(ROOTS_DASHBOARD, '/profit'),
     // all: path(ROOTS_DASHBOARD, '/mail/all'),
   },
+
+  // General Settings
+  settings: {
+    root: path(ROOTS_DASHBOARD, '/settings'),
+  },
+
+  changepassword: {
+    root: path(ROOTS_DASHBOARD, '/settings/changepassword'),
+    form: path(ROOTS_DASHBOARD, '/settings/changepassword/form'),
+  },
+
   gift: {
     root: path(ROOTS_DASHBOARD, '/gift'),
     list: path(ROOTS_DASHBOARD, '/gift/list'),
@@ -94,22 +105,21 @@ export const PATH_DASHBOARD = {
     // edit: (id) => path(ROOTS_DASHBOARD, `/markets/marketrecords/${id}/edit`),
     // view: (id) => path(ROOTS_DASHBOARD, `/markets/marketrecords/${id}/view`),
   },
-  // invoice: {
-  //   root: path(ROOTS_DASHBOARD, '/invoice'),
-  //   list: path(ROOTS_DASHBOARD, '/invoice/list'),
-  //   new: path(ROOTS_DASHBOARD, '/invoice/new'),
-  //   view: (id) => path(ROOTS_DASHBOARD, `/invoice/${id}`),
-  //   edit: (id) => path(ROOTS_DASHBOARD, `/invoice/${id}/edit`),
-  //   demoEdit: path(ROOTS_DASHBOARD, '/invoice/e99f09a7-dd88-49d5-b1c8-1daf80c2d7b1/edit'),
-  //   demoView: path(ROOTS_DASHBOARD, '/invoice/e99f09a7-dd88-49d5-b1c8-1daf80c2d7b5'),
-  // },
-  // blog: {
-  //   root: path(ROOTS_DASHBOARD, '/blog'),
-  //   posts: path(ROOTS_DASHBOARD, '/blog/posts'),
-  //   new: path(ROOTS_DASHBOARD, '/blog/new'),
-  //   view: (title) => path(ROOTS_DASHBOARD, `/blog/post/${title}`),
-  //   demoView: path(ROOTS_DASHBOARD, '/blog/post/apply-these-7-secret-techniques-to-improve-event'),
-  // },
+  previousresults: {
+    root: path(ROOTS_DASHBOARD, '/markets/previousresults'),
+    list: path(ROOTS_DASHBOARD, '/markets/previousresults/list'),
+    // new: path(ROOTS_DASHBOARD, '/markets/previousresults/new'),
+    // edit: (id) => path(ROOTS_DASHBOARD, `/markets/previousresults/${id}/edit`),
+    // view: (id) => path(ROOTS_DASHBOARD, `/markets/previousresults/${id}/view`),
+  },
+  predictionform: {
+    root: path(ROOTS_DASHBOARD, '/markets/predictionform'),
+    form: path(ROOTS_DASHBOARD, '/markets/predictionform/form'),
+  },
+  winhistory: {
+    root: path(ROOTS_DASHBOARD, '/markets/winhistory'),
+    list: path(ROOTS_DASHBOARD, '/markets/winhistory/list'),
+  },
 };
 
 export const PATH_ZONE_ON_STORE = 'https://mui.com/store/items/zone-landing-page/';

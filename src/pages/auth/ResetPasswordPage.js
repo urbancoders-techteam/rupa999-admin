@@ -1,53 +1,44 @@
 import { Helmet } from 'react-helmet-async';
-import { Link as RouterLink } from 'react-router-dom';
 // @mui
-import { Link, Typography } from '@mui/material';
+import { Container, Stack, Typography } from '@mui/material';
 // routes
-import { PATH_AUTH } from '../../routes/paths';
-// components
-import Iconify from '../../components/iconify';
+import { PATH_DASHBOARD } from '../../routes/paths';
 // sections
 import AuthResetPasswordForm from '../../sections/auth/AuthResetPasswordForm';
 // assets
+import { useSettingsContext } from '../../components/settings';
 import { PasswordIcon } from '../../assets/icons';
+import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 
 // ----------------------------------------------------------------------
 
 export default function ResetPasswordPage() {
+  const themeStretch = useSettingsContext()
   return (
     <>
       <Helmet>
-        <title> Reset Password | Minimal UI</title>
+        <title> Change Password | Rupa999 </title>
       </Helmet>
+      <Container maxWidth={themeStretch ? false : 'xl'}>
+        <CustomBreadcrumbs
+          heading="Change Password"
+          links={[
+            { name: 'Dashboard', href: PATH_DASHBOARD.root },
+            { name: 'Change Password', href: PATH_DASHBOARD.changepassword.form },
+            { name: 'Form' },
+          ]}
+        />
 
-      <PasswordIcon sx={{ mb: 5, height: 96 }} />
+        <Stack sx={{ display: 'flex', mt: {xs:2, sm:0} }}>
+          <PasswordIcon sx={{ height:{xs:60 ,sm: 96} }} />
 
-      <Typography variant="h3" paragraph>
-        Forgot your password?
-      </Typography>
+          <Typography variant="h3" paragraph align="center">
+            Forgot your password?
+          </Typography>
+        </Stack>
 
-      <Typography sx={{ color: 'text.secondary', mb: 5 }}>
-        Please enter the email address associated with your account and We will email you a link to
-        reset your password.
-      </Typography>
-
-      <AuthResetPasswordForm />
-
-      <Link
-        component={RouterLink}
-        to={PATH_AUTH.login}
-        color="inherit"
-        variant="subtitle2"
-        sx={{
-          mt: 3,
-          mx: 'auto',
-          alignItems: 'center',
-          display: 'inline-flex',
-        }}
-      >
-        <Iconify icon="eva:chevron-left-fill" width={16} />
-        Return to sign in
-      </Link>
+        <AuthResetPasswordForm />
+      </Container>
     </>
   );
 }

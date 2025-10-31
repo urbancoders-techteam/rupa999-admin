@@ -66,7 +66,7 @@ export default function GiftFormHandlePage() {
               href: PATH_DASHBOARD.root,
             },
             {
-              name: 'Gift',
+              name: 'Gift List',
               href: PATH_DASHBOARD.gift?.list,
             },
             {

@@ -35,44 +35,47 @@ export default function UserTableToolbar({
       }}
       sx={{ px: 2.5, py: 3 }}
     >
-      <TextField
-        fullWidth
-        select
-        label="Role"
-        value={filterRole}
-        onChange={onFilterRole}
-        SelectProps={{
-          MenuProps: {
-            PaperProps: {
-              sx: {
-                maxHeight: 260,
+      {optionsRole && (
+        <TextField
+          size="small"
+          fullWidth
+          select
+          label="Role"
+          value={filterRole}
+          onChange={onFilterRole}
+          SelectProps={{
+            MenuProps: {
+              PaperProps: {
+                sx: {
+                  maxHeight: 260,
+                },
               },
             },
-          },
-        }}
-        sx={{
-          maxWidth: { sm: 240 },
-          textTransform: 'capitalize',
-        }}
-      >
-        {optionsRole.map((option) => (
-          <MenuItem
-            key={option}
-            value={option}
-            sx={{
-              mx: 1,
-              borderRadius: 0.75,
-              typography: 'body2',
-              textTransform: 'capitalize',
-            }}
-          >
-            {option}
-          </MenuItem>
-        ))}
-      </TextField>
-
+          }}
+          sx={{
+            maxWidth: { sm: 240 },
+            textTransform: 'capitalize',
+          }}
+        >
+          {optionsRole.map((option) => (
+            <MenuItem
+              key={option}
+              value={option}
+              sx={{
+                mx: 1,
+                borderRadius: 0.75,
+                typography: 'body2',
+                textTransform: 'capitalize',
+              }}
+            >
+              {option}
+            </MenuItem>
+          ))}
+        </TextField>
+      )}
       <TextField
         fullWidth
+        size="small"
         value={filterName}
         onChange={onFilterName}
         placeholder="Search..."

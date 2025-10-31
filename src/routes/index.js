@@ -34,6 +34,10 @@ import {
   MarketFormHandlePage,
   PanaChartsListPage,
   GeneralMarketRecordListPage,
+  ResetPasswordPage,
+  PreviousResultListPage,
+  GeneralPredictionFormPage,
+  WinHistoryListPage,
   //
 } from './elements';
 
@@ -117,6 +121,46 @@ export default function Router() {
         },
         { path: 'profit', element: <ProfitPage />, index: true },
 
+        // General Settings
+        {
+          path: 'settings',
+          children: [
+            {
+              path: 'changepassword',
+              children: [
+                {
+                  element: <Navigate to="/dashboard/settings/changepassword" replace />,
+                  index: true,
+                },
+                { path: 'form', element: <ResetPasswordPage /> },
+              ],
+            },
+            {
+              path: 'helpsupport',
+              children: [
+                { element: <Navigate to="/dashboard/settings/helpsupport" replace />, index: true },
+                // { path: 'list', element: <PanaChartsListPage /> },
+                // { path: 'new', element: <MarketFormHandlePage /> },
+                // { path: ':id/edit', element: <MarketFormHandlePage /> },
+                // { path: ':id/view', element: <MarketFormHandlePage /> },
+              ],
+            },
+            {
+              path: 'marketrecords',
+              children: [
+                {
+                  element: <Navigate to="/dashboard/markets/marketrecords" replace />,
+                  index: true,
+                },
+                { path: 'list', element: <GeneralMarketRecordListPage /> },
+                // { path: 'new', element: <MarketFormHandlePage /> },
+                // { path: ':id/edit', element: <MarketFormHandlePage /> },
+                // { path: ':id/view', element: <MarketFormHandlePage /> },
+              ],
+            },
+          ],
+        },
+
         // Gift
         {
           path: 'gift',
@@ -156,11 +200,47 @@ export default function Router() {
             {
               path: 'marketrecords',
               children: [
-                { element: <Navigate to="/dashboard/markets/marketrecords" replace />, index: true },
+                {
+                  element: <Navigate to="/dashboard/markets/marketrecords" replace />,
+                  index: true,
+                },
                 { path: 'list', element: <GeneralMarketRecordListPage /> },
                 // { path: 'new', element: <MarketFormHandlePage /> },
                 // { path: ':id/edit', element: <MarketFormHandlePage /> },
                 // { path: ':id/view', element: <MarketFormHandlePage /> },
+              ],
+            },
+            {
+              path: 'previousresults',
+              children: [
+                {
+                  element: <Navigate to="/dashboard/markets/previousresults" replace />,
+                  index: true,
+                },
+                { path: 'list', element: <PreviousResultListPage /> },
+                // { path: 'new', element: <MarketFormHandlePage /> },
+                // { path: ':id/edit', element: <MarketFormHandlePage /> },
+                // { path: ':id/view', element: <MarketFormHandlePage /> },
+              ],
+            },
+            {
+              path: 'predictionform',
+              children: [
+                {
+                  element: <Navigate to="/dashboard/markets/predictionform" replace />,
+                  index: true,
+                },
+                { path: 'form', element: <GeneralPredictionFormPage /> },
+              ],
+            },
+            {
+              path: 'winhistory',
+              children: [
+                {
+                  element: <Navigate to="/dashboard/markets/winhistory" replace />,
+                  index: true,
+                },
+                { path: 'list', element: <WinHistoryListPage /> },
               ],
             },
           ],

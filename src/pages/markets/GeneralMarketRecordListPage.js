@@ -58,7 +58,6 @@ export default function GeneralMarketRecordListPage() {
     selected,
     setSelected,
     onSelectRow,
-    onSelectAllRows,
     //
     onSort,
     onChangeDense,
@@ -110,9 +109,6 @@ export default function GeneralMarketRecordListPage() {
     (!dataFiltered.length && !!filterRole) ||
     (!dataFiltered.length && !!filterStatus);
 
-  const handleOpenConfirm = () => {
-    setOpenConfirm(true);
-  };
 
   const handleCloseConfirm = () => {
     setOpenConfirm(false);

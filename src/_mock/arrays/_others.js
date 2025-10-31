@@ -123,3 +123,138 @@ export const _socials = [
     path: 'https://www.twitter.com/caitlyn.kerluke',
   },
 ];
+
+
+
+export const giftListData = [
+  {
+    "id": 1,
+    "limit": 5000,
+    "remaining": 3200,
+    "amount": 1800,
+    "createdAt": "2025-10-31 10:45:00",
+    "status": "active",
+    "code": "TXN-8542",
+    "action": "Edit"
+  },
+  {
+    "id": 2,
+    "limit": 10000,
+    "remaining": 7500,
+    "amount": 2500,
+    "createdAt": "2025-10-30 14:30:00",
+    "status": "active",
+    "code": "TXN-9147",
+    "action": "Edit"
+  },
+  {
+    "id": 3,
+    "limit": 7000,
+    "remaining": 0,
+    "amount": 7000,
+    "createdAt": "2025-10-29 09:12:00",
+    "status": "completed",
+    "code": "TXN-6713",
+    "action": "View"
+  },
+  {
+    "id": 4,
+    "limit": 3000,
+    "remaining": 3000,
+    "amount": 0,
+    "createdAt": "2025-10-31 12:00:00",
+    "status": "pending",
+    "code": "TXN-2239",
+    "action": "Edit"
+  },
+  {
+    "id": 5,
+    "limit": 9000,
+    "remaining": 1000,
+    "amount": 8000,
+    "createdAt": "2025-10-28 16:45:00",
+    "status": "active",
+    "code": "TXN-7431",
+    "action": "View"
+  },
+  {
+    "id": 6,
+    "limit": 12000,
+    "remaining": 11800,
+    "amount": 200,
+    "createdAt": "2025-10-30 11:10:00",
+    "status": "inactive",
+    "code": "TXN-5082",
+    "action": "Edit"
+  },
+  {
+    "id": 7,
+    "limit": 8000,
+    "remaining": 4000,
+    "amount": 4000,
+    "createdAt": "2025-10-31 08:20:00",
+    "status": "completed",
+    "code": "TXN-3907",
+    "action": "View"
+  },
+  {
+    "id": 8,
+    "limit": 6000,
+    "remaining": 5500,
+    "amount": 500,
+    "createdAt": "2025-10-30 19:25:00",
+    "status": "pending",
+    "code": "TXN-1198",
+    "action": "Edit"
+  },
+  {
+    "id": 4,
+    "limit": 3000,
+    "remaining": 3000,
+    "amount": 0,
+    "createdAt": "2025-10-31 12:00:00",
+    "status": "pending",
+    "code": "TXN-2239",
+    "action": "Edit"
+  },
+  {
+    "id": 5,
+    "limit": 9000,
+    "remaining": 1000,
+    "amount": 8000,
+    "createdAt": "2025-10-28 16:45:00",
+    "status": "active",
+    "code": "TXN-7431",
+    "action": "View"
+  },
+  {
+    "id": 6,
+    "limit": 12000,
+    "remaining": 11800,
+    "amount": 200,
+    "createdAt": "2025-10-30 11:10:00",
+    "status": "inactive",
+    "code": "TXN-5082",
+    "action": "Edit"
+  },
+  {
+    "id": 7,
+    "limit": 8000,
+    "remaining": 4000,
+    "amount": 4000,
+    "createdAt": "2025-10-31 08:20:00",
+    "status": "completed",
+    "code": "TXN-3907",
+    "action": "View"
+  },
+  {
+    "id": 8,
+    "limit": 6000,
+    "remaining": 5500,
+    "amount": 500,
+    "createdAt": "2025-10-30 19:25:00",
+    "status": "pending",
+    "code": "TXN-1198",
+    "action": "Edit"
+  }
+]

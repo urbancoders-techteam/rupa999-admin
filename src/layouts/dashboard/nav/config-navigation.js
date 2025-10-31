@@ -45,6 +45,7 @@ const navConfig = [
       { title: 'dashboard', path: PATH_DASHBOARD.home.root, icon: ICONS.dashboard },
       { title: 'profits', path: PATH_DASHBOARD.profit.root, icon: ICONS.analytics },
       { title: 'slider image', path: PATH_DASHBOARD.sliderImage.root, icon: ICONS.slider },
+
       {
         title: 'users',
         path: PATH_DASHBOARD.users.root,
@@ -54,22 +55,27 @@ const navConfig = [
           { title: 'withdraw details', path: PATH_DASHBOARD.withdrawdetails.list },
         ],
       },
+
       {
-        title: 'general settings',
-        // path: PATH_DASHBOARD.setting.root,
+        title: 'settings',
+        path: PATH_DASHBOARD.settings.root,
         icon: ICONS.setting,
         children: [
-          { title: 'change password',
-            //  path: PATH_DASHBOARD.changepassword.list 
-            },
-          { title: 'Help and Support',
-            //  path: PATH_DASHBOARD.helpsupport.list 
-            },
+          {
+            title: 'change password',
+            path: PATH_DASHBOARD.changepassword.form,
+          },
+          {
+            title: 'Help and Support',
+            //  path: PATH_DASHBOARD.helpsupport.list
+          },
         ],
       },
-      { title: 'gift', path: PATH_DASHBOARD.gift.root, icon: ICONS.booking },
 
-        {
+      { title: 'gift', path: PATH_DASHBOARD.gift.root, icon: ICONS.booking },
+      // { title: 'gift', path: PATH_DASHBOARD.gift.root, icon: ICONS.booking },
+
+      {
         title: 'markets',
         path: PATH_DASHBOARD.markets.root,
         icon: ICONS.user,
@@ -77,6 +83,25 @@ const navConfig = [
           { title: 'Market list', path: PATH_DASHBOARD.marketlist.list },
           { title: 'Pana Charts', path: PATH_DASHBOARD.panacharts.list },
           { title: 'General Market Records', path: PATH_DASHBOARD.marketrecords.list },
+          { title: 'Previsous Results', path: PATH_DASHBOARD.previousresults.list },
+          { title: 'General Predict Result', path: PATH_DASHBOARD.predictionform.form },
+          { title: 'Win History', path: PATH_DASHBOARD.winhistory.list },
+          { title: 'Data', path: PATH_DASHBOARD.marketrecords.list },
+        ],
+      },
+
+      {
+        title: 'Star Line Markets',
+        path: PATH_DASHBOARD.markets.root,
+        icon: ICONS.user,
+        children: [
+          { title: 'Market list', path: PATH_DASHBOARD.marketlist.list },
+          { title: 'Pana Charts', path: PATH_DASHBOARD.panacharts.list },
+          { title: 'General Market Records', path: PATH_DASHBOARD.marketrecords.list },
+          { title: 'Previsous Results', path: PATH_DASHBOARD.previousresults.list },
+          { title: 'General Predict Result', path: PATH_DASHBOARD.predictionform.form },
+          { title: 'Win History', path: PATH_DASHBOARD.winhistory.list },
+          { title: 'Data', path: PATH_DASHBOARD.marketrecords.list },
         ],
       },
     ],

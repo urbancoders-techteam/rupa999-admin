@@ -4,23 +4,19 @@ import { useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
 import {
-  Tab,
-  Tabs,
   Card,
   Table,
   Button,
   Tooltip,
-  Divider,
   TableBody,
   Container,
   IconButton,
   TableContainer,
 } from '@mui/material';
-import { useTheme } from '@mui/system';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
 // _mock_
-import { _userDataList, _userList } from '../_mock/arrays';
+import { giftListData } from '../_mock/arrays';
 // components
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
@@ -38,44 +34,24 @@ import {
   TablePaginationCustom,
 } from '../components/table';
 // sections
-import { UserTableToolbar, UserTableRow } from '../sections/user/list';
+import GiftTableRow from '../sections/_gift/components/GiftTableRow';
 
 // ----------------------------------------------------------------------
-
-const STATUS_OPTIONS = ['all', 'Blocked', 'Unblock'];
-
-const ROLE_OPTIONS = [
-  'all',
-  'ux designer',
-  'full stack designer',
-  'backend developer',
-  'project manager',
-  'leader',
-  'ui designer',
-  'ui/ux designer',
-  'front end developer',
-  'full stack developer',
-];
 
 const TABLE_HEAD = [
   { id: 'id', label: 'ID', align: 'left' },
-  { id: 'name', label: 'Name', align: 'left' },
-  { id: 'company', label: 'Phone', align: 'left' },
-  { id: 'company', label: 'Password', align: 'left' },
-  { id: 'role', label: 'Balance', align: 'left' },
-  { id: 'isVerified', label: 'Total Game Amt', align: 'center' },
-  { id: 'totalWon', label: 'Total Won', align: 'left' },
-  { id: 'Withdraw', label: 'Total Withdraw', align: 'left' },
-  { id: 'Bonus', label: 'Total Bonus', align: 'left' },
-  { id: 'status', label: 'Blocked Status', align: 'left' },
-  { id: 'createdAt', label: 'createdAt', align: 'left' },
+  { id: 'Limit', label: 'Limit', align: 'left' },
+  { id: 'Remaining', label: 'Remaining', align: 'left' },
+  { id: 'Amount', label: 'Amount', align: 'left' },
+  { id: 'CreatedAt', label: 'Created At', align: 'center' },
+  { id: 'status', label: 'Status', align: 'left' },
+  { id: 'Code', label: 'Code', align: 'left' },
   { id: 'Action', label: 'Action', align: 'left' },
-  { id: '' },
 ];
 
 // ----------------------------------------------------------------------
 
-export default function UserListPage() {
+export default function GiftListPage() {
   const {
     dense,
     page,
@@ -98,36 +74,25 @@ export default function UserListPage() {
   const { themeStretch } = useSettingsContext();
 
   const navigate = useNavigate();
-  const theme = useTheme();
 
-  const [tableData, setTableData] = useState(_userDataList);
+  const [tableData, setTableData] = useState(giftListData);
+  console.log('tableData :>> ', tableData);
 
   const [openConfirm, setOpenConfirm] = useState(false);
-
-  const [filterName, setFilterName] = useState('');
-
-  const [filterRole, setFilterRole] = useState('all');
-
-  const [filterStatus, setFilterStatus] = useState('all');
 
   const dataFiltered = applyFilter({
     inputData: tableData,
     comparator: getComparator(order, orderBy),
-    filterName,
-    filterRole,
-    filterStatus,
   });
 
-  const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  console.log('dataFiltered :>> ', dataFiltered);
+
+  const dataInPage = tableData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   const denseHeight = dense ? 52 : 72;
 
-  const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
-  const isNotFound =
-    (!dataFiltered.length && !!filterName) ||
-    (!dataFiltered.length && !!filterRole) ||
-    (!dataFiltered.length && !!filterStatus);
+  const isNotFound = !tableData.length && Boolean(tableData.length)
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
@@ -135,21 +100,6 @@ export default function UserListPage() {
 
   const handleCloseConfirm = () => {
     setOpenConfirm(false);
-  };
-
-  const handleFilterStatus = (event, newValue) => {
-    setPage(0);
-    setFilterStatus(newValue);
-  };
-
-  const handleFilterName = (event) => {
-    setPage(0);
-    setFilterName(event.target.value);
-  };
-
-  const handleFilterRole = (event) => {
-    setPage(0);
-    setFilterRole(event.target.value);
   };
 
   const handleDeleteRow = (id) => {
@@ -172,7 +122,7 @@ export default function UserListPage() {
     if (page > 0) {
       if (selectedRows.length === dataInPage.length) {
         setPage(page - 1);
-      } else if (selectedRows.length === dataFiltered.length) {
+      } else if (selectedRows.length === tableData.length) {
         setPage(0);
       } else if (selectedRows.length > dataInPage.length) {
         const newPage = Math.ceil((tableData.length - selectedRows.length) / rowsPerPage) - 1;
@@ -185,64 +135,32 @@ export default function UserListPage() {
     navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
   };
 
-  const handleResetFilter = () => {
-    setFilterName('');
-    setFilterRole('all');
-    setFilterStatus('all');
-  };
-
   return (
     <>
       <Helmet>
-        <title> User: List | Rupa999 </title>
+        <title> Gift: List | Rupa999 </title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <CustomBreadcrumbs
-          heading="User List"
+          heading="Gift List"
           links={[
             { name: 'Dashboard', href: PATH_DASHBOARD.root },
-            { name: 'User List', href: PATH_DASHBOARD.userlist.list },
-            // { name: 'List' },
+            { name: 'Gift List', href: PATH_DASHBOARD.gift.list },
           ]}
           action={
             <Button
               component={RouterLink}
-              // to={PATH_DASHBOARD.user.new}
+              to={PATH_DASHBOARD.gift.new}
               variant="contained"
               startIcon={<Iconify icon="eva:plus-fill" />}
             >
-              New User
+              New Gift
             </Button>
           }
         />
 
         <Card>
-          <Tabs
-            value={filterStatus}
-            onChange={handleFilterStatus}
-            sx={{
-              px: 2,
-              bgcolor: 'background.neutral',
-            }}
-          >
-            {STATUS_OPTIONS.map((tab) => (
-              <Tab key={tab} label={tab} value={tab} />
-            ))}
-          </Tabs>
-
-          <Divider />
-
-          <UserTableToolbar
-            isFiltered={isFiltered}
-            filterName={filterName}
-            filterRole={filterRole}
-            optionsRole={ROLE_OPTIONS}
-            onFilterName={handleFilterName}
-            onFilterRole={handleFilterRole}
-            onResetFilter={handleResetFilter}
-          />
-
           <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
             <TableSelectedAction
               dense={dense}
@@ -264,8 +182,9 @@ export default function UserListPage() {
             />
 
             <Scrollbar>
-              <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
+              <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
                 <TableHeadCustom
+                  sx={{paddingY: 5 }}
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
@@ -281,10 +200,10 @@ export default function UserListPage() {
                 />
 
                 <TableBody>
-                  {dataFiltered
+                  {tableData
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row) => (
-                      <UserTableRow
+                      <GiftTableRow
                         key={row.id}
                         row={row}
                         selected={selected.includes(row.id)}
@@ -306,7 +225,7 @@ export default function UserListPage() {
           </TableContainer>
 
           <TablePaginationCustom
-            count={dataFiltered.length}
+            count={tableData.length}
             page={page}
             rowsPerPage={rowsPerPage}
             onPageChange={onChangePage}

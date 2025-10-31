@@ -23,7 +23,6 @@ const ProfitCheckingFilters = () => {
     >
       {/* RIGHT SIDE CONTENT */}
       <Box sx={{ flex: 1 }}>
-
         {/* FILTER BAR */}
         <Grid container spacing={2} alignItems="center" sx={{ mb: 4 }}>
           <Grid item xs={12} sm={6} md={3}>
@@ -80,7 +79,7 @@ const ProfitCheckingFilters = () => {
 
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3.5}>
-             <HorizontalProgressGraph title="Profit Progress" data={_ecommerceSalesOverview} />
+            <HorizontalProgressGraph title="Profit Progress" data={_ecommerceSalesOverview} />
           </Grid>
           <Grid item xs={12} md={6} lg={5}>
             <YearlySalesGraph

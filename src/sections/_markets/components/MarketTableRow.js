@@ -66,7 +66,7 @@ export default function MarketTableRow({ index, row, onEditRow }) {
           </Typography>
         </TableCell>
 
-        <TableCell align="left">
+        <TableCell align="left" sx={{minWidth:'100px'}}>
           <Label
             variant="soft"
             color={(() => {
@@ -80,10 +80,10 @@ export default function MarketTableRow({ index, row, onEditRow }) {
           </Label>
         </TableCell>
 
-        <TableCell align="left">{gameDisabled}</TableCell>
-        <TableCell align="left">{saturdayOpen}</TableCell>
-        <TableCell align="left">{sundayOpen}</TableCell>
-        <TableCell align="left">{autoResult}</TableCell>
+        <TableCell align="left" sx={{minWidth:'100px'}}>{gameDisabled}</TableCell>
+        <TableCell align="left" sx={{minWidth:'100px'}}>{saturdayOpen}</TableCell>
+        <TableCell align="left" sx={{minWidth:'100px'}}>{sundayOpen}</TableCell>
+        <TableCell align="left" sx={{minWidth:'100px'}}>{autoResult}</TableCell>
         <TableCell align="left" sx={{minWidth:'100px'}}>{openTime}</TableCell>
         <TableCell align="left" sx={{minWidth:'100px'}}>{closeTime}</TableCell>
         <TableCell align="left" sx={{minWidth:'100px'}}>{openResultTime}</TableCell>

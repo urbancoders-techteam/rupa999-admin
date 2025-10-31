@@ -18,7 +18,7 @@ export const LoginPage = Loadable(lazy(() => import('../pages/auth/LoginPage')))
 export const RegisterPage = Loadable(lazy(() => import('../pages/auth/RegisterPage')));
 export const VerifyCodePage = Loadable(lazy(() => import('../pages/auth/VerifyCodePage')));
 export const NewPasswordPage = Loadable(lazy(() => import('../pages/auth/NewPasswordPage')));
-export const ResetPasswordPage = Loadable(lazy(() => import('../pages/auth/ResetPasswordPage')));
+// export const ResetPasswordPage = Loadable(lazy(() => import('../pages/auth/ResetPasswordPage')));
 
 // DASHBOARD: Main
 export const GeneralDashboardPage = Loadable(lazy(() => import('../pages/GeneralDashboardPage')));
@@ -31,8 +31,12 @@ export const WithdrawDetailsPage = Loadable(lazy(() => import('../pages/Withdraw
 // DASHBOARD: Profit
 export const ProfitPage = Loadable(lazy(() => import('../pages/ProfitPage')));
 
+// DASHBOARD: General Settings | Change Password
+export const ResetPasswordPage = Loadable(lazy(() => import('../pages/auth/ResetPasswordPage')));
+
+
 // DASHBOARD: Gift
-export const GiftPage = Loadable(lazy(() => import('../pages/GiftPage')));
+export const GiftPage = Loadable(lazy(() => import('../pages/GiftListPage')));
 export const GiftFormHandlePage = Loadable(lazy(() => import('../sections/_gift/pages/GiftFormHandlePage')));
 
 // DASHBOARD: Markets
@@ -46,6 +50,15 @@ export const PanaChartsListPage = Loadable(lazy(() => import('../pages/markets/P
 
 // DASHBOARD: Markets | Records
 export const GeneralMarketRecordListPage = Loadable(lazy(() => import('../pages/markets/GeneralMarketRecordListPage')));
+
+// DASHBOARD: Markets | Previous Results
+export const PreviousResultListPage = Loadable(lazy(() => import('../pages/markets/PreviousResultListPage')));
+
+// DASHBOARD: Markets | Predictions Form
+export const GeneralPredictionFormPage = Loadable(lazy(() => import('../pages/markets/GeneralPredictionFormPage')));
+
+// DASHBOARD: Markets | Win History List
+export const WinHistoryListPage = Loadable(lazy(() => import('../pages/markets/WinHistoryListPage')));
 
 // BASIC PAGES
 export const Page500 = Loadable(lazy(() => import('../pages/ErrorHandlingPages/Page500')));

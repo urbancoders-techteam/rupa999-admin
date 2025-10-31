@@ -1,9 +1,10 @@
 // @mui
 import { Stack, Button, Typography, Box } from '@mui/material';
 import { useLocales } from '../../../locales';
+
 // auth
 import { useAuthContext } from '../../../auth/useAuthContext';
-// locales
+
 // routes
 // import { PATH_DOCS } from '../../../routes/paths';
 
@@ -20,7 +21,7 @@ export default function NavDocs() {
       sx={{
         px: 5,
         pb: 5,
-        mt: 10,
+        mt: 5,
         width: 1,
         display: 'block',
         textAlign: 'center',
@@ -30,12 +31,13 @@ export default function NavDocs() {
 
       <div>
         <Typography gutterBottom variant="subtitle1">
-          {`${translate('docs.hi')}, ${user?.displayName}`}
+          {/* {`${translate('docs.hi')}, ${user?.displayName}`} */}
+          Rupa999 Admin
         </Typography>
 
-        <Typography variant="body2" sx={{ color: 'text.secondary', whiteSpace: 'pre-line' }}>
+        {/* <Typography variant="body2" sx={{ color: 'text.secondary', whiteSpace: 'pre-line' }}>
           {`${translate('docs.description')}`}
-        </Typography>
+        </Typography> */}
       </div>
 
       {/* <Button href={PATH_DOCS.root} target="_blank" rel="noopener" variant="contained">
