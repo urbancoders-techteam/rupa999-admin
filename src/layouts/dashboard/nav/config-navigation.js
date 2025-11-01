@@ -73,7 +73,6 @@ const navConfig = [
       },
 
       { title: 'gift', path: PATH_DASHBOARD.gift.root, icon: ICONS.booking },
-      // { title: 'gift', path: PATH_DASHBOARD.gift.root, icon: ICONS.booking },
 
       {
         title: 'markets',
@@ -103,6 +102,11 @@ const navConfig = [
           { title: 'Win History', path: PATH_DASHBOARD.winhistory.list },
           { title: 'Data', path: PATH_DASHBOARD.marketrecords.list },
         ],
+      },
+      {
+        title: 'General Withdraw History',
+        path: PATH_DASHBOARD.generalwithdrawhistory.list,
+        icon: ICONS.banking,
       },
     ],
   },

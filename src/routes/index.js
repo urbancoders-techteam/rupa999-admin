@@ -38,6 +38,7 @@ import {
   PreviousResultListPage,
   GeneralPredictionFormPage,
   WinHistoryListPage,
+  GeneralWithdrawHistoryListPage,
   //
 } from './elements';
 
@@ -243,6 +244,17 @@ export default function Router() {
                 { path: 'list', element: <WinHistoryListPage /> },
               ],
             },
+          ],
+        },
+
+         {
+          path: 'generalwithdrawhistory',
+          children: [
+            { element: <Navigate to="/dashboard/generalwithdrawhistory/list" replace />, index: true },
+            { path: 'list', element: <GeneralWithdrawHistoryListPage /> },
+            // { path: 'new', element: <GiftFormHandlePage /> },
+            // { path: ':id/edit', element: <GiftFormHandlePage /> },
+            // { path: ':id/view', element: <GiftFormHandlePage /> },
           ],
         },
       ],

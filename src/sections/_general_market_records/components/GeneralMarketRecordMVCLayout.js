@@ -15,7 +15,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CircularProgress from '@mui/material/CircularProgress';
 
-function WithdrawMobileViewCardLayout({ data = [], onEditRow, onDeleteRow, onSelectRow, selected = [] }) {
+function GeneralMarketRecordMVCLayout({ data = [], onEditRow, onDeleteRow, onSelectRow, selected = [] }) {
   const [visibleData, setVisibleData] = useState(data.slice(0, 10));
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(data.length > 10);
@@ -123,7 +123,7 @@ function WithdrawMobileViewCardLayout({ data = [], onEditRow, onDeleteRow, onSel
   );
 }
 
-WithdrawMobileViewCardLayout.propTypes = {
+GeneralMarketRecordMVCLayout.propTypes = {
   data: PropTypes.array,
   onEditRow: PropTypes.func,
   onDeleteRow: PropTypes.func,
@@ -131,4 +131,4 @@ WithdrawMobileViewCardLayout.propTypes = {
   selected: PropTypes.array,
 };
 
-export default WithdrawMobileViewCardLayout;
+export default GeneralMarketRecordMVCLayout;

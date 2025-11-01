@@ -60,6 +60,9 @@ export const GeneralPredictionFormPage = Loadable(lazy(() => import('../pages/ma
 // DASHBOARD: Markets | Win History List
 export const WinHistoryListPage = Loadable(lazy(() => import('../pages/markets/WinHistoryListPage')));
 
+// DASHBOARD: Withdraw History
+export const GeneralWithdrawHistoryListPage = Loadable(lazy(() => import('../pages/GeneralWithdrawHistoryListPage')));
+
 // BASIC PAGES
 export const Page500 = Loadable(lazy(() => import('../pages/ErrorHandlingPages/Page500')));
 export const Page403 = Loadable(lazy(() => import('../pages/ErrorHandlingPages/Page403')));

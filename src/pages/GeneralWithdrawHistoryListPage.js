@@ -3,17 +3,22 @@ import { paramCase } from 'change-case';
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 // @mui
+
 import { Card, Table, Button, TableBody, Container, TableContainer, Box } from '@mui/material';
 import useResponsive from '../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
+
 // _mock_
-import { _userDataList } from '../_mock/arrays';
+import {generalWithdrawHistoryData}  from '../_mock/arrays';
+
 // components
 import Scrollbar from '../components/scrollbar';
 import ConfirmDialog from '../components/confirm-dialog';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 import { useSettingsContext } from '../components/settings';
+
+// table
 import {
   useTable,
   getComparator,
@@ -23,29 +28,36 @@ import {
   TableHeadCustom,
   TablePaginationCustom,
 } from '../components/table';
+import CustomTableToolbar from '../components/table/CustomTableToolBar';
+
 // sections
-import WithdrawDetailsTableRow from '../sections/_withdraw_details/components/WithdrawDetailsTableRow';
 import WithdrawDetailsToolbar from '../sections/_withdraw_details/components/WithdrawDetailsToolbar';
 import WithdrawMobileViewCardLayout from '../sections/_withdraw_details/components/WithdrawDetailsMobileViewCardLayout';
+import GeneralWithdrawHistoryTableRow from '../sections/_general_withdraw_history/components/GeneralWithdrawHistoryTableRow';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 's.no.', label: 'S.No.', align: 'left' },
-  { id: 'name', label: 'Name', align: 'left' },
-  { id: 'Account', label: 'Account Holder Name', align: 'left' },
-  { id: 'UPI', label: 'UPI Name', align: 'left' },
-  { id: 'AccountNO', label: 'Account Number', align: 'center' },
-  { id: 'AccountISFC', label: 'Account ISFC Code', align: 'left' },
-  { id: 'UPIId', label: 'UPI Id', align: 'left' },
-  { id: 'CeatedAt', label: 'Ceated At', align: 'left' },
-  { id: 'action', label: 'Action', align: 'left' },
-  { id: '' },
+  { id: 'actions', label: 'Actions', align: 'left' },
+  { id: 'id', label: 'ID', align: 'left' },
+  { id: 'marketName', label: 'Name', align: 'left' },
+  { id: 'userPhone', label: 'Phone', align: 'left' },
+  { id: 'amount', label: 'Amount', align: 'left' },
+  { id: 'payableAmount', label: 'Payable Amount', align: 'left' },
+  { id: 'requestType', label: 'Request Type', align: 'left' },
+  { id: 'withdrawMode', label: 'Withdraw Mode', align: 'left' },
+  { id: 'upiName', label: 'UPI Name', align: 'left' },
+  { id: 'upiID', label: 'UPI ID', align: 'left' },
+  { id: 'bankName', label: 'Bank Name', align: 'left' },
+  { id: 'ifsc', label: 'Bank IFSC', align: 'left' },
+  { id: 'status', label: 'Status', align: 'left' },
+  { id: 'reason', label: 'Faild Reason', align: 'left' },
+  { id: 'createdAt', label: 'Created At', align: 'left' },
 ];
 
 // ----------------------------------------------------------------------
 
-export default function WithdrawDetailsPage() {
+export default function GeneralWithdrawHistoryListPage() {
   const {
     dense,
     page,
@@ -57,7 +69,6 @@ export default function WithdrawDetailsPage() {
     selected,
     setSelected,
     onSelectRow,
-    onSelectAllRows,
     //
     onSort,
     onChangeDense,
@@ -69,7 +80,7 @@ export default function WithdrawDetailsPage() {
 
   const navigate = useNavigate();
 
-  const [tableData, setTableData] = useState(_userDataList);
+  const [tableData, setTableData] = useState(generalWithdrawHistoryData);
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
@@ -80,16 +91,23 @@ export default function WithdrawDetailsPage() {
   const [filterStatus, setFilterStatus] = useState('all');
 
   // Memoized filtered data
-  const dataFiltered = useMemo(() => applyFilter({
-    inputData: tableData,
-    comparator: getComparator(order, orderBy),
-    filterName,
-    filterRole,
-    filterStatus,
-  }), [tableData, order, orderBy, filterName, filterRole, filterStatus]);
+  const dataFiltered = useMemo(
+    () =>
+      applyFilter({
+        inputData: tableData,
+        comparator: getComparator(order, orderBy),
+        filterName,
+        filterRole,
+        filterStatus,
+      }),
+    [tableData, order, orderBy, filterName, filterRole, filterStatus]
+  );
 
   // Memoized paginated data
-  const dataInPage = useMemo(() => dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage), [dataFiltered, page, rowsPerPage]);
+  const dataInPage = useMemo(
+    () => dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+    [dataFiltered, page, rowsPerPage]
+  );
 
   const denseHeight = dense ? 52 : 72;
 
@@ -101,10 +119,7 @@ export default function WithdrawDetailsPage() {
     (!dataFiltered.length && !!filterName) ||
     (!dataFiltered.length && !!filterRole) ||
     (!dataFiltered.length && !!filterStatus);
-    
-  const handleOpenConfirm = () => {
-    setOpenConfirm(true);
-  };
+
 
   const handleCloseConfirm = () => {
     setOpenConfirm(false);
@@ -167,17 +182,17 @@ export default function WithdrawDetailsPage() {
   return (
     <>
       <Helmet>
-        <title> Withdraw : Details | Rupa999 </title>
+        <title> General Withdraw History List : List | Rupa999 </title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         {isMobile ? (
           <Box sx={{ position: 'sticky', top: 0, zIndex: 10, bgcolor: 'background.paper' }}>
             <CustomBreadcrumbs
-              heading="Withdraw Details"
+              heading="General Withdraw History List"
               links={[
                 { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                { name: 'Withdraw Details', href: PATH_DASHBOARD.withdrawdetails.root },
+                { name: 'General Withdraw History List', href: PATH_DASHBOARD.marketrecords.root },
               ]}
             />
             <WithdrawDetailsToolbar
@@ -191,13 +206,13 @@ export default function WithdrawDetailsPage() {
         ) : (
           <>
             <CustomBreadcrumbs
-              heading="Withdraw Details"
+              heading="General Withdraw History List"
               links={[
                 { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                { name: 'Withdraw Details', href: PATH_DASHBOARD.withdrawdetails.root },
+                { name: 'General Withdraw History List', href: PATH_DASHBOARD.marketrecords.root },
               ]}
             />
-            <WithdrawDetailsToolbar
+            <CustomTableToolbar
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
@@ -220,7 +235,7 @@ export default function WithdrawDetailsPage() {
           <Card>
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
               <Scrollbar>
-                <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
+                <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
                   <TableHeadCustom
                     order={order}
                     orderBy={orderBy}
@@ -234,7 +249,7 @@ export default function WithdrawDetailsPage() {
                     {dataFiltered
                       ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                       .map((row, index) => (
-                        <WithdrawDetailsTableRow
+                        <GeneralWithdrawHistoryTableRow
                           index={index + 1}
                           key={row.id}
                           row={row}
@@ -310,7 +325,7 @@ function applyFilter({ inputData, comparator, filterName, filterStatus, filterRo
 
   if (filterName) {
     inputData = inputData.filter(
-      (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+      (user) => user.marketName.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
     );
   }
 

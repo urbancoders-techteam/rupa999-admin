@@ -25,8 +25,8 @@ import {
 } from '../../components/table';
 // sections
 import WithdrawDetailsToolbar from '../../sections/_withdraw_details/components/WithdrawDetailsToolbar';
-import WithdrawMobileViewCardLayout from '../../sections/_withdraw_details/components/WithdrawMobileViewCardLayout';
 import GeneralMarketRecordTableRow from '../../sections/_general_market_records/components/GeneralMarketRecordsTableRow';
+import GeneralMarketRecordMVCLayout from '../../sections/_general_market_records/components/GeneralMarketRecordMVCLayout';
 
 // ----------------------------------------------------------------------
 
@@ -213,7 +213,7 @@ export default function GeneralMarketRecordListPage() {
 
         {/* Render mobile card layout for small screens, otherwise render the table */}
         {isMobile ? (
-          <WithdrawMobileViewCardLayout
+          <GeneralMarketRecordMVCLayout
             data={dataFiltered}
             onEditRow={(id) => handleEditRow(id)}
             onDeleteRow={(id) => handleDeleteRow(id)}

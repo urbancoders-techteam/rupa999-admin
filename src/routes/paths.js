@@ -120,6 +120,14 @@ export const PATH_DASHBOARD = {
     root: path(ROOTS_DASHBOARD, '/markets/winhistory'),
     list: path(ROOTS_DASHBOARD, '/markets/winhistory/list'),
   },
+
+  generalwithdrawhistory: {
+    root: path(ROOTS_DASHBOARD, '/generalwithdrawhistory'),
+    list: path(ROOTS_DASHBOARD, '/generalwithdrawhistory/list'),
+    // new: path(ROOTS_DASHBOARD, '/markets/generalwithdrawhistory/new'),
+    // edit: (id) => path(ROOTS_DASHBOARD, `/markets/generalwithdrawhistory/${id}/edit`),
+    // view: (id) => path(ROOTS_DASHBOARD, `/markets/generalwithdrawhistory/${id}/view`),
+  },
 };
 
 export const PATH_ZONE_ON_STORE = 'https://mui.com/store/items/zone-landing-page/';
