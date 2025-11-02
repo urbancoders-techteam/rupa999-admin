@@ -39,9 +39,6 @@ export const PATH_DASHBOARD = {
   home: {
     root: path(ROOTS_DASHBOARD, '/home'),
   },
-  sliderImage: {
-    root: path(ROOTS_DASHBOARD, '/slider-image'),
-  },
 
   users: {
     root: path(ROOTS_DASHBOARD, '/users'),
@@ -71,6 +68,10 @@ export const PATH_DASHBOARD = {
   changepassword: {
     root: path(ROOTS_DASHBOARD, '/settings/changepassword'),
     form: path(ROOTS_DASHBOARD, '/settings/changepassword/form'),
+  },
+
+  sliderimage: {
+    root: path(ROOTS_DASHBOARD, '/settings/sliderimage'),
   },
 
   gift: {
@@ -124,9 +125,11 @@ export const PATH_DASHBOARD = {
   generalwithdrawhistory: {
     root: path(ROOTS_DASHBOARD, '/generalwithdrawhistory'),
     list: path(ROOTS_DASHBOARD, '/generalwithdrawhistory/list'),
-    // new: path(ROOTS_DASHBOARD, '/markets/generalwithdrawhistory/new'),
-    // edit: (id) => path(ROOTS_DASHBOARD, `/markets/generalwithdrawhistory/${id}/edit`),
-    // view: (id) => path(ROOTS_DASHBOARD, `/markets/generalwithdrawhistory/${id}/view`),
+  },
+
+  diposithistory: {
+    root: path(ROOTS_DASHBOARD, '/diposithistory'),
+    list: path(ROOTS_DASHBOARD, '/diposithistory/list'),
   },
 };
 

@@ -44,7 +44,6 @@ const navConfig = [
     items: [
       { title: 'dashboard', path: PATH_DASHBOARD.home.root, icon: ICONS.dashboard },
       { title: 'profits', path: PATH_DASHBOARD.profit.root, icon: ICONS.analytics },
-      { title: 'slider image', path: PATH_DASHBOARD.sliderImage.root, icon: ICONS.slider },
 
       {
         title: 'users',
@@ -65,6 +64,7 @@ const navConfig = [
             title: 'change password',
             path: PATH_DASHBOARD.changepassword.form,
           },
+          { title: 'slider images', path: PATH_DASHBOARD.sliderimage.root },
           {
             title: 'Help and Support',
             //  path: PATH_DASHBOARD.helpsupport.list
@@ -108,106 +108,13 @@ const navConfig = [
         path: PATH_DASHBOARD.generalwithdrawhistory.list,
         icon: ICONS.banking,
       },
+      {
+        title: 'Diposit History',
+        path: PATH_DASHBOARD.diposithistory.list,
+        icon: ICONS.banking,
+      },
     ],
   },
-
-  // MANAGEMENT
-  // ----------------------------------------------------------------------
-  // {
-  //   subheader: 'management',
-  //   items: [
-  //     // USER
-  //     {
-  //       title: 'user',
-  //       path: PATH_DASHBOARD.user.root,
-  //       icon: ICONS.user,
-  //       children: [
-  //         { title: 'list', path: PATH_DASHBOARD.user.list },
-  //       ],
-  //     },
-
-  //     // E-COMMERCE
-  //     // {
-  //     //   title: 'e-commerce',
-  //     //   path: PATH_DASHBOARD.eCommerce.root,
-  //     //   icon: ICONS.cart,
-  //     //   children: [
-  //     //     { title: 'list', path: PATH_DASHBOARD.eCommerce.list },
-  //     //     { title: 'create', path: PATH_DASHBOARD.eCommerce.new },
-  //     //     { title: 'edit', path: PATH_DASHBOARD.eCommerce.demoEdit },
-  //     //     { title: 'checkout', path: PATH_DASHBOARD.eCommerce.checkout },
-  //     //   ],
-  //     // },
-
-  //     // INVOICE
-  //     // {
-  //     //   title: 'invoice',
-  //     //   path: PATH_DASHBOARD.invoice.root,
-  //     //   icon: ICONS.invoice,
-  //     //   children: [
-  //     //     { title: 'list', path: PATH_DASHBOARD.invoice.list },
-  //     //     { title: 'details', path: PATH_DASHBOARD.invoice.demoView },
-  //     //     { title: 'create', path: PATH_DASHBOARD.invoice.new },
-  //     //     { title: 'edit', path: PATH_DASHBOARD.invoice.demoEdit },
-  //     //   ],
-  //     // },
-  //   ],
-  // },
-
-  // DEMO MENU STATES
-  // {
-  //   subheader: 'Other cases',
-  //   items: [
-
-  //     // {
-  //     //   title: 'menu_level',
-  //     //   path: '#/dashboard/menu_level',
-  //     //   icon: ICONS.menuItem,
-  //     //   children: [
-  //     //     {
-  //     //       title: 'menu_level_2a',
-  //     //       path: '#/dashboard/menu_level/menu_level_2a',
-  //     //     },
-  //     //     {
-  //     //       title: 'menu_level_2b',
-  //     //       path: '#/dashboard/menu_level/menu_level_2b',
-  //     //       children: [
-  //     //         {
-  //     //           title: 'menu_level_3a',
-  //     //           path: '#/dashboard/menu_level/menu_level_2b/menu_level_3a',
-  //     //         },
-  //     //         {
-  //     //           title: 'menu_level_3b',
-  //     //           path: '#/dashboard/menu_level/menu_level_2b/menu_level_3b',
-  //     //           children: [
-  //     //             {
-  //     //               title: 'menu_level_4a',
-  //     //               path: '#/dashboard/menu_level/menu_level_2b/menu_level_3b/menu_level_4a',
-  //     //             },
-  //     //             {
-  //     //               title: 'menu_level_4b',
-  //     //               path: '#/dashboard/menu_level/menu_level_2b/menu_level_3b/menu_level_4b',
-  //     //             },
-  //     //           ],
-  //     //         },
-  //     //       ],
-  //     //     },
-  //     //   ],
-  //     // },
-
-  //     // {
-  //     //   title: 'item_label',
-  //     //   path: '#label',
-  //     //   icon: ICONS.label,
-  //     //   info: (
-  //     //     <Label color="info" startIcon={<Iconify icon="eva:email-fill" />}>
-  //     //       NEW
-  //     //     </Label>
-  //     //   ),
-  //     // },
-
-  //   ],
-  // },
 ];
 
 export default navConfig;

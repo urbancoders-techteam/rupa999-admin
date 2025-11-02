@@ -39,6 +39,7 @@ import {
   GeneralPredictionFormPage,
   WinHistoryListPage,
   GeneralWithdrawHistoryListPage,
+  DipositHistoryListPage,
   //
 } from './elements';
 
@@ -94,7 +95,7 @@ export default function Router() {
       children: [
         { element: <Navigate to={PATH_AFTER_LOGIN} replace />, index: true },
         { path: 'home', element: <GeneralDashboardPage />, index: true },
-        { path: 'slider-image', element: <SliderImagePage />, index: true },
+
         {
           path: 'users',
           children: [
@@ -134,6 +135,16 @@ export default function Router() {
                   index: true,
                 },
                 { path: 'form', element: <ResetPasswordPage /> },
+              ],
+            },
+            {
+              path: 'sliderimage',
+              children: [
+                {
+                  element: <Navigate to="/dashboard/settings/sliderimage/from" replace />,
+                  index: true,
+                },
+                { path: 'form', element: <SliderImagePage /> },
               ],
             },
             {
@@ -247,14 +258,21 @@ export default function Router() {
           ],
         },
 
-         {
+        {
           path: 'generalwithdrawhistory',
           children: [
-            { element: <Navigate to="/dashboard/generalwithdrawhistory/list" replace />, index: true },
+            {
+              element: <Navigate to="/dashboard/generalwithdrawhistory/list" replace />,
+              index: true,
+            },
             { path: 'list', element: <GeneralWithdrawHistoryListPage /> },
-            // { path: 'new', element: <GiftFormHandlePage /> },
-            // { path: ':id/edit', element: <GiftFormHandlePage /> },
-            // { path: ':id/view', element: <GiftFormHandlePage /> },
+          ],
+        },
+        {
+          path: 'diposithistory',
+          children: [
+            { element: <Navigate to="/dashboard/diposithistory/list" replace />, index: true },
+            { path: 'list', element: <DipositHistoryListPage /> },
           ],
         },
       ],

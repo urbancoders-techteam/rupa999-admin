@@ -63,6 +63,9 @@ export const WinHistoryListPage = Loadable(lazy(() => import('../pages/markets/W
 // DASHBOARD: Withdraw History
 export const GeneralWithdrawHistoryListPage = Loadable(lazy(() => import('../pages/GeneralWithdrawHistoryListPage')));
 
+// DASHBOARD: Diposit History
+export const DipositHistoryListPage = Loadable(lazy(() => import('../pages/DipositHistoryListPage')));
+
 // BASIC PAGES
 export const Page500 = Loadable(lazy(() => import('../pages/ErrorHandlingPages/Page500')));
 export const Page403 = Loadable(lazy(() => import('../pages/ErrorHandlingPages/Page403')));
