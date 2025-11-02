@@ -43,8 +43,6 @@ const navConfig = [
     subheader: 'Main',
     items: [
       { title: 'dashboard', path: PATH_DASHBOARD.home.root, icon: ICONS.dashboard },
-      { title: 'profits', path: PATH_DASHBOARD.profit.root, icon: ICONS.analytics },
-
       {
         title: 'users',
         path: PATH_DASHBOARD.users.root,
@@ -54,6 +52,7 @@ const navConfig = [
           { title: 'withdraw details', path: PATH_DASHBOARD.withdrawdetails.list },
         ],
       },
+      { title: 'profits', path: PATH_DASHBOARD.profit.root, icon: ICONS.analytics },
 
       {
         title: 'settings',

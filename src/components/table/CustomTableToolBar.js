@@ -33,7 +33,7 @@ export default function CustomTableToolbar({
         xs: 'column',
         sm: 'row',
       }}
-      sx={{ px: 2.5, py: 3 }}
+      sx={{ px: 2.5, py: 2,}}
     >
       {optionsRole && (
         <TextField
@@ -74,7 +74,7 @@ export default function CustomTableToolbar({
         </TextField>
       )}
 
-      {filterName && <TextField
+       <TextField
         fullWidth
         size="small"
         value={filterName}
@@ -87,7 +87,7 @@ export default function CustomTableToolbar({
             </InputAdornment>
           ),
         }}
-      />}
+      />
 
       {isFiltered && (
         <Button

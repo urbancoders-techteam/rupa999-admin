@@ -26,7 +26,7 @@ import {
 // sections
 import WithdrawDetailsToolbar from '../../sections/_withdraw_details/components/WithdrawDetailsToolbar';
 import WithdrawMobileViewCardLayout from '../../sections/_withdraw_details/components/WithdrawDetailsMobileViewCardLayout';
-import WinHistoryTableRow from '../../sections/_win_history/components/WinHistoryTableRow';
+import WinHistoryTableRow from '../../sections/_win_history/list/WinHistoryTableRow';
 
 // ----------------------------------------------------------------------
 

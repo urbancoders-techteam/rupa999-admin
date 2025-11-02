@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 // @mui
 
-import { Card, Table, Button, TableBody, Container, TableContainer, Box } from '@mui/material';
+import { Card, Table, TableBody, Container, TableContainer, Box } from '@mui/material';
 import useResponsive from '../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
@@ -14,7 +14,6 @@ import {generalWithdrawHistoryData}  from '../_mock/arrays';
 
 // components
 import Scrollbar from '../components/scrollbar';
-import ConfirmDialog from '../components/confirm-dialog';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 import { useSettingsContext } from '../components/settings';
 
@@ -31,7 +30,6 @@ import {
 import CustomTableToolbar from '../components/table/CustomTableToolBar';
 
 // sections
-import WithdrawDetailsToolbar from '../sections/_withdraw_details/components/WithdrawDetailsToolbar';
 import WithdrawMobileViewCardLayout from '../sections/_withdraw_details/components/WithdrawDetailsMobileViewCardLayout';
 import GeneralWithdrawHistoryTableRow from '../sections/_general_withdraw_history/components/GeneralWithdrawHistoryTableRow';
 
@@ -77,18 +75,11 @@ export default function DipositHistoryListPage() {
   } = useTable();
 
   const { themeStretch } = useSettingsContext();
-
   const navigate = useNavigate();
 
+  const [filterName, setFilterName] = useState('');
   const [tableData, setTableData] = useState(generalWithdrawHistoryData);
 
-  const [openConfirm, setOpenConfirm] = useState(false);
-
-  const [filterName, setFilterName] = useState('');
-
-  const [filterRole, setFilterRole] = useState('all');
-
-  const [filterStatus, setFilterStatus] = useState('all');
 
   // Memoized filtered data
   const dataFiltered = useMemo(
@@ -97,10 +88,8 @@ export default function DipositHistoryListPage() {
         inputData: tableData,
         comparator: getComparator(order, orderBy),
         filterName,
-        filterRole,
-        filterStatus,
       }),
-    [tableData, order, orderBy, filterName, filterRole, filterStatus]
+    [tableData, order, orderBy, filterName]
   );
 
   // Memoized paginated data
@@ -113,17 +102,9 @@ export default function DipositHistoryListPage() {
 
   const isMobile = useResponsive('down', 'sm');
 
-  const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
+  const isFiltered = filterName !== '';
 
-  const isNotFound =
-    (!dataFiltered.length && !!filterName) ||
-    (!dataFiltered.length && !!filterRole) ||
-    (!dataFiltered.length && !!filterStatus);
-
-
-  const handleCloseConfirm = () => {
-    setOpenConfirm(false);
-  };
+  const isNotFound = !dataFiltered.length && !!filterName || !dataFiltered.length
 
   const handleFilterName = (event) => {
     setPage(0);
@@ -142,51 +123,22 @@ export default function DipositHistoryListPage() {
     }
   };
 
-  const handleDeleteRows = (selectedRows) => {
-    const deleteRows = tableData.filter((row) => !selectedRows.includes(row.id));
-    setSelected([]);
-    setTableData(deleteRows);
-
-    if (page > 0) {
-      if (selectedRows.length === dataInPage.length) {
-        setPage(page - 1);
-      } else if (selectedRows.length === dataFiltered.length) {
-        setPage(0);
-      } else if (selectedRows.length > dataInPage.length) {
-        <TablePaginationCustom
-          count={dataFiltered.length}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={onChangePage}
-          onRowsPerPageChange={onChangeRowsPerPage}
-          //
-          dense={dense}
-          onChangeDense={onChangeDense}
-        />;
-        const newPage = Math.ceil((tableData.length - selectedRows.length) / rowsPerPage) - 1;
-        setPage(newPage);
-      }
-    }
-  };
-
   const handleEditRow = (id) => {
     navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
   };
 
   const handleResetFilter = () => {
     setFilterName('');
-    setFilterRole('all');
-    setFilterStatus('all');
   };
 
   return (
     <>
       <Helmet>
-        <title> Diposit History List : List | Rupa999 </title>
+        <title> Diposit History : List | Rupa999 </title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
-        {isMobile ? (
+        {!isMobile ? (
           <Box sx={{ position: 'sticky', top: 0, zIndex: 10, bgcolor: 'background.paper' }}>
             <CustomBreadcrumbs
               heading="Diposit History List"
@@ -195,7 +147,7 @@ export default function DipositHistoryListPage() {
                 { name: 'Diposit History List', href: PATH_DASHBOARD.diposithistory.root },
               ]}
             />
-            <WithdrawDetailsToolbar
+            <CustomTableToolbar
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
@@ -283,29 +235,6 @@ export default function DipositHistoryListPage() {
           </Card>
         )}
       </Container>
-
-      <ConfirmDialog
-        open={openConfirm}
-        onClose={handleCloseConfirm}
-        title="Delete"
-        content={
-          <>
-            Are you sure want to delete <strong> {selected.length} </strong> items?
-          </>
-        }
-        action={
-          <Button
-            variant="contained"
-            color="error"
-            onClick={() => {
-              handleDeleteRows(selected);
-              handleCloseConfirm();
-            }}
-          >
-            Delete
-          </Button>
-        }
-      />
     </>
   );
 }

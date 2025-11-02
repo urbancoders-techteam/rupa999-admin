@@ -2,7 +2,6 @@ import PropTypes from 'prop-types';
 import { useState } from 'react';
 import {
   Stack,
-  Avatar,
   Button,
   TableRow,
   TableCell,
@@ -11,10 +10,10 @@ import {
   styled,
   MenuItem,
 } from '@mui/material';
-import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
 import MenuPopover from '../../../components/menu-popover';
 import ConfirmDialog from '../../../components/confirm-dialog';
+import StatusToggleCell from './StatusToggledCell';
 
 // ----------------------------------------------------------------------
 
@@ -35,10 +34,9 @@ UserTableRow.propTypes = {
   selected: PropTypes.bool,
   onEditRow: PropTypes.func,
   onDeleteRow: PropTypes.func,
-  onSelectRow: PropTypes.func,
-};
+ };
 
-export default function UserTableRow({ row, selected, onEditRow, onSelectRow, onDeleteRow }) {
+export default function UserTableRow({ row, selected, onEditRow, onDeleteRow }) {
   const {
     id,
     name,
@@ -58,20 +56,13 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
 
   const handleOpenConfirm = () => setOpenConfirm(true);
   const handleCloseConfirm = () => setOpenConfirm(false);
-   const handleOpenPopover = (event) => {
+
+  const handleOpenPopover = (event) => {
+    console.log('event', event)
     setOpenPopover(event.currentTarget);
   };
   const handleClosePopover = () => setOpenPopover(null);
-
-  // Generate initials for avatar
-  const initials = name
-    ? name
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
-    : '?';
-
+  
   // Style for alternate rows
   const StyledTableRow = styled(TableRow)(({ theme }) => ({
     '&:nth-of-type(even)': {
@@ -84,12 +75,17 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
 
   return (
     <>
-      <StyledTableRow hover selected={selected}>
+      <StyledTableRow hover >
+        <TableCell align="left">
+          <IconButton color={openPopover ? 'inherit' : 'default'} onClick={(event)=>handleOpenPopover(event)}>
+            <Iconify icon="eva:more-vertical-fill" />
+          </IconButton>
+        </TableCell>
+
         <TableCell align="left">{id}</TableCell>
 
         <TableCell align="left">
           <Stack direction="row" alignItems="center" spacing={2}>
-            <Avatar alt={name}>{initials}</Avatar>
             <Typography variant="subtitle2" noWrap>
               {name}
             </Typography>
@@ -108,36 +104,29 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
 
         <TableCell align="left">₹{balance?.toLocaleString('en-IN')}</TableCell>
 
-        <TableCell align="center">₹{totalGameAmt?.toLocaleString('en-IN')}</TableCell>
-
-        <TableCell align="left">₹{totalWon?.toLocaleString('en-IN')}</TableCell>
-
-        <TableCell align="left">₹{totalWithdraw?.toLocaleString('en-IN')}</TableCell>
-
-        <TableCell align="left">₹{totalBonus?.toLocaleString('en-IN')}</TableCell>
-
-        <TableCell align="left">
-          <Label
-            variant="soft"
-            color={status === 'Blocked' ? 'error' : 'success'}
-            sx={{ textTransform: 'capitalize', fontWeight: 600 }}
-          >
-            {status}
-          </Label>
+        <TableCell align="center" sx={{ minWidth: '140px' }}>
+          ₹{totalGameAmt?.toLocaleString('en-IN')}
         </TableCell>
 
-        <TableCell align="left">
+        <TableCell align="center" sx={{ minWidth: '100px' }}>
+          ₹{totalWon?.toLocaleString('en-IN')}
+        </TableCell>
+
+        <TableCell align="center" sx={{ minWidth: '140px' }}>
+          ₹{totalWithdraw?.toLocaleString('en-IN')}
+        </TableCell>
+
+        <TableCell align="center" sx={{ minWidth: '110px' }}>
+          ₹{totalBonus?.toLocaleString('en-IN')}
+        </TableCell>
+
+       <StatusToggleCell id={id} status={status} />
+
+        <TableCell align="left" sx={{ minWidth: '140px' }}>
           <Typography variant="body2" color="text.secondary">
             {createdAt}
           </Typography>
         </TableCell>
-
-        <TableCell align="left">
-          <IconButton color={openPopover ? 'inherit' : 'default'} onClick={handleOpenPopover}>
-            <Iconify icon="eva:more-vertical-fill" />
-          </IconButton>
-        </TableCell>
-        
       </StyledTableRow>
 
       {/* Action Menu */}
@@ -145,7 +134,7 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
         open={openPopover}
         onClose={handleClosePopover}
         arrow="right-top"
-        sx={{ width: 150 }}
+        // sx={{ width: 150 }}
       >
         <MenuItem
           onClick={() => {
@@ -155,6 +144,24 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
         >
           <Iconify icon="eva:edit-fill" />
           Edit
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            onEditRow();
+            handleClosePopover();
+          }}
+        >
+          <Iconify icon="eva:edit-fill" />
+          Transactions
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            onEditRow();
+            handleClosePopover();
+          }}
+        >
+          <Iconify icon="eva:edit-fill" />
+          Withdrawal Details
         </MenuItem>
 
         <MenuItem

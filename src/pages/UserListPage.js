@@ -38,7 +38,8 @@ import {
   TablePaginationCustom,
 } from '../components/table';
 // sections
-import { UserTableToolbar, UserTableRow } from '../sections/user/list';
+import CustomTableToolbar from '../components/table/CustomTableToolBar';
+import { UserTableToolbar, UserTableRow } from '../sections/_users/list';
 
 // ----------------------------------------------------------------------
 
@@ -58,6 +59,7 @@ const ROLE_OPTIONS = [
 ];
 
 const TABLE_HEAD = [
+  { id: 'Action', label: 'Action', align: 'left' },
   { id: 'id', label: 'ID', align: 'left' },
   { id: 'name', label: 'Name', align: 'left' },
   { id: 'company', label: 'Phone', align: 'left' },
@@ -69,7 +71,6 @@ const TABLE_HEAD = [
   { id: 'Bonus', label: 'Total Bonus', align: 'left' },
   { id: 'status', label: 'Blocked Status', align: 'left' },
   { id: 'createdAt', label: 'createdAt', align: 'left' },
-  { id: 'Action', label: 'Action', align: 'left' },
   { id: '' },
 ];
 
@@ -164,31 +165,12 @@ export default function UserListPage() {
     }
   };
 
-  const handleDeleteRows = (selectedRows) => {
-    const deleteRows = tableData.filter((row) => !selectedRows.includes(row.id));
-    setSelected([]);
-    setTableData(deleteRows);
-
-    if (page > 0) {
-      if (selectedRows.length === dataInPage.length) {
-        setPage(page - 1);
-      } else if (selectedRows.length === dataFiltered.length) {
-        setPage(0);
-      } else if (selectedRows.length > dataInPage.length) {
-        const newPage = Math.ceil((tableData.length - selectedRows.length) / rowsPerPage) - 1;
-        setPage(newPage);
-      }
-    }
-  };
-
   const handleEditRow = (id) => {
     navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
   };
 
   const handleResetFilter = () => {
     setFilterName('');
-    setFilterRole('all');
-    setFilterStatus('all');
   };
 
   return (
@@ -233,14 +215,10 @@ export default function UserListPage() {
 
           <Divider />
 
-          <UserTableToolbar
+          <CustomTableToolbar
             isFiltered={isFiltered}
             filterName={filterName}
-            filterRole={filterRole}
-            optionsRole={ROLE_OPTIONS}
             onFilterName={handleFilterName}
-            onFilterRole={handleFilterRole}
-            onResetFilter={handleResetFilter}
           />
 
           <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
@@ -272,12 +250,6 @@ export default function UserListPage() {
                   rowCount={tableData.length}
                   numSelected={selected.length}
                   onSort={onSort}
-                  // onSelectAllRows={(checked) =>
-                  //   onSelectAllRows(
-                  //     checked,
-                  //     tableData.map((row) => row.id)
-                  //   )
-                  // }
                 />
 
                 <TableBody>
@@ -287,8 +259,8 @@ export default function UserListPage() {
                       <UserTableRow
                         key={row.id}
                         row={row}
-                        selected={selected.includes(row.id)}
-                        onSelectRow={() => onSelectRow(row.id)}
+                        // selected={selected.includes(row.id)}
+                        // onSelectRow={() => onSelectRow(row.id)}
                         onDeleteRow={() => handleDeleteRow(row.id)}
                         onEditRow={() => handleEditRow(row.name)}
                       />
@@ -317,29 +289,6 @@ export default function UserListPage() {
           />
         </Card>
       </Container>
-
-      <ConfirmDialog
-        open={openConfirm}
-        onClose={handleCloseConfirm}
-        title="Delete"
-        content={
-          <>
-            Are you sure want to delete <strong> {selected.length} </strong> items?
-          </>
-        }
-        action={
-          <Button
-            variant="contained"
-            color="error"
-            onClick={() => {
-              handleDeleteRows(selected);
-              handleCloseConfirm();
-            }}
-          >
-            Delete
-          </Button>
-        }
-      />
     </>
   );
 }

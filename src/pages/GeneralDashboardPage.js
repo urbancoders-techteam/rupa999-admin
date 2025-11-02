@@ -98,7 +98,7 @@ export default function GeneralDashboardPage() {
                   }}
                 />
 
-                <SummaryCard
+                {/* <SummaryCard
                   title="Total Manually Added Wallet Balance"
                   percent={-1}
                   total={285013}
@@ -106,7 +106,7 @@ export default function GeneralDashboardPage() {
                   chart={{
                     series: [10, 35, 25, 45, 39, 65, 42, 45, 59, 25],
                   }}
-                />
+                /> */}
             </Box>
           </Grid>
         </Grid>
