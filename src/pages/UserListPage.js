@@ -16,7 +16,8 @@ import {
   IconButton,
   TableContainer,
 } from '@mui/material';
-import { useTheme } from '@mui/system';
+import { Box, useTheme } from '@mui/system';
+import useResponsive from '../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
 // _mock_
@@ -39,24 +40,12 @@ import {
 } from '../components/table';
 // sections
 import CustomTableToolbar from '../components/table/CustomTableToolBar';
-import { UserTableToolbar, UserTableRow } from '../sections/_users/list';
+import { UserTableRow } from '../sections/_users/list';
+import UserMobileViewCardLayout from '../sections/_users/list/UserMobileViewCardLayout';
 
 // ----------------------------------------------------------------------
 
 const STATUS_OPTIONS = ['all', 'Blocked', 'Unblock'];
-
-const ROLE_OPTIONS = [
-  'all',
-  'ux designer',
-  'full stack designer',
-  'backend developer',
-  'project manager',
-  'leader',
-  'ui designer',
-  'ui/ux designer',
-  'front end developer',
-  'full stack developer',
-];
 
 const TABLE_HEAD = [
   { id: 'Action', label: 'Action', align: 'left' },
@@ -87,7 +76,6 @@ export default function UserListPage() {
     //
     selected,
     setSelected,
-    onSelectRow,
     onSelectAllRows,
     //
     onSort,
@@ -99,7 +87,7 @@ export default function UserListPage() {
   const { themeStretch } = useSettingsContext();
 
   const navigate = useNavigate();
-  const theme = useTheme();
+  // const theme = useTheme();
 
   const [tableData, setTableData] = useState(_userDataList);
 
@@ -122,6 +110,8 @@ export default function UserListPage() {
   const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   const denseHeight = dense ? 52 : 72;
+
+  const isMobile = useResponsive('down', 'sm');
 
   const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
@@ -146,11 +136,6 @@ export default function UserListPage() {
   const handleFilterName = (event) => {
     setPage(0);
     setFilterName(event.target.value);
-  };
-
-  const handleFilterRole = (event) => {
-    setPage(0);
-    setFilterRole(event.target.value);
   };
 
   const handleDeleteRow = (id) => {
@@ -180,114 +165,156 @@ export default function UserListPage() {
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
-        <CustomBreadcrumbs
-          heading="User List"
-          links={[
-            { name: 'Dashboard', href: PATH_DASHBOARD.root },
-            { name: 'User List', href: PATH_DASHBOARD.userlist.list },
-            // { name: 'List' },
-          ]}
-          action={
-            <Button
-              component={RouterLink}
-              // to={PATH_DASHBOARD.user.new}
-              variant="contained"
-              startIcon={<Iconify icon="eva:plus-fill" />}
-            >
-              New User
-            </Button>
-          }
+        <Box
+          sx={(theme) => ({
+            position: 'relative', // default for desktop
+            bgcolor: 'background.paper',
+            zIndex: 10,
+            [theme.breakpoints.down('sm')]: {
+              position: 'fixed',
+              top: 60,
+              left: 0,
+              width: '100%',
+              px:2,
+              boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+              borderBottom: '1px solid',
+              borderColor: 'divider',
+            },
+          })}
+        >
+          <CustomBreadcrumbs
+            heading="User List"
+            links={[
+              { name: 'Dashboard', href: PATH_DASHBOARD.root },
+              { name: 'User List', href: PATH_DASHBOARD.userlist.list },
+            ]}
+            action={
+              <Button
+                component={RouterLink}
+                variant="contained"
+                startIcon={<Iconify icon="eva:plus-fill" />}
+                sx={{
+                  [(theme) => theme.breakpoints.down('sm')]: {
+                    fontSize: '0.75rem',
+                    py: 0.5,
+                    px: 1.5,
+                  },
+                }}
+              >
+                New User
+              </Button>
+            }
+          />
+        </Box>
+
+        {/* 👇 Add margin to push content below breadcrumb for mobile */}
+        <Box
+          sx={(theme) => ({
+            [theme.breakpoints.down('sm')]: {
+              height: 80, // equal to breadcrumb bar height
+            },
+          })}
         />
 
-        <Card>
-          <Tabs
-            value={filterStatus}
-            onChange={handleFilterStatus}
-            sx={{
-              px: 2,
-              bgcolor: 'background.neutral',
-            }}
-          >
-            {STATUS_OPTIONS.map((tab) => (
-              <Tab key={tab} label={tab} value={tab} />
-            ))}
-          </Tabs>
-
-          <Divider />
-
-          <CustomTableToolbar
-            isFiltered={isFiltered}
-            filterName={filterName}
-            onFilterName={handleFilterName}
+        {isMobile ? (
+          <UserMobileViewCardLayout
+            data={dataFiltered}
+            onEditRow={handleEditRow}
+            onDeleteRow={(id) => handleDeleteRow(id)}
+            // onSelectRow={(id) => onSelectRow(id)}
+            // selected={selected}
           />
+        ) : (
+          <Card>
+            <Tabs
+              value={filterStatus}
+              onChange={handleFilterStatus}
+              sx={{
+                px: 2,
+                bgcolor: 'background.neutral',
+              }}
+            >
+              {STATUS_OPTIONS.map((tab) => (
+                <Tab key={tab} label={tab} value={tab} />
+              ))}
+            </Tabs>
 
-          <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
-            <TableSelectedAction
-              dense={dense}
-              numSelected={selected.length}
-              rowCount={tableData.length}
-              onSelectAllRows={(checked) =>
-                onSelectAllRows(
-                  checked,
-                  tableData.map((row) => row.id)
-                )
-              }
-              action={
-                <Tooltip title="Delete">
-                  <IconButton color="primary" onClick={handleOpenConfirm}>
-                    <Iconify icon="eva:trash-2-outline" />
-                  </IconButton>
-                </Tooltip>
-              }
+            <Divider />
+
+            <CustomTableToolbar
+              isFiltered={isFiltered}
+              filterName={filterName}
+              onFilterName={handleFilterName}
             />
 
-            <Scrollbar>
-              <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
-                <TableHeadCustom
-                  order={order}
-                  orderBy={orderBy}
-                  headLabel={TABLE_HEAD}
-                  rowCount={tableData.length}
-                  numSelected={selected.length}
-                  onSort={onSort}
-                />
+            <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
+              <TableSelectedAction
+                dense={dense}
+                numSelected={selected.length}
+                rowCount={tableData.length}
+                onSelectAllRows={(checked) =>
+                  onSelectAllRows(
+                    checked,
+                    tableData.map((row) => row.id)
+                  )
+                }
+                action={
+                  <Tooltip title="Delete">
+                    <IconButton color="primary" onClick={handleOpenConfirm}>
+                      <Iconify icon="eva:trash-2-outline" />
+                    </IconButton>
+                  </Tooltip>
+                }
+              />
 
-                <TableBody>
-                  {dataFiltered
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row) => (
-                      <UserTableRow
-                        key={row.id}
-                        row={row}
-                        // selected={selected.includes(row.id)}
-                        // onSelectRow={() => onSelectRow(row.id)}
-                        onDeleteRow={() => handleDeleteRow(row.id)}
-                        onEditRow={() => handleEditRow(row.name)}
-                      />
-                    ))}
-
-                  <TableEmptyRows
-                    height={denseHeight}
-                    emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
+              <Scrollbar>
+                <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
+                  <TableHeadCustom
+                    order={order}
+                    orderBy={orderBy}
+                    headLabel={TABLE_HEAD}
+                    rowCount={tableData.length}
+                    numSelected={selected.length}
+                    onSort={onSort}
                   />
 
-                  <TableNoData isNotFound={isNotFound} />
-                </TableBody>
-              </Table>
-            </Scrollbar>
-          </TableContainer>
+                  <TableBody>
+                    {dataFiltered
+                      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                      .map((row) => (
+                        <UserTableRow
+                          key={row.id}
+                          row={row}
+                          // selected={selected.includes(row.id)}
+                          // onSelectRow={() => onSelectRow(row.id)}
+                          onDeleteRow={() => handleDeleteRow(row.id)}
+                          onEditRow={() => handleEditRow(row.name)}
+                        />
+                      ))}
 
-          <TablePaginationCustom
-            count={dataFiltered.length}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={onChangePage}
-            onRowsPerPageChange={onChangeRowsPerPage}
-            //
-            dense={dense}
-            onChangeDense={onChangeDense}
-          />
-        </Card>
+                    <TableEmptyRows
+                      height={denseHeight}
+                      emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
+                    />
+
+                    <TableNoData isNotFound={isNotFound} />
+                  </TableBody>
+                </Table>
+              </Scrollbar>
+            </TableContainer>
+
+            <TablePaginationCustom
+              count={dataFiltered.length}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={onChangePage}
+              onRowsPerPageChange={onChangeRowsPerPage}
+              //
+              dense={dense}
+              onChangeDense={onChangeDense}
+            />
+          </Card>
+        )}
       </Container>
     </>
   );

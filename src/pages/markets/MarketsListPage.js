@@ -11,7 +11,6 @@ import { PATH_DASHBOARD } from '../../routes/paths';
 import { _marketjson } from '../../_mock/arrays/_marketjson';
 // components
 import Scrollbar from '../../components/scrollbar';
-import ConfirmDialog from '../../components/confirm-dialog';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
 import {
@@ -23,12 +22,11 @@ import {
   TableHeadCustom,
   TablePaginationCustom,
 } from '../../components/table';
-// Links
+import CustomTableToolbar from '../../components/table/CustomTableToolBar';
 // sections
 import Iconify from '../../components/iconify';
 import MarketTableRow from '../../sections/_markets/components/MarketTableRow';
 import MarketMobileViewCardLayout from '../../sections/_markets/components/MarketMobileViewCardLayout';
-import MarketToolbar from '../../sections/_markets/components/MarketToolbar';
 
 // ----------------------------------------------------------------------
 
@@ -75,8 +73,6 @@ export default function MarketDetailsPage() {
 
   const [tableData, setTableData] = useState(_marketjson);
 
-  const [openConfirm, setOpenConfirm] = useState(false);
-
   const [filterName, setFilterName] = useState('');
 
   const [filterRole, setFilterRole] = useState('all');
@@ -113,13 +109,6 @@ export default function MarketDetailsPage() {
     (!dataFiltered.length && !!filterRole) ||
     (!dataFiltered.length && !!filterStatus);
 
-  const handleOpenConfirm = () => {
-    setOpenConfirm(true);
-  };
-
-  const handleCloseConfirm = () => {
-    setOpenConfirm(false);
-  };
 
   const handleFilterName = (event) => {
     setPage(0);
@@ -134,33 +123,6 @@ export default function MarketDetailsPage() {
     if (page > 0) {
       if (dataInPage.length < 2) {
         setPage(page - 1);
-      }
-    }
-  };
-
-  const handleDeleteRows = (selectedRows) => {
-    const deleteRows = tableData.filter((row) => !selectedRows.includes(row.id));
-    setSelected([]);
-    setTableData(deleteRows);
-
-    if (page > 0) {
-      if (selectedRows.length === dataInPage.length) {
-        setPage(page - 1);
-      } else if (selectedRows.length === dataFiltered.length) {
-        setPage(0);
-      } else if (selectedRows.length > dataInPage.length) {
-        <TablePaginationCustom
-          count={dataFiltered.length}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={onChangePage}
-          onRowsPerPageChange={onChangeRowsPerPage}
-          //
-          dense={dense}
-          onChangeDense={onChangeDense}
-        />;
-        const newPage = Math.ceil((tableData.length - selectedRows.length) / rowsPerPage) - 1;
-        setPage(newPage);
       }
     }
   };
@@ -197,11 +159,11 @@ export default function MarketDetailsPage() {
                   variant="contained"
                   startIcon={<Iconify icon="eva:plus-fill" />}
                 >
-                  New Gift
+                  New Market
                 </Button>
               }
             />
-            <MarketToolbar
+            <CustomTableToolbar
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
@@ -224,11 +186,11 @@ export default function MarketDetailsPage() {
                   variant="contained"
                   startIcon={<Iconify icon="eva:plus-fill" />}
                 >
-                  New Gift
+                  New Market
                 </Button>
               }
             />
-            <MarketToolbar
+            <CustomTableToolbar
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
@@ -242,7 +204,7 @@ export default function MarketDetailsPage() {
         {isMobile ? (
           <MarketMobileViewCardLayout
             data={dataFiltered}
-            onEditRow={(id) => handleEditRow(id)}
+            onEditRow={handleEditRow}
             onDeleteRow={(id) => handleDeleteRow(id)}
             onSelectRow={(id) => onSelectRow(id)}
             selected={selected}
@@ -299,29 +261,6 @@ export default function MarketDetailsPage() {
           </Card>
         )}
       </Container>
-
-      <ConfirmDialog
-        open={openConfirm}
-        onClose={handleCloseConfirm}
-        title="Delete"
-        content={
-          <>
-            Are you sure want to delete <strong> {selected.length} </strong> items?
-          </>
-        }
-        action={
-          <Button
-            variant="contained"
-            color="error"
-            onClick={() => {
-              handleDeleteRows(selected);
-              handleCloseConfirm();
-            }}
-          >
-            Delete
-          </Button>
-        }
-      />
     </>
   );
 }

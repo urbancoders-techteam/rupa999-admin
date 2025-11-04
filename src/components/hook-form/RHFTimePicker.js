@@ -1,39 +1,36 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Controller } from "react-hook-form";
-import { TextField, Box, Typography } from "@mui/material";
+import { Controller, useFormContext } from "react-hook-form";
+import { TextField, Box } from "@mui/material";
 import { LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
-const RHFTimePicker = ({
-  label,
-  name,
-  control,
-  value,
-  onChange,
-  width = "100%",
-  required = false,
-  errorMessage,
-}) => (
+const RHFTimePicker = ({ name, label, width = "100%", required = false, onChange }) => {
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext();
+
+  const fieldError = errors?.[name];
+  const errorMessage = fieldError?.message || "";
+
+  return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Controller
         name={name}
         control={control}
-        defaultValue={value || null}
-        rules={{ required: required ? "Time is required" : false }}
+        rules={{ required: required ? `${label || "Time"} is required` : false }}
         render={({ field }) => (
           <Box sx={{ width }}>
             <TimePicker
               {...field}
               label={label}
-              sx={{width}}
-              value={field.value}
-              onChange={(newTime) => {
-                field.onChange(newTime);
-                if (onChange) {
-                  onChange(newTime);
-                }
+              value={field.value || null}
+              onChange={(newValue) => {
+                field.onChange(newValue);
+                if (onChange) onChange(newValue);
               }}
+              // ✅ handle both MUI v5 & v6 APIs safely
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -50,24 +47,36 @@ const RHFTimePicker = ({
                   }}
                 />
               )}
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                  error: !!errorMessage,
+                  helperText: errorMessage,
+                  sx: {
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      "& fieldset": { borderColor: "#00999E" },
+                      "&:hover fieldset": { borderColor: "#007B7F" },
+                      "&.Mui-focused fieldset": { borderColor: "#005F61" },
+                    },
+                  },
+                },
+              }}
             />
-            <Typography variant="caption" ml={1.5} color="error">{errorMessage}</Typography>
           </Box>
         )}
       />
     </LocalizationProvider>
   );
+};
 
-// Prop Types
+// ✅ PropTypes
 RHFTimePicker.propTypes = {
-  label: PropTypes.string,
   name: PropTypes.string.isRequired,
-  control: PropTypes.object.isRequired,
-  value: PropTypes.object,
-  onChange: PropTypes.func,
+  label: PropTypes.string,
   width: PropTypes.string,
   required: PropTypes.bool,
-  errorMessage: PropTypes.string,
+  onChange: PropTypes.func,
 };
 
 export default RHFTimePicker;

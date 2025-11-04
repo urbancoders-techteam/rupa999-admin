@@ -33,7 +33,8 @@ export default function CustomTableToolbar({
         xs: 'column',
         sm: 'row',
       }}
-      sx={{ px: 2.5, py: 2,}}
+      // sx={{ px: 2.5, py: 2,}}
+      sx={{  px: { xs: 1.5, md: 2.5 }, py: { xs: 1, md: 3 } }}
     >
       {optionsRole && (
         <TextField

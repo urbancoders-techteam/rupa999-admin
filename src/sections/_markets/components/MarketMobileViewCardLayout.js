@@ -125,7 +125,7 @@ function MarketMobileViewCardLayout({ data = [], onEditRow, onDeleteRow, onSelec
                   <IconButton
                     size="small"
                     color="primary"
-                    onClick={() => onEditRow && onEditRow(row.id)}
+                    onClick={() => onEditRow(row.name)}
                   >
                     <EditIcon fontSize="small" />
                   </IconButton>
