@@ -72,6 +72,7 @@ export const PATH_DASHBOARD = {
 
   sliderimage: {
     root: path(ROOTS_DASHBOARD, '/settings/sliderimage'),
+    form: path(ROOTS_DASHBOARD, '/settings/sliderimage/form'),
   },
 
   gift: {

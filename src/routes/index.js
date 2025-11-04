@@ -141,7 +141,7 @@ export default function Router() {
               path: 'sliderimage',
               children: [
                 {
-                  element: <Navigate to="/dashboard/settings/sliderimage/from" replace />,
+                  element: <Navigate to="/dashboard/settings/sliderimage/form" replace />,
                   index: true,
                 },
                 { path: 'form', element: <SliderImagePage /> },
