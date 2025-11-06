@@ -161,15 +161,15 @@ export default function PreviousResultListPage() {
   return (
     <>
       <Helmet>
-        <title> Previous Results: List | Rupa999 </title>
+        <title> Add Result: List | Rupa999 </title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <CustomBreadcrumbs
-          heading="Previous Results List"
+          heading="Add Result"
           links={[
             { name: 'Dashboard', href: PATH_DASHBOARD.root },
-            { name: 'Previous Results List', href: PATH_DASHBOARD.previousresults.list },
+            { name: 'Add Result', href: PATH_DASHBOARD.previousresults.list },
           ]}
           action={
             <Button
@@ -178,7 +178,7 @@ export default function PreviousResultListPage() {
               variant="contained"
               startIcon={<Iconify icon="eva:plus-fill" />}
             >
-              New Previous Results
+              Add New Result
             </Button>
           }
         />

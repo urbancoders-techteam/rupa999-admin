@@ -57,7 +57,7 @@ export const PanaChartsListPage = Loadable(lazy(() => import('../pages/markets/P
 // DASHBOARD: Markets | Records
 export const GeneralMarketRecordListPage = Loadable(lazy(() => import('../pages/markets/GeneralMarketRecordListPage')));
 
-// DASHBOARD: Markets | Previous Results
+// DASHBOARD: Markets | Add Result
 export const PreviousResultListPage = Loadable(lazy(() => import('../pages/markets/PreviousResultListPage')));
 
 // DASHBOARD: Markets | Predictions Form
