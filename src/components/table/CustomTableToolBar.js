@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 // @mui
 import { Stack, InputAdornment, TextField, MenuItem, Button } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers';
+import { useState } from 'react';
 import Iconify from '../iconify';
 // components
 
@@ -9,22 +11,27 @@ import Iconify from '../iconify';
 CustomTableToolbar.propTypes = {
   isFiltered: PropTypes.bool,
   filterName: PropTypes.string,
-  filterRole: PropTypes.string,
+  selectedDate: PropTypes.object,
+  selectedDropDown: PropTypes.string,
   onFilterName: PropTypes.func,
-  onFilterRole: PropTypes.func,
+  onselectedDropDown: PropTypes.func,
   onResetFilter: PropTypes.func,
-  optionsRole: PropTypes.arrayOf(PropTypes.string),
+  onDateFilter: PropTypes.func,
+  fileterOptions: PropTypes.arrayOf(PropTypes.string),
 };
 
 export default function CustomTableToolbar({
   isFiltered,
   filterName,
-  filterRole,
-  optionsRole,
+  selectedDate,
+  selectedDropDown,
+  fileterOptions,
   onFilterName,
-  onFilterRole,
+  onDateFilter,
+  onselectedDropDown,
   onResetFilter,
 }) {
+
   return (
     <Stack
       spacing={2}
@@ -33,17 +40,33 @@ export default function CustomTableToolbar({
         xs: 'column',
         sm: 'row',
       }}
-      // sx={{ px: 2.5, py: 2,}}
-      sx={{  px: { xs: 1.5, md: 2.5 }, py: { xs: 1, md: 3 } }}
+      sx={{ px: { xs: 1.5, md: 2.5 }, py: { xs: 1, md: 3 } }}
     >
-      {optionsRole && (
+    
+
+      <TextField
+        fullWidth
+        size="small"
+        maxWidth={{ sm: 240 }}
+        value={filterName}
+        onChange={onFilterName}
+        placeholder="Search..."
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
+            </InputAdornment>
+          ),
+        }}
+      />
+        {fileterOptions && (
         <TextField
           size="small"
           fullWidth
           select
-          label="Role"
-          value={filterRole}
-          onChange={onFilterRole}
+          label="Select Market"
+          value={selectedDropDown}
+          onChange={onselectedDropDown}
           SelectProps={{
             MenuProps: {
               PaperProps: {
@@ -58,7 +81,7 @@ export default function CustomTableToolbar({
             textTransform: 'capitalize',
           }}
         >
-          {optionsRole.map((option) => (
+          {fileterOptions.map((option) => (
             <MenuItem
               key={option}
               value={option}
@@ -75,20 +98,14 @@ export default function CustomTableToolbar({
         </TextField>
       )}
 
-       <TextField
-        fullWidth
+     {selectedDate && <DatePicker
         size="small"
-        value={filterName}
-        onChange={onFilterName}
-        placeholder="Search..."
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
-            </InputAdornment>
-          ),
-        }}
-      />
+        label="Selecte date"
+        format="DD/MM/YYYY"
+        value={selectedDate}
+        onChange={onDateFilter}
+        renderInput={(params) => <TextField size="small" {...params} />}
+      />}
 
       {isFiltered && (
         <Button

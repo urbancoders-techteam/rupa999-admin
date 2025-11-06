@@ -40,6 +40,10 @@ import {
   WinHistoryListPage,
   GeneralWithdrawHistoryListPage,
   DipositHistoryListPage,
+  UserFormHandle,
+  UserBidHistoryListPage,
+  UserTransactionListPage,
+  WithdrawalResquestListPage,
   //
 } from './elements';
 
@@ -95,32 +99,30 @@ export default function Router() {
       children: [
         { element: <Navigate to={PATH_AFTER_LOGIN} replace />, index: true },
         { path: 'home', element: <GeneralDashboardPage />, index: true },
-
         {
-          path: 'users',
+          path: 'user',
           children: [
-            {
-              path: 'userlist',
-              children: [
-                { element: <Navigate to="/dashboard/users/userlist" replace />, index: true },
-                { path: 'list', element: <UserListPage /> },
-                // { path: 'new', element: <User /> },
-                // { path: ':id/edit', element: <User /> },
-                // { path: ':id/view', element: <User /> },
-              ],
-            },
-            {
-              path: 'withdrawdetails',
-              children: [
-                {
-                  element: <Navigate to="/dashboard/users/withdrawdetails/list" replace />,
-                  index: true,
-                },
-                { path: 'list', element: <WithdrawDetailsPage /> },
-              ],
-            },
+            { element: <Navigate to="/dashboard/user/list" replace />, index: true },
+            { path: 'list', element: <UserListPage /> },
+            { path: 'new', element: <UserFormHandle /> },
+            { path: ':id/edit', element: <UserFormHandle /> },
+            { path: ':id/view', element: <UserFormHandle /> },
+            { path: ':id/transactions', element: <UserTransactionListPage /> },
+            { path: ':id/bidhistory', element: <UserBidHistoryListPage /> },
+            { path: ':id/withdrawalrequest', element: <WithdrawalResquestListPage /> },
           ],
         },
+        {
+          path: 'withdrawdetails',
+          children: [
+            {
+              element: <Navigate to="/dashboard/withdrawdetails/list" replace />,
+              index: true,
+            },
+            { path: 'list', element: <WithdrawDetailsPage /> },
+          ],
+        },
+
         { path: 'profit', element: <ProfitPage />, index: true },
 
         // General Settings

@@ -19,7 +19,7 @@ export default function GeneralDashboardPage() {
         <title> General: Dashboard | Rupa999 </title>
       </Helmet>
 
-      <Container maxWidth={themeStretch ? false : 'xl'} sx={{mt:2}}>
+      <Container maxWidth={themeStretch ? false : 'xl'} sx={{ mt: 2 }}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Box
@@ -29,58 +29,53 @@ export default function GeneralDashboardPage() {
               gridTemplateColumns={{ xs: '1fr', sm: 'repeat(4, 1fr)' }}
             >
               <DashboardSummaryCard
-                leftTitle="Total Market"
-                leftValue="1200"
-                rightTitle="Today Market"
-                rightValue="320"
-                color="primary"
+                todayLabel="Today Market"
+                todayValue={8230}
+                totalValue={32120}
+                totalLabel="Total Market"
+                // imageSrc="/assets/illustrations/deposit.svg" // your image path here
               />
-             
               <DashboardSummaryCard
-                leftTitle="Total Users"
-                leftValue="1200"
-                rightTitle="Today New Users"
-                rightValue="320"
-                color="primary"
+                todayLabel="Total Users"
+                todayValue={8230}
+                totalValue={32120}
+                totalLabel="Today New Users"
+                // imageSrc="/assets/illustrations/deposit.svg" // your image path here
               />
-           
               <DashboardSummaryCard
-                leftTitle="Total Bid Amount"
-                leftValue="1200"
-                rightTitle="Today Bid Amount"
-                rightValue="320"
-                color="primary"
+                todayLabel="Today Bid Amount"
+                todayValue={8230}
+                totalValue={32120}
+                totalLabel="Total Bid Amount"
+                // imageSrc="/assets/illustrations/deposit.svg" // your image path here
               />
-           
               <DashboardSummaryCard
-                leftTitle="Total Win Amount"
-                leftValue="1200"
-                rightTitle="Today Win Amount"
-                rightValue="320"
-                color="primary"
+                todayLabel="Today Win Amount"
+                todayValue={8230}
+                totalValue={32120}
+                totalLabel="Total Win Amount"
+                // imageSrc="/assets/illustrations/deposit.svg" // your image path here
               />
-           
               <DashboardSummaryCard
-                leftTitle="Total Deposit"
-                leftValue="1200"
-                rightTitle="Today Deposit"
-                rightValue="320"
-                color="primary"
+                todayLabel="Today Deposit"
+                todayValue={8230}
+                totalValue={32120}
+                totalLabel="Total Deposit"
+                // imageSrc="/assets/illustrations/deposit.svg" // your image path here
               />
-              
               <DashboardSummaryCard
-                leftTitle="Total Withdraw"
-                leftValue="1200"
-                rightTitle="Today Withdraw"
-                rightValue="320"
-                color="primary"
+                todayLabel="Today Withdraw"
+                todayValue={8230}
+                totalValue={32120}
+                totalLabel="Total Withdraw"
+                // imageSrc="/assets/illustrations/deposit.svg" // your image path here
               />
-           
               <DashboardSummaryCard
-                leftTitle="Total Wallet Balance"
-                leftValue="1200"
+                totalLabel="Today Wallet Balance"
+                totalValue={32120}
+                // imageSrc="/assets/illustrations/deposit.svg" // your image path here
               />
-
+            
             </Box>
           </Grid>
         </Grid>

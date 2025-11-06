@@ -44,13 +44,14 @@ const navConfig = [
     items: [
       { title: 'dashboard', path: PATH_DASHBOARD.home.root, icon: ICONS.dashboard },
       {
-        title: 'users',
-        path: PATH_DASHBOARD.users.root,
+        title: 'user',
+        path: PATH_DASHBOARD.user.root,
         icon: ICONS.user,
-        children: [
-          { title: 'user list', path: PATH_DASHBOARD.userlist.list },
-          { title: 'withdraw details', path: PATH_DASHBOARD.withdrawdetails.list },
-        ],
+      },
+      {
+        title: 'withdraw details',
+        path: PATH_DASHBOARD.withdrawdetails.root,
+        icon: ICONS.banking,
       },
       { title: 'profits', path: PATH_DASHBOARD.profit.root, icon: ICONS.analytics },
 

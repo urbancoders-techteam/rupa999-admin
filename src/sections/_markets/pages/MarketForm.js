@@ -131,12 +131,9 @@ export default function MarketForm({ isEdit = false, isView = false, currentUser
               }}
             >
               <RHFTextField name="name" label="Name" disabled={isView} />
-              <RHFTextField name="apiKeyName" label="API Key Name" disabled={isView} />
 
               <RHFTimePicker name="openTime" label="Open Time" required />
               <RHFTimePicker name="closeTime" label="Close Time" />
-              <RHFTimePicker name="openResultTime" label="Open Result Time" />
-              <RHFTimePicker name="closeResultTime" label="Close Result Time" />
             </Box>
 
             {/* Active Days */}

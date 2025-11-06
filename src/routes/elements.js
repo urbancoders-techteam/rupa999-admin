@@ -26,6 +26,12 @@ export const SliderImagePage = Loadable(lazy(() => import('../pages/SliderImageP
 
 // DASHBOARD: User 
 export const UserListPage = Loadable(lazy(() => import('../pages/UserListPage')));
+export const UserFormHandle = Loadable(lazy(() => import('../sections/_users/form/UserFormHandle')));
+export const UserBidHistoryListPage = Loadable(lazy(() => import('../pages/UserBidHistoryListPage')));
+export const UserTransactionListPage = Loadable(lazy(() => import('../pages/UserTransactionListPage')));
+export const WithdrawalResquestListPage = Loadable(lazy(() => import('../pages/WithdrawalResquestListPage')));
+
+// DASHBOARD: Withdraw Details
 export const WithdrawDetailsPage = Loadable(lazy(() => import('../pages/WithdrawDetailsPage')));
 
 // DASHBOARD: Profit
@@ -41,7 +47,7 @@ export const GiftFormHandlePage = Loadable(lazy(() => import('../sections/_gift/
 
 // DASHBOARD: Markets
 export const MarketsListPage = Loadable(lazy(() => import('../pages/markets/MarketsListPage')));
-export const MarketFormHandlePage = Loadable(lazy(() => import('../sections/_markets/pages/MarketFormHandlePage')));
+export const MarketFormHandlePage = Loadable(lazy(() => import('../sections/_markets/pages/MarketFormHandle')));
 
 // DASHBOARD: Markets | Pana Charts
 export const PanaChartsListPage = Loadable(lazy(() => import('../pages/markets/PanaChartsListPage')));

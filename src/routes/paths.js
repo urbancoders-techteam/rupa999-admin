@@ -40,19 +40,20 @@ export const PATH_DASHBOARD = {
     root: path(ROOTS_DASHBOARD, '/home'),
   },
 
-  users: {
-    root: path(ROOTS_DASHBOARD, '/users'),
+  user: {
+    root: path(ROOTS_DASHBOARD, '/user'),
+    list: path(ROOTS_DASHBOARD, '/user/list'),
+    new: path(ROOTS_DASHBOARD, '/user/new'),
+    edit: (id) => path(ROOTS_DASHBOARD, `/user/${id}/edit`),
+    view: (id) => path(ROOTS_DASHBOARD, `/user/${id}/view`),
+    transactions: (id) => path(ROOTS_DASHBOARD, `/user/${id}/transactions`),
+    bidhistory: (id) => path(ROOTS_DASHBOARD, `/user/${id}/bidhistory`),
+    withdrawalrequest: (id) => path(ROOTS_DASHBOARD, `/user/${id}/withdrawalrequest`),
   },
-  userlist: {
-    root: path(ROOTS_DASHBOARD, '/users/userlist'),
-    list: path(ROOTS_DASHBOARD, '/users/userlist/list'),
-    // new: path(ROOTS_DASHBOARD, '/user/new'),
-    // edit: (id) => path(ROOTS_DASHBOARD, `/user/${id}/edit`),
-    // view: (id) => path(ROOTS_DASHBOARD, `/user/${id}/view`),
-  },
+  
   withdrawdetails: {
-    root: path(ROOTS_DASHBOARD, '/users/withdrawdetails'),
-    list: path(ROOTS_DASHBOARD, '/users/withdrawdetails/list'),
+    root: path(ROOTS_DASHBOARD, '/withdrawdetails'),
+    list: path(ROOTS_DASHBOARD, '/withdrawdetails/list'),
   },
 
   profit: {

@@ -33,10 +33,11 @@ UserTableRow.propTypes = {
   }),
   selected: PropTypes.bool,
   onEditRow: PropTypes.func,
+  onTransationRow: PropTypes.func,
   onDeleteRow: PropTypes.func,
  };
 
-export default function UserTableRow({ row, selected, onEditRow, onDeleteRow }) {
+export default function UserTableRow({ row, selected, onEditRow, onTransationRow, onDeleteRow }) {
   const {
     id,
     name,
@@ -147,7 +148,7 @@ export default function UserTableRow({ row, selected, onEditRow, onDeleteRow }) 
         </MenuItem>
         <MenuItem
           onClick={() => {
-            onEditRow();
+            onTransationRow();
             handleClosePopover();
           }}
         >

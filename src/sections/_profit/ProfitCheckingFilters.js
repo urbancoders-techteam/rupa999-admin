@@ -29,7 +29,7 @@ const ProfitCheckingFilters = () => {
             <Autocomplete
               size="small"
               fullWidth
-              options={['Market', 'Starline Markets', 'Desawer Markets']}
+              options={['Market', 'Starline Markets']}
               value={dropdownValue}
               onChange={(_, newValue) => setDropdownValue(newValue)}
               renderInput={(params) => <TextField {...params} label="Market Types" fullWidth />}

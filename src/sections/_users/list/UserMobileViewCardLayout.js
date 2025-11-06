@@ -14,19 +14,31 @@ import {
   CircularProgress,
   Paper,
   Pagination,
+  Button,
 } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import CallIcon from '@mui/icons-material/Call';
+import { useNavigate } from 'react-router';
+import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import StatusToggleCell from './StatusToggledCell';
+import { PATH_DASHBOARD } from '../../../routes/paths';
+import AddDeductBalanceModal from '../form/UserAddDeductForm';
 
 function UserMobileViewCardLayout({ data = [], onEditRow, onDeleteRow }) {
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
 
   // Derived values
   const totalPages = Math.ceil(data.length / rowsPerPage);
   const [paginatedData, setPaginatedData] = useState([]);
+
+  const [open, setOpen] = useState(false);
+
+  const handleSubmit = (values) => {
+    console.log('Submitted:', values);
+  };
 
   // Handle pagination update
   useEffect(() => {
@@ -40,17 +52,29 @@ function UserMobileViewCardLayout({ data = [], onEditRow, onDeleteRow }) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+//   const viewUserBidHistory = (userId) => {
+//     navigate(PATH_DASHBOARD.user.bidhistory(userId));
+//   };
+  const viewTransaction = (userId) => {
+    navigate(PATH_DASHBOARD.user.transactions(userId));
+  };
+  const viewGameRecord = (userId) => {
+    navigate(PATH_DASHBOARD.user.bidhistory(userId));
+  };
+  const viewWithdrawalRequests = (userId) => {
+    navigate(PATH_DASHBOARD.user.withdrawalrequest(userId));
+  };
+
   return (
     <Box
       sx={{
         maxHeight: '100%',
         overflow: 'hidden',
-        p: 1.5,
+        // p: 1,
         borderRadius: 2,
         bgcolor: 'background.default',
       }}
     >
-
       {data.length === 0 ? (
         <Box
           sx={{
@@ -81,28 +105,57 @@ function UserMobileViewCardLayout({ data = [], onEditRow, onDeleteRow }) {
                   sx={{ boxShadow: 'none', '&:before': { display: 'none' } }}
                 >
                   <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
+                    expandIcon={<ExpandMoreRoundedIcon />}
                     sx={{
                       px: 2,
                       py: 1,
                       bgcolor: 'grey.50',
-                      '& .MuiAccordionSummary-content': { alignItems: 'start' },
+                      '& .MuiAccordionSummary-content': {
+                        alignItems: 'center',
+                        width: '100%',
+                      },
+                      // Move the expand icon to the top-right corner
+                      '& .MuiAccordionSummary-expandIconWrapper': {
+                        position: 'absolute',
+                        top: 18,
+                        right: 12,
+                        transform: 'none !important',
+                      },
                     }}
                   >
                     <Stack
                       direction="row"
                       alignItems="start"
                       justifyContent="space-between"
-                      sx={{ width: '100%' }}
+                      sx={{ width: '100%', pr: 4 }} // add padding-right so text doesn't overlap the icon
                     >
-                      <Box >
-                        <Typography variant="body2" fontWeight={600}>
-                          ID: {row.id || '—'}
-                        </Typography>
-                        <Typography variant="subtitle1">{row.name || '—'}</Typography>
-                        <Typography variant="subtitle2" >
-                          Mb No: {row.phone || '—'}
-                        </Typography>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Stack
+                          direction="column"
+                          spacing={0.5}
+                          sx={{ borderRight: '1px solid #ccc', paddingRight: 1 }}
+                        >
+                          <Typography variant="subtitle1">ID:</Typography>
+                          <Typography variant="subtitle2">{row.id || '—'}</Typography>
+                        </Stack>
+
+                        <Stack
+                          direction="column"
+                          spacing={0.5}
+                          sx={{ borderRight: '1px solid #ccc', paddingRight: 1 }}
+                        >
+                          <Typography variant="subtitle1" sx={{ textWrap: 'wrap' }}>
+                            Name:
+                          </Typography>
+                          <Typography variant="subtitle2" color="text.secondary">
+                            {row.name || '—'}
+                          </Typography>
+                        </Stack>
+
+                        <Stack direction="column" spacing={0.5}>
+                          <Typography variant="subtitle1">Mb No.:</Typography>
+                          <Typography variant="subtitle2">{row.phone || '—'}</Typography>
+                        </Stack>
                       </Box>
 
                       <Typography
@@ -121,21 +174,18 @@ function UserMobileViewCardLayout({ data = [], onEditRow, onDeleteRow }) {
                       py: 1.5,
                     }}
                   >
+                    <Box flex={1} sx={{ display: 'flex', alignItems: 'center',gap:1, mb: 1 }}>
+                      <Button variant="contained" onClick={viewTransaction}>
+                        <Typography variant="body2"> Transaction</Typography>
+                      </Button>
+                      <Button variant="contained" onClick={viewWithdrawalRequests}>
+                        <Typography variant="body2">Withdrawal</Typography>
+                      </Button>
+                      <Button variant="contained" onClick={viewGameRecord}>
+                        <Typography variant="body2">Game</Typography>
+                      </Button>
+                    </Box>
                     <Stack spacing={0.5}>
-                      <StatusToggleCell id={row.id} status={row.status} />
-
-                      <Typography variant="body2">
-                        <b>Account Details:</b> {row.accountDetails || '—'}
-                      </Typography>
-                      <Typography variant="body2">
-                        <b>Balance:</b> {row.balance || '—'}
-                      </Typography>
-                      <Typography variant="body2">
-                        <b>Withdrawal:</b> {row.withdrawal || '—'}
-                      </Typography>
-                      <Typography variant="body2">
-                        <b>Game Record:</b> {row.gameRecord || '—'}
-                      </Typography>
                       <Typography variant="body2">
                         <b>Password:</b> {row.password || '—'}
                       </Typography>
@@ -144,9 +194,75 @@ function UserMobileViewCardLayout({ data = [], onEditRow, onDeleteRow }) {
                         {row.createdAt ? new Date(row.createdAt).toLocaleString() : '—'}
                       </Typography>
 
+                      <Accordion
+                        disableGutters
+                        sx={{
+                          boxShadow: 'none',
+                          borderRadius: 1,
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          '&:before': { display: 'none' },
+                          bgcolor: 'background.paper',
+                        }}
+                      >
+                        <AccordionSummary
+                          expandIcon={<ExpandMoreRoundedIcon />}
+                          sx={{
+                            bgcolor: 'grey.50',
+                            borderBottom: '1px solid',
+                            borderColor: 'divider',
+                            '& .MuiAccordionSummary-content': {
+                              alignItems: 'center',
+                              width: '100%',
+                            },
+                          }}
+                        >
+                          <Typography variant="subtitle1" fontWeight={600}>
+                            Account Details
+                          </Typography>
+                        </AccordionSummary>
+
+                        <AccordionDetails
+                          sx={{
+                            px: 2,
+                            py: 1.5,
+                            bgcolor: 'background.default',
+                          }}
+                        >
+                          {/* {row?.accountDetails ? ( */}
+                          <Box>
+                            <Typography variant="body2" sx={{ mb: 0.5 }}>
+                              <strong>Bank Name:</strong> {row?.accountDetails?.bankName || '—'}
+                            </Typography>
+                            <Typography variant="body2" sx={{ mb: 0.5 }}>
+                              <strong>Account No:</strong>{' '}
+                              {row?.accountDetails?.accountNumber || '—'}
+                            </Typography>
+                            <Typography variant="body2" sx={{ mb: 0.5 }}>
+                              <strong>IFSC Code:</strong> {row?.accountDetails?.ifscCode || '—'}
+                            </Typography>
+                            <Typography variant="body2">
+                              <strong>Account Holder:</strong>{' '}
+                              {row?.accountDetails?.holderName || '—'}
+                            </Typography>
+                          </Box>
+                          {/* //   ) : (
+                        //     <Typography variant="body2" color="text.secondary">
+                        //       No account details available.
+                        //     </Typography>
+                        //   )} */}
+                        </AccordionDetails>
+                      </Accordion>
+
+                      <Button variant="contained" onClick={() => setOpen(true)}>
+                        <b>Add / Deduct Money</b>
+                      </Button>
+
                       <Divider sx={{ my: 1 }} />
 
-                      <Stack direction="row" justifyContent="flex-end" spacing={1}>
+                      <Stack direction="row" justifyContent="space-between" spacing={1}>
+                        <StatusToggleCell id={row.id} status={row.status} />
+
                         <IconButton size="small" color="primary" onClick={() => onEditRow(row.id)}>
                           <EditIcon fontSize="small" />
                         </IconButton>
@@ -177,6 +293,13 @@ function UserMobileViewCardLayout({ data = [], onEditRow, onDeleteRow }) {
           </Stack>
         </>
       )}
+
+      <AddDeductBalanceModal
+        open={open}
+        handleClose={() => setOpen(false)}
+        currentBalance={2.01}
+        onSubmit={handleSubmit}
+      />
     </Box>
   );
 }

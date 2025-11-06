@@ -8,7 +8,7 @@ import useResponsive from '../../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
 // _mock_
-import {marketRecordData}  from '../../_mock/arrays/_market';
+import { marketRecordData } from '../../_mock/arrays/_market';
 // components
 import Scrollbar from '../../components/scrollbar';
 import ConfirmDialog from '../../components/confirm-dialog';
@@ -27,8 +27,27 @@ import {
 import WithdrawDetailsToolbar from '../../sections/_withdraw_details/components/WithdrawDetailsToolbar';
 import GeneralMarketRecordTableRow from '../../sections/_general_market_records/components/GeneralMarketRecordsTableRow';
 import GeneralMarketRecordMVCLayout from '../../sections/_general_market_records/components/GeneralMarketRecordMVCLayout';
+import CustomTableToolbar from '../../components/table/CustomTableToolBar';
 
 // ----------------------------------------------------------------------
+
+const optionsData = [
+  'SRIDEVI DAY',
+  'TIME BAZAR',
+  'MADHUR DAY',
+  'MILAN DAY',
+  'RAJDHANI DAY',
+  'SUPREME DAY',
+  'KALIYAN',
+  'SRIDEVI NIGHT',
+  'MADHUR NIGHT',
+  'MILAN NIGHT',
+  'KALIYAN NIGHT',
+  'MAIN BAZAR',
+  'RAJDHANI NIGHT',
+  'KARNATAKA DAY',
+  'KARNATAKA NIGHT',
+];
 
 const TABLE_HEAD = [
   { id: 'actions', label: 'Actions', align: 'center' },
@@ -75,9 +94,15 @@ export default function GeneralMarketRecordListPage() {
 
   const [filterName, setFilterName] = useState('');
 
-  const [filterRole, setFilterRole] = useState('all');
+  const [selectedDropDown, setSelectedDropDown] = useState('');
 
   const [filterStatus, setFilterStatus] = useState('all');
+
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  const handleDateFilter = (newValue) => {
+    setSelectedDate(newValue);
+  };
 
   // Memoized filtered data
   const dataFiltered = useMemo(
@@ -86,10 +111,10 @@ export default function GeneralMarketRecordListPage() {
         inputData: tableData,
         comparator: getComparator(order, orderBy),
         filterName,
-        filterRole,
+        selectedDropDown,
         filterStatus,
       }),
-    [tableData, order, orderBy, filterName, filterRole, filterStatus]
+    [tableData, order, orderBy, filterName, selectedDropDown, filterStatus]
   );
 
   // Memoized paginated data
@@ -102,13 +127,12 @@ export default function GeneralMarketRecordListPage() {
 
   const isMobile = useResponsive('down', 'sm');
 
-  const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
+  const isFiltered = filterName !== '' || selectedDropDown !== 'all' || filterStatus !== 'all';
 
   const isNotFound =
     (!dataFiltered.length && !!filterName) ||
-    (!dataFiltered.length && !!filterRole) ||
+    (!dataFiltered.length && !!selectedDropDown) ||
     (!dataFiltered.length && !!filterStatus);
-
 
   const handleCloseConfirm = () => {
     setOpenConfirm(false);
@@ -117,6 +141,10 @@ export default function GeneralMarketRecordListPage() {
   const handleFilterName = (event) => {
     setPage(0);
     setFilterName(event.target.value);
+  };
+
+  const handleSelectedDropDown = (items) => {
+    setSelectedDropDown(items);
   };
 
   const handleDeleteRow = (id) => {
@@ -164,7 +192,7 @@ export default function GeneralMarketRecordListPage() {
 
   const handleResetFilter = () => {
     setFilterName('');
-    setFilterRole('all');
+    setSelectedDropDown('all');
     setFilterStatus('all');
   };
 
@@ -184,9 +212,14 @@ export default function GeneralMarketRecordListPage() {
                 { name: 'General Market Record', href: PATH_DASHBOARD.marketrecords.root },
               ]}
             />
-            <WithdrawDetailsToolbar
+            <CustomTableToolbar
               isFiltered={isFiltered}
               filterName={filterName}
+              selectedDate={selectedDate}
+              fileterOptions={optionsData}
+              selectedDropDown={selectedDropDown}
+              onselectedDropDown={handleSelectedDropDown}
+              onDateFilter = {handleDateFilter}
               onFilterName={handleFilterName}
               onResetFilter={handleResetFilter}
               sx={{ mt: 1 }}
@@ -201,9 +234,12 @@ export default function GeneralMarketRecordListPage() {
                 { name: 'General Market Record', href: PATH_DASHBOARD.marketrecords.root },
               ]}
             />
-            <WithdrawDetailsToolbar
+            <CustomTableToolbar
               isFiltered={isFiltered}
               filterName={filterName}
+              fileterOptions={optionsData}
+              selectedDropDown={selectedDropDown}
+              onselectedDropDown={handleSelectedDropDown}
               onFilterName={handleFilterName}
               onResetFilter={handleResetFilter}
               sx={{ mt: 1 }}
@@ -301,7 +337,7 @@ export default function GeneralMarketRecordListPage() {
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, comparator, filterName, filterStatus, filterRole }) {
+function applyFilter({ inputData, comparator, filterName, filterStatus, selectedDropDown }) {
   const stabilizedThis = inputData.map((el, index) => [el, index]);
 
   stabilizedThis.sort((a, b) => {
@@ -322,8 +358,8 @@ function applyFilter({ inputData, comparator, filterName, filterStatus, filterRo
     inputData = inputData.filter((user) => user.status === filterStatus);
   }
 
-  if (filterRole !== 'all') {
-    inputData = inputData.filter((user) => user.role === filterRole);
+  if (selectedDropDown !== 'all') {
+    inputData = inputData.filter((user) => user.role === selectedDropDown);
   }
 
   return inputData;

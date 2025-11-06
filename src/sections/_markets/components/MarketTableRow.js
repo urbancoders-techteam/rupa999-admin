@@ -26,14 +26,8 @@ export default function MarketTableRow({ index, row, onEditRow }) {
     id,
     name,
     currentStatus,
-    gameDisabled,
-    saturdayOpen,
-    sundayOpen,
-    autoResult,
     openTime,
     closeTime,
-    openResultTime,
-    closeResultTime,
     createdAt,
   } = row;
 
@@ -80,14 +74,9 @@ export default function MarketTableRow({ index, row, onEditRow }) {
           </Label>
         </TableCell>
 
-        <TableCell align="left" sx={{minWidth:'100px'}}>{gameDisabled}</TableCell>
-        <TableCell align="left" sx={{minWidth:'100px'}}>{saturdayOpen}</TableCell>
-        <TableCell align="left" sx={{minWidth:'100px'}}>{sundayOpen}</TableCell>
-        <TableCell align="left" sx={{minWidth:'100px'}}>{autoResult}</TableCell>
+        {/* <TableCell align="left" sx={{minWidth:'100px'}}>{gameDisabled}</TableCell> */}
         <TableCell align="left" sx={{minWidth:'100px'}}>{openTime}</TableCell>
         <TableCell align="left" sx={{minWidth:'100px'}}>{closeTime}</TableCell>
-        <TableCell align="left" sx={{minWidth:'100px'}}>{openResultTime}</TableCell>
-        <TableCell align="left" sx={{minWidth:'100px'}}>{closeResultTime}</TableCell>
         <TableCell align="left" sx={{minWidth:'150px'}}>{createdAt}</TableCell>
 
        

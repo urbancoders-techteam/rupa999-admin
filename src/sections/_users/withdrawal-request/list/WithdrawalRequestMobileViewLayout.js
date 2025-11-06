@@ -11,12 +11,11 @@ import {
   Button,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import Iconify from '../../../components/iconify';
-import MenuPopover from '../../../components/menu-popover';
-import ConfirmDialog from '../../../components/confirm-dialog';
-import Label from '../../../components/label';
+import Iconify from '../../../../components/iconify';
+import MenuPopover from '../../../../components/menu-popover';
+import ConfirmDialog from '../../../../components/confirm-dialog';
 
-function PreviousResultMobileViewCardLayout({
+function WithdrawalRequestMobileViewLayout({
   data = [],
   onEditRow,
   onDeleteRow,
@@ -29,7 +28,7 @@ function PreviousResultMobileViewCardLayout({
   const [hasMore, setHasMore] = useState(data.length > 10);
   const containerRef = useRef(null);
 
-  // Popover + Confirm
+  // Popover and Confirm
   const [openPopover, setOpenPopover] = useState(null);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
@@ -38,11 +37,12 @@ function PreviousResultMobileViewCardLayout({
     setSelectedRow(row);
     setOpenPopover(event.currentTarget);
   };
+
   const handleClosePopover = () => setOpenPopover(null);
   const handleOpenConfirm = () => setOpenConfirm(true);
   const handleCloseConfirm = () => setOpenConfirm(false);
 
-  // Infinite Scroll
+  // Infinite Scroll Logic
   const handleScroll = useCallback(() => {
     if (!containerRef.current || loading || !hasMore) return;
     const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
@@ -92,7 +92,7 @@ function PreviousResultMobileViewCardLayout({
               borderRadius: 2,
               border: `1px solid ${theme.palette.divider}`,
               p: 2,
-              mb: 2,
+              mb: 1,
               boxShadow: theme.shadows[1],
             }}
           >
@@ -104,54 +104,44 @@ function PreviousResultMobileViewCardLayout({
               mb={1}
             >
               <Typography variant="subtitle1" fontWeight={600}>
-                {row.gameName}
+                {row.name || 'SUPREME NIGHT'}
               </Typography>
-              <IconButton size="small" onClick={(e) => handleOpenPopover(e, row)}>
+              <IconButton
+                size="small"
+                onClick={(e) => handleOpenPopover(e, row)}
+              >
                 <Iconify icon="eva:more-vertical-fill" />
               </IconButton>
             </Stack>
 
-            {/* Details */}
+            {/* Basic Info */}
             <Typography variant="body2" color="text.secondary">
-              Date: <strong>{row.resultDate}</strong>
+              Phone. : <strong>{row.phone || '—'}</strong>
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              	Amount : <strong>{row.resultDate || '—'}</strong>
             </Typography>
             <Typography variant="body2" sx={{ mt: 0.5 }}>
-              Result: <strong>{row.result}</strong>
+              Request Type : <strong>{row.digits || '—'}</strong>
+            </Typography>
+            <Typography variant="body2" sx={{ mt: 0.5 }}>
+              Date: <strong>{row.points || '—'}</strong>
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Status: <strong>{row.date || '—'}</strong>
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Created At: <strong>{row.createdAt || '—'}</strong>
             </Typography>
 
-            <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-              <Label variant="soft" color="info" sx={{ px: 1.5 }}>
-               Open: {row.openPana ?? '-'}
-              </Label>
-              <Label
-                variant="soft"
-                color={row.closePana ? 'success' : 'warning'}
-                sx={{ px: 1.5 }}
+            {selected.includes(row.id) && (
+              <Typography
+                variant="caption"
+                sx={{ color: 'text.secondary', mt: 0.5 }}
               >
-               Close: {row.closePana ?? 'NULL'}
-              </Label>
-            </Stack>
-
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{ mt: 1, display: 'block' }}
-            >
-              Created: {row.createdAt}
-            </Typography>
-
-            <Button
-              variant="outlined"
-              color="primary"
-              size="small"
-              sx={{ mt: 1 }}
-              onClick={() => {
-                setSelectedRow(row);
-                handleOpenConfirm();
-              }}
-            >
-              Revert
-            </Button>
+                Selected
+              </Typography>
+            )}
           </Box>
         ))}
 
@@ -172,7 +162,7 @@ function PreviousResultMobileViewCardLayout({
         )}
       </Stack>
 
-      {/* Popover Menu */}
+      {/* Popover */}
       <MenuPopover
         open={openPopover}
         onClose={handleClosePopover}
@@ -214,7 +204,7 @@ function PreviousResultMobileViewCardLayout({
   );
 }
 
-PreviousResultMobileViewCardLayout.propTypes = {
+WithdrawalRequestMobileViewLayout.propTypes = {
   data: PropTypes.array,
   onEditRow: PropTypes.func,
   onDeleteRow: PropTypes.func,
@@ -222,4 +212,4 @@ PreviousResultMobileViewCardLayout.propTypes = {
   selected: PropTypes.array,
 };
 
-export default PreviousResultMobileViewCardLayout;
+export default WithdrawalRequestMobileViewLayout;

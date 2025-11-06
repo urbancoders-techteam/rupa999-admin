@@ -8,7 +8,6 @@ import {
   Typography,
   Stack,
   IconButton,
-  Divider,
   Box,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -17,7 +16,13 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CircularProgress from '@mui/material/CircularProgress';
 import Label from '../../../components/label';
 
-function MarketMobileViewCardLayout({ data = [], onEditRow, onDeleteRow, onSelectRow, selected = [] }) {
+function MarketMobileViewCardLayout({
+  data = [],
+  onEditRow,
+  onDeleteRow,
+  onSelectRow,
+  selected = [],
+}) {
   const [visibleData, setVisibleData] = useState(data.slice(0, 10));
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(data.length > 10);
@@ -69,8 +74,11 @@ function MarketMobileViewCardLayout({ data = [], onEditRow, onDeleteRow, onSelec
             sx={{ borderRadius: 2, boxShadow: 'none', border: '1px solid #e0e0e0' }}
           >
             <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ px: 2, py: 1 }}>
-              <Box sx={{ width: '100%' }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+              <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="body1" sx={{ fontWeight: 700, borderRight: '1px solid', pr: 1, mr: 1 }}>
+                  {row.id || '—'}
+                </Typography>
+                <Typography variant="body1" sx={{flex:1 , flexWrap:'nowrap', fontWeight: 700, borderRight: '1px solid', pr: 1, mr: 1 }}>
                   {row.name || '—'}
                 </Typography>
                 <Label
@@ -85,23 +93,11 @@ function MarketMobileViewCardLayout({ data = [], onEditRow, onDeleteRow, onSelec
                 >
                   {row.currentStatus}
                 </Label>
-                <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-                  Game Disabled: {row.gameDisabled || '—'}
-                </Typography>
               </Box>
             </AccordionSummary>
 
             <AccordionDetails>
               <Stack spacing={0.5}>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Saturday: {row.saturdayOpen || '—'}
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Sunday: {row.sundayOpen || '—'}
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Auto Result: {row.autoResult || '—'}
-                </Typography>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                   Open Time: {row.openTime || '—'}
                 </Typography>
@@ -109,24 +105,11 @@ function MarketMobileViewCardLayout({ data = [], onEditRow, onDeleteRow, onSelec
                   Close Time: {row.closeTime || '—'}
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Open Result Time: {row.openResultTime || '—'}
+                  Created At: {row.createdAt ? new Date(row.createdAt).toLocaleString() : '—'}
                 </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Close Result Time: {row.closeResultTime || '—'}
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Created At:{' '}
-                  {row.createdAt ? new Date(row.createdAt).toLocaleString() : '—'}
-                </Typography>
-
-                <Divider sx={{ my: 1 }} />
 
                 <Stack direction="row" spacing={1}>
-                  <IconButton
-                    size="small"
-                    color="primary"
-                    onClick={() => onEditRow(row.name)}
-                  >
+                  <IconButton size="small" color="primary" onClick={() => onEditRow(row.name)}>
                     <EditIcon fontSize="small" />
                   </IconButton>
                   <IconButton

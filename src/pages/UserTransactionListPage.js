@@ -35,37 +35,33 @@ import {
   TableNoData,
   TableEmptyRows,
   TableHeadCustom,
-  TableSelectedAction,
   TablePaginationCustom,
 } from '../components/table';
 // sections
 import CustomTableToolbar from '../components/table/CustomTableToolBar';
-import { UserTableRow } from '../sections/_users/list';
-import UserMobileViewCardLayout from '../sections/_users/list/UserMobileViewCardLayout';
+import TransactionMobileViewCardLayout from '../sections/_users/transactions/list/TransactionMobileViewCardLayout';
 
 // ----------------------------------------------------------------------
 
-const STATUS_OPTIONS = ['all', 'Blocked', 'Unblock'];
+const STATUS_OPTIONS = ['Creadit', 'Debit'];
 
 const TABLE_HEAD = [
   { id: 'Action', label: 'Action', align: 'left' },
   { id: 'id', label: 'ID', align: 'left' },
   { id: 'name', label: 'Name', align: 'left' },
-  { id: 'company', label: 'Phone', align: 'left' },
-  { id: 'company', label: 'Password', align: 'left' },
-  { id: 'role', label: 'Balance', align: 'left' },
-  { id: 'isVerified', label: 'Total Game Amt', align: 'center' },
-  { id: 'totalWon', label: 'Total Won', align: 'left' },
-  { id: 'Withdraw', label: 'Total Withdraw', align: 'left' },
-  { id: 'Bonus', label: 'Total Bonus', align: 'left' },
-  { id: 'status', label: 'Blocked Status', align: 'left' },
-  { id: 'createdAt', label: 'createdAt', align: 'left' },
+  { id: 'name', label: 'Phone', align: 'left' },
+  { id: 'digit', label: 'Previous Amt', align: 'left' },
+  { id: 'point', label: 'Transaction Amt', align: 'left' },
+  { id: 'point', label: 'Current Amt', align: 'left' },
+  { id: 'point', label: 'Type', align: 'left' },
+  { id: 'point', label: 'Details', align: 'left' },
+  { id: 'date', label: 'Created At', align: 'left' },
   { id: '' },
-];
+];;
 
 // ----------------------------------------------------------------------
 
-export default function UserListPage() {
+export default function UserTransactionListPage() {
   const {
     dense,
     page,
@@ -77,7 +73,6 @@ export default function UserListPage() {
     selected,
     setSelected,
     onSelectAllRows,
-    //
     onSort,
     onChangeDense,
     onChangePage,
@@ -115,10 +110,10 @@ export default function UserListPage() {
 
   const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
-  const isNotFound =
-    (!dataFiltered.length && !!filterName) ||
-    (!dataFiltered.length && !!filterRole) ||
-    (!dataFiltered.length && !!filterStatus);
+  const isNotFound = true
+    // (!dataFiltered.length && !!filterName) ||
+    // (!dataFiltered.length && !!filterRole) ||
+    // (!dataFiltered.length && !!filterStatus);
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
@@ -153,9 +148,6 @@ export default function UserListPage() {
   const handleEditRow = (id) => {
     navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
   };
-  const handleTransactionRow = (id) => {
-    navigate(PATH_DASHBOARD.user.transactions(paramCase(id)));
-  };
 
   const handleResetFilter = () => {
     setFilterName('');
@@ -164,7 +156,7 @@ export default function UserListPage() {
   return (
     <>
       <Helmet>
-        <title> User: List | Rupa999 </title>
+        <title> Transctions : List | Rupa999 </title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
@@ -186,17 +178,18 @@ export default function UserListPage() {
           })}
         >
           <CustomBreadcrumbs
-            heading="User List"
+            heading=" Transctions List"
             links={[
               { name: 'Dashboard', href: PATH_DASHBOARD.root },
               { name: 'User List', href: PATH_DASHBOARD.user.list },
+              { name: 'Transactions List'},
             ]}
             action={
               <Button
                 component={RouterLink}
                 variant="contained"
                 startIcon={<Iconify icon="eva:plus-fill" />}
-                to={PATH_DASHBOARD.user.new}
+                // to={PATH_DASHBOARD.user.new}
                 sx={{
                   [(theme) => theme.breakpoints.down('sm')]: {
                     fontSize: '0.75rem',
@@ -205,7 +198,7 @@ export default function UserListPage() {
                   },
                 }}
               >
-                New User
+                Add / Deduct 
               </Button>
             }
           />
@@ -215,7 +208,7 @@ export default function UserListPage() {
         <Box
           sx={(theme) => ({
             [theme.breakpoints.down('sm')]: {
-              height: 80, // equal to breadcrumb bar height
+              height: 120, // equal to breadcrumb bar height
             },
           })}
         />
@@ -227,7 +220,7 @@ export default function UserListPage() {
               filterName={filterName}
               onFilterName={handleFilterName}
             />
-            <UserMobileViewCardLayout
+            <TransactionMobileViewCardLayout
               data={dataFiltered}
               onEditRow={handleEditRow}
               onDeleteRow={(id) => handleDeleteRow(id)}
@@ -259,7 +252,7 @@ export default function UserListPage() {
             />
 
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
-              <TableSelectedAction
+              {/* <TableSelectedAction
                 dense={dense}
                 numSelected={selected.length}
                 rowCount={tableData.length}
@@ -276,7 +269,7 @@ export default function UserListPage() {
                     </IconButton>
                   </Tooltip>
                 }
-              />
+              /> */}
 
               <Scrollbar>
                 <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
@@ -290,18 +283,18 @@ export default function UserListPage() {
                   />
 
                   <TableBody>
-                    {dataFiltered
+                    {/* {dataFiltered
                       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                       .map((row) => (
                         <UserTableRow
                           key={row.id}
                           row={row}
                           // selected={selected.includes(row.id)}
-                          onTransationRow={() => handleTransactionRow(row.id)}
+                          // onSelectRow={() => onSelectRow(row.id)}
                           onDeleteRow={() => handleDeleteRow(row.id)}
                           onEditRow={() => handleEditRow(row.name)}
                         />
-                      ))}
+                      ))} */}
 
                     <TableEmptyRows
                       height={denseHeight}

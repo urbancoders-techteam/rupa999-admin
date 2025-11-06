@@ -1,77 +1,131 @@
 import PropTypes from 'prop-types';
-import { alpha, useTheme } from '@mui/material/styles';
-import { Card, Typography, Stack, Divider, Box } from '@mui/material';
+import { useTheme, alpha } from '@mui/material/styles';
+import { Card, Typography, Box, Stack, useMediaQuery } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
 export default function DashboardSummaryCard({
-  leftTitle,
-  leftValue,
-  rightTitle,
-  rightValue,
-  color = 'primary',
-  enableHoverEffect = true,
+  todayLabel,
+  todayValue = 0,
+  totalValue = 0,
+  totalLabel ,
+  imageSrc = '',
+  color = 'success',
   sx,
   ...other
 }) {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
     <Card
       sx={{
-        px: 2.5,
-        py: 2,
+        p: { xs: 2, sm: 2.5, md: 3 },
         display: 'flex',
-        // alignItems: 'center',
+        alignItems:'flex-start',
         justifyContent: 'space-between',
         borderRadius: 2,
-        boxShadow: theme.shadows[4],
-        background: alpha(theme.palette.background.paper, 0.9),
-        transition: enableHoverEffect ? 'all 0.3s ease' : 'none',
-        ...(enableHoverEffect && {
-          '&:hover': {
-            transform: 'translateY(-6px)',
-            boxShadow: theme.shadows[8],
-            bgcolor: alpha(theme.palette[color].lighter || theme.palette.primary.light, 0.25),
-          },
-        }),
+        boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+        backgroundColor: theme.palette.background.paper,
+        transition: 'all 0.3s ease',
+        '&:hover': {
+          transform: 'translateY(-3px)',
+          boxShadow: '0 6px 16px rgba(0,0,0,0.12)',
+        },
         ...sx,
       }}
       {...other}
     >
-      {/* Left Section */}
-      <Box flex={0.5} textAlign="start" sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-        <Typography variant="subtitle2" sx={{ color: theme.palette.text.secondary, mb: 0.5 }}>
-          {leftTitle}
+      {/* LEFT SECTION */}
+      <Box
+        spacing={isMobile ? 0.8 : 1.2}
+        sx={{
+          flex: 1,
+          pr: { sm: 2, md: 3 },
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+        }}
+      >
+        <Typography
+          variant="subtitle2"
+          sx={{
+            color: theme.palette.text.secondary,
+            textTransform: 'capitalize',
+          }}
+        >
+          {totalLabel}
         </Typography>
-        <Typography variant="h3" sx={{ color: theme.palette.text.primary }}>
-          {leftValue}
+
+        <Typography
+          variant={isMobile ? 'h5' : 'h4'}
+          sx={{
+            fontWeight: 700,
+            color: theme.palette.text.primary,
+            lineHeight: 1.3,
+          }}
+        >
+          {totalValue}
         </Typography>
+
+       {todayLabel && <Box sx={{  mt: 1,}}>
+          <Typography
+            variant="subtitle2"
+            sx={{
+              color: theme.palette.text.secondary,
+            }}
+          >
+            {todayLabel}
+          </Typography>
+          <Typography
+            variant={isMobile ? 'h5' : 'h4'}
+            sx={{
+              flexWrap: 'wrap',
+              color: theme.palette[color].main,
+              fontWeight: 700,
+            }}
+          >
+            {todayValue}&nbsp;
+          </Typography>
+        </Box>}
       </Box>
 
-      {/* Vertical Divider */}
-      {rightTitle && (
-        <>
-          {' '}
-          <Divider
-            orientation="vertical"
-            flexItem
+      {/* RIGHT SECTION (IMAGE) */}
+      <Box
+        sx={{
+          width: { xs: '50%', sm: 120, md: 80 },
+          height: { xs: 100, sm: 100, md: 80 },
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+          borderRadius: 2,
+          bgcolor: alpha(theme.palette.primary.main, 0.04),
+        }}
+      >
+        {imageSrc ? (
+          <Box
+            component="img"
+            src={imageSrc}
+            alt={todayLabel}
             sx={{
-              mx: 1,
-              borderColor: alpha(theme.palette.text.primary, 0.2),
+              width: '50%',
+              height: 'auto',
+              objectFit: 'contain',
             }}
           />
-          {/* Right Section */}
-          <Box flex={0.5} textAlign="end" sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <Typography variant="subtitle2" sx={{ color: theme.palette.text.secondary, mb: 0.5 }}>
-              {rightTitle}
-            </Typography>
-            <Typography variant="h3" sx={{ color: theme.palette.text.primary }}>
-              {rightValue}
-            </Typography>
-          </Box>{' '}
-        </>
-      )}
+        ) : (
+          <Typography
+            variant="caption"
+            sx={{
+              color: theme.palette.text.disabled,
+            }}
+          >
+            No Image
+          </Typography>
+        )}
+      </Box>
     </Card>
   );
 }
@@ -79,11 +133,11 @@ export default function DashboardSummaryCard({
 // ----------------------------------------------------------------------
 
 DashboardSummaryCard.propTypes = {
-  leftTitle: PropTypes.string.isRequired,
-  leftValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  rightTitle: PropTypes.string.isRequired,
-  rightValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  todayLabel: PropTypes.string,
+  todayValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  totalValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  totalLabel: PropTypes.string,
+  imageSrc: PropTypes.string,
   color: PropTypes.string,
-  enableHoverEffect: PropTypes.bool,
   sx: PropTypes.object,
 };

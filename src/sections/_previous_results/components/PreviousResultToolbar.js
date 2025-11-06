@@ -1,7 +1,9 @@
 import PropTypes from 'prop-types';
 // @mui
-import { Stack, InputAdornment, TextField, Button } from '@mui/material';
+import { Stack, InputAdornment, TextField, Button, Autocomplete } from '@mui/material';
 // components
+import { useState } from 'react';
+import { DatePicker } from '@mui/x-date-pickers';
 import Iconify from '../../../components/iconify';
 
 // ----------------------------------------------------------------------
@@ -13,7 +15,18 @@ PreviousResultToolbar.propTypes = {
   onResetFilter: PropTypes.func,
 };
 
-export default function PreviousResultToolbar({ isFiltered, filterName, onFilterName, onResetFilter }) {
+export default function PreviousResultToolbar({
+  isFiltered,
+  filterName,
+  onFilterName,
+  onResetFilter,
+}) {
+  const [startDate, setStartDate] = useState(new Date());
+  const [subMenuValue, setSubMenuValue] = useState('');
+
+  const onChangeStartDate = (newValue) => {
+    setStartDate(newValue);
+  };
   return (
     <Stack
       spacing={2}
@@ -39,6 +52,26 @@ export default function PreviousResultToolbar({ isFiltered, filterName, onFilter
         }}
       />
 
+      <Autocomplete
+        size="small"
+        fullWidth
+        options={optionsData}
+        value={subMenuValue}
+        onChange={(_, newValue) => setSubMenuValue(newValue)}
+        renderInput={(params) => <TextField {...params} label="Choose Markets" fullWidth />}
+      />
+
+      {/* <Grid item xs={12} sm={6} md={3}> */}
+                  <DatePicker
+                    size="small"
+                    label="Start date"
+                    format="DD/MM/YYYY"
+                    value={startDate}
+                    onChange={onChangeStartDate}
+                    renderInput={(params) => <TextField size="small" {...params} />}
+                  />
+                {/* </Grid> */}
+
       {isFiltered && (
         <Button
           color="error"
@@ -52,3 +85,21 @@ export default function PreviousResultToolbar({ isFiltered, filterName, onFilter
     </Stack>
   );
 }
+
+const optionsData = [
+  'SRIDEVI DAY',
+  'TIME BAZAR',
+  'MADHUR DAY',
+  'MILAN DAY',
+  'RAJDHANI DAY',
+  'SUPREME DAY',
+  'KALIYAN',
+  'SRIDEVI NIGHT',
+  'MADHUR NIGHT',
+  'MILAN NIGHT',
+  'KALIYAN NIGHT',
+  'MAIN BAZAR',
+  'RAJDHANI NIGHT',
+  'KARNATAKA DAY',
+  'KARNATAKA NIGHT',
+];

@@ -12,8 +12,10 @@ import {
   Container,
   IconButton,
   TableContainer,
+  useMediaQuery,
 } from '@mui/material';
 // routes
+import { useTheme } from '@mui/system';
 import { PATH_DASHBOARD } from '../../routes/paths';
 // _mock_
 import { previousResults } from '../../_mock/arrays';
@@ -36,6 +38,9 @@ import {
 // sections
 import PreviousResultTableRow from '../../sections/_previous_results/components/PreviousResultTableRow';
 import PreviousResultToolbar from '../../sections/_previous_results/components/PreviousResultToolbar';
+import GeneralCreateResultForm from '../../sections/_previous_results/components/GeneralCreateResultForm';
+import ResultTable from '../../sections/_previous_results/components/ResultTable';
+import PreviousResultMobileViewCardLayout from '../../sections/_previous_results/components/PreviousResultMobileViewCardLayout';
 
 // ----------------------------------------------------------------------
 
@@ -77,6 +82,9 @@ export default function PreviousResultListPage() {
 
   const navigate = useNavigate();
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [tableData, setTableData] = useState(previousResults);
 
   const [openConfirm, setOpenConfirm] = useState(false);
@@ -95,7 +103,7 @@ export default function PreviousResultListPage() {
 
   const isFiltered = filterName !== '';
 
-  const isNotFound =  (!dataFiltered.length && !!filterName)
+  const isNotFound = !dataFiltered.length && !!filterName;
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
@@ -173,82 +181,92 @@ export default function PreviousResultListPage() {
           }
         />
 
-        <Card>
-          
-          <PreviousResultToolbar
-            isFiltered={isFiltered}
-            filterName={filterName}
-            onFilterName={handleFilterName}
-            onResetFilter={handleResetFilter}
-          />
+        <GeneralCreateResultForm />
 
-          <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
-            <TableSelectedAction
-              dense={dense}
-              numSelected={selected.length}
-              rowCount={tableData.length}
-              onSelectAllRows={(checked) =>
-                onSelectAllRows(
-                  checked,
-                  tableData.map((row) => row.id)
-                )
-              }
-              action={
-                <Tooltip title="Delete">
-                  <IconButton color="primary" onClick={handleOpenConfirm}>
-                    <Iconify icon="eva:trash-2-outline" />
-                  </IconButton>
-                </Tooltip>
-              }
+        <ResultTable />
+        {isMobile ? (
+          <PreviousResultMobileViewCardLayout
+            data={dataFiltered}
+            onEditRow={handleEditRow}
+            onDeleteRow={(id) => handleDeleteRow(id)}
+          />
+        ) : (
+          <Card>
+            <PreviousResultToolbar
+              isFiltered={isFiltered}
+              filterName={filterName}
+              onFilterName={handleFilterName}
+              onResetFilter={handleResetFilter}
             />
 
-            <Scrollbar>
-              <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
-                <TableHeadCustom
-                  order={order}
-                  orderBy={orderBy}
-                  headLabel={TABLE_HEAD}
-                  rowCount={tableData.length}
-                  numSelected={selected.length}
-                  onSort={onSort}
-                />
+            <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
+              <TableSelectedAction
+                dense={dense}
+                numSelected={selected.length}
+                rowCount={tableData.length}
+                onSelectAllRows={(checked) =>
+                  onSelectAllRows(
+                    checked,
+                    tableData.map((row) => row.id)
+                  )
+                }
+                action={
+                  <Tooltip title="Delete">
+                    <IconButton color="primary" onClick={handleOpenConfirm}>
+                      <Iconify icon="eva:trash-2-outline" />
+                    </IconButton>
+                  </Tooltip>
+                }
+              />
 
-                <TableBody>
-                  {dataFiltered
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row) => (
-                      <PreviousResultTableRow
-                        key={row.id}
-                        row={row}
-                        selected={selected.includes(row.id)}
-                        onSelectRow={() => onSelectRow(row.id)}
-                        onDeleteRow={() => handleDeleteRow(row.id)}
-                        onEditRow={() => handleEditRow(row.name)}
-                      />
-                    ))}
-
-                  <TableEmptyRows
-                    height={denseHeight}
-                    emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
+              <Scrollbar>
+                <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
+                  <TableHeadCustom
+                    order={order}
+                    orderBy={orderBy}
+                    headLabel={TABLE_HEAD}
+                    rowCount={tableData.length}
+                    numSelected={selected.length}
+                    onSort={onSort}
                   />
 
-                  <TableNoData isNotFound={isNotFound} />
-                </TableBody>
-              </Table>
-            </Scrollbar>
-          </TableContainer>
+                  <TableBody>
+                    {dataFiltered
+                      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                      .map((row) => (
+                        <PreviousResultTableRow
+                          key={row.id}
+                          row={row}
+                          selected={selected.includes(row.id)}
+                          onSelectRow={() => onSelectRow(row.id)}
+                          onDeleteRow={() => handleDeleteRow(row.id)}
+                          onEditRow={() => handleEditRow(row.name)}
+                        />
+                      ))}
 
-          <TablePaginationCustom
-            count={dataFiltered.length}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={onChangePage}
-            onRowsPerPageChange={onChangeRowsPerPage}
-            //
-            dense={dense}
-            onChangeDense={onChangeDense}
-          />
-        </Card>
+                    <TableEmptyRows
+                      height={denseHeight}
+                      emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
+                    />
+
+                    <TableNoData isNotFound={isNotFound} />
+                  </TableBody>
+                </Table>
+              </Scrollbar>
+            </TableContainer>
+
+            <TablePaginationCustom
+              page={page}
+              count={dataFiltered.length}
+              rowsPerPage={rowsPerPage}
+              onPageChange={onChangePage}
+              onRowsPerPageChange={onChangeRowsPerPage}
+              //
+              dense={dense}
+              onChangeDense={onChangeDense}
+            />
+          </Card>
+        )}
       </Container>
 
       <ConfirmDialog
@@ -292,7 +310,8 @@ function applyFilter({ inputData, comparator, filterName, filterStatus, filterRo
 
   if (filterName) {
     inputData = inputData.filter(
-      (previousresults) => previousresults.gameName.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+      (previousresults) =>
+        previousresults.gameName.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
     );
   }
 

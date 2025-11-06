@@ -35,14 +35,8 @@ const TABLE_HEAD = [
   { id: 'id', label: 'ID', align: 'left' },
   { id: 'name', label: 'Name', align: 'left' },
   { id: 'currentStatus', label: 'Current Status', align: 'left' },
-  { id: 'gameDisabled', label: 'Game Disabled?', align: 'left' },
-  { id: 'saturdayOpen', label: 'Saturday Open', align: 'left' },
-  { id: 'sundayOpen', label: 'Sunday Open', align: 'left' },
-  { id: 'autoResult', label: 'Auto Result', align: 'left' },
   { id: 'openTime', label: 'Open Time', align: 'left' },
   { id: 'closeTime', label: 'Close Time', align: 'left' },
-  { id: 'openResultTime', label: 'Open Result Time', align: 'left' },
-  { id: 'closeResultTime', label: 'Close Result Time', align: 'left' },
   { id: 'createdAt', label: 'Created At', align: 'left' },
 ];
 

@@ -35,37 +35,32 @@ import {
   TableNoData,
   TableEmptyRows,
   TableHeadCustom,
-  TableSelectedAction,
   TablePaginationCustom,
 } from '../components/table';
 // sections
 import CustomTableToolbar from '../components/table/CustomTableToolBar';
-import { UserTableRow } from '../sections/_users/list';
-import UserMobileViewCardLayout from '../sections/_users/list/UserMobileViewCardLayout';
+import WithdrawalRequestMobileViewLayout from '../sections/_users/withdrawal-request/list/WithdrawalRequestMobileViewLayout';
 
 // ----------------------------------------------------------------------
 
-const STATUS_OPTIONS = ['all', 'Blocked', 'Unblock'];
+const STATUS_OPTIONS = ['Creadit', 'Debit'];
 
 const TABLE_HEAD = [
   { id: 'Action', label: 'Action', align: 'left' },
   { id: 'id', label: 'ID', align: 'left' },
   { id: 'name', label: 'Name', align: 'left' },
-  { id: 'company', label: 'Phone', align: 'left' },
-  { id: 'company', label: 'Password', align: 'left' },
-  { id: 'role', label: 'Balance', align: 'left' },
-  { id: 'isVerified', label: 'Total Game Amt', align: 'center' },
-  { id: 'totalWon', label: 'Total Won', align: 'left' },
-  { id: 'Withdraw', label: 'Total Withdraw', align: 'left' },
-  { id: 'Bonus', label: 'Total Bonus', align: 'left' },
-  { id: 'status', label: 'Blocked Status', align: 'left' },
-  { id: 'createdAt', label: 'createdAt', align: 'left' },
+  { id: 'name', label: 'Phone', align: 'left' },
+  { id: 'digit', label: 'Amount', align: 'left' },
+  { id: 'point', label: 'Request Type', align: 'left' },
+  { id: 'point', label: 'Date', align: 'left' },
+  { id: 'point', label: 'Status', align: 'left' },
+  { id: 'date', label: 'Created At', align: 'left' },
   { id: '' },
-];
+];;
 
 // ----------------------------------------------------------------------
 
-export default function UserListPage() {
+export default function WithdrawalResquestListPage() {
   const {
     dense,
     page,
@@ -77,7 +72,6 @@ export default function UserListPage() {
     selected,
     setSelected,
     onSelectAllRows,
-    //
     onSort,
     onChangeDense,
     onChangePage,
@@ -115,10 +109,10 @@ export default function UserListPage() {
 
   const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
-  const isNotFound =
-    (!dataFiltered.length && !!filterName) ||
-    (!dataFiltered.length && !!filterRole) ||
-    (!dataFiltered.length && !!filterStatus);
+  const isNotFound = true
+    // (!dataFiltered.length && !!filterName) ||
+    // (!dataFiltered.length && !!filterRole) ||
+    // (!dataFiltered.length && !!filterStatus);
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
@@ -153,9 +147,6 @@ export default function UserListPage() {
   const handleEditRow = (id) => {
     navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
   };
-  const handleTransactionRow = (id) => {
-    navigate(PATH_DASHBOARD.user.transactions(paramCase(id)));
-  };
 
   const handleResetFilter = () => {
     setFilterName('');
@@ -164,7 +155,7 @@ export default function UserListPage() {
   return (
     <>
       <Helmet>
-        <title> User: List | Rupa999 </title>
+        <title> Transctions : List | Rupa999 </title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
@@ -186,28 +177,29 @@ export default function UserListPage() {
           })}
         >
           <CustomBreadcrumbs
-            heading="User List"
+            heading="Withdrawal Requests"
             links={[
               { name: 'Dashboard', href: PATH_DASHBOARD.root },
               { name: 'User List', href: PATH_DASHBOARD.user.list },
+              { name: 'Withdrawal Requests'},
             ]}
-            action={
-              <Button
-                component={RouterLink}
-                variant="contained"
-                startIcon={<Iconify icon="eva:plus-fill" />}
-                to={PATH_DASHBOARD.user.new}
-                sx={{
-                  [(theme) => theme.breakpoints.down('sm')]: {
-                    fontSize: '0.75rem',
-                    py: 0.5,
-                    px: 1.5,
-                  },
-                }}
-              >
-                New User
-              </Button>
-            }
+            // action={
+            //   <Button
+            //     component={RouterLink}
+            //     variant="contained"
+            //     startIcon={<Iconify icon="eva:plus-fill" />}
+            //     // to={PATH_DASHBOARD.user.new}
+            //     sx={{
+            //       [(theme) => theme.breakpoints.down('sm')]: {
+            //         fontSize: '0.75rem',
+            //         py: 0.5,
+            //         px: 1.5,
+            //       },
+            //     }}
+            //   >
+            //     Add / Deduct 
+            //   </Button>
+            // }
           />
         </Box>
 
@@ -215,7 +207,7 @@ export default function UserListPage() {
         <Box
           sx={(theme) => ({
             [theme.breakpoints.down('sm')]: {
-              height: 80, // equal to breadcrumb bar height
+              height: 90, // equal to breadcrumb bar height
             },
           })}
         />
@@ -227,7 +219,7 @@ export default function UserListPage() {
               filterName={filterName}
               onFilterName={handleFilterName}
             />
-            <UserMobileViewCardLayout
+            <WithdrawalRequestMobileViewLayout
               data={dataFiltered}
               onEditRow={handleEditRow}
               onDeleteRow={(id) => handleDeleteRow(id)}
@@ -237,21 +229,6 @@ export default function UserListPage() {
           </>
         ) : (
           <Card>
-            <Tabs
-              value={filterStatus}
-              onChange={handleFilterStatus}
-              sx={{
-                px: 2,
-                bgcolor: 'background.neutral',
-              }}
-            >
-              {STATUS_OPTIONS.map((tab) => (
-                <Tab key={tab} label={tab} value={tab} />
-              ))}
-            </Tabs>
-
-            <Divider />
-
             <CustomTableToolbar
               isFiltered={isFiltered}
               filterName={filterName}
@@ -259,7 +236,7 @@ export default function UserListPage() {
             />
 
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
-              <TableSelectedAction
+              {/* <TableSelectedAction
                 dense={dense}
                 numSelected={selected.length}
                 rowCount={tableData.length}
@@ -276,7 +253,7 @@ export default function UserListPage() {
                     </IconButton>
                   </Tooltip>
                 }
-              />
+              /> */}
 
               <Scrollbar>
                 <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
@@ -290,18 +267,18 @@ export default function UserListPage() {
                   />
 
                   <TableBody>
-                    {dataFiltered
+                    {/* {dataFiltered
                       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                       .map((row) => (
                         <UserTableRow
                           key={row.id}
                           row={row}
                           // selected={selected.includes(row.id)}
-                          onTransationRow={() => handleTransactionRow(row.id)}
+                          // onSelectRow={() => onSelectRow(row.id)}
                           onDeleteRow={() => handleDeleteRow(row.id)}
                           onEditRow={() => handleEditRow(row.name)}
                         />
-                      ))}
+                      ))} */}
 
                     <TableEmptyRows
                       height={denseHeight}

@@ -8,9 +8,9 @@ import { PATH_DASHBOARD } from '../../../routes/paths';
 // import { getBannerByIdAsync } from '../../../redux/services/banner';
 import CustomBreadcrumbs from '../../../components/custom-breadcrumbs/CustomBreadcrumbs';
 import LoadingScreen from '../../../components/loading-screen/LoadingScreen';
-import MarketForm from './MarketForm';
+import UserForm from './UserForm';
 
-export default function GiftFormHandlePage() {
+export default function UserFormHandle() {
   const { themeStretch } = useSettingsContext();
   const dispatch = useDispatch();
   const { id } = useParams();
@@ -21,8 +21,8 @@ export default function GiftFormHandlePage() {
   const editView = useMemo(() => {
     if (id && /edit/i?.test(pathname)) {
       return {
-        title: 'Market: Edit | Rupa999',
-        heading: 'Edit Market',
+        title: 'User: Edit | Rupa999',
+        heading: 'Edit User',
         user: state?.name ?? '',
         isEdit: true,
         isView: false,
@@ -30,16 +30,16 @@ export default function GiftFormHandlePage() {
     }
     if (id && /view/i?.test(pathname)) {
       return {
-        title: 'Market: View | Rupa999',
-        heading: 'View Market',
+        title: 'User: View | Rupa999',
+        heading: 'View User',
         user: state?.name ?? '',
         isEdit: false,
         isView: true,
       };
     }
     return {
-      title: 'Market: Create | Rupa999',
-      heading: 'Create Market',
+      title: 'User: Create | Rupa999',
+      heading: 'Create User',
       user: 'New',
       isEdit: false,
       isView: false,
@@ -65,19 +65,19 @@ export default function GiftFormHandlePage() {
               href: PATH_DASHBOARD.root,
             },
             {
-              name: 'Market List',
-              href: PATH_DASHBOARD.marketlist.list,
+              name: 'User List',
+              href: PATH_DASHBOARD.user.list,
             },
             {
               name: editView?.heading,
-              href: PATH_DASHBOARD.marketlist.list,
+              href: PATH_DASHBOARD.user.list,
             },
           ]}
         />
         {/* {isLoading ? (
         <LoadingScreen />
       ) : ( */}
-        <MarketForm
+        <UserForm
           isEdit={editView?.isEdit}
           isView={editView?.isView}
           // currentBanner={editView?.isView || editView?.isEdit ? bannerById : {}}
