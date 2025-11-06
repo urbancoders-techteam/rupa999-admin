@@ -91,6 +91,8 @@ export default function PreviousResultListPage() {
 
   const [filterName, setFilterName] = useState('');
 
+  const [showWinner, setShowWinner] = useState(false);
+
   const dataFiltered = applyFilter({
     inputData: tableData,
     comparator: getComparator(order, orderBy),
@@ -181,9 +183,10 @@ export default function PreviousResultListPage() {
           }
         />
 
-        <GeneralCreateResultForm />
+        <GeneralCreateResultForm setShowWinner={setShowWinner} />
 
-        <ResultTable />
+        {showWinner === true && <ResultTable />}
+
         {isMobile ? (
           <PreviousResultMobileViewCardLayout
             data={dataFiltered}

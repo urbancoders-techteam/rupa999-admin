@@ -13,6 +13,7 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
+import PropTypes from 'prop-types';
 
 // ----------------------------------------------------------------------
 
@@ -27,8 +28,13 @@ const validationSchema = Yup.object().shape({
 const markets = ['Game 1', 'Game 2', 'Game 3'];
 const sessions = ['Morning', 'Evening', 'Night'];
 
-export default function GeneralCreateResultForm() {
+GeneralCreateResultForm.propTypes = {
+  setShowWinner : PropTypes.bool
+}
+
+export default function GeneralCreateResultForm({setShowWinner}) {
   const [percentage, setPercentage] = useState('No');
+
 
   const {
     handleSubmit,
@@ -127,15 +133,16 @@ export default function GeneralCreateResultForm() {
           </Grid>
 
           {/* Percentage */}
-          <Grid item xs={12} md={3}>
-            <Typography variant="body2" sx={{ mb: 1, fontWeight: 500, color: 'text.secondary' }}>
+          <Grid item xs={12} md={4}>
+            <Typography variant="body2" sx={{ ml: 1, mb: 1, fontWeight: 500, color: 'text.secondary' }}>
               Did you want to do with percentage?
             </Typography>
 
             <Box
               sx={{
+                ml:1,
+                gap: 1,
                 display: 'flex',
-                gap: 2,
                 alignItems: 'center',
               }}
             >
@@ -145,15 +152,11 @@ export default function GeneralCreateResultForm() {
                 onClick={() => setPercentage('Yes')}
                 sx={{
                   flex: 1,
+                  maxWidth:'100px',
                   textTransform: 'none',
                   fontWeight: 600,
-                  py: 1,
                   borderRadius: 2,
                   boxShadow: percentage === 'Yes' ? '0px 2px 8px rgba(25, 135, 84, 0.4)' : 'none',
-                //   transition: 'all 0.3s ease',
-                //   '&:hover': {
-                //     transform: 'scale(1.03)',
-                //   },
                 }}
               >
                 Yes
@@ -165,15 +168,12 @@ export default function GeneralCreateResultForm() {
                 onClick={() => setPercentage('No')}
                 sx={{
                   flex: 1,
+                  maxWidth:'100px',
                   textTransform: 'none',
                   fontWeight: 600,
-                  py: 1,
                   borderRadius: 2,
                   boxShadow: percentage === 'No' ? '0px 2px 8px rgba(220, 53, 69, 0.4)' : 'none',
-                //   transition: 'all 0.3s ease',
-                //   '&:hover': {
-                //     transform: 'scale(1.03)',
-                //   },
+                
                 }}
               >
                 No
@@ -182,7 +182,7 @@ export default function GeneralCreateResultForm() {
           </Grid>
 
           {/* Pana */}
-          <Grid item xs={12} md={4.5}>
+          <Grid item xs={12} md={4}>
             <Controller
               name="pana"
               control={control}
@@ -201,7 +201,7 @@ export default function GeneralCreateResultForm() {
           </Grid>
 
           {/* Digit */}
-          <Grid item xs={12} md={4.5}>
+          <Grid item xs={12} md={4}>
             <Controller
               name="digit"
               control={control}
@@ -222,8 +222,8 @@ export default function GeneralCreateResultForm() {
         </Grid>
 
         {/* Buttons */}
-        <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
-          <Button variant="outlined" color="primary" onClick={() => alert('Show Winners Clicked')}>
+        <Box sx={{ mt: 2, display: 'flex', justifyContent:'flex-end', gap: 2 }}>
+          <Button variant="outlined" color="primary" onClick={() => setShowWinner(true)}>
             Show Winners
           </Button>
           <Button variant="contained" color="primary" type="submit">

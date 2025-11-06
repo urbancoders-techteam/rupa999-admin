@@ -127,6 +127,12 @@ function BidHostoryMobileViewCardLayout({
             <Typography variant="body2" sx={{ mt: 0.5 }}>
               Points: <strong>{row.points || '—'}</strong>
             </Typography>
+            <Typography variant="body2" sx={{ mt: 0.5 }}>
+              Amount: <strong>{row.amount || '—'}</strong>
+            </Typography>
+            <Typography variant="body2" sx={{ mt: 0.5 }}>
+              Status: <strong>{row.status || '—'}</strong>
+            </Typography>
             <Typography variant="body2" color="text.secondary">
               Date: <strong>{row.date || '—'}</strong>
             </Typography>
