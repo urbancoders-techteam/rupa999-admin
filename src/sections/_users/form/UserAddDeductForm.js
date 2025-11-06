@@ -13,7 +13,7 @@ import {
   useTheme,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import { useForm, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import PropTypes from 'prop-types';
@@ -29,12 +29,7 @@ AddDeductBalanceModal.propTypes = {
   onSubmit: PropTypes.func,
 };
 
-export default function AddDeductBalanceModal({
-  open,
-  handleClose,
-  currentBalance = 0,
-  onSubmit,
-}) {
+export default function AddDeductBalanceModal({ open, handleClose, currentBalance = 0, onSubmit }) {
   const theme = useTheme();
   const [action, setAction] = useState('add');
 
@@ -54,10 +49,7 @@ export default function AddDeductBalanceModal({
     },
   });
 
-  const {
-    handleSubmit,
-    reset,
-  } = methods;
+  const { handleSubmit, reset } = methods;
 
   const handleActionChange = (_, newAction) => {
     if (newAction !== null) setAction(newAction);
@@ -78,6 +70,7 @@ export default function AddDeductBalanceModal({
       fullWidth
       PaperProps={{
         sx: {
+          py: 2,
           borderRadius: 2,
           boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
         },
@@ -92,7 +85,7 @@ export default function AddDeductBalanceModal({
           pb: 1,
         }}
       >
-        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+        <Typography variant="h4">
           Add | Deduct Balance
         </Typography>
         <IconButton onClick={handleClose} size="small">
@@ -116,14 +109,12 @@ export default function AddDeductBalanceModal({
         <FormProvider {...methods}>
           <Box component="form" noValidate onSubmit={handleSubmit(onFormSubmit)}>
             {/* CURRENCY FIELD */}
-            <Typography
-              variant="subtitle2"
-              sx={{ color: theme.palette.text.secondary, mb: 1 }}
-            >
+            <Typography variant="subtitle2" sx={{ color: theme.palette.text.secondary, mb: 1 }}>
               Currency
             </Typography>
 
             <RHFTextField
+              size="small"
               name="amount"
               placeholder="Enter amount"
               type="number"
@@ -131,7 +122,7 @@ export default function AddDeductBalanceModal({
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <AttachMoneyIcon fontSize="small" />
+                    <CurrencyRupeeIcon fontSize="small" />
                   </InputAdornment>
                 ),
               }}
@@ -145,10 +136,7 @@ export default function AddDeductBalanceModal({
             />
 
             {/* ACTION TOGGLE */}
-            <Typography
-              variant="subtitle2"
-              sx={{ color: theme.palette.text.secondary, mb: 1 }}
-            >
+            <Typography variant="subtitle2" sx={{ color: theme.palette.text.secondary, mb: 1 }}>
               Choose Action
             </Typography>
 
@@ -160,7 +148,7 @@ export default function AddDeductBalanceModal({
               fullWidth
               sx={{
                 mb: 3,
-                borderRadius: 1.5,
+                borderRadius: 1,
                 overflow: 'hidden',
                 '& .MuiToggleButton-root': {
                   textTransform: 'none',

@@ -154,7 +154,10 @@ export default function UserListPage() {
     navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
   };
   const handleTransactionRow = (id) => {
-    navigate(PATH_DASHBOARD.user.transactions(paramCase(id)));
+    navigate(PATH_DASHBOARD.user.transactions(id));
+  };
+  const handleWithdrawalRequestRow = (id) => {
+    navigate(PATH_DASHBOARD.user.withdrawalrequest(id));
   };
 
   const handleResetFilter = () => {
@@ -298,6 +301,7 @@ export default function UserListPage() {
                           row={row}
                           // selected={selected.includes(row.id)}
                           onTransationRow={() => handleTransactionRow(row.id)}
+                          onWithdrawalRequestRow={() => handleWithdrawalRequestRow(row.id)}
                           onDeleteRow={() => handleDeleteRow(row.id)}
                           onEditRow={() => handleEditRow(row.name)}
                         />

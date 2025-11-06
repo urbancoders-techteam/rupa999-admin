@@ -16,6 +16,17 @@ import ConfirmDialog from '../../../components/confirm-dialog';
 import StatusToggleCell from './StatusToggledCell';
 
 // ----------------------------------------------------------------------
+// ✅ Move this styled component OUTSIDE of UserTableRow
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  '&:nth-of-type(even)': {
+    backgroundColor: theme.palette.action.hover,
+  },
+  '&:last-child td, &:last-child th': {
+    border: 0,
+  },
+}));
+
+// ----------------------------------------------------------------------
 
 UserTableRow.propTypes = {
   row: PropTypes.shape({
@@ -34,10 +45,11 @@ UserTableRow.propTypes = {
   selected: PropTypes.bool,
   onEditRow: PropTypes.func,
   onTransationRow: PropTypes.func,
+  onWithdrawalRequestRow: PropTypes.func,
   onDeleteRow: PropTypes.func,
- };
+};
 
-export default function UserTableRow({ row, selected, onEditRow, onTransationRow, onDeleteRow }) {
+export default function UserTableRow({ row, selected, onEditRow, onTransationRow, onWithdrawalRequestRow, onDeleteRow }) {
   const {
     id,
     name,
@@ -53,32 +65,22 @@ export default function UserTableRow({ row, selected, onEditRow, onTransationRow
   } = row;
 
   const [openConfirm, setOpenConfirm] = useState(false);
-  const [openPopover, setOpenPopover] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
 
   const handleOpenConfirm = () => setOpenConfirm(true);
   const handleCloseConfirm = () => setOpenConfirm(false);
 
   const handleOpenPopover = (event) => {
-    console.log('event', event)
-    setOpenPopover(event.currentTarget);
+    setAnchorEl(event.currentTarget);
   };
-  const handleClosePopover = () => setOpenPopover(null);
-  
-  // Style for alternate rows
-  const StyledTableRow = styled(TableRow)(({ theme }) => ({
-    '&:nth-of-type(even)': {
-      backgroundColor: theme.palette.action.hover,
-    },
-    '&:last-child td, &:last-child th': {
-      border: 0,
-    },
-  }));
+
+  const handleClosePopover = () => setAnchorEl(null);
 
   return (
     <>
-      <StyledTableRow hover >
+      <StyledTableRow hover>
         <TableCell align="left">
-          <IconButton color={openPopover ? 'inherit' : 'default'} onClick={(event)=>handleOpenPopover(event)}>
+          <IconButton color={anchorEl ? 'inherit' : 'default'} onClick={handleOpenPopover}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
         </TableCell>
@@ -121,7 +123,7 @@ export default function UserTableRow({ row, selected, onEditRow, onTransationRow
           ₹{totalBonus?.toLocaleString('en-IN')}
         </TableCell>
 
-       <StatusToggleCell id={id} status={status} />
+        <StatusToggleCell id={id} status={status} />
 
         <TableCell align="left" sx={{ minWidth: '140px' }}>
           <Typography variant="body2" color="text.secondary">
@@ -130,12 +132,19 @@ export default function UserTableRow({ row, selected, onEditRow, onTransationRow
         </TableCell>
       </StyledTableRow>
 
-      {/* Action Menu */}
+      {/* ✅ Properly anchored MenuPopover */}
       <MenuPopover
-        open={openPopover}
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
         onClose={handleClosePopover}
-        arrow="right-top"
-        // sx={{ width: 150 }}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          // vertical: 'top',
+          horizontal: 'right',
+        }}
       >
         <MenuItem
           onClick={() => {
@@ -146,22 +155,24 @@ export default function UserTableRow({ row, selected, onEditRow, onTransationRow
           <Iconify icon="eva:edit-fill" />
           Edit
         </MenuItem>
+
         <MenuItem
           onClick={() => {
             onTransationRow();
             handleClosePopover();
           }}
         >
-          <Iconify icon="eva:edit-fill" />
+          <Iconify icon="solar:wallet-bold" />
           Transactions
         </MenuItem>
+
         <MenuItem
           onClick={() => {
-            onEditRow();
+            onWithdrawalRequestRow();
             handleClosePopover();
           }}
         >
-          <Iconify icon="eva:edit-fill" />
+          <Iconify icon="mdi:bank-transfer" />
           Withdrawal Details
         </MenuItem>
 
