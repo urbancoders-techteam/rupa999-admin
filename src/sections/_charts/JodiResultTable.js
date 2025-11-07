@@ -10,27 +10,38 @@ import {
   Paper,
   Box,
   useTheme,
-  Divider,
   Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-// ✅ Styled Components
-const StyledTableCell = styled(TableCell)(() => ({
+// ===== Styled Components =====
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
   border: '1px solid #1a1a1a',
   textAlign: 'center',
-  padding: '8px 6px',
-  fontSize: '16px',
+  padding: '6px 4px',
+  fontSize: '0.95rem',
   fontWeight: 500,
   color: '#000',
   userSelect: 'none',
+  [theme.breakpoints.down('sm')]: {
+    padding: '4px 2px',
+    fontSize: '0.75rem',
+  },
 }));
 
-const StyledHeaderCell = styled(StyledTableCell)(() => ({
+const StyledHeaderCell = styled(StyledTableCell)(({ theme }) => ({
   fontWeight: 600,
-  fontSize: '16px',
-  minWidth: '100px',
+  fontSize: '1rem',
+  color: '#fff',
+  backgroundColor: '#1b3153ff !important', // 👈 ensure it overrides stickyHeader
+  position: 'sticky',
+  top: 0, // 👈 necessary for sticky headers to stay visible
+  zIndex: 2, // 👈 ensures it's above table rows
+  [theme.breakpoints.down('sm')]: {
+    fontSize: '0.8rem',
+  },
 }));
+
 
 const StyledTableRow = styled(TableRow)(() => ({
   '&:hover': {
@@ -39,39 +50,28 @@ const StyledTableRow = styled(TableRow)(() => ({
   },
 }));
 
-// ✅ Premium Scroll Styling (hidden by default, visible on scroll)
 const ScrollContainer = styled(TableContainer)(() => ({
   maxHeight: 500,
+  overflowX: 'auto',
   overflowY: 'auto',
   scrollBehavior: 'smooth',
-  position: 'relative',
-
-  // Chrome, Edge, Safari scrollbar
   '&::-webkit-scrollbar': {
-    width: 8,
-    backgroundColor: 'transparent',
-  },
-  '&::-webkit-scrollbar-track': {
-    backgroundColor: 'transparent',
+    height: 6,
+    width: 6,
   },
   '&::-webkit-scrollbar-thumb': {
     backgroundColor: 'transparent',
+    borderRadius: 6,
   },
   '&:hover::-webkit-scrollbar-thumb': {
-    backgroundColor: '#c1c1c1',
+    backgroundColor: '#bdbdbd',
   },
   '&::-webkit-scrollbar-thumb:hover': {
     backgroundColor: '#999',
   },
-
-  // Firefox scrollbar
-  scrollbarWidth: 'thin',
-  scrollbarColor: 'transparent transparent',
-  '&:hover': {
-    scrollbarColor: '#c1c1c1 transparent',
-  },
 }));
 
+// ===== Component =====
 export default function JodiResultTable() {
   const theme = useTheme();
   const [data, setData] = useState([]);
@@ -101,30 +101,46 @@ export default function JodiResultTable() {
   }, []);
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        width: '100%',
+        overflowX: 'auto',
+        px: { xs: 1, sm: 3 },
+      }}
+    >
       <Paper
         elevation={0}
         sx={{
           border: '1px solid #ddd',
           margin: 'auto',
+          width: '100%',
+          maxWidth: 900,
           transition: 'box-shadow 0.3s ease',
-          '&:hover': {
-            boxShadow: '0px 6px 16px rgba(0,0,0,0.05)',
-          },
+          '&:hover': { boxShadow: '0px 6px 16px rgba(0,0,0,0.05)' },
         }}
       >
-        <Typography variant="h5" ml={{ xs: 1 }} p={0.5}>
-          Jodi Chart{' '}
+        <Typography
+          variant="h6"
+          fontWeight={700}
+          textAlign="center"
+          sx={{
+            py: 1,
+            backgroundColor: '#1b3153ff',
+            color: '#fff',
+            fontSize: { xs: '1rem', sm: '1.25rem' },
+          }}
+        >
+          Jodi Chart
         </Typography>
+
         <ScrollContainer>
-          <Table stickyHeader>
+          <Table stickyHeader size="small">
             <TableHead>
-              <TableRow>
+              <TableRow >
                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
-                  <StyledHeaderCell
-                    key={day}
-                    sx={{ backgroundColor: theme.palette.primary.lighter }}
-                  >
+                  <StyledHeaderCell key={day} >
                     {day}
                   </StyledHeaderCell>
                 ))}
