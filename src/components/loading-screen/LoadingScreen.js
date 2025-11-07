@@ -62,9 +62,9 @@ export default function LoadingScreen() {
           }),
         }}
       >
-        {isDashboard ? (
+        {/* {isDashboard ? ( */}
           <CircularProgress color="inherit" sx={{ width: 1, maxWidth: 360 }} />
-        ) : (
+        {/* ) : (
           <>
             <m.div
               animate={{
@@ -119,7 +119,7 @@ export default function LoadingScreen() {
               }}
             />
           </>
-        )}
+        )} */}
       </StyledRoot>
     </>
   );
