@@ -19,9 +19,9 @@ import { PATH_DASHBOARD } from '../../routes/paths';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
 // sections
-import SinglePanaTable from '../../sections/_panaChart/components/SinglePanaTable';
 import DoublePanaTable from '../../sections/_panaChart/components/DoublePanaTable';
 import PanaChartToolBar from '../../sections/_panaChart/components/PanaChartToolBar';
+import JodiResultTable from '../../sections/_charts/JodiResultTable';
 
 // ----------------------------------------------------------------------
 
@@ -68,7 +68,7 @@ export default function PanaChartsListPage() {
         </Paper>
 
         <Stack spacing={3} mb={3}>
-          <SinglePanaTable />
+          <JodiResultTable />
           <DoublePanaTable />
         </Stack>
       </Container>
