@@ -133,6 +133,10 @@ export const PATH_DASHBOARD = {
     root: path(ROOTS_DASHBOARD, '/diposithistory'),
     list: path(ROOTS_DASHBOARD, '/diposithistory/list'),
   },
+  
+  gametypes: {
+    root: path(ROOTS_DASHBOARD, '/gametypes'),
+  },
 };
 
 export const PATH_ZONE_ON_STORE = 'https://mui.com/store/items/zone-landing-page/';

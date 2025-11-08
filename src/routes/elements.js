@@ -72,6 +72,9 @@ export const GeneralWithdrawHistoryListPage = Loadable(lazy(() => import('../pag
 // DASHBOARD: Diposit History
 export const DipositHistoryListPage = Loadable(lazy(() => import('../pages/DipositHistoryListPage')));
 
+// DASHBOARD: Game Types
+export const GameTypeFormPage = Loadable(lazy(() => import('../pages/GameTypeFormPage')));
+
 // BASIC PAGES
 export const Page500 = Loadable(lazy(() => import('../pages/ErrorHandlingPages/Page500')));
 export const Page403 = Loadable(lazy(() => import('../pages/ErrorHandlingPages/Page403')));

@@ -107,6 +107,11 @@ const navConfig = [
         icon: ICONS.banking,
       },
       {
+        title: 'Game Types',
+        path: PATH_DASHBOARD.gametypes.root,
+        icon: ICONS.banking,
+      },
+      {
         title: 'Diposit History',
         path: PATH_DASHBOARD.diposithistory.list,
         icon: ICONS.banking,

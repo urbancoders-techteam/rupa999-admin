@@ -44,6 +44,7 @@ import {
   UserBidHistoryListPage,
   UserTransactionListPage,
   WithdrawalResquestListPage,
+  GameTypeFormPage,
   //
 } from './elements';
 
@@ -186,6 +187,9 @@ export default function Router() {
             { path: ':id/view', element: <GiftFormHandlePage /> },
           ],
         },
+
+        { path: 'gametypes', element: <GameTypeFormPage />, index: true },
+
 
         // Markets
         {
