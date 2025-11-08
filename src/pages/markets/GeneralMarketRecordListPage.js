@@ -192,7 +192,7 @@ export default function GeneralMarketRecordListPage() {
 
   const handleResetFilter = () => {
     setFilterName('');
-    setSelectedDropDown('all');
+    setSelectedDropDown('');
     setFilterStatus('all');
   };
 

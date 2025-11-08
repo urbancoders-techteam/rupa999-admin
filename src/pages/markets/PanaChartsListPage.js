@@ -27,6 +27,7 @@ import PanaChartToolBar from '../../sections/_panaChart/components/PanaChartTool
 import JodiResultTable from '../../sections/_charts/JodiResultTable';
 import SinglePanaChart from '../../sections/_charts/SinglePanaChart';
 import { RHFAutocomplete } from '../../components/hook-form';
+import SinglePanaChartTable from '../../sections/_charts/SinglePanaChartTable';
 
 // ----------------------------------------------------------------------
 
@@ -99,7 +100,7 @@ export default function PanaChartsListPage() {
         </Grid>
         <Stack spacing={3} mb={3}>
           {selectedGame === 'Jodi' && <JodiResultTable />}
-          {selectedGame === 'Single Pana' && <SinglePanaChart />}
+          {selectedGame === 'Single Pana' && <SinglePanaChartTable />}
         </Stack>
       </Container>
     </>

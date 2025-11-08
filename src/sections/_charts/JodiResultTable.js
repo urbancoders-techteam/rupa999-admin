@@ -9,43 +9,42 @@ import {
   TableRow,
   Paper,
   Box,
-  useTheme,
   Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 // ===== Styled Components =====
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  border: '1px solid #1a1a1a',
+  border: '1px solid #e0e0e0', // light grey like your previous table
   textAlign: 'center',
   padding: '6px 4px',
-  fontSize: '0.95rem',
+  fontSize: '0.9rem',
   fontWeight: 500,
-  color: '#000',
+  color: '#111827', // dark grey for readability
   userSelect: 'none',
   [theme.breakpoints.down('sm')]: {
     padding: '4px 2px',
-    fontSize: '0.75rem',
+    fontSize: '0.7rem',
   },
 }));
 
 const StyledHeaderCell = styled(StyledTableCell)(({ theme }) => ({
   fontWeight: 600,
   fontSize: '1rem',
-  color: '#fff',
-  backgroundColor: '#1b3153ff !important', // 👈 ensure it overrides stickyHeader
+  minWidth:'30px',
+//   color: '#fff',
+  backgroundColor: '#1b3153ff !important', // consistent header color
   position: 'sticky',
-  top: 0, // 👈 necessary for sticky headers to stay visible
-  zIndex: 2, // 👈 ensures it's above table rows
+  top: 0,
+  zIndex: 2,
   [theme.breakpoints.down('sm')]: {
     fontSize: '0.8rem',
   },
 }));
 
-
 const StyledTableRow = styled(TableRow)(() => ({
   '&:hover': {
-    backgroundColor: '#fafafa',
+    backgroundColor: '#f9fafb',
     transition: 'background-color 0.2s ease-in-out',
   },
 }));
@@ -73,7 +72,6 @@ const ScrollContainer = styled(TableContainer)(() => ({
 
 // ===== Component =====
 export default function JodiResultTable() {
-  const theme = useTheme();
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -108,12 +106,14 @@ export default function JodiResultTable() {
         width: '100%',
         overflowX: 'auto',
         px: { xs: 1, sm: 3 },
+        backgroundColor: '#f9fafb',
+        py: 2,
       }}
     >
       <Paper
         elevation={0}
         sx={{
-          border: '1px solid #ddd',
+          border: '1px solid #e0e0e0',
           margin: 'auto',
           width: '100%',
           maxWidth: 900,
@@ -126,10 +126,11 @@ export default function JodiResultTable() {
           fontWeight={700}
           textAlign="center"
           sx={{
-            py: 1,
+            py: { xs: 0.75, sm: 1 },
             backgroundColor: '#1b3153ff',
             color: '#fff',
-            fontSize: { xs: '1rem', sm: '1.25rem' },
+            fontSize: { xs: '0.95rem', sm: '1.25rem' },
+            borderRadius: '4px 4px 0 0',
           }}
         >
           Jodi Chart
@@ -138,11 +139,9 @@ export default function JodiResultTable() {
         <ScrollContainer>
           <Table stickyHeader size="small">
             <TableHead>
-              <TableRow >
+              <TableRow>
                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
-                  <StyledHeaderCell key={day} >
-                    {day}
-                  </StyledHeaderCell>
+                  <StyledHeaderCell key={day}>{day}</StyledHeaderCell>
                 ))}
               </TableRow>
             </TableHead>
@@ -156,8 +155,14 @@ export default function JodiResultTable() {
                       <StyledTableCell
                         key={key}
                         sx={{
-                          color: value === '**' ? '#000' : isSpecial ? '#c62828' : '#000',
+                          color:
+                            value === '**'
+                              ? '#111827'
+                              : isSpecial
+                              ? '#dc2626' // red tone like previous table
+                              : '#111827',
                           fontWeight: isSpecial ? 700 : 400,
+                          fontSize: { xs: '0.7rem', sm: '0.9rem' },
                         }}
                       >
                         {value}

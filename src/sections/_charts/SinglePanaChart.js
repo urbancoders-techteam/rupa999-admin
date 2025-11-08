@@ -85,7 +85,7 @@ export default function MarketResultsChart() {
       <StyledTableContainer
         component={Paper}
         sx={{
-        //   backgroundColor: '#1e293b',
+          backgroundColor: '#1e293b',
           borderRadius: 2,
           overflowX: 'auto',
         }}
@@ -136,7 +136,7 @@ export default function MarketResultsChart() {
                     borderBottom: '1px solid #334155',
                     p: isMobile ? 0.6 : 1,
                     minWidth: isMobile ? 100 : 140,
-                    backgroundColor: '#1b3153ff',
+                    backgroundColor: '#1e293b',
                   }}
                 >
                   {week.range}
@@ -151,7 +151,7 @@ export default function MarketResultsChart() {
                       minWidth: isMobile ? 70 : 100,
                       borderRight: dIdx !== week.days.length - 1 ? '1px solid #334155' : 'none',
                       borderBottom: '1px solid #334155',
-                      backgroundColor: '#1b3153ff',
+                      backgroundColor: '#1e293b',
                       p: isMobile ? 0.5 : 1,
                     }}
                   >
