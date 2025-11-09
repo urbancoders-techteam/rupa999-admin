@@ -1,0 +1,36 @@
+// export const optionsData = [
+//   { name: 'SRIDEVI DAY', key: 'sridevi_day' },
+//   { name: 'TIME BAZAR', key: 'time_bazar' },
+//   { name: 'MADHUR DAY', key: 'madhur_day' },
+//   { name: 'MILAN DAY', key: 'milan_day' },
+//   { name: 'RAJDHANI DAY', key: 'rajdhani_day' },
+//   { name: 'SUPREME DAY', key: 'supreme_day' },
+//   { name: 'KALIYAN', key: 'kaliyan' },
+//   { name: 'SRIDEVI NIGHT', key: 'sridevi_night' },
+//   { name: 'MADHUR NIGHT', key: 'madhur_night' },
+//   { name: 'MILAN NIGHT', key: 'milan_night' },
+//   { name: 'KALIYAN NIGHT', key: 'kaliyan_night' },
+//   { name: 'MAIN BAZAR', key: 'main_bazar' },
+//   { name: 'RAJDHANI NIGHT', key: 'rajdhani_night' },
+//   { name: 'KARNATAKA DAY', key: 'karnataka_day' },
+//   { name: 'KARNATAKA NIGHT', key: 'karnataka_night' },
+// ];
+
+
+const marketEnum = [
+  'SRIDEVI DAY',
+  'TIME BAZAR',
+  'MADHUR DAY',
+  'MILAN DAY',
+  'RAJDHANI DAY',
+  'SUPREME DAY',
+  'KALIYAN',
+  'SRIDEVI NIGHT',
+  'MADHUR NIGHT',
+  'MILAN NIGHT',
+  'KALIYAN NIGHT',
+  'MAIN BAZAR',
+  'RAJDHANI NIGHT',
+  'KARNATAKA DAY',
+  'KARNATAKA NIGHT',
+];
