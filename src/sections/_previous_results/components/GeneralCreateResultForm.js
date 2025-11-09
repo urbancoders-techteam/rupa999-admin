@@ -1,19 +1,10 @@
 import React, { useState } from 'react';
-import {
-  Box,
-  Card,
-  Grid,
-  Button,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-  TextField,
-  Autocomplete,
-} from '@mui/material';
+import { Box, Card, Grid, Button, Typography, TextField, Autocomplete } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import PropTypes from 'prop-types';
+import { marketEnum } from '../../../assets/data/marketEnum';
 
 // ----------------------------------------------------------------------
 
@@ -25,16 +16,14 @@ const validationSchema = Yup.object().shape({
   digit: Yup.string().required('Digit is required'),
 });
 
-const markets = ['Game 1', 'Game 2', 'Game 3'];
-const sessions = ['Morning', 'Evening', 'Night'];
+const sessions = ['Open', 'Close'];
 
 GeneralCreateResultForm.propTypes = {
-  setShowWinner : PropTypes.bool
-}
+  setShowWinner: PropTypes.bool,
+};
 
-export default function GeneralCreateResultForm({setShowWinner}) {
+export default function GeneralCreateResultForm({ setShowWinner }) {
   const [percentage, setPercentage] = useState('No');
-
 
   const {
     handleSubmit,
@@ -92,7 +81,7 @@ export default function GeneralCreateResultForm({setShowWinner}) {
               render={({ field }) => (
                 <Autocomplete
                   {...field}
-                  options={markets}
+                  options={marketEnum}
                   onChange={(_, value) => field.onChange(value || '')}
                   renderInput={(params) => (
                     <TextField
@@ -134,13 +123,16 @@ export default function GeneralCreateResultForm({setShowWinner}) {
 
           {/* Percentage */}
           <Grid item xs={12} md={4}>
-            <Typography variant="body2" sx={{ ml: 1, mb: 1, fontWeight: 500, color: 'text.secondary' }}>
+            <Typography
+              variant="body2"
+              sx={{ ml: 1, mb: 1, fontWeight: 500, color: 'text.secondary' }}
+            >
               Did you want to do with percentage?
             </Typography>
 
             <Box
               sx={{
-                ml:1,
+                ml: 1,
                 gap: 1,
                 display: 'flex',
                 alignItems: 'center',
@@ -152,7 +144,7 @@ export default function GeneralCreateResultForm({setShowWinner}) {
                 onClick={() => setPercentage('Yes')}
                 sx={{
                   flex: 1,
-                  maxWidth:'100px',
+                  maxWidth: '100px',
                   textTransform: 'none',
                   fontWeight: 600,
                   borderRadius: 2,
@@ -168,12 +160,11 @@ export default function GeneralCreateResultForm({setShowWinner}) {
                 onClick={() => setPercentage('No')}
                 sx={{
                   flex: 1,
-                  maxWidth:'100px',
+                  maxWidth: '100px',
                   textTransform: 'none',
                   fontWeight: 600,
                   borderRadius: 2,
                   boxShadow: percentage === 'No' ? '0px 2px 8px rgba(220, 53, 69, 0.4)' : 'none',
-                
                 }}
               >
                 No
@@ -182,47 +173,69 @@ export default function GeneralCreateResultForm({setShowWinner}) {
           </Grid>
 
           {/* Pana */}
-          <Grid item xs={12} md={4}>
-            <Controller
-              name="pana"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  label="Pana"
-                  placeholder="Enter Pana"
-                  size="small"
-                  error={!!errors.pana}
-                  helperText={errors.pana?.message}
+          {percentage === 'Yes' ? (
+            <Grid item xs={12} md={4}>
+              <Controller
+                name="percentage"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Percentage"
+                    placeholder="Enter Percentage"
+                    size="small"
+                    error={!!errors.percentage}
+                    helperText={errors.percentage?.message}
+                  />
+                )}
+              />
+            </Grid>
+          ) : (
+            <>
+              {' '}
+              <Grid item xs={12} md={4}>
+                <Controller
+                  name="pana"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Pana"
+                      placeholder="Enter Pana"
+                      size="small"
+                      error={!!errors.pana}
+                      helperText={errors.pana?.message}
+                    />
+                  )}
                 />
-              )}
-            />
-          </Grid>
-
-          {/* Digit */}
-          <Grid item xs={12} md={4}>
-            <Controller
-              name="digit"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  label="Digit"
-                  placeholder="Enter Digit"
-                  size="small"
-                  error={!!errors.digit}
-                  helperText={errors.digit?.message}
-                  disabled={percentage === 'No'}
+              </Grid>
+              {/* Digit */}
+              <Grid item xs={12} md={4}>
+                <Controller
+                  name="digit"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Digit"
+                      placeholder="Enter Digit"
+                      size="small"
+                      error={!!errors.digit}
+                      helperText={errors.digit?.message}
+                      disabled={percentage === 'No'}
+                    />
+                  )}
                 />
-              )}
-            />
-          </Grid>
+              </Grid>
+            </>
+          )}
         </Grid>
 
         {/* Buttons */}
-        <Box sx={{ mt: 2, display: 'flex', justifyContent:'flex-end', gap: 2 }}>
+        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
           <Button variant="outlined" color="primary" onClick={() => setShowWinner(true)}>
             Show Winners
           </Button>

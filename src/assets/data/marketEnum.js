@@ -17,7 +17,7 @@
 // ];
 
 
-const marketEnum = [
+export const marketEnum = [
   'SRIDEVI DAY',
   'TIME BAZAR',
   'MADHUR DAY',
