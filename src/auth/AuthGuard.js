@@ -2,10 +2,10 @@ import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 // components
-import LoadingScreen from '../components/loading-screen';
+// import LoadingScreen from '../components/loading-screen';
 //
-import Login from '../pages/auth/LoginPage';
-import { useAuthContext } from './useAuthContext';
+// import Login from '../pages/auth/LoginPage';
+// import { useAuthContext } from './useAuthContext';
 
 // ----------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ AuthGuard.propTypes = {
 };
 
 export default function AuthGuard({ children }) {
-  const { isAuthenticated, isInitialized } = useAuthContext();
+  // const { isAuthenticated, isInitialized } = useAuthContext();
 
   const { pathname } = useLocation();
 
