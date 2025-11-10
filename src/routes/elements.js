@@ -83,9 +83,9 @@ export const DipositHistoryListPage = Loadable(lazy(() => import('../pages/Dipos
 export const GameTypeFormPage = Loadable(lazy(() => import('../pages/GameTypeFormPage')));
 
 // BASIC PAGES
-export const Page500 = Loadable(lazy(() => import('../pages/errorHandlingPages/Page500')));
-export const Page403 = Loadable(lazy(() => import('../pages/errorHandlingPages/Page403')));
-export const Page404 = Loadable(lazy(() => import('../pages/errorHandlingPages/Page404')));
+export const Page500 = Loadable(lazy(() => import('../pages/errorHandlingPage/Page500')));
+export const Page403 = Loadable(lazy(() => import('../pages/errorHandlingPage/Page403')));
+export const Page404 = Loadable(lazy(() => import('../pages/errorHandlingPage/Page404')));
 
 
 
