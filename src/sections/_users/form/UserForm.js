@@ -81,7 +81,7 @@ export default function UserForm({ isEdit = false, isView = false, currentUser }
     navigate(PATH_DASHBOARD.userlist.list);
   };
 
-  const handleBack = () => navigate(PATH_DASHBOARD.userlist.list);
+  const handleBack = () => navigate(PATH_DASHBOARD.user.list);
 
   // -------------------------------------------------------------
 

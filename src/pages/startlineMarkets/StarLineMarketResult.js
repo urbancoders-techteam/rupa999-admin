@@ -1,15 +1,26 @@
 import { Helmet } from 'react-helmet-async';
 import { paramCase } from 'change-case';
-import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
-import { Card, Table, Button, TableBody, Container, TableContainer, Box } from '@mui/material';
-import useResponsive from '../../hooks/useResponsive';
+import {
+  Card,
+  Table,
+  Button,
+  Tooltip,
+  TableBody,
+  Container,
+  IconButton,
+  TableContainer,
+  useMediaQuery,
+} from '@mui/material';
 // routes
+import { useTheme } from '@mui/system';
 import { PATH_DASHBOARD } from '../../routes/paths';
 // _mock_
-import {marketRecordData}  from '../../_mock/arrays/_market';
+import { previousResults } from '../../_mock/arrays';
 // components
+import Iconify from '../../components/iconify';
 import Scrollbar from '../../components/scrollbar';
 import ConfirmDialog from '../../components/confirm-dialog';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
@@ -21,30 +32,32 @@ import {
   TableNoData,
   TableEmptyRows,
   TableHeadCustom,
+  TableSelectedAction,
   TablePaginationCustom,
 } from '../../components/table';
 // sections
-import WithdrawDetailsToolbar from '../../sections/_withdraw_details/components/WithdrawDetailsToolbar';
-import WithdrawMobileViewCardLayout from '../../sections/_withdraw_details/components/WithdrawDetailsMobileViewCardLayout';
-import WinHistoryTableRow from '../../sections/_win_history/list/WinHistoryTableRow';
+import PreviousResultMobileViewCardLayout from '../../sections/_previous_results/components/PreviousResultMobileViewCardLayout';
+import CustomTableToolbar from '../../components/table/CustomTableToolBar';
+import CreateResultForm from '../../sections/_starline_market_results/CreateResultForm';
+import StarLineMarketResultsTableRow from '../../sections/_starline_market_results/StarLineMarketResultsTableRow';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'actions', label: 'Actions', align: 'center' },
+  { id: 'action', label: 'Action', align: 'left' },
   { id: 'id', label: 'ID', align: 'left' },
-  { id: 'marketName', label: 'Market Name', align: 'left' },
-  { id: 'userName', label: 'Winner Name', align: 'left' },
-  { id: 'session', label: 'Session', align: 'left' },
-  { id: 'amount', label: 'Amount', align: 'left' },
-  { id: 'number', label: 'Number', align: 'left' },
-  { id: 'winAmount', label: 'Win Amount', align: 'left' },
+  { id: 'name', label: 'Game Name', align: 'left' },
+  { id: 'resultDate', label: 'Result Date', align: 'left' },
+  { id: 'openPana', label: 'Open Pana', align: 'center' },
+  { id: 'openDigits', label: 'Open Digits', align: 'center' },
+  { id: 'revert', label: 'Revert', align: 'left' },
   { id: 'createdAt', label: 'Created At', align: 'left' },
+  { id: '' },
 ];
 
 // ----------------------------------------------------------------------
 
-export default function WinHistoryListPage() {
+export default function StarLineMarketResultListPage() {
   const {
     dense,
     page,
@@ -56,6 +69,7 @@ export default function WinHistoryListPage() {
     selected,
     setSelected,
     onSelectRow,
+    onSelectAllRows,
     //
     onSort,
     onChangeDense,
@@ -67,46 +81,32 @@ export default function WinHistoryListPage() {
 
   const navigate = useNavigate();
 
-  const [tableData, setTableData] = useState(marketRecordData);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const [tableData, setTableData] = useState(previousResults);
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
   const [filterName, setFilterName] = useState('');
 
-  const [filterRole, setFilterRole] = useState('all');
+  const dataFiltered = applyFilter({
+    inputData: tableData,
+    comparator: getComparator(order, orderBy),
+    filterName,
+  });
 
-  const [filterStatus, setFilterStatus] = useState('all');
-
-  // Memoized filtered data
-  const dataFiltered = useMemo(
-    () =>
-      applyFilter({
-        inputData: tableData,
-        comparator: getComparator(order, orderBy),
-        filterName,
-        filterRole,
-        filterStatus,
-      }),
-    [tableData, order, orderBy, filterName, filterRole, filterStatus]
-  );
-
-  // Memoized paginated data
-  const dataInPage = useMemo(
-    () => dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [dataFiltered, page, rowsPerPage]
-  );
+  const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   const denseHeight = dense ? 52 : 72;
 
-  const isMobile = useResponsive('down', 'sm');
+  const isFiltered = filterName !== '';
 
-  const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
+  const isNotFound = !dataFiltered.length && !!filterName;
 
-  const isNotFound =
-    (!dataFiltered.length && !!filterName) ||
-    (!dataFiltered.length && !!filterRole) ||
-    (!dataFiltered.length && !!filterStatus);
-
+  const handleOpenConfirm = () => {
+    setOpenConfirm(true);
+  };
 
   const handleCloseConfirm = () => {
     setOpenConfirm(false);
@@ -115,6 +115,7 @@ export default function WinHistoryListPage() {
   const handleFilterName = (event) => {
     setPage(0);
     setFilterName(event.target.value);
+    console.log('event.target.value :>> ', event.target.value);
   };
 
   const handleDeleteRow = (id) => {
@@ -140,16 +141,6 @@ export default function WinHistoryListPage() {
       } else if (selectedRows.length === dataFiltered.length) {
         setPage(0);
       } else if (selectedRows.length > dataInPage.length) {
-        <TablePaginationCustom
-          count={dataFiltered.length}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={onChangePage}
-          onRowsPerPageChange={onChangeRowsPerPage}
-          //
-          dense={dense}
-          onChangeDense={onChangeDense}
-        />;
         const newPage = Math.ceil((tableData.length - selectedRows.length) / rowsPerPage) - 1;
         setPage(newPage);
       }
@@ -157,70 +148,66 @@ export default function WinHistoryListPage() {
   };
 
   const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
+    navigate(PATH_DASHBOARD.starline.marketresults.edit(paramCase(id)));
   };
 
   const handleResetFilter = () => {
     setFilterName('');
-    setFilterRole('all');
-    setFilterStatus('all');
   };
 
   return (
     <>
       <Helmet>
-        <title> Win History List : List | Rupa999 </title>
+        <title> Market Results : List | Rupa999 </title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
-        {isMobile ? (
-          <Box sx={{ position: 'sticky', top: 0, zIndex: 10, bgcolor: 'background.paper' }}>
-            <CustomBreadcrumbs
-              heading="Win History List"
-              links={[
-                { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                { name: 'Win History List', href: PATH_DASHBOARD.markets.winhistory.root },
-              ]}
-            />
-            <WithdrawDetailsToolbar
-              isFiltered={isFiltered}
-              filterName={filterName}
-              onFilterName={handleFilterName}
-              onResetFilter={handleResetFilter}
-              sx={{ mt: 1 }}
-            />
-          </Box>
-        ) : (
-          <>
-            <CustomBreadcrumbs
-              heading="Win History List"
-              links={[
-                { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                { name: 'Win History List', href: PATH_DASHBOARD.markets.winhistory.list },
-              ]}
-            />
-            <WithdrawDetailsToolbar
-              isFiltered={isFiltered}
-              filterName={filterName}
-              onFilterName={handleFilterName}
-              onResetFilter={handleResetFilter}
-              sx={{ mt: 1 }}
-            />
-          </>
-        )}
+        <CustomBreadcrumbs
+          heading="Market Results"
+          links={[
+            { name: 'Dashboard', href: PATH_DASHBOARD.root },
+            { name: 'Market Results', href: PATH_DASHBOARD.starline.marketresults.list },
+          ]}
+        />
 
-        {/* Render mobile card layout for small screens, otherwise render the table */}
+        {/* --- Result Form --- */}
+        <CreateResultForm />
+
         {isMobile ? (
-          <WithdrawMobileViewCardLayout
+          <PreviousResultMobileViewCardLayout
             data={dataFiltered}
-            onEditRow={(id) => handleEditRow(id)}
+            onEditRow={handleEditRow}
             onDeleteRow={(id) => handleDeleteRow(id)}
-            onSelectRow={(id) => onSelectRow(id)}
-            selected={selected}
           />
         ) : (
           <Card>
+            <CustomTableToolbar
+              isFiltered={isFiltered}
+              filterName={filterName}
+              onFilterName={handleFilterName}
+              onResetFilter={handleResetFilter}
+            />
+
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
+              <TableSelectedAction
+                dense={dense}
+                numSelected={selected.length}
+                rowCount={tableData.length}
+                onSelectAllRows={(checked) =>
+                  onSelectAllRows(
+                    checked,
+                    tableData.map((row) => row.id)
+                  )
+                }
+                action={
+                  <Tooltip title="Delete">
+                    <IconButton color="primary" onClick={handleOpenConfirm}>
+                      <Iconify icon="eva:trash-2-outline" />
+                    </IconButton>
+                  </Tooltip>
+                }
+              />
+
               <Scrollbar>
                 <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
                   <TableHeadCustom
@@ -234,10 +221,9 @@ export default function WinHistoryListPage() {
 
                   <TableBody>
                     {dataFiltered
-                      ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((row, index) => (
-                        <WinHistoryTableRow
-                          index={index + 1}
+                      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                      .map((row) => (
+                        <StarLineMarketResultsTableRow
                           key={row.id}
                           row={row}
                           selected={selected.includes(row.id)}
@@ -257,9 +243,10 @@ export default function WinHistoryListPage() {
                 </Table>
               </Scrollbar>
             </TableContainer>
+
             <TablePaginationCustom
-              count={dataFiltered.length}
               page={page}
+              count={dataFiltered.length}
               rowsPerPage={rowsPerPage}
               onPageChange={onChangePage}
               onRowsPerPageChange={onChangeRowsPerPage}
@@ -312,16 +299,17 @@ function applyFilter({ inputData, comparator, filterName, filterStatus, filterRo
 
   if (filterName) {
     inputData = inputData.filter(
-      (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+      (marketresults) =>
+        marketresults.gameName.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
     );
   }
 
   if (filterStatus !== 'all') {
-    inputData = inputData.filter((user) => user.status === filterStatus);
+    inputData = inputData.filter((marketresults) => marketresults.status === filterStatus);
   }
 
   if (filterRole !== 'all') {
-    inputData = inputData.filter((user) => user.role === filterRole);
+    inputData = inputData.filter((marketresults) => marketresults.role === filterRole);
   }
 
   return inputData;

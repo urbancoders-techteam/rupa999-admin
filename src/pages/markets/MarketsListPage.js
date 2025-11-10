@@ -122,7 +122,7 @@ export default function MarketDetailsPage() {
   };
 
   const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.marketlist.edit(paramCase(id)));
+    navigate(PATH_DASHBOARD.markets.marketlist.edit(paramCase(id)));
   };
 
   const handleResetFilter = () => {
@@ -144,12 +144,12 @@ export default function MarketDetailsPage() {
               heading="Market List"
               links={[
                 { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                { name: 'Market List', href: PATH_DASHBOARD.marketlist.root },
+                { name: 'Market List', href: PATH_DASHBOARD.markets.marketlist.root },
               ]}
               action={
                 <Button
                   component={RouterLink}
-                  to={PATH_DASHBOARD.marketlist.new}
+                  to={PATH_DASHBOARD.markets.marketlist.new}
                   variant="contained"
                   startIcon={<Iconify icon="eva:plus-fill" />}
                 >
@@ -171,12 +171,12 @@ export default function MarketDetailsPage() {
               heading="Market List"
               links={[
                 { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                { name: 'Market List', href: PATH_DASHBOARD.marketlist.root },
+                { name: 'Market List', href: PATH_DASHBOARD.markets.marketlist.root },
               ]}
               action={
                 <Button
                   component={RouterLink}
-                  to={PATH_DASHBOARD.marketlist.new}
+                  to={PATH_DASHBOARD.markets.marketlist.new}
                   variant="contained"
                   startIcon={<Iconify icon="eva:plus-fill" />}
                 >

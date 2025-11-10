@@ -35,7 +35,6 @@ import {
   PanaChartsListPage,
   GeneralMarketRecordListPage,
   ResetPasswordPage,
-  PreviousResultListPage,
   GeneralPredictionFormPage,
   WinHistoryListPage,
   GeneralWithdrawHistoryListPage,
@@ -45,6 +44,11 @@ import {
   UserTransactionListPage,
   WithdrawalResquestListPage,
   GameTypeFormPage,
+  StarLineMarketsListPage,
+  StarlineMarketFormHandle,
+  StarLineMarketsRecordListPage,
+  MarketResultListPage,
+  StarLineMarketResultListPage,
   //
 } from './elements';
 
@@ -190,7 +194,6 @@ export default function Router() {
 
         { path: 'gametypes', element: <GameTypeFormPage />, index: true },
 
-
         // Markets
         {
           path: 'markets',
@@ -210,9 +213,6 @@ export default function Router() {
               children: [
                 { element: <Navigate to="/dashboard/markets/panacharts" replace />, index: true },
                 { path: 'list', element: <PanaChartsListPage /> },
-                // { path: 'new', element: <MarketFormHandlePage /> },
-                // { path: ':id/edit', element: <MarketFormHandlePage /> },
-                // { path: ':id/view', element: <MarketFormHandlePage /> },
               ],
             },
             {
@@ -223,22 +223,16 @@ export default function Router() {
                   index: true,
                 },
                 { path: 'list', element: <GeneralMarketRecordListPage /> },
-                // { path: 'new', element: <MarketFormHandlePage /> },
-                // { path: ':id/edit', element: <MarketFormHandlePage /> },
-                // { path: ':id/view', element: <MarketFormHandlePage /> },
               ],
             },
             {
-              path: 'previousresults',
+              path: 'marketresults',
               children: [
                 {
-                  element: <Navigate to="/dashboard/markets/previousresults" replace />,
+                  element: <Navigate to="/dashboard/markets/marketresults/list" replace />,
                   index: true,
                 },
-                { path: 'list', element: <PreviousResultListPage /> },
-                // { path: 'new', element: <MarketFormHandlePage /> },
-                // { path: ':id/edit', element: <MarketFormHandlePage /> },
-                // { path: ':id/view', element: <MarketFormHandlePage /> },
+                { path: 'list', element: <MarketResultListPage /> },
               ],
             },
             {
@@ -261,6 +255,69 @@ export default function Router() {
                 { path: 'list', element: <WinHistoryListPage /> },
               ],
             },
+          ],
+        },
+
+        // Markets
+        {
+          path: 'starline',
+          children: [
+            {
+              path: 'market',
+              children: [
+                { element: <Navigate to="/dashboard/starline/market/list" replace />, index: true },
+                { path: 'list', element: <StarLineMarketsListPage /> },
+                { path: 'new', element: <StarlineMarketFormHandle /> },
+                { path: ':id/edit', element: <StarlineMarketFormHandle /> },
+                { path: ':id/view', element: <StarlineMarketFormHandle /> },
+              ],
+            },
+            {
+              path: 'marketrecords',
+              children: [
+                {
+                  element: <Navigate to="/dashboard/starline/marketrecords" replace />,
+                  index: true,
+                },
+                { path: 'list', element: <StarLineMarketsRecordListPage /> },
+                // { path: 'new', element: <MarketFormHandlePage /> },
+                // { path: ':id/edit', element: <MarketFormHandlePage /> },
+                // { path: ':id/view', element: <MarketFormHandlePage /> },
+              ],
+            },
+            {
+              path: 'marketresults',
+              children: [
+                {
+                  element: <Navigate to="/dashboard/starline/marketresults" replace />,
+                  index: true,
+                },
+                { path: 'list', element: <StarLineMarketResultListPage /> },
+                // { path: 'new', element: <MarketFormHandlePage /> },
+                // { path: ':id/edit', element: <MarketFormHandlePage /> },
+                // { path: ':id/view', element: <MarketFormHandlePage /> },
+              ],
+            },
+            // {
+            //   path: 'predictionform',
+            //   children: [
+            //     {
+            //       element: <Navigate to="/dashboard/markets/predictionform" replace />,
+            //       index: true,
+            //     },
+            //     { path: 'form', element: <GeneralPredictionFormPage /> },
+            //   ],
+            // },
+            // {
+            //   path: 'winhistory',
+            //   children: [
+            //     {
+            //       element: <Navigate to="/dashboard/markets/winhistory" replace />,
+            //       index: true,
+            //     },
+            //     { path: 'list', element: <WinHistoryListPage /> },
+            //   ],
+            // },
           ],
         },
 

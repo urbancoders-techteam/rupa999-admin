@@ -209,7 +209,7 @@ export default function GeneralMarketRecordListPage() {
               heading="General Market Record"
               links={[
                 { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                { name: 'General Market Record', href: PATH_DASHBOARD.marketrecords.root },
+                { name: 'General Market Record', href: PATH_DASHBOARD.markets.marketrecords.root },
               ]}
             />
             <CustomTableToolbar
@@ -231,7 +231,7 @@ export default function GeneralMarketRecordListPage() {
               heading="General Market Record"
               links={[
                 { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                { name: 'General Market Record', href: PATH_DASHBOARD.marketrecords.root },
+                { name: 'General Market Record', href: PATH_DASHBOARD.markets.marketrecords.list },
               ]}
             />
             <CustomTableToolbar

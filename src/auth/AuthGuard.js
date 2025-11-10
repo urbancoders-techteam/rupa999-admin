@@ -2,10 +2,10 @@ import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 // components
-// import LoadingScreen from '../components/loading-screen';
+import LoadingScreen from '../components/loading-screen';
 //
-// import Login from '../pages/auth/LoginPage';
-// import { useAuthContext } from './useAuthContext';
+import LoginPage from '../pages/auth/LoginPage';
+import { useAuthContext } from './useAuthContext';
 
 // ----------------------------------------------------------------------
 
@@ -14,21 +14,23 @@ AuthGuard.propTypes = {
 };
 
 export default function AuthGuard({ children }) {
-  // const { isAuthenticated, isInitialized } = useAuthContext();
+  const { isInitialized } = useAuthContext();
+
+  const token = localStorage.getItem('token');
 
   const { pathname } = useLocation();
 
   const [requestedLocation, setRequestedLocation] = useState(null);
 
-  // if (!isInitialized) {
-  //   return <LoadingScreen />;
-  // }
+  if (!isInitialized) {
+    return <LoadingScreen />;
+  }
 
-  // if (!isAuthenticated) {
+  // if (!token) {
   //   if (pathname !== requestedLocation) {
   //     setRequestedLocation(pathname);
   //   }
-  //   return <Login />;
+  //   return <LoginPage />;
   // }
 
   if (requestedLocation && pathname !== requestedLocation) {

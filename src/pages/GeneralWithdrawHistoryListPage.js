@@ -192,7 +192,7 @@ export default function GeneralWithdrawHistoryListPage() {
               heading="General Withdraw History List"
               links={[
                 { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                { name: 'General Withdraw History List', href: PATH_DASHBOARD.marketrecords.root },
+                { name: 'General Withdraw History List', href: PATH_DASHBOARD.generalwithdrawhistory.list },
               ]}
             />
             <WithdrawDetailsToolbar
@@ -209,7 +209,7 @@ export default function GeneralWithdrawHistoryListPage() {
               heading="General Withdraw History List"
               links={[
                 { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                { name: 'General Withdraw History List', href: PATH_DASHBOARD.marketrecords.root },
+                { name: 'General Withdraw History List', href: PATH_DASHBOARD.generalwithdrawhistory.list },
               ]}
             />
             <CustomTableToolbar

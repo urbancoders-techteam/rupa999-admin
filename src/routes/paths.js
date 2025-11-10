@@ -1,13 +1,9 @@
-// ----------------------------------------------------------------------
-
 function path(root, sublink) {
   return `${root}${sublink}`;
 }
 
 const ROOTS_AUTH = '/auth';
 const ROOTS_DASHBOARD = '/dashboard';
-
-// ----------------------------------------------------------------------
 
 export const PATH_AUTH = {
   root: ROOTS_AUTH,
@@ -36,6 +32,7 @@ export const PATH_PAGE = {
 
 export const PATH_DASHBOARD = {
   root: ROOTS_DASHBOARD,
+
   home: {
     root: path(ROOTS_DASHBOARD, '/home'),
   },
@@ -50,7 +47,7 @@ export const PATH_DASHBOARD = {
     bidhistory: (id) => path(ROOTS_DASHBOARD, `/user/${id}/bidhistory`),
     withdrawalrequest: (id) => path(ROOTS_DASHBOARD, `/user/${id}/withdrawalrequest`),
   },
-  
+
   withdrawdetails: {
     root: path(ROOTS_DASHBOARD, '/withdrawdetails'),
     list: path(ROOTS_DASHBOARD, '/withdrawdetails/list'),
@@ -58,25 +55,22 @@ export const PATH_DASHBOARD = {
 
   profit: {
     root: path(ROOTS_DASHBOARD, '/profit'),
-    // all: path(ROOTS_DASHBOARD, '/mail/all'),
   },
 
-  // General Settings
+  // -------------------------- General Settings --------------------------
   settings: {
     root: path(ROOTS_DASHBOARD, '/settings'),
   },
-
   changepassword: {
     root: path(ROOTS_DASHBOARD, '/settings/changepassword'),
     form: path(ROOTS_DASHBOARD, '/settings/changepassword/form'),
   },
-
   sliderimage: {
     root: path(ROOTS_DASHBOARD, '/settings/sliderimage'),
     form: path(ROOTS_DASHBOARD, '/settings/sliderimage/form'),
   },
 
-  gift: {
+    gift: {
     root: path(ROOTS_DASHBOARD, '/gift'),
     list: path(ROOTS_DASHBOARD, '/gift/list'),
     new: path(ROOTS_DASHBOARD, '/gift/new'),
@@ -84,44 +78,71 @@ export const PATH_DASHBOARD = {
     view: (id) => path(ROOTS_DASHBOARD, `/gift/${id}/view`),
   },
 
+  // -------------------------- Markets (General) --------------------------
   markets: {
     root: path(ROOTS_DASHBOARD, '/markets'),
+
+    marketlist: {
+      root: path(ROOTS_DASHBOARD, '/markets/marketlist'),
+      list: path(ROOTS_DASHBOARD, '/markets/marketlist/list'),
+      new: path(ROOTS_DASHBOARD, '/markets/marketlist/new'),
+      edit: (id) => path(ROOTS_DASHBOARD, `/markets/marketlist/${id}/edit`),
+      view: (id) => path(ROOTS_DASHBOARD, `/markets/marketlist/${id}/view`),
+    },
+
+    panacharts: {
+      root: path(ROOTS_DASHBOARD, '/markets/panacharts'),
+      list: path(ROOTS_DASHBOARD, '/markets/panacharts/list'),
+    },
+
+    marketrecords: {
+      root: path(ROOTS_DASHBOARD, '/markets/marketrecords'),
+      list: path(ROOTS_DASHBOARD, '/markets/marketrecords/list'),
+    },
+
+    marketresults: {
+      root: path(ROOTS_DASHBOARD, '/markets/marketresults'),
+      list: path(ROOTS_DASHBOARD, '/markets/marketresults/list'),
+    },
+
+    predictionform: {
+      root: path(ROOTS_DASHBOARD, '/markets/predictionform'),
+      form: path(ROOTS_DASHBOARD, '/markets/predictionform/form'),
+    },
+
+    winhistory: {
+      root: path(ROOTS_DASHBOARD, '/markets/winhistory'),
+      list: path(ROOTS_DASHBOARD, '/markets/winhistory/list'),
+    },
   },
-  marketlist: {
-    root: path(ROOTS_DASHBOARD, '/markets/marketlist'),
-    list: path(ROOTS_DASHBOARD, '/markets/marketlist/list'),
-    new: path(ROOTS_DASHBOARD, '/markets/marketlist/new'),
-    edit: (id) => path(ROOTS_DASHBOARD, `/markets/marketlist/${id}/edit`),
-    view: (id) => path(ROOTS_DASHBOARD, `/markets/marketlist/${id}/view`),
-  },
-  panacharts: {
-    root: path(ROOTS_DASHBOARD, '/markets/panacharts'),
-    list: path(ROOTS_DASHBOARD, '/markets/panacharts/list'),
-    // new: path(ROOTS_DASHBOARD, '/markets/panacharts/new'),
-    // edit: (id) => path(ROOTS_DASHBOARD, `/markets/panacharts/${id}/edit`),
-    // view: (id) => path(ROOTS_DASHBOARD, `/markets/panacharts/${id}/view`),
-  },
-  marketrecords: {
-    root: path(ROOTS_DASHBOARD, '/markets/marketrecords'),
-    list: path(ROOTS_DASHBOARD, '/markets/marketrecords/list'),
-    // new: path(ROOTS_DASHBOARD, '/markets/marketrecords/new'),
-    // edit: (id) => path(ROOTS_DASHBOARD, `/markets/marketrecords/${id}/edit`),
-    // view: (id) => path(ROOTS_DASHBOARD, `/markets/marketrecords/${id}/view`),
-  },
-  previousresults: {
-    root: path(ROOTS_DASHBOARD, '/markets/previousresults'),
-    list: path(ROOTS_DASHBOARD, '/markets/previousresults/list'),
-    // new: path(ROOTS_DASHBOARD, '/markets/previousresults/new'),
-    // edit: (id) => path(ROOTS_DASHBOARD, `/markets/previousresults/${id}/edit`),
-    // view: (id) => path(ROOTS_DASHBOARD, `/markets/previousresults/${id}/view`),
-  },
-  predictionform: {
-    root: path(ROOTS_DASHBOARD, '/markets/predictionform'),
-    form: path(ROOTS_DASHBOARD, '/markets/predictionform/form'),
-  },
-  winhistory: {
-    root: path(ROOTS_DASHBOARD, '/markets/winhistory'),
-    list: path(ROOTS_DASHBOARD, '/markets/winhistory/list'),
+
+  // -------------------------- Starline Market --------------------------
+  starline: {
+    root: path(ROOTS_DASHBOARD, '/starline'),
+
+    market: {
+      root: path(ROOTS_DASHBOARD, '/starline/market'),
+      list: path(ROOTS_DASHBOARD, '/starline/market/list'),
+      new: path(ROOTS_DASHBOARD, '/starline/market/new'),
+      edit: (id) => path(ROOTS_DASHBOARD, `/starline/market/${id}/edit`),
+      view: (id) => path(ROOTS_DASHBOARD, `/starline/market/${id}/view`),
+    },
+
+    marketrecords: {
+      root: path(ROOTS_DASHBOARD, '/starline/marketrecords'),
+      list: path(ROOTS_DASHBOARD, '/starline/marketrecords/list'),
+      new: path(ROOTS_DASHBOARD, '/starline/marketrecords/new'),
+      edit: (id) => path(ROOTS_DASHBOARD, `/starline/marketrecords/${id}/edit`),
+      view: (id) => path(ROOTS_DASHBOARD, `/starline/marketrecords/${id}/view`),
+    },
+
+    marketresults: {
+      root: path(ROOTS_DASHBOARD, '/starline/marketresults'),
+      list: path(ROOTS_DASHBOARD, '/starline/marketresults/list'),
+      new: path(ROOTS_DASHBOARD, '/starline/marketresults/new'),
+      edit: (id) => path(ROOTS_DASHBOARD, `/starline/marketresults/${id}/edit`),
+      view: (id) => path(ROOTS_DASHBOARD, `/starline/marketresults/${id}/view`),
+    },
   },
 
   generalwithdrawhistory: {
@@ -133,17 +154,14 @@ export const PATH_DASHBOARD = {
     root: path(ROOTS_DASHBOARD, '/diposithistory'),
     list: path(ROOTS_DASHBOARD, '/diposithistory/list'),
   },
-  
+
   gametypes: {
     root: path(ROOTS_DASHBOARD, '/gametypes'),
   },
 };
 
 export const PATH_ZONE_ON_STORE = 'https://mui.com/store/items/zone-landing-page/';
-
 export const PATH_MINIMAL_ON_STORE = 'https://mui.com/store/items/minimal-dashboard/';
-
 export const PATH_FREE_VERSION = 'https://mui.com/store/items/minimal-dashboard-free/';
-
 export const PATH_FIGMA_PREVIEW =
   'https://www.figma.com/file/rWMDOkMZYw2VpTdNuBBCvN/%5BPreview%5D-Minimal-Web.26.11.22?node-id=0%3A1&t=ya2mDFiuhTXXLLF1-1';

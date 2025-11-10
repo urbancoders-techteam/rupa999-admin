@@ -40,31 +40,38 @@ export const ProfitPage = Loadable(lazy(() => import('../pages/ProfitPage')));
 // DASHBOARD: General Settings | Change Password
 export const ResetPasswordPage = Loadable(lazy(() => import('../pages/auth/ResetPasswordPage')));
 
-
 // DASHBOARD: Gift
 export const GiftPage = Loadable(lazy(() => import('../pages/GiftListPage')));
 export const GiftFormHandlePage = Loadable(lazy(() => import('../sections/_gift/pages/GiftFormHandlePage')));
 
-// DASHBOARD: Markets
+// -------------------DASHBOARD: Markets-------------------------------
 export const MarketsListPage = Loadable(lazy(() => import('../pages/markets/MarketsListPage')));
 export const MarketFormHandlePage = Loadable(lazy(() => import('../sections/_markets/pages/MarketFormHandle')));
 
 // DASHBOARD: Markets | Pana Charts
 export const PanaChartsListPage = Loadable(lazy(() => import('../pages/markets/PanaChartsListPage')));
-// export const PanaChartFormHandlePage = Loadable(lazy(() => import('../sections/_panaChart/pages/PanaChartFormHandlePage')));
-
 
 // DASHBOARD: Markets | Records
 export const GeneralMarketRecordListPage = Loadable(lazy(() => import('../pages/markets/GeneralMarketRecordListPage')));
 
-// DASHBOARD: Markets | Add Result
-export const PreviousResultListPage = Loadable(lazy(() => import('../pages/markets/PreviousResultListPage')));
+// DASHBOARD: Markets | Market Results
+export const MarketResultListPage = Loadable(lazy(() => import('../pages/markets/MarketResultListPage')));
 
 // DASHBOARD: Markets | Predictions Form
 export const GeneralPredictionFormPage = Loadable(lazy(() => import('../pages/markets/GeneralPredictionFormPage')));
 
 // DASHBOARD: Markets | Win History List
 export const WinHistoryListPage = Loadable(lazy(() => import('../pages/markets/WinHistoryListPage')));
+
+// -----------------------DASHBOARD: Starline | Markets -------------------------------------------------- 
+export const StarLineMarketsListPage = Loadable(lazy(() => import('../pages/startlineMarkets/StarLineMarketsListPage')));
+export const StarlineMarketFormHandle = Loadable(lazy(() => import('../sections/_starline_market/pages/StarlineMarketFormHandle')));
+
+// DASHBOARD: Starline Market | Records
+export const StarLineMarketsRecordListPage = Loadable(lazy(() => import('../pages/startlineMarkets/StarLineMarketsRecordListPage')));
+
+// DASHBOARD: Starline Market | Result
+export const StarLineMarketResultListPage = Loadable(lazy(() => import('../pages/startlineMarkets/StarLineMarketResult')));
 
 // DASHBOARD: Withdraw History
 export const GeneralWithdrawHistoryListPage = Loadable(lazy(() => import('../pages/GeneralWithdrawHistoryListPage')));
@@ -76,9 +83,9 @@ export const DipositHistoryListPage = Loadable(lazy(() => import('../pages/Dipos
 export const GameTypeFormPage = Loadable(lazy(() => import('../pages/GameTypeFormPage')));
 
 // BASIC PAGES
-export const Page500 = Loadable(lazy(() => import('../pages/ErrorHandlingPages/Page500')));
-export const Page403 = Loadable(lazy(() => import('../pages/ErrorHandlingPages/Page403')));
-export const Page404 = Loadable(lazy(() => import('../pages/ErrorHandlingPages/Page404')));
+export const Page500 = Loadable(lazy(() => import('../pages/errorHandlingPages/Page500')));
+export const Page403 = Loadable(lazy(() => import('../pages/errorHandlingPages/Page403')));
+export const Page404 = Loadable(lazy(() => import('../pages/errorHandlingPages/Page404')));
 
 
 

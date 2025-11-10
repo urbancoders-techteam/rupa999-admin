@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 import {
-  Stack,
   Button,
   TableRow,
   TableCell,
@@ -10,7 +9,6 @@ import {
   styled,
   MenuItem,
   useMediaQuery,
-  Box,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import Iconify from '../../../components/iconify';
@@ -20,7 +18,7 @@ import Label from '../../../components/label';
 
 // ----------------------------------------------------------------------
 
-PreviousResultTableRow.propTypes = {
+MarketResultTableRow.propTypes = {
   row: PropTypes.shape({
     id: PropTypes.number,
     gameName: PropTypes.string,
@@ -34,21 +32,12 @@ PreviousResultTableRow.propTypes = {
   onRevert: PropTypes.func,
 };
 
-export default function PreviousResultTableRow({ row, onRevert }) {
-  const {
-    id,
-    gameName,
-    resultDate,
-    result,
-    openPana,
-    closePana,
-    createdAt,
-  } = row;
+export default function MarketResultTableRow({ row, onRevert }) {
+  const { id, gameName, resultDate, result, openPana, closePana, createdAt } = row;
 
   const [openPopover, setOpenPopover] = useState(null);
   const [openConfirm, setOpenConfirm] = useState(false);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleOpenPopover = (event) => setOpenPopover(event.currentTarget);
   const handleClosePopover = () => setOpenPopover(null);
@@ -67,6 +56,12 @@ export default function PreviousResultTableRow({ row, onRevert }) {
   return (
     <>
       <StyledTableRow hover>
+        <TableCell align="right">
+          <IconButton onClick={handleOpenPopover}>
+            <Iconify icon="eva:more-vertical-fill" />
+          </IconButton>
+        </TableCell>
+        
         <TableCell align="left">{id}</TableCell>
 
         <TableCell align="left">
@@ -100,12 +95,7 @@ export default function PreviousResultTableRow({ row, onRevert }) {
         </TableCell>
 
         <TableCell align="center">
-          <Button
-            variant="outlined"
-            size="small"
-            color="primary"
-            onClick={handleOpenConfirm}
-          >
+          <Button variant="outlined" size="small" color="primary" onClick={handleOpenConfirm}>
             Revert
           </Button>
         </TableCell>
@@ -114,12 +104,6 @@ export default function PreviousResultTableRow({ row, onRevert }) {
           <Typography variant="body2" color="text.secondary">
             {createdAt}
           </Typography>
-        </TableCell>
-
-        <TableCell align="right">
-          <IconButton onClick={handleOpenPopover}>
-            <Iconify icon="eva:more-vertical-fill" />
-          </IconButton>
         </TableCell>
       </StyledTableRow>
 

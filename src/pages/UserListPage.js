@@ -151,7 +151,7 @@ export default function UserListPage() {
   };
 
   const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
+    navigate(PATH_DASHBOARD.user.edit(id));
   };
   const handleTransactionRow = (id) => {
     navigate(PATH_DASHBOARD.user.transactions(id));

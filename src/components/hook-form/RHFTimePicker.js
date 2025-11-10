@@ -35,6 +35,7 @@ const RHFTimePicker = ({ name, label, width = "100%", required = false, onChange
                 <TextField
                   {...params}
                   fullWidth
+                  size='small'
                   error={!!errorMessage}
                   helperText={errorMessage}
                   sx={{

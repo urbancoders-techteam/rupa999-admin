@@ -1,10 +1,7 @@
 import { combineReducers } from 'redux';
-import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 // slices
-import mailReducer from './slices/mail';
-import chatReducer from './slices/chat';
-import productReducer from './slices/product';
+import authReducer from './slices/auth_slices';
 
 // ----------------------------------------------------------------------
 
@@ -15,17 +12,8 @@ export const rootPersistConfig = {
   whitelist: [],
 };
 
-export const productPersistConfig = {
-  key: 'product',
-  storage,
-  keyPrefix: 'redux-',
-  whitelist: ['sortBy', 'checkout'],
-};
-
 const rootReducer = combineReducers({
-  mail: mailReducer,
-  chat: chatReducer,
-  product: persistReducer(productPersistConfig, productReducer),
+  auth: authReducer,
 });
 
 export default rootReducer;

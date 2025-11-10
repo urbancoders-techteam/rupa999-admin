@@ -1,15 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Box, Card, Grid, Button, Typography } from '@mui/material';
 import { useForm, FormProvider, useWatch } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import { RHFTextField, RHFAutocomplete } from '../../../components/hook-form'; // <-- update this import path
-import { marketEnum } from '../../../assets/data/marketEnum';
+import { RHFTextField, RHFAutocomplete } from '../../components/hook-form'; // <-- update this import path
+import { marketEnum } from '../../assets/data/marketEnum';
+import RHFDatePicker from '../../components/hook-form/RHFDatePicker';
 
 // ----------------------------------------------------------------------
-
-const sessions = ['Open', 'Close'];
 
 const validationSchema = Yup.object({
   date: Yup.string().required('Date is required'),
@@ -37,11 +35,7 @@ const validationSchema = Yup.object({
   }),
 });
 
-GeneralCreateResultForm.propTypes = {
-  setShowWinner: PropTypes.func,
-};
-
-export default function GeneralCreateResultForm({ setShowWinner }) {
+export default function CreateResultForm() {
   const methods = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: {
@@ -77,8 +71,8 @@ export default function GeneralCreateResultForm({ setShowWinner }) {
         <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
           <Grid container spacing={2}>
             {/* Date */}
-            <Grid item xs={12} md={4}>
-              <RHFTextField
+            <Grid item xs={12} sm={6}>
+              <RHFDatePicker
                 name="date"
                 label="Date"
                 type="date"
@@ -89,7 +83,7 @@ export default function GeneralCreateResultForm({ setShowWinner }) {
             </Grid>
 
             {/* Markets */}
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} sm={6}>
               <RHFAutocomplete
                 name="market"
                 label="Markets"
@@ -102,21 +96,8 @@ export default function GeneralCreateResultForm({ setShowWinner }) {
               />
             </Grid>
 
-            {/* Session */}
-            <Grid item xs={12} md={4}>
-              <RHFAutocomplete
-                name="session"
-                label="Session"
-                size="small"
-                fullWidth
-                options={sessions}
-                getOptionLabel={(opt) => (typeof opt === 'string' ? opt : '')}
-                isOptionEqualToValue={(opt, val) => opt === val}
-              />
-            </Grid>
-
             {/* Percentage toggle */}
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} sm={12}>
               <Typography
                 variant="body2"
                 sx={{ ml: 1, mb: 1, fontWeight: 500, color: 'text.secondary' }}
@@ -131,7 +112,7 @@ export default function GeneralCreateResultForm({ setShowWinner }) {
                   onClick={() => setValue('usePercentage', true, { shouldValidate: true })}
                   sx={{
                     flex: 1,
-                    maxWidth: '100px',
+                    maxWidth: '120px',
                     textTransform: 'none',
                     fontWeight: 600,
                     borderRadius: 2,
@@ -147,7 +128,7 @@ export default function GeneralCreateResultForm({ setShowWinner }) {
                   onClick={() => setValue('usePercentage', false, { shouldValidate: true })}
                   sx={{
                     flex: 1,
-                    maxWidth: '100px',
+                    maxWidth: '120px',
                     textTransform: 'none',
                     fontWeight: 600,
                     borderRadius: 2,
@@ -161,7 +142,7 @@ export default function GeneralCreateResultForm({ setShowWinner }) {
 
             {/* Conditional fields */}
             {usePercentage ? (
-              <Grid item xs={12} md={4}>
+              <Grid item xs={12} sm={6}>
                 <RHFTextField
                   name="percentage"
                   label="Percentage"
@@ -172,7 +153,7 @@ export default function GeneralCreateResultForm({ setShowWinner }) {
               </Grid>
             ) : (
               <>
-                <Grid item xs={12} md={4}>
+                <Grid item xs={12} sm={6}>
                   <RHFTextField
                     name="pana"
                     label="Pana"
@@ -182,7 +163,7 @@ export default function GeneralCreateResultForm({ setShowWinner }) {
                   />
                 </Grid>
 
-                <Grid item xs={12} md={4}>
+                <Grid item xs={12} sm={6}>
                   <RHFTextField
                     name="digit"
                     label="Digit"
@@ -197,9 +178,6 @@ export default function GeneralCreateResultForm({ setShowWinner }) {
 
           {/* Buttons */}
           <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-            <Button variant="outlined" color="primary" onClick={() => setShowWinner?.(true)}>
-              Show Winners
-            </Button>
             <Button variant="contained" color="primary" type="submit">
               Save
             </Button>

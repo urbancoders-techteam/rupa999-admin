@@ -16,7 +16,6 @@ import {
   Pagination,
   Button,
 } from '@mui/material';
-import CallIcon from '@mui/icons-material/Call';
 import { useNavigate } from 'react-router';
 import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
 import EditIcon from '@mui/icons-material/Edit';
@@ -133,28 +132,26 @@ function UserMobileViewCardLayout({ data = [], onEditRow, onDeleteRow }) {
                         <Stack
                           direction="column"
                           spacing={0.5}
-                          sx={{ borderRight: '1px solid #ccc', paddingRight: 1 }}
+                          sx={{ borderRight: '1px solid #ccc', paddingRight: 1, minWidth:'30px' }}
                         >
-                          <Typography variant="subtitle1">ID:</Typography>
-                          <Typography variant="subtitle2">{row.id || '—'}</Typography>
+                          {/* <Typography variant="subtitle1">ID:</Typography> */}
+                          <Typography variant="subtitle2">{row.id || '—'}.</Typography>
                         </Stack>
 
                         <Stack
                           direction="column"
                           spacing={0.5}
-                          sx={{ borderRight: '1px solid #ccc', paddingRight: 1 }}
+                          sx={{ borderRight: '1px solid #ccc', paddingRight: 1, minWidth:'120px' }}
                         >
-                          <Typography variant="subtitle1" sx={{ textWrap: 'wrap' }}>
-                            Name:
-                          </Typography>
-                          <Typography variant="subtitle2" color="text.secondary">
+                          <Typography variant="subtitle1">
                             {row.name || '—'}
                           </Typography>
+                           <Typography variant="subtitle2" color="text.secondary">{row.phone || '—'}</Typography>
                         </Stack>
 
                         <Stack direction="column" spacing={0.5}>
-                          <Typography variant="subtitle1">Mb No.:</Typography>
-                          <Typography variant="subtitle2">{row.phone || '—'}</Typography>
+                          <Typography variant="subtitle2">Balance : </Typography>
+                          <Typography variant="subtitle2" color="text.secondary">{row.balance || '—'}</Typography>
                         </Stack>
                       </Box>
 
@@ -263,7 +260,7 @@ function UserMobileViewCardLayout({ data = [], onEditRow, onDeleteRow }) {
                       <Stack direction="row" justifyContent="space-between" spacing={1}>
                         <StatusToggleCell id={row.id} status={row.status} />
 
-                        <IconButton size="small" color="primary" onClick={() => onEditRow(row.id)}>
+                        <IconButton size="small" color="primary" onClick={() => onEditRow(row.name)}>
                           <EditIcon fontSize="small" />
                         </IconButton>
                         <IconButton size="small" color="error" onClick={() => onDeleteRow(row.id)}>

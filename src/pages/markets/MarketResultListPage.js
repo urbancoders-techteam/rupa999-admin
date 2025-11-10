@@ -36,11 +36,11 @@ import {
   TablePaginationCustom,
 } from '../../components/table';
 // sections
-import PreviousResultTableRow from '../../sections/_previous_results/components/PreviousResultTableRow';
-import PreviousResultToolbar from '../../sections/_previous_results/components/PreviousResultToolbar';
 import GeneralCreateResultForm from '../../sections/_previous_results/components/GeneralCreateResultForm';
 import ResultTable from '../../sections/_previous_results/components/ResultTable';
 import PreviousResultMobileViewCardLayout from '../../sections/_previous_results/components/PreviousResultMobileViewCardLayout';
+import CustomTableToolbar from '../../components/table/CustomTableToolBar';
+import MarketResultTableRow from '../../sections/_previous_results/components/MarketResultTableRow';
 
 // ----------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ const TABLE_HEAD = [
 
 // ----------------------------------------------------------------------
 
-export default function PreviousResultListPage() {
+export default function MarketResultListPage() {
   const {
     dense,
     page,
@@ -151,7 +151,7 @@ export default function PreviousResultListPage() {
   };
 
   const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.previousresults.edit(paramCase(id)));
+    navigate(PATH_DASHBOARD.gameresults.edit(paramCase(id)));
   };
 
   const handleResetFilter = () => {
@@ -161,26 +161,16 @@ export default function PreviousResultListPage() {
   return (
     <>
       <Helmet>
-        <title> Add Result: List | Rupa999 </title>
+        <title> Market Results : List | Rupa999 </title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <CustomBreadcrumbs
-          heading="Add Result"
+          heading="Market Results"
           links={[
             { name: 'Dashboard', href: PATH_DASHBOARD.root },
-            { name: 'Add Result', href: PATH_DASHBOARD.previousresults.list },
+            { name: 'Market Results', href: PATH_DASHBOARD.markets.marketresults.list },
           ]}
-          action={
-            <Button
-              component={RouterLink}
-              // to={PATH_DASHBOARD.previousresults.new}
-              variant="contained"
-              startIcon={<Iconify icon="eva:plus-fill" />}
-            >
-              Add New Result
-            </Button>
-          }
         />
 
         <GeneralCreateResultForm setShowWinner={setShowWinner} />
@@ -195,7 +185,7 @@ export default function PreviousResultListPage() {
           />
         ) : (
           <Card>
-            <PreviousResultToolbar
+            <CustomTableToolbar
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
@@ -237,7 +227,7 @@ export default function PreviousResultListPage() {
                     {dataFiltered
                       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                       .map((row) => (
-                        <PreviousResultTableRow
+                        <MarketResultTableRow
                           key={row.id}
                           row={row}
                           selected={selected.includes(row.id)}
@@ -313,17 +303,17 @@ function applyFilter({ inputData, comparator, filterName, filterStatus, filterRo
 
   if (filterName) {
     inputData = inputData.filter(
-      (previousresults) =>
-        previousresults.gameName.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+      (gameresults) =>
+        gameresults.gameName.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
     );
   }
 
   if (filterStatus !== 'all') {
-    inputData = inputData.filter((previousresults) => previousresults.status === filterStatus);
+    inputData = inputData.filter((gameresults) => gameresults.status === filterStatus);
   }
 
   if (filterRole !== 'all') {
-    inputData = inputData.filter((previousresults) => previousresults.role === filterRole);
+    inputData = inputData.filter((gameresults) => gameresults.role === filterRole);
   }
 
   return inputData;
