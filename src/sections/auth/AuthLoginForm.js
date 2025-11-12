@@ -24,7 +24,7 @@ import { getPermissionByRoleIdAsync } from '../../redux/services/auth_role_permi
 export default function AuthLoginForm() {
   const { login } = useAuthContext();
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -36,9 +36,8 @@ export default function AuthLoginForm() {
   const defaultValues = {
     // email: '',
     // password: '',
-        email: 'demo@minimals.cc',
+    email: 'demo@minimals.cc',
     password: 'demo1234',
-
   };
 
   const methods = useForm({
@@ -53,64 +52,59 @@ export default function AuthLoginForm() {
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = methods;
 
-  const onSubmit = async (data) => {
-    console.log(data);
-    navigate(PATH_DASHBOARD.home.root);
-    // try {
-    //   await login(data.email, data.password);
-    // } catch (error) {
-    //   console.error(error);
-    //   reset();
-    //   setError('afterSubmit', {
-    //     ...error,
-    //     message: error.message,
-    //   });
-    // }
-  };
-
-  //   const onSubmit = async (data) => {
-  //  try {
-  //     const res = await dispatch(staffLoginAsync({ email: data?.email, password: data?.password }));
-  //     console.log('res', res)
-  //     if (res?.payload?.success && res.payload.data) {
-  //       localStorage.setItem('token', res.payload.data.token);
-        
-  //       if (res?.payload?.data?.staff._id || res) {
-          
-  //         const id = res?.payload?.data?.staff.role;
-  //         const initialUserData = {
-  //           user: res?.payload?.data,
-  //         }
-  //         navigate(PATH_DASHBOARD.home.root);
-  //         // dispatch(getPermissionByRoleIdAsync({ id })).then((permission) => {
-  //         //   console.log('permission', permission)
-  //         //   if (permission.payload.status === 200) {
-  //         //     const updatedUserData = {
-  //         //       ...initialUserData,
-  //         //       route: permission?.payload?.data,
-  //         //     };
-  //         //     localStorage.setItem('user', JSON.stringify(updatedUserData));
-  //         //     dispatch(setUserInfoRedux(updatedUserData));
-  //         //   }
-  //         // });
-  //         toast.success('Logged in successfully, Welcome to Tied Admin Panel.');   
-  //         localStorage.setItem('login', JSON.stringify(res?.payload?.data));
-  //       }
-        
-  //     } else {
-  //       throw new Error(res.payload?.message || 'Login failed');
-  //     }
-  //   } catch (error) {
-  //     setError('afterSubmit', {
-  //       message: error.message || 'Login failed',
-  //     });
-
-  //     reset({
-  //       email: data.email,
-  //       password: '',
-  //     });
-  //   }
+  // const onSubmit = async (data) => {
+  //   console.log(data);
+  //   navigate(PATH_DASHBOARD.home.root);
+  //   // try {
+  //   //   await login(data.email, data.password);
+  //   // } catch (error) {
+  //   //   console.error(error);
+  //   //   reset();
+  //   //   setError('afterSubmit', {
+  //   //     ...error,
+  //   //     message: error.message,
+  //   //   });
+  //   // }
   // };
+
+  const onSubmit = async (data) => {
+    try {
+      const res = await dispatch(staffLoginAsync({ email: data?.email, password: data?.password }));
+      console.log('res', res);
+      navigate(PATH_DASHBOARD.home.root);
+
+      // if (res?.payload?.success && res.payload.data) {
+      //   localStorage.setItem('token', res.payload.data.token);
+
+      //   if (res?.payload?.data?.staff._id || res) {
+      //     const id = res?.payload?.data?.staff.role;
+      //     const initialUserData = {
+      //       user: res?.payload?.data,
+      //     };
+      //     navigate(PATH_DASHBOARD.home.root);
+      //     // dispatch(getPermissionByRoleIdAsync({ id })).then((permission) => {
+      //     //   console.log('permission', permission)
+      //     //   if (permission.payload.status === 200) {
+      //     //     const updatedUserData = {
+      //     //       ...initialUserData,
+      //     //       route: permission?.payload?.data,
+      //     //     };
+      //     //     localStorage.setItem('user', JSON.stringify(updatedUserData));
+      //     //     dispatch(setUserInfoRedux(updatedUserData));
+      //     //   }
+      //     // });
+      //     toast.success('Logged in successfully, Welcome to Tied Admin Panel.');
+      //     localStorage.setItem('login', JSON.stringify(res?.payload?.data));
+      //   }
+      // } else {
+      //   throw new Error(res.payload?.message || 'Login failed');
+      // }
+    } catch (error) {
+      setError('afterSubmit', {
+        message: error.message || 'Login failed',
+      });
+    }
+  };
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>

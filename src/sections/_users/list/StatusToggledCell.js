@@ -9,12 +9,12 @@ StatusToggleCell.propTypes = {
 };
 
 export default function StatusToggleCell({ id, status }) {
-  // false = Active (green), true = Blocked (red)
-  const [isBlocked, setIsBlocked] = useState(status === 'Blocked');
+  // false = Active (green), true = InActive (red)
+  const [isBlocked, setIsBlocked] = useState(status === 'InActive');
   const [loading, setLoading] = useState(false);
 
   const handleToggle = async () => {
-    const newStatus = isBlocked ? 'Active' : 'Blocked';
+    const newStatus = isBlocked ? 'Active' : 'InActive';
     setIsBlocked(!isBlocked);
     // setLoading(true);
 
@@ -46,7 +46,7 @@ export default function StatusToggleCell({ id, status }) {
             transition: 'color 0.3s ease',
           }}
         >
-          {isBlocked ? 'Blocked' : 'Active'}
+          {isBlocked ? 'InActive' : 'Active'}
         </Typography>
 
         {/* Switch with subtle animation */}

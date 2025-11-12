@@ -49,6 +49,8 @@ import {
   StarLineMarketsRecordListPage,
   MarketResultListPage,
   StarLineMarketResultListPage,
+  StarLineWinHistoryListPage,
+  StaffListPage,
   //
 } from './elements';
 
@@ -104,6 +106,16 @@ export default function Router() {
       children: [
         { element: <Navigate to={PATH_AFTER_LOGIN} replace />, index: true },
         { path: 'home', element: <GeneralDashboardPage />, index: true },
+        {
+          path: 'staff',
+          children: [
+            { element: <Navigate to="/dashboard/staff/list" replace />, index: true },
+            { path: 'list', element: <StaffListPage /> },
+            // { path: 'new', element: <UserFormHandle /> },
+            // { path: ':id/edit', element: <UserFormHandle /> },
+            // { path: ':id/view', element: <UserFormHandle /> },
+          ],
+        },
         {
           path: 'user',
           children: [
@@ -298,26 +310,16 @@ export default function Router() {
                 // { path: ':id/view', element: <MarketFormHandlePage /> },
               ],
             },
-            // {
-            //   path: 'predictionform',
-            //   children: [
-            //     {
-            //       element: <Navigate to="/dashboard/markets/predictionform" replace />,
-            //       index: true,
-            //     },
-            //     { path: 'form', element: <GeneralPredictionFormPage /> },
-            //   ],
-            // },
-            // {
-            //   path: 'winhistory',
-            //   children: [
-            //     {
-            //       element: <Navigate to="/dashboard/markets/winhistory" replace />,
-            //       index: true,
-            //     },
-            //     { path: 'list', element: <WinHistoryListPage /> },
-            //   ],
-            // },
+            {
+              path: 'winhistory',
+              children: [
+                {
+                  element: <Navigate to="/dashboard/starline/winhistory" replace />,
+                  index: true,
+                },
+                { path: 'list', element: <StarLineWinHistoryListPage /> },
+              ],
+            },
           ],
         },
 

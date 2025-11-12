@@ -42,6 +42,11 @@ const navConfig = [
     items: [
       { title: 'dashboard', path: PATH_DASHBOARD.home.root, icon: ICONS.dashboard },
       {
+        title: 'staff',
+        path: PATH_DASHBOARD.staff.root,
+        icon: ICONS.user,
+      },
+      {
         title: 'user',
         path: PATH_DASHBOARD.user.root,
         icon: ICONS.user,
@@ -95,7 +100,7 @@ const navConfig = [
           { title: 'Market list', path: PATH_DASHBOARD.starline.market.list },
           { title: 'Market Record', path: PATH_DASHBOARD.starline.marketrecords.list },
           { title: 'Game Result', path: PATH_DASHBOARD.starline.marketresults.list },
-          // { title: 'Win History', path: PATH_DASHBOARD.starline.winhistory.list },
+          { title: 'Win History', path: PATH_DASHBOARD.starline.winhistory.list },
           // { title: 'Data', path: PATH_DASHBOARD.starline.marketrecords.list },
         ],
       },

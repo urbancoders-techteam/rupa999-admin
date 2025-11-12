@@ -24,6 +24,9 @@ export const NewPasswordPage = Loadable(lazy(() => import('../pages/auth/NewPass
 export const GeneralDashboardPage = Loadable(lazy(() => import('../pages/GeneralDashboardPage')));
 export const SliderImagePage = Loadable(lazy(() => import('../pages/SliderImagePage')));
 
+// DASHBOARD: Saff
+export const StaffListPage = Loadable(lazy(() => import('../pages/StaffListPage')));
+
 // DASHBOARD: User 
 export const UserListPage = Loadable(lazy(() => import('../pages/UserListPage')));
 export const UserFormHandle = Loadable(lazy(() => import('../sections/_users/form/UserFormHandle')));
@@ -72,6 +75,9 @@ export const StarLineMarketsRecordListPage = Loadable(lazy(() => import('../page
 
 // DASHBOARD: Starline Market | Result
 export const StarLineMarketResultListPage = Loadable(lazy(() => import('../pages/startlineMarkets/StarLineMarketResult')));
+
+// DASHBOARD: Starline Market | Win History
+export const StarLineWinHistoryListPage = Loadable(lazy(() => import('../pages/startlineMarkets/StarLineWinHistoryListPage')));
 
 // DASHBOARD: Withdraw History
 export const GeneralWithdrawHistoryListPage = Loadable(lazy(() => import('../pages/GeneralWithdrawHistoryListPage')));

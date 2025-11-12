@@ -26,12 +26,12 @@ export default function AuthGuard({ children }) {
     return <LoadingScreen />;
   }
 
-  // if (!token) {
-  //   if (pathname !== requestedLocation) {
-  //     setRequestedLocation(pathname);
-  //   }
-  //   return <LoginPage />;
-  // }
+  if (!token) {
+    if (pathname !== requestedLocation) {
+      setRequestedLocation(pathname);
+    }
+    return <LoginPage />;
+  }
 
   if (requestedLocation && pathname !== requestedLocation) {
     setRequestedLocation(null);

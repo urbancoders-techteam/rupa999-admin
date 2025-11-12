@@ -37,6 +37,14 @@ export const PATH_DASHBOARD = {
     root: path(ROOTS_DASHBOARD, '/home'),
   },
 
+  staff: {
+    root: path(ROOTS_DASHBOARD, '/staff'),
+    list: path(ROOTS_DASHBOARD, '/staff/list'),
+    new: path(ROOTS_DASHBOARD, '/staff/new'),
+    edit: (id) => path(ROOTS_DASHBOARD, `/staff/${id}/edit`),
+    view: (id) => path(ROOTS_DASHBOARD, `/staff/${id}/view`),
+  },
+
   user: {
     root: path(ROOTS_DASHBOARD, '/user'),
     list: path(ROOTS_DASHBOARD, '/user/list'),
@@ -70,7 +78,7 @@ export const PATH_DASHBOARD = {
     form: path(ROOTS_DASHBOARD, '/settings/sliderimage/form'),
   },
 
-    gift: {
+  gift: {
     root: path(ROOTS_DASHBOARD, '/gift'),
     list: path(ROOTS_DASHBOARD, '/gift/list'),
     new: path(ROOTS_DASHBOARD, '/gift/new'),
@@ -131,17 +139,16 @@ export const PATH_DASHBOARD = {
     marketrecords: {
       root: path(ROOTS_DASHBOARD, '/starline/marketrecords'),
       list: path(ROOTS_DASHBOARD, '/starline/marketrecords/list'),
-      new: path(ROOTS_DASHBOARD, '/starline/marketrecords/new'),
-      edit: (id) => path(ROOTS_DASHBOARD, `/starline/marketrecords/${id}/edit`),
-      view: (id) => path(ROOTS_DASHBOARD, `/starline/marketrecords/${id}/view`),
     },
 
     marketresults: {
       root: path(ROOTS_DASHBOARD, '/starline/marketresults'),
       list: path(ROOTS_DASHBOARD, '/starline/marketresults/list'),
-      new: path(ROOTS_DASHBOARD, '/starline/marketresults/new'),
-      edit: (id) => path(ROOTS_DASHBOARD, `/starline/marketresults/${id}/edit`),
-      view: (id) => path(ROOTS_DASHBOARD, `/starline/marketresults/${id}/view`),
+    },
+
+    winhistory: {
+      root: path(ROOTS_DASHBOARD, '/starline/winhistory'),
+      list: path(ROOTS_DASHBOARD, '/starline/winhistory/list'),
     },
   },
 
