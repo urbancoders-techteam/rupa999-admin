@@ -20,9 +20,9 @@ export default function GuestGuard({ children }) {
     return <Navigate to={PATH_DASHBOARD.root} />;
   }
 
-  if (!isInitialized) {
-    return <LoadingScreen />;
-  }
+  // if (!isInitialized) {
+  //   return <LoadingScreen />;
+  // }
 
   return <> {children} </>;
 }

@@ -4,7 +4,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 // components
 import LoadingScreen from '../components/loading-screen';
 //
-import Login from '../pages/auth/LoginPage';
+import LoginPage from '../pages/auth/LoginPage';
 import { useAuthContext } from './useAuthContext';
 
 // ----------------------------------------------------------------------
@@ -14,7 +14,9 @@ AuthGuard.propTypes = {
 };
 
 export default function AuthGuard({ children }) {
-  const { isAuthenticated, isInitialized } = useAuthContext();
+  const { isInitialized } = useAuthContext();
+
+  const token = localStorage.getItem('token');
 
   const { pathname } = useLocation();
 
@@ -24,11 +26,11 @@ export default function AuthGuard({ children }) {
     return <LoadingScreen />;
   }
 
-  // if (!isAuthenticated) {
+  // if (!token) {
   //   if (pathname !== requestedLocation) {
   //     setRequestedLocation(pathname);
   //   }
-  //   return <Login />;
+  //   return <LoginPage />;
   // }
 
   if (requestedLocation && pathname !== requestedLocation) {

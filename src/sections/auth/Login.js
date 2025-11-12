@@ -17,6 +17,7 @@ export default function Login() {
 
   return (
     <LoginLayout>
+      
       <Stack spacing={2} sx={{ mb: 5, position: 'relative' }}>
         <Typography variant="h4">Sign in to Rupa999</Typography>
 
@@ -28,6 +29,7 @@ export default function Login() {
           </Link>
         </Stack>
       </Stack>
+
       <AuthLoginForm />
 
     </LoginLayout>

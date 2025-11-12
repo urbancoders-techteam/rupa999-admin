@@ -1,99 +1,89 @@
 import PropTypes from 'prop-types';
-// @mui
-import { alpha } from '@mui/material/styles';
-import { Box, Card, Typography, Stack } from '@mui/material';
-import { fNumber, fPercent } from '../../utils/formatNumber';
-import Chart from '../chart';
-import Iconify from '../iconify';
-// utils
-// import { fNumber, fPercent } from '../../../../utils/formatNumber';
-// components
+import { alpha, useTheme } from '@mui/material/styles';
+import { Card, Typography, Stack, Divider, Box } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
-DashboardSummaryCard.propTypes = {
-  sx: PropTypes.object,
-  chart: PropTypes.object,
-  title: PropTypes.string,
-  total: PropTypes.number,
-  percent: PropTypes.number,
-};
-
-export default function DashboardSummaryCard({ title, percent, total, chart, sx, ...other }) {
-  const { colors, series, options } = chart;
-
-  const chartOptions = {
-    colors,
-    chart: {
-      sparkline: {
-        enabled: true,
-      },
-    },
-    plotOptions: {
-      bar: {
-        columnWidth: '68%',
-        borderRadius: 2,
-      },
-    },
-    tooltip: {
-      x: { show: false },
-      y: {
-        formatter: (value) => fNumber(value),
-        title: {
-          formatter: () => '',
-        },
-      },
-      marker: { show: false },
-    },
-    ...options,
-  };
+export default function DashboardSummaryCard({
+  leftTitle,
+  leftValue,
+  rightTitle,
+  rightValue,
+  color = 'primary',
+  enableHoverEffect = true,
+  sx,
+  ...other
+}) {
+  const theme = useTheme();
 
   return (
-    <Card sx={{ display: 'flex', alignItems: 'center', p: 3, ...sx }} {...other}>
-      <Box sx={{ flexGrow: 1 }}>
-        <Typography variant="subtitle2">{title}</Typography>
-
-        <TrendingInfo percent={percent} />
-
-        <Typography variant="h3">{fNumber(total)}</Typography>
+    <Card
+      sx={{
+        px: 2.5,
+        py: 2,
+        display: 'flex',
+        // alignItems: 'center',
+        justifyContent: 'space-between',
+        borderRadius: 2,
+        boxShadow: theme.shadows[4],
+        background: alpha(theme.palette.background.paper, 0.9),
+        transition: enableHoverEffect ? 'all 0.3s ease' : 'none',
+        ...(enableHoverEffect && {
+          '&:hover': {
+            transform: 'translateY(-6px)',
+            boxShadow: theme.shadows[8],
+            bgcolor: alpha(theme.palette[color].lighter || theme.palette.primary.light, 0.25),
+          },
+        }),
+        ...sx,
+      }}
+      {...other}
+    >
+      {/* Left Section */}
+      <Box flex={0.5} textAlign="start" sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <Typography variant="subtitle2" sx={{ color: theme.palette.text.secondary, mb: 0.5 }}>
+          {leftTitle}
+        </Typography>
+        <Typography variant="h3" sx={{ color: theme.palette.text.primary }}>
+          {leftValue}
+        </Typography>
       </Box>
 
-      <Chart type="bar" series={[{ data: series }]} options={chartOptions} width={60} height={36} />
+      {/* Vertical Divider */}
+      {rightTitle && (
+        <>
+          {' '}
+          <Divider
+            orientation="vertical"
+            flexItem
+            sx={{
+              mx: 1,
+              borderColor: alpha(theme.palette.text.primary, 0.2),
+            }}
+          />
+          {/* Right Section */}
+          <Box flex={0.5} textAlign="end" sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <Typography variant="subtitle2" sx={{ color: theme.palette.text.secondary, mb: 0.5 }}>
+              {rightTitle}
+            </Typography>
+            <Typography variant="h3" sx={{ color: theme.palette.text.primary }}>
+              {rightValue}
+            </Typography>
+          </Box>{' '}
+        </>
+      )}
     </Card>
   );
 }
 
 // ----------------------------------------------------------------------
 
-TrendingInfo.propTypes = {
-  percent: PropTypes.number,
+DashboardSummaryCard.propTypes = {
+  leftTitle: PropTypes.string.isRequired,
+  leftValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  rightTitle: PropTypes.string.isRequired,
+  rightValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  color: PropTypes.string,
+  enableHoverEffect: PropTypes.bool,
+  sx: PropTypes.object,
 };
-
-function TrendingInfo({ percent }) {
-  return (
-    <Stack direction="row" alignItems="center" sx={{ mt: 2, mb: 1 }}>
-      <Iconify
-        icon={percent < 0 ? 'eva:trending-down-fill' : 'eva:trending-up-fill'}
-        sx={{
-          mr: 1,
-          p: 0.5,
-          width: 24,
-          height: 24,
-          borderRadius: '50%',
-          color: 'success.main',
-          bgcolor: (theme) => alpha(theme.palette.success.main, 0.16),
-          ...(percent < 0 && {
-            color: 'error.main',
-            bgcolor: (theme) => alpha(theme.palette.error.main, 0.16),
-          }),
-        }}
-      />
-
-      <Typography component="div" variant="subtitle2">
-        {percent > 0 && '+'}
-
-        {fPercent(percent)}
-      </Typography>
-    </Stack>
-  );
-}

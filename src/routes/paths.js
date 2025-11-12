@@ -1,13 +1,9 @@
-// ----------------------------------------------------------------------
-
 function path(root, sublink) {
   return `${root}${sublink}`;
 }
 
 const ROOTS_AUTH = '/auth';
 const ROOTS_DASHBOARD = '/dashboard';
-
-// ----------------------------------------------------------------------
 
 export const PATH_AUTH = {
   root: ROOTS_AUTH,
@@ -36,71 +32,136 @@ export const PATH_PAGE = {
 
 export const PATH_DASHBOARD = {
   root: ROOTS_DASHBOARD,
+
   home: {
     root: path(ROOTS_DASHBOARD, '/home'),
   },
-  // dashboard: {
-  //   root: path(ROOTS_DASHBOARD, '/dashboard'),
-  // },
-  sliderImage: {
-    root: path(ROOTS_DASHBOARD, '/slider-image'),
+
+  user: {
+    root: path(ROOTS_DASHBOARD, '/user'),
+    list: path(ROOTS_DASHBOARD, '/user/list'),
+    new: path(ROOTS_DASHBOARD, '/user/new'),
+    edit: (id) => path(ROOTS_DASHBOARD, `/user/${id}/edit`),
+    view: (id) => path(ROOTS_DASHBOARD, `/user/${id}/view`),
+    transactions: (id) => path(ROOTS_DASHBOARD, `/user/${id}/transactions`),
+    bidhistory: (id) => path(ROOTS_DASHBOARD, `/user/${id}/bidhistory`),
+    withdrawalrequest: (id) => path(ROOTS_DASHBOARD, `/user/${id}/withdrawalrequest`),
   },
-  // general: {
-  //   home: path(ROOTS_DASHBOARD, '/home'),
-  //   sliderImage: path(ROOTS_DASHBOARD, '/slider-image'),
-  //   analytics: path(ROOTS_DASHBOARD, '/analytics'),
-  // },
-  users: {
-    root: path(ROOTS_DASHBOARD, '/users'),
-  },
-  userlist: {
-    root: path(ROOTS_DASHBOARD, '/users/userlist'),
-    list: path(ROOTS_DASHBOARD, '/users/userlist/list'),
-    // new: path(ROOTS_DASHBOARD, '/userlist/new'),
-    // account: path(ROOTS_DASHBOARD, '/userlist/account'),
-    // edit: (name) => path(ROOTS_DASHBOARD, `/userlist/${name}/edit`),
-  },
+
   withdrawdetails: {
-    root: path(ROOTS_DASHBOARD, '/users/withdrawdetails'),
-    list: path(ROOTS_DASHBOARD, '/users/withdrawdetails/list'),
+    root: path(ROOTS_DASHBOARD, '/withdrawdetails'),
+    list: path(ROOTS_DASHBOARD, '/withdrawdetails/list'),
   },
 
   profit: {
     root: path(ROOTS_DASHBOARD, '/profit'),
-    // all: path(ROOTS_DASHBOARD, '/mail/all'),
   },
-  // eCommerce: {
-  //   root: path(ROOTS_DASHBOARD, '/e-commerce'),
-  //   list: path(ROOTS_DASHBOARD, '/e-commerce/list'),
-  //   checkout: path(ROOTS_DASHBOARD, '/e-commerce/checkout'),
-  //   view: (name) => path(ROOTS_DASHBOARD, `/e-commerce/product/${name}`),
-  //   edit: (name) => path(ROOTS_DASHBOARD, `/e-commerce/product/${name}/edit`),
-  //   demoEdit: path(ROOTS_DASHBOARD, '/e-commerce/product/nike-blazer-low-77-vintage/edit'),
-  //   demoView: path(ROOTS_DASHBOARD, '/e-commerce/product/nike-air-force-1-ndestrukt'),
-  // },
-  // invoice: {
-  //   root: path(ROOTS_DASHBOARD, '/invoice'),
-  //   list: path(ROOTS_DASHBOARD, '/invoice/list'),
-  //   new: path(ROOTS_DASHBOARD, '/invoice/new'),
-  //   view: (id) => path(ROOTS_DASHBOARD, `/invoice/${id}`),
-  //   edit: (id) => path(ROOTS_DASHBOARD, `/invoice/${id}/edit`),
-  //   demoEdit: path(ROOTS_DASHBOARD, '/invoice/e99f09a7-dd88-49d5-b1c8-1daf80c2d7b1/edit'),
-  //   demoView: path(ROOTS_DASHBOARD, '/invoice/e99f09a7-dd88-49d5-b1c8-1daf80c2d7b5'),
-  // },
-  // blog: {
-  //   root: path(ROOTS_DASHBOARD, '/blog'),
-  //   posts: path(ROOTS_DASHBOARD, '/blog/posts'),
-  //   new: path(ROOTS_DASHBOARD, '/blog/new'),
-  //   view: (title) => path(ROOTS_DASHBOARD, `/blog/post/${title}`),
-  //   demoView: path(ROOTS_DASHBOARD, '/blog/post/apply-these-7-secret-techniques-to-improve-event'),
-  // },
+
+  // -------------------------- General Settings --------------------------
+  settings: {
+    root: path(ROOTS_DASHBOARD, '/settings'),
+  },
+  changepassword: {
+    root: path(ROOTS_DASHBOARD, '/settings/changepassword'),
+    form: path(ROOTS_DASHBOARD, '/settings/changepassword/form'),
+  },
+  sliderimage: {
+    root: path(ROOTS_DASHBOARD, '/settings/sliderimage'),
+    form: path(ROOTS_DASHBOARD, '/settings/sliderimage/form'),
+  },
+
+    gift: {
+    root: path(ROOTS_DASHBOARD, '/gift'),
+    list: path(ROOTS_DASHBOARD, '/gift/list'),
+    new: path(ROOTS_DASHBOARD, '/gift/new'),
+    edit: (id) => path(ROOTS_DASHBOARD, `/gift/${id}/edit`),
+    view: (id) => path(ROOTS_DASHBOARD, `/gift/${id}/view`),
+  },
+
+  // -------------------------- Markets (General) --------------------------
+  markets: {
+    root: path(ROOTS_DASHBOARD, '/markets'),
+
+    marketlist: {
+      root: path(ROOTS_DASHBOARD, '/markets/marketlist'),
+      list: path(ROOTS_DASHBOARD, '/markets/marketlist/list'),
+      new: path(ROOTS_DASHBOARD, '/markets/marketlist/new'),
+      edit: (id) => path(ROOTS_DASHBOARD, `/markets/marketlist/${id}/edit`),
+      view: (id) => path(ROOTS_DASHBOARD, `/markets/marketlist/${id}/view`),
+    },
+
+    panacharts: {
+      root: path(ROOTS_DASHBOARD, '/markets/panacharts'),
+      list: path(ROOTS_DASHBOARD, '/markets/panacharts/list'),
+    },
+
+    marketrecords: {
+      root: path(ROOTS_DASHBOARD, '/markets/marketrecords'),
+      list: path(ROOTS_DASHBOARD, '/markets/marketrecords/list'),
+    },
+
+    marketresults: {
+      root: path(ROOTS_DASHBOARD, '/markets/marketresults'),
+      list: path(ROOTS_DASHBOARD, '/markets/marketresults/list'),
+    },
+
+    predictionform: {
+      root: path(ROOTS_DASHBOARD, '/markets/predictionform'),
+      form: path(ROOTS_DASHBOARD, '/markets/predictionform/form'),
+    },
+
+    winhistory: {
+      root: path(ROOTS_DASHBOARD, '/markets/winhistory'),
+      list: path(ROOTS_DASHBOARD, '/markets/winhistory/list'),
+    },
+  },
+
+  // -------------------------- Starline Market --------------------------
+  starline: {
+    root: path(ROOTS_DASHBOARD, '/starline'),
+
+    market: {
+      root: path(ROOTS_DASHBOARD, '/starline/market'),
+      list: path(ROOTS_DASHBOARD, '/starline/market/list'),
+      new: path(ROOTS_DASHBOARD, '/starline/market/new'),
+      edit: (id) => path(ROOTS_DASHBOARD, `/starline/market/${id}/edit`),
+      view: (id) => path(ROOTS_DASHBOARD, `/starline/market/${id}/view`),
+    },
+
+    marketrecords: {
+      root: path(ROOTS_DASHBOARD, '/starline/marketrecords'),
+      list: path(ROOTS_DASHBOARD, '/starline/marketrecords/list'),
+      new: path(ROOTS_DASHBOARD, '/starline/marketrecords/new'),
+      edit: (id) => path(ROOTS_DASHBOARD, `/starline/marketrecords/${id}/edit`),
+      view: (id) => path(ROOTS_DASHBOARD, `/starline/marketrecords/${id}/view`),
+    },
+
+    marketresults: {
+      root: path(ROOTS_DASHBOARD, '/starline/marketresults'),
+      list: path(ROOTS_DASHBOARD, '/starline/marketresults/list'),
+      new: path(ROOTS_DASHBOARD, '/starline/marketresults/new'),
+      edit: (id) => path(ROOTS_DASHBOARD, `/starline/marketresults/${id}/edit`),
+      view: (id) => path(ROOTS_DASHBOARD, `/starline/marketresults/${id}/view`),
+    },
+  },
+
+  generalwithdrawhistory: {
+    root: path(ROOTS_DASHBOARD, '/generalwithdrawhistory'),
+    list: path(ROOTS_DASHBOARD, '/generalwithdrawhistory/list'),
+  },
+
+  diposithistory: {
+    root: path(ROOTS_DASHBOARD, '/diposithistory'),
+    list: path(ROOTS_DASHBOARD, '/diposithistory/list'),
+  },
+
+  gametypes: {
+    root: path(ROOTS_DASHBOARD, '/gametypes'),
+  },
 };
 
 export const PATH_ZONE_ON_STORE = 'https://mui.com/store/items/zone-landing-page/';
-
 export const PATH_MINIMAL_ON_STORE = 'https://mui.com/store/items/minimal-dashboard/';
-
 export const PATH_FREE_VERSION = 'https://mui.com/store/items/minimal-dashboard-free/';
-
 export const PATH_FIGMA_PREVIEW =
   'https://www.figma.com/file/rWMDOkMZYw2VpTdNuBBCvN/%5BPreview%5D-Minimal-Web.26.11.22?node-id=0%3A1&t=ya2mDFiuhTXXLLF1-1';

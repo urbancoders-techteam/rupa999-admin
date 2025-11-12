@@ -1,13 +1,14 @@
 import { Helmet } from 'react-helmet-async';
 import { paramCase } from 'change-case';
-import { useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 // @mui
-import { Card, Table, Button, TableBody, Container, TableContainer } from '@mui/material';
+import { Card, Table, Button, TableBody, Container, TableContainer, Box } from '@mui/material';
+import useResponsive from '../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
 // _mock_
-import { _userList } from '../_mock/arrays';
+import { _userDataList } from '../_mock/arrays';
 // components
 import Scrollbar from '../components/scrollbar';
 import ConfirmDialog from '../components/confirm-dialog';
@@ -23,8 +24,9 @@ import {
   TablePaginationCustom,
 } from '../components/table';
 // sections
-import WithdrawDetailsTableRow from '../sections/_withdraw_details/list/WithdrawDetailsTableRow';
-import WithdrawDetailsToolbar from '../sections/_withdraw_details/list/WithdrawDetailsToolbar';
+import WithdrawDetailsTableRow from '../sections/_withdraw_details/components/WithdrawDetailsTableRow';
+import WithdrawDetailsToolbar from '../sections/_withdraw_details/components/WithdrawDetailsToolbar';
+import WithdrawMobileViewCardLayout from '../sections/_withdraw_details/components/WithdrawDetailsMobileViewCardLayout';
 
 // ----------------------------------------------------------------------
 
@@ -67,7 +69,7 @@ export default function WithdrawDetailsPage() {
 
   const navigate = useNavigate();
 
-  const [tableData, setTableData] = useState(_userList);
+  const [tableData, setTableData] = useState(_userDataList);
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
@@ -77,17 +79,21 @@ export default function WithdrawDetailsPage() {
 
   const [filterStatus, setFilterStatus] = useState('all');
 
-  const dataFiltered = applyFilter({
+  // Memoized filtered data
+  const dataFiltered = useMemo(() => applyFilter({
     inputData: tableData,
     comparator: getComparator(order, orderBy),
     filterName,
     filterRole,
     filterStatus,
-  });
+  }), [tableData, order, orderBy, filterName, filterRole, filterStatus]);
 
-  const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  // Memoized paginated data
+  const dataInPage = useMemo(() => dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage), [dataFiltered, page, rowsPerPage]);
 
   const denseHeight = dense ? 52 : 72;
+
+  const isMobile = useResponsive('down', 'sm');
 
   const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
@@ -95,7 +101,7 @@ export default function WithdrawDetailsPage() {
     (!dataFiltered.length && !!filterName) ||
     (!dataFiltered.length && !!filterRole) ||
     (!dataFiltered.length && !!filterStatus);
-
+    
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
   };
@@ -132,6 +138,16 @@ export default function WithdrawDetailsPage() {
       } else if (selectedRows.length === dataFiltered.length) {
         setPage(0);
       } else if (selectedRows.length > dataInPage.length) {
+        <TablePaginationCustom
+          count={dataFiltered.length}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={onChangePage}
+          onRowsPerPageChange={onChangeRowsPerPage}
+          //
+          dense={dense}
+          onChangeDense={onChangeDense}
+        />;
         const newPage = Math.ceil((tableData.length - selectedRows.length) / rowsPerPage) - 1;
         setPage(newPage);
       }
@@ -154,76 +170,103 @@ export default function WithdrawDetailsPage() {
         <title> Withdraw : Details | Rupa999 </title>
       </Helmet>
 
-      <Container maxWidth={themeStretch ? false : 'lg'}>
-        <CustomBreadcrumbs
-          heading="Withdraw Details"
-          links={[
-            { name: 'Dashboard', href: PATH_DASHBOARD.root },
-            { name: 'Withdraw Details', href: PATH_DASHBOARD.withdrawdetails.root },
-          ]}
-        />
+      <Container maxWidth={themeStretch ? false : 'xl'}>
+        {isMobile ? (
+          <Box sx={{ position: 'sticky', top: 0, zIndex: 10, bgcolor: 'background.paper' }}>
+            <CustomBreadcrumbs
+              heading="Withdraw Details"
+              links={[
+                { name: 'Dashboard', href: PATH_DASHBOARD.root },
+                { name: 'Withdraw Details', href: PATH_DASHBOARD.withdrawdetails.root },
+              ]}
+            />
+            <WithdrawDetailsToolbar
+              isFiltered={isFiltered}
+              filterName={filterName}
+              onFilterName={handleFilterName}
+              onResetFilter={handleResetFilter}
+              sx={{ mt: 1 }}
+            />
+          </Box>
+        ) : (
+          <>
+            <CustomBreadcrumbs
+              heading="Withdraw Details"
+              links={[
+                { name: 'Dashboard', href: PATH_DASHBOARD.root },
+                { name: 'Withdraw Details', href: PATH_DASHBOARD.withdrawdetails.root },
+              ]}
+            />
+            <WithdrawDetailsToolbar
+              isFiltered={isFiltered}
+              filterName={filterName}
+              onFilterName={handleFilterName}
+              onResetFilter={handleResetFilter}
+              sx={{ mt: 1 }}
+            />
+          </>
+        )}
 
-        <Card>
-          <WithdrawDetailsToolbar
-            isFiltered={isFiltered}
-            filterName={filterName}
-            onFilterName={handleFilterName}
-            onResetFilter={handleResetFilter}
+        {/* Render mobile card layout for small screens, otherwise render the table */}
+        {isMobile ? (
+          <WithdrawMobileViewCardLayout
+            data={dataFiltered}
+            onEditRow={(id) => handleEditRow(id)}
+            onDeleteRow={(id) => handleDeleteRow(id)}
+            onSelectRow={(id) => onSelectRow(id)}
+            selected={selected}
           />
-
-          <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
-            <Scrollbar>
-              <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
-                <TableHeadCustom
-                  order={order}
-                  orderBy={orderBy}
-                  headLabel={TABLE_HEAD}
-                  rowCount={tableData.length}
-                  numSelected={selected.length}
-                  onSort={onSort}
-                  // onSelectAllRows={(checked) =>
-                  //   onSelectAllRows(
-                  //     checked,
-                  //     tableData.map((row) => row.id)
-                  //   )
-                  // }
-                />
-
-                <TableBody>
-                  {dataFiltered?.map((row,index) => (
-                    <WithdrawDetailsTableRow
-                      index={index + 1}
-                      key={row.id}
-                      row={row}
-                      selected={selected.includes(row.id)}
-                      onSelectRow={() => onSelectRow(row.id)}
-                      onDeleteRow={() => handleDeleteRow(row.id)}
-                      onEditRow={() => handleEditRow(row.name)}
-                    />
-                  ))}
-
-                  <TableEmptyRows
-                    height={denseHeight}
-                    emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
+        ) : (
+          <Card>
+            <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
+              <Scrollbar>
+                <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
+                  <TableHeadCustom
+                    order={order}
+                    orderBy={orderBy}
+                    headLabel={TABLE_HEAD}
+                    rowCount={tableData.length}
+                    numSelected={selected.length}
+                    onSort={onSort}
                   />
 
-                  <TableNoData isNotFound={isNotFound} />
-                </TableBody>
-              </Table>
-            </Scrollbar>
-          </TableContainer>
+                  <TableBody>
+                    {dataFiltered
+                      ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                      .map((row, index) => (
+                        <WithdrawDetailsTableRow
+                          index={index + 1}
+                          key={row.id}
+                          row={row}
+                          selected={selected.includes(row.id)}
+                          onSelectRow={() => onSelectRow(row.id)}
+                          onDeleteRow={() => handleDeleteRow(row.id)}
+                          onEditRow={() => handleEditRow(row.name)}
+                        />
+                      ))}
 
-          <TablePaginationCustom
-            count={dataFiltered.length}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={onChangePage}
-            onRowsPerPageChange={onChangeRowsPerPage}
-            //
-            dense={dense}
-            onChangeDense={onChangeDense}
-          />
-        </Card>
+                    <TableEmptyRows
+                      height={denseHeight}
+                      emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
+                    />
+
+                    <TableNoData isNotFound={isNotFound} />
+                  </TableBody>
+                </Table>
+              </Scrollbar>
+            </TableContainer>
+            <TablePaginationCustom
+              count={dataFiltered.length}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={onChangePage}
+              onRowsPerPageChange={onChangeRowsPerPage}
+              //
+              dense={dense}
+              onChangeDense={onChangeDense}
+            />
+          </Card>
+        )}
       </Container>
 
       <ConfirmDialog
