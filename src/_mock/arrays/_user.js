@@ -128,6 +128,7 @@ export const _userList = [...Array(24)].map((_, index) => ({
   address: '908 Jack Locks',
   country: _mock.address.country(index),
   state: 'Virginia',
+  upi: 'dummyupi@ybl',
   city: 'Rancho Cordova',
   zipCode: '85807',
   company: _mock.company(index),

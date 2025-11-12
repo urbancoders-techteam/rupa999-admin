@@ -24,7 +24,7 @@ WithdrawDetailsTableRow.propTypes = {
 };
 
 export default function WithdrawDetailsTableRow({ index, row, onEditRow }) {
-  const { name, avatarUrl, company, role, isVerified, status } = row;
+  const { name, avatarUrl, company, role, isVerified, status, upi } = row;
 
   const [openPopover, setOpenPopover] = useState(null);
 
@@ -38,8 +38,9 @@ export default function WithdrawDetailsTableRow({ index, row, onEditRow }) {
 
   return (
     <>
-      <TableRow hover>
-        <TableCell align="left">{index}</TableCell>
+      <TableRow hover   sx={{ '&:last-child td, &:last-child th': { border: .5}}}>
+        {/* <TableCell align="left">{" "}</TableCell> */}
+        <TableCell align="center" >{index}</TableCell>
 
         <TableCell>
           <Stack direction="row" alignItems="center" spacing={2}>
@@ -68,6 +69,12 @@ export default function WithdrawDetailsTableRow({ index, row, onEditRow }) {
             }}
           />
         </TableCell>
+            <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
+              {role}
+            </TableCell>
+            <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
+              {upi}
+            </TableCell>
 
         <TableCell align="left">
           <Label
