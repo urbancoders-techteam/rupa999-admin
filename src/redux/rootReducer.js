@@ -5,6 +5,7 @@ import authReducer from './slices/auth_slices';
 import staffReducer from './slices/staff_slices';
 import roleReducer from './slices/role_slices';
 import permissionReducer from './slices/permission_slices';
+import marketReducer from './slices/market_slices';
 
 // ----------------------------------------------------------------------
 
@@ -20,6 +21,7 @@ const rootReducer = combineReducers({
   staff: staffReducer,
   role: roleReducer,
   permission: permissionReducer,
+  market: marketReducer,
 });
 
 export default rootReducer;

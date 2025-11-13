@@ -1,14 +1,14 @@
 import { Helmet } from 'react-helmet-async';
 import { paramCase } from 'change-case';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
 import { Card, Table, Button, TableBody, Container, TableContainer, Box } from '@mui/material';
+// redux
+import { useDispatch, useSelector } from 'react-redux';
 import useResponsive from '../../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
-// _mock_
-import { _marketjson } from '../../_mock/arrays/_marketjson';
 // components
 import Scrollbar from '../../components/scrollbar';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
@@ -23,10 +23,13 @@ import {
   TablePaginationCustom,
 } from '../../components/table';
 import CustomTableToolbar from '../../components/table/CustomTableToolBar';
+import ConfirmDialog from '../../components/confirm-dialog';
 // sections
 import Iconify from '../../components/iconify';
 import MarketTableRow from '../../sections/_markets/components/MarketTableRow';
 import MarketMobileViewCardLayout from '../../sections/_markets/components/MarketMobileViewCardLayout';
+import { getAllMarketsAsync, deleteMarketAsync } from '../../redux/services/market_services';
+import { useSnackbar } from '../../components/snackbar';
 
 // ----------------------------------------------------------------------
 
@@ -34,9 +37,11 @@ const TABLE_HEAD = [
   { id: 'action', label: 'Action', align: 'center' },
   { id: 'id', label: 'ID', align: 'left' },
   { id: 'name', label: 'Name', align: 'left' },
-  { id: 'currentStatus', label: 'Current Status', align: 'left' },
   { id: 'openTime', label: 'Open Time', align: 'left' },
   { id: 'closeTime', label: 'Close Time', align: 'left' },
+  { id: 'activeDays', label: 'Active Days', align: 'left' },
+  { id: 'disableGame', label: 'Disable Game', align: 'left' },
+  { id: 'hideOpen', label: 'Hide Open', align: 'left' },
   { id: 'createdAt', label: 'Created At', align: 'left' },
 ];
 
@@ -62,16 +67,37 @@ export default function MarketDetailsPage() {
   } = useTable();
 
   const { themeStretch } = useSettingsContext();
-
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
 
-  const [tableData, setTableData] = useState(_marketjson);
+  // Redux state
+  const { marketList, loading } = useSelector((state) => state.market);
 
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
   const [filterName, setFilterName] = useState('');
-
   const [filterRole, setFilterRole] = useState('all');
-
   const [filterStatus, setFilterStatus] = useState('all');
+
+  // Fetch markets on component mount
+  useEffect(() => {
+    dispatch(getAllMarketsAsync());
+  }, [dispatch]);
+
+  // Transform API data to table format
+  const tableData = marketList.map((market, index) => ({
+    id: market._id || market.id || index + 1,
+    _id: market._id,
+    name: market.name,
+    openTime: market.openTime,
+    closeTime: market.closeTime,
+    activeDays: market.activeDays?.join(', ') || 'N/A',
+    disableGame: market.disableGame || 'no',
+    hideOpen: market.hideOpen || 'disable',
+    createdAt: market.createdAt ? new Date(market.createdAt).toLocaleDateString() : '-',
+    ...market,
+  }));
 
   // Memoized filtered data
   const dataFiltered = useMemo(
@@ -109,20 +135,41 @@ export default function MarketDetailsPage() {
     setFilterName(event.target.value);
   };
 
-  const handleDeleteRow = (id) => {
-    const deleteRow = tableData.filter((row) => row.id !== id);
-    setSelected([]);
-    setTableData(deleteRow);
-
-    if (page > 0) {
-      if (dataInPage.length < 2) {
+  const handleDeleteRow = async (id) => {
+    try {
+      await dispatch(deleteMarketAsync(id)).unwrap();
+      enqueueSnackbar('Market deleted successfully!', { variant: 'success' });
+      // Refresh the list
+      dispatch(getAllMarketsAsync());
+      setSelected([]);
+      if (page > 0 && dataInPage.length < 2) {
         setPage(page - 1);
       }
+    } catch (error) {
+      enqueueSnackbar(error?.message || 'Failed to delete market', { variant: 'error' });
     }
   };
 
-  const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.markets.marketlist.edit(paramCase(id)));
+  const handleOpenDeleteConfirm = (id) => {
+    setDeleteId(id);
+    setOpenConfirm(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteId) {
+      handleDeleteRow(deleteId);
+      setDeleteId(null);
+    }
+    setOpenConfirm(false);
+  };
+
+  const handleEditRow = (name) => {
+    const market = tableData.find((m) => m.name === name);
+    if (market?._id) {
+      navigate(PATH_DASHBOARD.markets.marketlist.edit(market._id), {
+        state: { market },
+      });
+    }
   };
 
   const handleResetFilter = () => {
@@ -223,11 +270,11 @@ export default function MarketDetailsPage() {
                       .map((row, index) => (
                         <MarketTableRow
                           index={index + 1}
-                          key={row.id}
+                          key={row.id || row._id}
                           row={row}
                           selected={selected.includes(row.id)}
                           onSelectRow={() => onSelectRow(row.id)}
-                          onDeleteRow={() => handleDeleteRow(row.id)}
+                          onDeleteRow={() => handleOpenDeleteConfirm(row._id || row.id)}
                           onEditRow={() => handleEditRow(row.name)}
                         />
                       ))}
@@ -254,6 +301,22 @@ export default function MarketDetailsPage() {
             />
           </Card>
         )}
+
+        <ConfirmDialog
+          open={openConfirm}
+          onClose={() => setOpenConfirm(false)}
+          title="Delete"
+          content="Are you sure want to delete?"
+          action={
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleConfirmDelete}
+            >
+              Delete
+            </Button>
+          }
+        />
       </Container>
     </>
   );

@@ -25,6 +25,7 @@ import FormProvider, { RHFTextField } from '../../../components/hook-form';
 import RHFTimePicker from '../../../components/hook-form/RHFTimePicker';
 import { PATH_DASHBOARD } from '../../../routes/paths';
 import { useSettingsContext } from '../../../components/settings';
+import { createMarketAsync, updateMarketAsync } from '../../../redux/services/market_services';
 
 MarketForm.propTypes = {
   isEdit: PropTypes.bool,
@@ -40,49 +41,32 @@ export default function MarketForm({ isEdit = false, isView = false, currentUser
   const { enqueueSnackbar } = useSnackbar();
 
   // ✅ Validation Schema
-  const UserSchema = Yup.object().shape({
+  const MarketSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
-    apiKeyName: Yup.string().required('API Key Name is required'),
-    openTime: Yup.mixed().required('Open Time is required'),
-    closeTime: Yup.mixed().required('Close Time is required'),
-    openResultTime: Yup.mixed().required('Open Result Time is required'),
-    closeResultTime: Yup.mixed().required('Close Result Time is required'),
-    userLimit: Yup.string().required('User Limit is required'),
-    amount: Yup.string().required('Amount is required'),
-    disableGame: Yup.string().required('Please select an option'),
-    hideOpen: Yup.string().required('Please select an option'),
-    activeDays: Yup.object().test('at-least-one-day', 'Select at least one active day', (value) =>
-      Object.values(value || {}).some(Boolean)
-    ),
+    openTime: Yup.string().required('Open Time is required'),
+    closeTime: Yup.string().required('Close Time is required'),
+    disableGame: Yup.string().oneOf(['yes', 'no'], 'Invalid option').required('Please select an option'),
+    hideOpen: Yup.string().oneOf(['enable', 'disable'], 'Invalid option').required('Please select an option'),
+    activeDays: Yup.array()
+      .of(Yup.string().oneOf(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']))
+      .min(1, 'Select at least one active day')
+      .required('Active days are required'),
   });
 
   const defaultValues = useMemo(
     () => ({
       name: currentUser?.name || '',
-      apiKeyName: currentUser?.apiKeyName || '',
-      openTime: currentUser?.openTime || null,
-      closeTime: currentUser?.closeTime || null,
-      openResultTime: currentUser?.openResultTime || null,
-      closeResultTime: currentUser?.closeResultTime || null,
-      userLimit: currentUser?.userLimit || '',
-      amount: currentUser?.amount || '',
-      disableGame: currentUser?.disableGame || '',
-      hideOpen: currentUser?.hideOpen || '',
-      activeDays: currentUser?.activeDays || {
-        Sunday: false,
-        Monday: false,
-        Tuesday: false,
-        Wednesday: false,
-        Thursday: false,
-        Friday: false,
-        Saturday: false,
-      },
+      openTime: currentUser?.openTime || '',
+      closeTime: currentUser?.closeTime || '',
+      disableGame: currentUser?.disableGame || 'no',
+      hideOpen: currentUser?.hideOpen || 'disable',
+      activeDays: currentUser?.activeDays || [],
     }),
     [currentUser]
   );
 
   const methods = useForm({
-    resolver: yupResolver(UserSchema),
+    resolver: yupResolver(MarketSchema),
     defaultValues,
   });
 
@@ -107,11 +91,21 @@ export default function MarketForm({ isEdit = false, isView = false, currentUser
   }, [isEdit, isView, currentUser, reset, defaultValues]);
 
   const onSubmit = async (data) => {
-    console.log('✅ Form Submitted:', data);
-    enqueueSnackbar('Form submitted successfully!');
+    try {
+      if (isEdit && currentUser?._id) {
+        await dispatch(updateMarketAsync({ id: currentUser._id, data })).unwrap();
+        enqueueSnackbar('Market updated successfully!', { variant: 'success' });
+      } else {
+        await dispatch(createMarketAsync(data)).unwrap();
+        enqueueSnackbar('Market created successfully!', { variant: 'success' });
+      }
+      navigate(PATH_DASHBOARD.markets.marketlist.list);
+    } catch (error) {
+      enqueueSnackbar(error?.message || 'Failed to save market', { variant: 'error' });
+    }
   };
 
-  const handleBack = () => navigate(PATH_DASHBOARD.marketlist.list);
+  const handleBack = () => navigate(PATH_DASHBOARD.markets.marketlist.list);
 
   const themeStretch = useSettingsContext();
 
@@ -132,8 +126,8 @@ export default function MarketForm({ isEdit = false, isView = false, currentUser
             >
               <RHFTextField name="name" label="Name" disabled={isView} />
 
-              <RHFTimePicker name="openTime" label="Open Time" required />
-              <RHFTimePicker name="closeTime" label="Close Time" />
+              <RHFTextField name="openTime" label="Open Time (e.g., 09:00)" disabled={isView} required />
+              <RHFTextField name="closeTime" label="Close Time (e.g., 21:00)" disabled={isView} required />
             </Box>
 
             {/* Active Days */}
@@ -150,39 +144,53 @@ export default function MarketForm({ isEdit = false, isView = false, currentUser
                   mt: 1,
                 }}
               >
-                {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(
-                  (day) => (
+                {[
+                  { label: 'Monday', value: 'monday' },
+                  { label: 'Tuesday', value: 'tuesday' },
+                  { label: 'Wednesday', value: 'wednesday' },
+                  { label: 'Thursday', value: 'thursday' },
+                  { label: 'Friday', value: 'friday' },
+                  { label: 'Saturday', value: 'saturday' },
+                  { label: 'Sunday', value: 'sunday' },
+                ].map((day) => {
+                  const isChecked = values.activeDays?.includes(day.value) || false;
+                  return (
                     <FormControlLabel
-                      key={day}
+                      key={day.value}
                       control={
-                        <Controller
-                          name={`activeDays.${day}`}
-                          control={control}
-                          render={({ field }) => (
-                            <Checkbox
-                              {...field}
-                              checked={!!field.value}
-                              onChange={(e) => setValue(`activeDays.${day}`, e.target.checked)}
-                              sx={{
-                                color: theme.palette.primary.light,
-                                '&.Mui-checked': {
-                                  color: theme.palette.primary.main,
-                                },
-                                '&:hover': {
-                                  backgroundColor: theme.palette.action.hover,
-                                  borderRadius: '8px',
-                                },
-                                transition: 'all 0.25s ease',
-                                borderRadius: '8px',
-                              }}
-                            />
-                          )}
+                        <Checkbox
+                          checked={isChecked}
+                          onChange={(e) => {
+                            const currentDays = values.activeDays || [];
+                            if (e.target.checked) {
+                              setValue('activeDays', [...currentDays, day.value], { shouldValidate: true });
+                            } else {
+                              setValue(
+                                'activeDays',
+                                currentDays.filter((d) => d !== day.value),
+                                { shouldValidate: true }
+                              );
+                            }
+                          }}
+                          disabled={isView}
+                          sx={{
+                            color: theme.palette.primary.light,
+                            '&.Mui-checked': {
+                              color: theme.palette.primary.main,
+                            },
+                            '&:hover': {
+                              backgroundColor: theme.palette.action.hover,
+                              borderRadius: '8px',
+                            },
+                            transition: 'all 0.25s ease',
+                            borderRadius: '8px',
+                          }}
                         />
                       }
-                      label={day}
+                      label={day.label}
                     />
-                  )
-                )}
+                  );
+                })}
               </Box>
               {errors.activeDays && <FormHelperText>{errors.activeDays.message}</FormHelperText>}
             </FormControl>
@@ -205,8 +213,8 @@ export default function MarketForm({ isEdit = false, isView = false, currentUser
                   value={values.disableGame}
                   onChange={(e) => setValue('disableGame', e.target.value)}
                 >
-                  <FormControlLabel value="yes" control={<Radio />} label="Yes" />
-                  <FormControlLabel value="no" control={<Radio />} label="No" />
+                  <FormControlLabel value="yes" control={<Radio disabled={isView} />} label="Yes" />
+                  <FormControlLabel value="no" control={<Radio disabled={isView} />} label="No" />
                 </RadioGroup>
                 {errors.disableGame && (
                   <FormHelperText>{errors.disableGame.message}</FormHelperText>
@@ -221,8 +229,8 @@ export default function MarketForm({ isEdit = false, isView = false, currentUser
                   value={values.hideOpen}
                   onChange={(e) => setValue('hideOpen', e.target.value)}
                 >
-                  <FormControlLabel value="enable" control={<Radio />} label="Enable" />
-                  <FormControlLabel value="disable" control={<Radio />} label="Disable" />
+                  <FormControlLabel value="enable" control={<Radio disabled={isView} />} label="Enable" />
+                  <FormControlLabel value="disable" control={<Radio disabled={isView} />} label="Disable" />
                 </RadioGroup>
                 {errors.hideOpen && <FormHelperText>{errors.hideOpen.message}</FormHelperText>}
               </FormControl>

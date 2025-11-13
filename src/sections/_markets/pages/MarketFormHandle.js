@@ -5,7 +5,7 @@ import { useLocation, useParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSettingsContext } from '../../../components/settings';
 import { PATH_DASHBOARD } from '../../../routes/paths';
-// import { getBannerByIdAsync } from '../../../redux/services/banner';
+import { getMarketByIdAsync } from '../../../redux/services/market_services';
 import CustomBreadcrumbs from '../../../components/custom-breadcrumbs/CustomBreadcrumbs';
 import LoadingScreen from '../../../components/loading-screen/LoadingScreen';
 import MarketForm from './MarketForm';
@@ -16,14 +16,14 @@ export default function MarketFormHandle() {
   const { id } = useParams();
   const { pathname = '', state } = useLocation();
 
-  // const { bannerById, isLoading } = useSelector((sliceState) => sliceState.banner);
+  const { currentMarket, loading } = useSelector((sliceState) => sliceState.market);
 
   const editView = useMemo(() => {
     if (id && /edit/i?.test(pathname)) {
       return {
         title: 'Market: Edit | Rupa999',
         heading: 'Edit Market',
-        user: state?.name ?? '',
+        user: state?.market?.name || currentMarket?.name || '',
         isEdit: true,
         isView: false,
       };
@@ -32,7 +32,7 @@ export default function MarketFormHandle() {
       return {
         title: 'Market: View | Rupa999',
         heading: 'View Market',
-        user: state?.name ?? '',
+        user: state?.market?.name || currentMarket?.name || '',
         isEdit: false,
         isView: true,
       };
@@ -44,11 +44,13 @@ export default function MarketFormHandle() {
       isEdit: false,
       isView: false,
     };
-  }, [pathname, id, state]);
+  }, [pathname, id, state, currentMarket]);
 
-  //   useEffect(() => {
-  //     if (id) dispatch(getBannerByIdAsync(id));
-  //   }, [id, dispatch]);
+  useEffect(() => {
+    if (id) {
+      dispatch(getMarketByIdAsync(id));
+    }
+  }, [id, dispatch]);
 
   return (
     <>
@@ -66,23 +68,23 @@ export default function MarketFormHandle() {
             },
             {
               name: 'Market List',
-              href: PATH_DASHBOARD.marketlist.list,
+              href: PATH_DASHBOARD.markets.marketlist.list,
             },
             {
               name: editView?.heading,
-              href: PATH_DASHBOARD.marketlist.list,
+              href: PATH_DASHBOARD.markets.marketlist.list,
             },
           ]}
         />
-        {/* {isLoading ? (
-        <LoadingScreen />
-      ) : ( */}
-        <MarketForm
-          isEdit={editView?.isEdit}
-          isView={editView?.isView}
-          // currentBanner={editView?.isView || editView?.isEdit ? bannerById : {}}
-        />
-        {/* )} */}
+        {loading ? (
+          <LoadingScreen />
+        ) : (
+          <MarketForm
+            isEdit={editView?.isEdit}
+            isView={editView?.isView}
+            currentUser={editView?.isView || editView?.isEdit ? (currentMarket || state?.market) : null}
+          />
+        )}
       </Container>
     </>
   );

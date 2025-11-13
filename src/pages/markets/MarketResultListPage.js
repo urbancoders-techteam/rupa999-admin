@@ -158,6 +158,12 @@ export default function MarketResultListPage() {
     setFilterName('');
   };
 
+  const onHandleShowWinner = () => {
+    setShowWinner(!showWinner);
+  }
+
+
+
   return (
     <>
       <Helmet>
@@ -173,7 +179,7 @@ export default function MarketResultListPage() {
           ]}
         />
 
-        <GeneralCreateResultForm setShowWinner={setShowWinner} />
+        <GeneralCreateResultForm showWinner={showWinner} onHandleShowWinner={onHandleShowWinner} />
 
         {showWinner === true && <ResultTable />}
 

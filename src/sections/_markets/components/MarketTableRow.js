@@ -18,16 +18,21 @@ import MenuPopover from '../../../components/menu-popover';
 MarketTableRow.propTypes = {
   index: PropTypes.number,
   row: PropTypes.object,
+  selected: PropTypes.bool,
   onEditRow: PropTypes.func,
+  onDeleteRow: PropTypes.func,
+  onSelectRow: PropTypes.func,
 };
 
-export default function MarketTableRow({ index, row, onEditRow }) {
+export default function MarketTableRow({ index, row, selected, onEditRow, onDeleteRow, onSelectRow }) {
   const {
     id,
     name,
-    currentStatus,
     openTime,
     closeTime,
+    activeDays,
+    disableGame,
+    hideOpen,
     createdAt,
   } = row;
 
@@ -52,7 +57,7 @@ export default function MarketTableRow({ index, row, onEditRow }) {
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
         </TableCell>
-        <TableCell align="center">{id}</TableCell>
+        <TableCell align="center">{index}</TableCell>
 
         <TableCell align="left">
           <Typography variant="subtitle2" noWrap>
@@ -60,23 +65,31 @@ export default function MarketTableRow({ index, row, onEditRow }) {
           </Typography>
         </TableCell>
 
+        <TableCell align="left" sx={{minWidth:'100px'}}>{openTime}</TableCell>
+        <TableCell align="left" sx={{minWidth:'100px'}}>{closeTime}</TableCell>
+        <TableCell align="left" sx={{minWidth:'150px'}}>
+          <Typography variant="body2" noWrap>
+            {activeDays}
+          </Typography>
+        </TableCell>
         <TableCell align="left" sx={{minWidth:'100px'}}>
           <Label
             variant="soft"
-            color={(() => {
-              if (currentStatus === 'OPEN NOW') return 'success';
-              if (currentStatus === 'CLOSED NOW') return 'error';
-              return 'default';
-            })()}
+            color={disableGame === 'yes' ? 'error' : 'success'}
             sx={{ textTransform: 'capitalize', fontSize: '0.75rem' }}
           >
-            {currentStatus}
+            {disableGame}
           </Label>
         </TableCell>
-
-        {/* <TableCell align="left" sx={{minWidth:'100px'}}>{gameDisabled}</TableCell> */}
-        <TableCell align="left" sx={{minWidth:'100px'}}>{openTime}</TableCell>
-        <TableCell align="left" sx={{minWidth:'100px'}}>{closeTime}</TableCell>
+        <TableCell align="left" sx={{minWidth:'100px'}}>
+          <Label
+            variant="soft"
+            color={hideOpen === 'enable' ? 'warning' : 'info'}
+            sx={{ textTransform: 'capitalize', fontSize: '0.75rem' }}
+          >
+            {hideOpen}
+          </Label>
+        </TableCell>
         <TableCell align="left" sx={{minWidth:'150px'}}>{createdAt}</TableCell>
 
        
@@ -96,6 +109,16 @@ export default function MarketTableRow({ index, row, onEditRow }) {
         >
           <Iconify icon="eva:edit-fill" />
           Edit
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            onDeleteRow();
+            handleClosePopover();
+          }}
+          sx={{ color: 'error.main' }}
+        >
+          <Iconify icon="eva:trash-2-outline" />
+          Delete
         </MenuItem>
       </MenuPopover>
     </>
