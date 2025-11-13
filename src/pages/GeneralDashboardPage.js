@@ -29,8 +29,8 @@ export default function GeneralDashboardPage() {
               gridTemplateColumns={{ xs: '1fr', sm: 'repeat(4, 1fr)' }}
             >
               <DashboardSummaryCard
-                todayLabel="Today Market"
-                todayValue={8230}
+                // todayLabel="Today Market"
+                // todayValue={8230}
                 totalValue={32120}
                 totalLabel="Total Market"
                 // imageSrc="/assets/illustrations/deposit.svg" // your image path here
@@ -43,17 +43,17 @@ export default function GeneralDashboardPage() {
                 // imageSrc="/assets/illustrations/deposit.svg" // your image path here
               />
               <DashboardSummaryCard
-                todayLabel="Today Bid Amount"
+                todayLabel="Today Bid Amt"
                 todayValue={8230}
                 totalValue={32120}
-                totalLabel="Total Bid Amount"
+                totalLabel="Total Bid Amt"
                 // imageSrc="/assets/illustrations/deposit.svg" // your image path here
               />
               <DashboardSummaryCard
-                todayLabel="Today Win Amount"
+                todayLabel="Today Win Amt"
                 todayValue={8230}
                 totalValue={32120}
-                totalLabel="Total Win Amount"
+                totalLabel="Total Win Amt"
                 // imageSrc="/assets/illustrations/deposit.svg" // your image path here
               />
               <DashboardSummaryCard

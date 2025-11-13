@@ -1,3 +1,4 @@
+/* eslint-disable no-lonely-if */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Box, Card, Grid, Button, Typography, TextField } from '@mui/material';
