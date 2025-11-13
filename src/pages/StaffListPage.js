@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { paramCase } from 'change-case';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
 import {
@@ -17,6 +17,8 @@ import {
   TableContainer,
 } from '@mui/material';
 import { Box, useTheme } from '@mui/system';
+// redux
+import { useDispatch, useSelector } from 'react-redux';
 import useResponsive from '../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
@@ -42,6 +44,8 @@ import {
 import CustomTableToolbar from '../components/table/CustomTableToolBar';
 import { UserTableRow } from '../sections/_users/list';
 import UserMobileViewCardLayout from '../sections/_users/list/UserMobileViewCardLayout';
+import { getAllStaffAsync, deleteStaffAsync } from '../redux/services/staff_services';
+import { useSnackbar } from '../components/snackbar';
 
 // ----------------------------------------------------------------------
 
@@ -81,19 +85,36 @@ export default function UserListPage() {
   } = useTable();
 
   const { themeStretch } = useSettingsContext();
-
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  // const theme = useTheme();
+  const { enqueueSnackbar } = useSnackbar();
 
-  const [tableData, setTableData] = useState([]);
+  // Redux state
+  const { staffList, loading, pagination } = useSelector((state) => state.staff);
 
   const [openConfirm, setOpenConfirm] = useState(false);
-
+  const [deleteId, setDeleteId] = useState(null);
   const [filterName, setFilterName] = useState('');
-
   const [filterRole, setFilterRole] = useState('all');
-
   const [filterStatus, setFilterStatus] = useState('all');
+
+  // Fetch staff on component mount and when filters change
+  useEffect(() => {
+    dispatch(getAllStaffAsync());
+  }, [dispatch]);
+
+  // Transform API data to table format
+  const tableData = staffList.map((staff, index) => ({
+    id: staff._id || staff.id || index + 1,
+    _id: staff._id,
+    name: staff.name,
+    email: staff.email,
+    mobileNumber: staff.mobile,
+    designation: staff.roleId?.roleName || 'N/A',
+    status: staff.status ? 'Active' : 'InActive',
+    createdAt: staff.createdAt ? new Date(staff.createdAt).toLocaleDateString() : '-',
+    ...staff,
+  }));
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -134,16 +155,32 @@ export default function UserListPage() {
     setFilterName(event.target.value);
   };
 
-  const handleDeleteRow = (id) => {
-    const deleteRow = tableData.filter((row) => row.id !== id);
-    setSelected([]);
-    setTableData(deleteRow);
-
-    if (page > 0) {
-      if (dataInPage.length < 2) {
+  const handleDeleteRow = async (id) => {
+    try {
+      await dispatch(deleteStaffAsync(id)).unwrap();
+      enqueueSnackbar('Staff deleted successfully!', { variant: 'success' });
+      // Refresh the list
+      dispatch(getAllStaffAsync());
+      setSelected([]);
+      if (page > 0 && dataInPage.length < 2) {
         setPage(page - 1);
       }
+    } catch (error) {
+      enqueueSnackbar(error?.message || 'Failed to delete staff', { variant: 'error' });
     }
+  };
+
+  const handleOpenDeleteConfirm = (id) => {
+    setDeleteId(id);
+    setOpenConfirm(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteId) {
+      handleDeleteRow(deleteId);
+      setDeleteId(null);
+    }
+    setOpenConfirm(false);
   };
 
   const handleEditRow = (id) => {
@@ -188,25 +225,42 @@ export default function UserListPage() {
             heading="Staff List"
             links={[
               { name: 'Dashboard', href: PATH_DASHBOARD.root },
-              { name: 'Staff List', href: PATH_DASHBOARD.user.list },
-              { name: 'List'},
+              { name: 'Staff List', href: PATH_DASHBOARD.staff.list },
+              { name: 'List' },
             ]}
             action={
-              <Button
-                component={RouterLink}
-                variant="contained"
-                startIcon={<Iconify icon="eva:plus-fill" />}
-                to={PATH_DASHBOARD.user.new}
-                sx={{
-                  [(theme) => theme.breakpoints.down('sm')]: {
-                    fontSize: '0.75rem',
-                    py: 0.5,
-                    px: 1.5,
-                  },
-                }}
-              >
-                New User
-              </Button>
+              <Box display="flex" gap={1}>
+                <Button
+                  component={RouterLink}
+                  variant="contained"
+                  startIcon={<Iconify icon="lucide:user-cog" />}
+                  to={PATH_DASHBOARD.designation.list}
+                  sx={{
+                    [(theme) => theme.breakpoints.down('sm')]: {
+                      fontSize: '0.75rem',
+                      py: 0.5,
+                      px: 1.5,
+                    },
+                  }}
+                >
+                  Designation and Rights
+                </Button>
+                <Button
+                  component={RouterLink}
+                  variant="contained"
+                  startIcon={<Iconify icon="eva:plus-fill" />}
+                  to={PATH_DASHBOARD.staff.new}
+                  sx={{
+                    [(theme) => theme.breakpoints.down('sm')]: {
+                      fontSize: '0.75rem',
+                      py: 0.5,
+                      px: 1.5,
+                    },
+                  }}
+                >
+                  New User
+                </Button>
+              </Box>
             }
           />
         </Box>
@@ -231,8 +285,8 @@ export default function UserListPage() {
               data={dataFiltered}
               onEditRow={handleEditRow}
               onDeleteRow={(id) => handleDeleteRow(id)}
-              // onSelectRow={(id) => onSelectRow(id)}
-              // selected={selected}
+            // onSelectRow={(id) => onSelectRow(id)}
+            // selected={selected}
             />
           </>
         ) : (
@@ -299,8 +353,8 @@ export default function UserListPage() {
                           // selected={selected.includes(row.id)}
                           onTransationRow={() => handleTransactionRow(row.id)}
                           onWithdrawalRequestRow={() => handleWithdrawalRequestRow(row.id)}
-                          onDeleteRow={() => handleDeleteRow(row.id)}
-                          onEditRow={() => handleEditRow(row.name)}
+                          onDeleteRow={() => handleOpenDeleteConfirm(row._id || row.id)}
+                          onEditRow={() => handleEditRow(row._id || row.id)}
                         />
                       ))}
 
@@ -316,7 +370,7 @@ export default function UserListPage() {
             </TableContainer>
 
             <TablePaginationCustom
-              count={dataFiltered.length}
+              count={pagination?.total || dataFiltered.length}
               page={page}
               rowsPerPage={rowsPerPage}
               onPageChange={onChangePage}
@@ -327,6 +381,21 @@ export default function UserListPage() {
             />
           </Card>
         )}
+
+        <ConfirmDialog
+          open={openConfirm}
+          onClose={() => {
+            setOpenConfirm(false);
+            setDeleteId(null);
+          }}
+          title="Delete Staff"
+          content="Are you sure you want to delete this staff member? This action cannot be undone."
+          action={
+            <Button variant="contained" color="error" onClick={handleConfirmDelete}>
+              Delete
+            </Button>
+          }
+        />
       </Container>
     </>
   );

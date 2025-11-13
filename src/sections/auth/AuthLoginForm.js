@@ -71,32 +71,38 @@ export default function AuthLoginForm() {
       console.log('res', res);
       navigate(PATH_DASHBOARD.home.root);
 
-      // if (res?.payload?.success && res.payload.data) {
-      //   localStorage.setItem('token', res.payload.data.token);
+      if (res?.payload?.success && res.payload.admin) {
+        localStorage.setItem('token', res.payload.access_token);
 
-      //   if (res?.payload?.data?.staff._id || res) {
-      //     const id = res?.payload?.data?.staff.role;
-      //     const initialUserData = {
-      //       user: res?.payload?.data,
-      //     };
-      //     navigate(PATH_DASHBOARD.home.root);
-      //     // dispatch(getPermissionByRoleIdAsync({ id })).then((permission) => {
-      //     //   console.log('permission', permission)
-      //     //   if (permission.payload.status === 200) {
-      //     //     const updatedUserData = {
-      //     //       ...initialUserData,
-      //     //       route: permission?.payload?.data,
-      //     //     };
-      //     //     localStorage.setItem('user', JSON.stringify(updatedUserData));
-      //     //     dispatch(setUserInfoRedux(updatedUserData));
-      //     //   }
-      //     // });
-      //     toast.success('Logged in successfully, Welcome to Tied Admin Panel.');
-      //     localStorage.setItem('login', JSON.stringify(res?.payload?.data));
-      //   }
-      // } else {
-      //   throw new Error(res.payload?.message || 'Login failed');
-      // }
+        if (res?.payload?.admin?._id || res) {
+          const isSuperAdmin = res?.payload?.admin?.isSuperAdmin === true;
+          
+          // Skip permission fetching for super admin - they have full access
+          if (!isSuperAdmin) {
+            // const id = res?.payload?.admin.role;
+            // const initialUserData = {
+            //   user: res?.payload?.admin,
+            // };
+            // dispatch(getPermissionByRoleIdAsync({ id })).then((permission) => {
+            //   console.log('permission', permission)
+            //   if (permission.payload.status === 200) {
+            //     const updatedUserData = {
+            //       ...initialUserData,
+            //       route: permission?.payload?.data,
+            //     };
+            //     localStorage.setItem('user', JSON.stringify(updatedUserData));
+            //     dispatch(setUserInfoRedux(updatedUserData));
+            //   }
+            // });
+          }
+          
+          navigate(PATH_DASHBOARD.home.root);
+          toast.success('Logged in successfully, Welcome to Tied Admin Panel.');
+          localStorage.setItem('login', JSON.stringify(res?.payload?.data));
+        }
+      } else {
+        throw new Error(res.payload?.message || 'Login failed');
+      }
     } catch (error) {
       setError('afterSubmit', {
         message: error.message || 'Login failed',

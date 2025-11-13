@@ -17,7 +17,12 @@ const authSlice = createSlice({
     });
     builder.addMatcher(isAnyOf(staffLoginAsync.fulfilled), (state, { payload }) => {
       state.isSubmitting = false;
-      state.user = payload?.data?.staff;
+      state.token = payload?.access_token || false;
+      state.user = payload?.admin || payload?.data?.admin || {};
+      // Store token in localStorage if not already stored
+      if (payload?.access_token && !localStorage.getItem('token')) {
+        localStorage.setItem('token', payload.access_token);
+      }
     });
     builder.addMatcher(isAnyOf(staffLoginAsync.rejected), (state, { payload }) => {
       state.isSubmitting = false;

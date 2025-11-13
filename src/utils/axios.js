@@ -11,7 +11,7 @@ const AxiosClient = async (args) => {
     ...rest,
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `${localStorage?.getItem('token')}` || null,
+      Authorization: localStorage?.getItem('token') ? `Bearer ${localStorage.getItem('token')}` : null,
       ...headers,
     },
   })

@@ -21,6 +21,14 @@ export default function RoleBasedGuard({ hasContent, roles, children }) {
   // Logic here to get current user role
   const { user } = useAuthContext();
 
+  // Check if user is super admin - if so, bypass all permission checks
+  const isSuperAdmin = user?.isSuperAdmin === true;
+
+  // If super admin, grant access without checking roles
+  if (isSuperAdmin) {
+    return <> {children} </>;
+  }
+
   // const currentRole = 'user';
   const currentRole = user?.role; // admin;
 

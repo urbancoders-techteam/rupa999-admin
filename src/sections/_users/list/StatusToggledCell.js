@@ -5,10 +5,12 @@ import PropTypes from 'prop-types';
 StatusToggleCell.propTypes = {
   id: PropTypes.number.isRequired,
   status: PropTypes.string,
+  align: PropTypes.string,
+  justifyContent: PropTypes.string,
 //   apiUrl: PropTypes.string.isRequired,
 };
 
-export default function StatusToggleCell({ id, status }) {
+export default function StatusToggleCell({ id, status, align, justifyContent }) {
   // false = Active (green), true = InActive (red)
   const [isBlocked, setIsBlocked] = useState(status === 'InActive');
   const [loading, setLoading] = useState(false);
@@ -35,8 +37,8 @@ export default function StatusToggleCell({ id, status }) {
   };
 
   return (
-      <TableCell align="center" sx={{ minWidth: 160 }}>
-      <Stack direction="row" alignItems="center" justifyContent="center" spacing={1.5}>
+      <TableCell align={align} sx={{ minWidth: 160 }}>
+      <Stack direction="row" alignItems="center" justifyContent={justifyContent} spacing={1.5}>
         {/* Status Label */}
         <Typography
           variant="body2"

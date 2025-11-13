@@ -45,6 +45,14 @@ export const PATH_DASHBOARD = {
     view: (id) => path(ROOTS_DASHBOARD, `/staff/${id}/view`),
   },
 
+  designation: {
+    root: path(ROOTS_DASHBOARD, '/designation'),
+    list: path(ROOTS_DASHBOARD, '/designation/list'),
+    new: path(ROOTS_DASHBOARD, '/designation/new'),
+    edit: (id) => path(ROOTS_DASHBOARD, `/designation/${id}/edit`),
+    view: (id) => path(ROOTS_DASHBOARD, `/designation/${id}/view`),
+  },
+
   user: {
     root: path(ROOTS_DASHBOARD, '/user'),
     list: path(ROOTS_DASHBOARD, '/user/list'),

@@ -2,11 +2,10 @@
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
-    "baseUrl": ".",
-    "ignoreDeprecations": "6.0"
+    "baseUrl": "."
   },
   "include": [
-    "src/**/*"
+    "src/*/"
   ],
   "exclude": [
     "node_modules"

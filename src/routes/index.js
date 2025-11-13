@@ -51,6 +51,9 @@ import {
   StarLineMarketResultListPage,
   StarLineWinHistoryListPage,
   StaffListPage,
+  StaffFormHandle,
+  RolePermissionFormHandle,
+  DesignationListPage,
   //
 } from './elements';
 
@@ -111,9 +114,19 @@ export default function Router() {
           children: [
             { element: <Navigate to="/dashboard/staff/list" replace />, index: true },
             { path: 'list', element: <StaffListPage /> },
-            // { path: 'new', element: <UserFormHandle /> },
-            // { path: ':id/edit', element: <UserFormHandle /> },
-            // { path: ':id/view', element: <UserFormHandle /> },
+            { path: 'new', element: <StaffFormHandle /> },
+            { path: ':id/edit', element: <StaffFormHandle /> },
+            { path: ':id/view', element: <StaffFormHandle /> },
+          ],
+        },
+        {
+          path: 'designation',
+          children: [
+            { element: <Navigate to="/dashboard/designation/list" replace />, index: true },
+            { path: 'list', element: <DesignationListPage /> },
+            { path: 'new', element: <RolePermissionFormHandle /> },
+            { path: ':id/edit', element: <RolePermissionFormHandle /> },
+            { path: ':id/view', element: <RolePermissionFormHandle /> },
           ],
         },
         {

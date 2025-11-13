@@ -24,8 +24,13 @@ export const NewPasswordPage = Loadable(lazy(() => import('../pages/auth/NewPass
 export const GeneralDashboardPage = Loadable(lazy(() => import('../pages/GeneralDashboardPage')));
 export const SliderImagePage = Loadable(lazy(() => import('../pages/SliderImagePage')));
 
-// DASHBOARD: Saff
+// DASHBOARD: Staff
 export const StaffListPage = Loadable(lazy(() => import('../pages/StaffListPage')));
+export const StaffFormHandle = Loadable(lazy(() => import('../sections/_staff/form/StaffFormHandle')));
+export const RolePermissionFormHandle = Loadable(lazy(() => import('../sections/_staff/form/RolePermissionFormHandle')));
+
+// DASHBOARD: Designation
+export const DesignationListPage = Loadable(lazy(() => import('../pages/DesignationListPage')));
 
 // DASHBOARD: User 
 export const UserListPage = Loadable(lazy(() => import('../pages/UserListPage')));
