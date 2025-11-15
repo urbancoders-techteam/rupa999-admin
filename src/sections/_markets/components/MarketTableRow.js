@@ -12,6 +12,7 @@ import {
 import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
 import MenuPopover from '../../../components/menu-popover';
+import { fDateTime } from '../../../utils/formatTime';
 
 // ----------------------------------------------------------------------
 
@@ -68,8 +69,8 @@ export default function MarketTableRow({ index, row, selected, onEditRow, onDele
         <TableCell align="left" sx={{minWidth:'100px'}}>{openTime}</TableCell>
         <TableCell align="left" sx={{minWidth:'100px'}}>{closeTime}</TableCell>
         <TableCell align="left" sx={{minWidth:'150px'}}>
-          <Typography variant="body2" noWrap>
-            {activeDays}
+          <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
+            {activeDays.join(', ')}
           </Typography>
         </TableCell>
         <TableCell align="left" sx={{minWidth:'100px'}}>
@@ -90,7 +91,7 @@ export default function MarketTableRow({ index, row, selected, onEditRow, onDele
             {hideOpen}
           </Label>
         </TableCell>
-        <TableCell align="left" sx={{minWidth:'150px'}}>{createdAt}</TableCell>
+        <TableCell align="left" sx={{minWidth:'150px'}}>{fDateTime(createdAt)}</TableCell>
 
        
       </TableRow>

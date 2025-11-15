@@ -130,6 +130,10 @@ export const PATH_DASHBOARD = {
       root: path(ROOTS_DASHBOARD, '/markets/winhistory'),
       list: path(ROOTS_DASHBOARD, '/markets/winhistory/list'),
     },
+    marketdata: {
+      root: path(ROOTS_DASHBOARD, '/markets/marketdata'),
+      list: path(ROOTS_DASHBOARD, '/markets/marketdata/list'),
+    },
   },
 
   // -------------------------- Starline Market --------------------------

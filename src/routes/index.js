@@ -54,6 +54,7 @@ import {
   StaffFormHandle,
   RolePermissionFormHandle,
   DesignationListPage,
+  MarketDataListPage,
   //
 } from './elements';
 
@@ -278,6 +279,16 @@ export default function Router() {
                   index: true,
                 },
                 { path: 'list', element: <WinHistoryListPage /> },
+              ],
+            },
+            {
+              path: 'marketdata',
+              children: [
+                {
+                  element: <Navigate to="/dashboard/markets/marketdata/list" replace />,
+                  index: true,
+                },
+                { path: 'list', element: <MarketDataListPage /> },
               ],
             },
           ],

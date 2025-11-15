@@ -1,0 +1,63 @@
+import PropTypes from 'prop-types';
+import { TableRow, TableCell, Typography } from '@mui/material';
+
+// ----------------------------------------------------------------------
+
+MarketDataTableRow.propTypes = {
+  index: PropTypes.number,
+  row: PropTypes.object,
+};
+
+export default function MarketDataTableRow({ index, row }) {
+  const {
+    jodiDigit,
+    halfSangamA,
+    halfSangamB,
+    fullSangam,
+    singleDigit,
+    singlePana,
+    doublePana,
+    triplePana,
+  } = row;
+
+  return (
+    <TableRow hover sx={{ '&:last-child td, &:last-child th': { border: 0.5 } }}>
+      <TableCell align="center">
+        <Typography variant="body2">{index}</Typography>
+      </TableCell>
+
+      <TableCell align="left">
+        <Typography variant="body2">{jodiDigit || '—'}</Typography>
+      </TableCell>
+
+      <TableCell align="left">
+        <Typography variant="body2">{halfSangamA || '0'}</Typography>
+      </TableCell>
+
+      <TableCell align="left">
+        <Typography variant="body2">{halfSangamB || '0'}</Typography>
+      </TableCell>
+
+      <TableCell align="left">
+        <Typography variant="body2">{fullSangam || '0'}</Typography>
+      </TableCell>
+
+      <TableCell align="left">
+        <Typography variant="body2">{singleDigit || '0'}</Typography>
+      </TableCell>
+
+      <TableCell align="left">
+        <Typography variant="body2">{singlePana || '0'}</Typography>
+      </TableCell>
+
+      <TableCell align="left">
+        <Typography variant="body2">{doublePana || '0'}</Typography>
+      </TableCell>
+
+      <TableCell align="left">
+        <Typography variant="body2">{triplePana || '0'}</Typography>
+      </TableCell>
+    </TableRow>
+  );
+}
+

@@ -71,6 +71,9 @@ export const GeneralPredictionFormPage = Loadable(lazy(() => import('../pages/ma
 // DASHBOARD: Markets | Win History List
 export const WinHistoryListPage = Loadable(lazy(() => import('../pages/markets/WinHistoryListPage')));
 
+// DASHBOARD: Markets | Market Data List
+export const MarketDataListPage = Loadable(lazy(() => import('../pages/markets/MarketDataListPage')));
+
 // -----------------------DASHBOARD: Starline | Markets -------------------------------------------------- 
 export const StarLineMarketsListPage = Loadable(lazy(() => import('../pages/startlineMarkets/StarLineMarketsListPage')));
 export const StarlineMarketFormHandle = Loadable(lazy(() => import('../sections/_starline_market/pages/StarlineMarketFormHandle')));

@@ -68,7 +68,7 @@ function MarketMobileViewCardLayout({
       }}
     >
       <Stack spacing={2}>
-        {visibleData.map((row) => (
+        {visibleData.map((row, index) => (
           <Accordion
             key={row.id}
             sx={{ borderRadius: 2, boxShadow: 'none', border: '1px solid #e0e0e0' }}
@@ -76,7 +76,7 @@ function MarketMobileViewCardLayout({
             <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ px: 2, py: 1 }}>
               <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="body1" sx={{ fontWeight: 700, borderRight: '1px solid', pr: 1, mr: 1 }}>
-                  {row.id || '—'}
+                  {index + 1 || '—'}
                 </Typography>
                 <Typography variant="body1" sx={{flex:1 , flexWrap:'nowrap', fontWeight: 700, borderRight: '1px solid', pr: 1, mr: 1 }}>
                   {row.name || '—'}
@@ -84,14 +84,15 @@ function MarketMobileViewCardLayout({
                 <Label
                   variant="soft"
                   color={
-                    row.currentStatus === 'OPEN NOW'
+                    row.currentStatus === 'enable'
                       ? 'success'
-                      : row.currentStatus === 'CLOSED NOW'
+                      : row.currentStatus === 'disable'
                       ? 'error'
                       : 'default'
                   }
+                  sx={{ textTransform: 'capitalize' }}
                 >
-                  {row.currentStatus}
+                  {row.hideOpen}
                 </Label>
               </Box>
             </AccordionSummary>

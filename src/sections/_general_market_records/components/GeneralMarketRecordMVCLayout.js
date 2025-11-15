@@ -63,7 +63,7 @@ function GeneralMarketRecordMVCLayout({ data = [], onEditRow, onDeleteRow, onSel
       }}
     >
       <Stack spacing={2} >
-        {visibleData.map((row) => (
+        {visibleData?.map((row) => (
           <Accordion key={row.ID} sx={{ borderRadius: 2, boxShadow: 'none', border: 'none' }}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ px: 2, py: 1 }}>
               <Box sx={{ width: '100%' }}>

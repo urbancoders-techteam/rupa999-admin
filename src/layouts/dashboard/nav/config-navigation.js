@@ -88,7 +88,7 @@ const navConfig = [
           { title: 'market results', path: PATH_DASHBOARD.markets.marketresults.list },
           // { title: 'General Predict Result', path: PATH_DASHBOARD.markets.predictionform.form },
           { title: 'Win History', path: PATH_DASHBOARD.markets.winhistory.list },
-          { title: 'Data', path: PATH_DASHBOARD.markets.marketrecords.list },
+          { title: 'Data', path: PATH_DASHBOARD.markets.marketdata.list },
         ],
       },
 
