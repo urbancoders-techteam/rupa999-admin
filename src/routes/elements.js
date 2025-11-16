@@ -74,6 +74,9 @@ export const WinHistoryListPage = Loadable(lazy(() => import('../pages/markets/W
 // DASHBOARD: Markets | Market Data List
 export const MarketDataListPage = Loadable(lazy(() => import('../pages/markets/MarketDataListPage')));
 
+// DASHBOARD: Markets | Bid Record List
+export const BidRecordListPage = Loadable(lazy(() => import('../pages/markets/BidRecordListPage')));
+
 // -----------------------DASHBOARD: Starline | Markets -------------------------------------------------- 
 export const StarLineMarketsListPage = Loadable(lazy(() => import('../pages/startlineMarkets/StarLineMarketsListPage')));
 export const StarlineMarketFormHandle = Loadable(lazy(() => import('../sections/_starline_market/pages/StarlineMarketFormHandle')));

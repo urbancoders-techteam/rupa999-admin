@@ -133,6 +133,7 @@ export const PATH_DASHBOARD = {
     marketdata: {
       root: path(ROOTS_DASHBOARD, '/markets/marketdata'),
       list: path(ROOTS_DASHBOARD, '/markets/marketdata/list'),
+      bidrecord: (id) => path(ROOTS_DASHBOARD, `/markets/marketdata/${id}/bidrecord`),
     },
   },
 

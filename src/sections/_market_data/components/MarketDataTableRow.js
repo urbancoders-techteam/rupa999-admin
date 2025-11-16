@@ -1,5 +1,7 @@
 import PropTypes from 'prop-types';
 import { TableRow, TableCell, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { PATH_DASHBOARD } from '../../../routes/paths';
 
 // ----------------------------------------------------------------------
 
@@ -10,6 +12,7 @@ MarketDataTableRow.propTypes = {
 
 export default function MarketDataTableRow({ index, row }) {
   const {
+    id,
     jodiDigit,
     halfSangamA,
     halfSangamB,
@@ -20,6 +23,12 @@ export default function MarketDataTableRow({ index, row }) {
     triplePana,
   } = row;
 
+  const navigate = useNavigate();
+
+  const handleNavigate = () => {
+    navigate(PATH_DASHBOARD.markets.marketdata.bidrecord(id));
+  };
+
   return (
     <TableRow hover sx={{ '&:last-child td, &:last-child th': { border: 0.5 } }}>
       <TableCell align="center">
@@ -27,7 +36,9 @@ export default function MarketDataTableRow({ index, row }) {
       </TableCell>
 
       <TableCell align="left">
-        <Typography variant="body2">{jodiDigit || '—'}</Typography>
+        <Typography variant="body2" onClick={handleNavigate} sx={{ cursor: 'pointer' }}>
+          {jodiDigit || '—'}
+        </Typography>
       </TableCell>
 
       <TableCell align="left">
@@ -60,4 +71,3 @@ export default function MarketDataTableRow({ index, row }) {
     </TableRow>
   );
 }
-

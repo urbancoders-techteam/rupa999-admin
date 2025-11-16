@@ -80,7 +80,7 @@ export default function MarketDataListPage() {
   const { themeStretch } = useSettingsContext();
 
   const [tableData] = useState(mockMarketData);
-  const [selectedDate, setSelectedDate] = useState(dayjs('2025-11-15'));
+  const [selectedDate, setSelectedDate] = useState(dayjs());
   const [selectedMarket, setSelectedMarket] = useState('RAJDHANI DAY');
   const [selectedMarketTime, setSelectedMarketTime] = useState('Open');
 
@@ -165,10 +165,11 @@ export default function MarketDataListPage() {
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Container maxWidth={themeStretch ? false : 'xl'}>
           <CustomBreadcrumbs
-            heading={`Market Data (${selectedDate.format('YYYY-MM-DD')})`}
+            heading={`Market Data (${selectedDate.format('DD-MM-YYYY')})`}
             links={[
               { name: 'Dashboard', href: '/' },
               { name: 'Market Data', href: '#' },
+              { name: 'List', href: '#' },
             ]}
           />
 

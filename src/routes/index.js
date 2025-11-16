@@ -55,6 +55,7 @@ import {
   RolePermissionFormHandle,
   DesignationListPage,
   MarketDataListPage,
+  BidRecordListPage,
   //
 } from './elements';
 
@@ -203,6 +204,17 @@ export default function Router() {
                 // { path: ':id/view', element: <MarketFormHandlePage /> },
               ],
             },
+            {
+              path: 'marketdata',
+              children: [
+                {
+                  element: <Navigate to="/dashboard/markets/marketdata/list" replace />,
+                  index: true,
+                },
+                { path: 'list', element: <MarketDataListPage /> },
+                // { path: ':id/view', element: <MarketFormHandlePage /> },
+              ],
+            },
           ],
         },
 
@@ -289,6 +301,7 @@ export default function Router() {
                   index: true,
                 },
                 { path: 'list', element: <MarketDataListPage /> },
+                { path: ':id/bidrecord', element: <BidRecordListPage /> },
               ],
             },
           ],
