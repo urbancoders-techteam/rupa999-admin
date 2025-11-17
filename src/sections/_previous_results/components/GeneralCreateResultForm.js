@@ -52,11 +52,11 @@ const validationSchema = Yup.object({
         .test('non-decreasing', 'Digits must be in non-decreasing order (e.g., 789, 778, 056). Numbers ending in 0 are allowed (e.g., 500, 560, 050, 000, 100, 200)', isNonDecreasing),
     otherwise: (s) => s.notRequired(),
   }),
-  digit: Yup.string().when('usePercentage', {
-    is: false,
-    then: (s) => s.required('Digit is required'),
-    otherwise: (s) => s.notRequired(),
-  }),
+  // digit: Yup.string().when('usePercentage', {
+  //   is: false,
+  //   then: (s) => s.required('Digit is required'),
+  //   otherwise: (s) => s.notRequired(),
+  // }),
 });
 
 GeneralCreateResultForm.propTypes = {

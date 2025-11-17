@@ -42,8 +42,8 @@ import {
 } from '../components/table';
 // sections
 import CustomTableToolbar from '../components/table/CustomTableToolBar';
-import { UserTableRow } from '../sections/_users/list';
 import UserMobileViewCardLayout from '../sections/_users/list/UserMobileViewCardLayout';
+import StaffTableRow from '../sections/_staff/list/StaffTableRow';
 import { getAllStaffAsync, deleteStaffAsync } from '../redux/services/staff_services';
 import { useSnackbar } from '../components/snackbar';
 
@@ -53,7 +53,7 @@ const STATUS_OPTIONS = ['all', 'Active', 'InActive'];
 
 const TABLE_HEAD = [
   { id: 'Action', label: 'Action', align: 'left' },
-  { id: 'id', label: 'ID', align: 'left' },
+  { id: 'srNo', label: 'Sr. No.', align: 'left' },
   { id: 'name', label: 'Name', align: 'left' },
   { id: 'company', label: 'Designation', align: 'left' },
   { id: 'company', label: 'Contact No.', align: 'left' },
@@ -65,7 +65,7 @@ const TABLE_HEAD = [
 
 // ----------------------------------------------------------------------
 
-export default function UserListPage() {
+export default function StaffListPage() {
   const {
     dense,
     page,
@@ -134,8 +134,8 @@ export default function UserListPage() {
 
   const isNotFound =
     (!dataFiltered.length && !!filterName) ||
-    (!dataFiltered.length && !!filterRole) ||
-    (!dataFiltered.length && !!filterStatus);
+    (!dataFiltered.length && !!filterRole && filterRole !== 'all') ||
+    (!dataFiltered.length && !!filterStatus && filterStatus !== 'all');
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
@@ -184,17 +184,20 @@ export default function UserListPage() {
   };
 
   const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.user.edit(id));
+    navigate(PATH_DASHBOARD.staff.edit(id));
   };
   const handleTransactionRow = (id) => {
-    navigate(PATH_DASHBOARD.user.transactions(id));
+    navigate(PATH_DASHBOARD.staff.transactions(id));
   };
   const handleWithdrawalRequestRow = (id) => {
-    navigate(PATH_DASHBOARD.user.withdrawalrequest(id));
+    navigate(PATH_DASHBOARD.staff.withdrawalrequest(id));
   };
 
   const handleResetFilter = () => {
     setFilterName('');
+    setFilterRole('all');
+    setFilterStatus('all');
+    setPage(0);
   };
 
   return (
@@ -258,7 +261,7 @@ export default function UserListPage() {
                     },
                   }}
                 >
-                  New User
+                  New Staff
                 </Button>
               </Box>
             }
@@ -276,10 +279,24 @@ export default function UserListPage() {
 
         {isMobile ? (
           <>
+            <Tabs
+              value={filterStatus}
+              onChange={handleFilterStatus}
+              sx={{
+                px: 2,
+                bgcolor: 'background.neutral',
+                mb: 2,
+              }}
+            >
+              {STATUS_OPTIONS.map((tab) => (
+                <Tab key={tab} label={tab} value={tab} />
+              ))}
+            </Tabs>
             <CustomTableToolbar
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
+              onResetFilter={handleResetFilter}
             />
             <UserMobileViewCardLayout
               data={dataFiltered}
@@ -310,6 +327,7 @@ export default function UserListPage() {
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
+              onResetFilter={handleResetFilter}
             />
 
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
@@ -346,10 +364,11 @@ export default function UserListPage() {
                   <TableBody>
                     {dataFiltered
                       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((row) => (
-                        <UserTableRow
+                      .map((row, index) => (
+                        <StaffTableRow
                           key={row.id}
                           row={row}
+                          index={index}
                           // selected={selected.includes(row.id)}
                           onTransationRow={() => handleTransactionRow(row.id)}
                           onWithdrawalRequestRow={() => handleWithdrawalRequestRow(row.id)}
@@ -360,7 +379,7 @@ export default function UserListPage() {
 
                     <TableEmptyRows
                       height={denseHeight}
-                      emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
+                      emptyRows={emptyRows(page, rowsPerPage, dataFiltered.length)}
                     />
 
                     <TableNoData isNotFound={isNotFound} />

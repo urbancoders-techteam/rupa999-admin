@@ -14,6 +14,7 @@ import Iconify from '../../../components/iconify';
 import MenuPopover from '../../../components/menu-popover';
 import ConfirmDialog from '../../../components/confirm-dialog';
 import StatusToggleCell from '../../_users/list/StatusToggledCell';
+import { fDateTime } from '../../../utils/formatTime';
 
 // ----------------------------------------------------------------------
 // ✅ Move this styled component OUTSIDE of StaffTableRow
@@ -32,11 +33,14 @@ StaffTableRow.propTypes = {
   row: PropTypes.shape({
     id: PropTypes.number,
     name: PropTypes.string,
-    phone: PropTypes.string,
+    email: PropTypes.string,
+    mobile: PropTypes.string,
+    designation: PropTypes.string,
     password: PropTypes.string,
     status: PropTypes.string,
     createdAt: PropTypes.string,
   }),
+  index: PropTypes.number,
   selected: PropTypes.bool,
   onEditRow: PropTypes.func,
   onTransationRow: PropTypes.func,
@@ -44,11 +48,13 @@ StaffTableRow.propTypes = {
   onDeleteRow: PropTypes.func,
 };
 
-export default function StaffTableRow({ row, selected, onEditRow, onTransationRow, onWithdrawalRequestRow, onDeleteRow }) {
+export default function StaffTableRow({ index, row, selected, onEditRow, onTransationRow, onWithdrawalRequestRow, onDeleteRow }) {
   const {
     id,
     name,
-    phone,
+    email,
+    mobile,
+    designation,
     password,
     status,
     createdAt,
@@ -75,7 +81,7 @@ export default function StaffTableRow({ row, selected, onEditRow, onTransationRo
           </IconButton>
         </TableCell>
 
-        <TableCell align="left">{id}</TableCell>
+        <TableCell align="left">{index + 1}</TableCell>
 
         <TableCell align="left">
           <Stack direction="row" alignItems="center" spacing={2}>
@@ -85,21 +91,29 @@ export default function StaffTableRow({ row, selected, onEditRow, onTransationRo
           </Stack>
         </TableCell>
 
+
         <TableCell align="left">
-          <Typography variant="body2">{phone}</Typography>
+          <Typography variant="body2">{designation || 'NA'}</Typography>
         </TableCell>
 
         <TableCell align="left">
+          <Typography variant="body2">{mobile}</Typography>
+        </TableCell>
+
+        <TableCell align="left">
+          <Typography variant="body2">{email}</Typography>
+        </TableCell>
+        {/* <TableCell align="left">
           <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
             {password}
           </Typography>
-        </TableCell>
+        </TableCell> */}
 
         <StatusToggleCell id={id} status={status} />
 
         <TableCell align="left" sx={{ minWidth: '140px' }}>
           <Typography variant="body2" color="text.secondary">
-            {createdAt}
+            {fDateTime(createdAt)}
           </Typography>
         </TableCell>
       </StyledTableRow>

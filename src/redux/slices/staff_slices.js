@@ -10,7 +10,7 @@ import {
 
 const initialState = {
   staffList: [],
-  currentStaff: null,
+  staffById: null,
   loading: false,
   error: null,
   pagination: {
@@ -27,8 +27,8 @@ const staffSlice = createSlice({
     clearStaffError: (state) => {
       state.error = null;
     },
-    clearCurrentStaff: (state) => {
-      state.currentStaff = null;
+    clearstaffById: (state) => {
+      state.staffById = null;
     },
   },
   extraReducers: (builder) => {
@@ -58,7 +58,7 @@ const staffSlice = createSlice({
       })
       .addCase(getStaffByIdAsync.fulfilled, (state, action) => {
         state.loading = false;
-        state.currentStaff = action.payload?.data || null;
+        state.staffById = action.payload?.data || null;
       })
       .addCase(getStaffByIdAsync.rejected, (state, action) => {
         state.loading = false;
@@ -96,8 +96,8 @@ const staffSlice = createSlice({
           if (index !== -1) {
             state.staffList[index] = updatedStaff;
           }
-          if (state.currentStaff?._id === updatedStaff._id) {
-            state.currentStaff = updatedStaff;
+          if (state.staffById?._id === updatedStaff._id) {
+            state.staffById = updatedStaff;
           }
         }
       })
@@ -116,8 +116,8 @@ const staffSlice = createSlice({
         state.loading = false;
         const staffId = action.meta.arg;
         state.staffList = state.staffList.filter((staff) => staff._id !== staffId);
-        if (state.currentStaff?._id === staffId) {
-          state.currentStaff = null;
+        if (state.staffById?._id === staffId) {
+          state.staffById = null;
         }
       })
       .addCase(deleteStaffAsync.rejected, (state, action) => {
@@ -133,7 +133,7 @@ const staffSlice = createSlice({
       })
       .addCase(getStaffProfileAsync.fulfilled, (state, action) => {
         state.loading = false;
-        state.currentStaff = action.payload?.admin || null;
+        state.staffById = action.payload?.admin || null;
       })
       .addCase(getStaffProfileAsync.rejected, (state, action) => {
         state.loading = false;
@@ -142,6 +142,6 @@ const staffSlice = createSlice({
   },
 });
 
-export const { clearStaffError, clearCurrentStaff } = staffSlice.actions;
+export const { clearStaffError, clearstaffById } = staffSlice.actions;
 export default staffSlice.reducer;
 
