@@ -8,9 +8,8 @@ import {
   Typography,
   styled,
   MenuItem,
-  useMediaQuery,
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { fDateTime } from '../../../utils/formatTime';
 import Iconify from '../../../components/iconify';
 import MenuPopover from '../../../components/menu-popover';
 import ConfirmDialog from '../../../components/confirm-dialog';
@@ -20,8 +19,7 @@ import Label from '../../../components/label';
 
 MarketResultTableRow.propTypes = {
   row: PropTypes.shape({
-    id: PropTypes.number,
-    gameName: PropTypes.string,
+    market: PropTypes.object,
     resultDate: PropTypes.string,
     result: PropTypes.string,
     openPana: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -32,45 +30,52 @@ MarketResultTableRow.propTypes = {
   onRevert: PropTypes.func,
 };
 
+// ----------------------------------------------------------------------
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  '&:nth-of-type(even)': {
+    backgroundColor: theme.palette.action.hover,
+  },
+  '&:last-child td, &:last-child th': {
+    borderBottom: 0,
+  },
+}));
+
+// ----------------------------------------------------------------------
+
 export default function MarketResultTableRow({ row, onRevert }) {
-  const { id, gameName, resultDate, result, openPana, closePana, createdAt } = row;
+  const { market, resultDate, result, openPana, closePana, createdAt } = row;
 
-  const [openPopover, setOpenPopover] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const [openConfirm, setOpenConfirm] = useState(false);
-  const theme = useTheme();
 
-  const handleOpenPopover = (event) => setOpenPopover(event.currentTarget);
-  const handleClosePopover = () => setOpenPopover(null);
+  const handleOpenPopover = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClosePopover = () => {
+    setAnchorEl(null);
+  };
+
   const handleOpenConfirm = () => setOpenConfirm(true);
   const handleCloseConfirm = () => setOpenConfirm(false);
 
-  const StyledTableRow = styled(TableRow)(() => ({
-    '&:nth-of-type(even)': {
-      backgroundColor: theme.palette.action.hover,
-    },
-    '&:last-child td, &:last-child th': {
-      borderBottom: 0,
-    },
-  }));
   // Desktop layout (TableRow)
   return (
     <>
       <StyledTableRow hover>
-        <TableCell align="right">
-          <IconButton onClick={handleOpenPopover}>
+        <TableCell align="left">
+          <IconButton color={anchorEl ? 'inherit' : 'default'} onClick={handleOpenPopover}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
         </TableCell>
         
-        <TableCell align="left">{id}</TableCell>
-
         <TableCell align="left">
           <Typography variant="subtitle2" noWrap>
-            {gameName}
+            {market.name}
           </Typography>
         </TableCell>
 
-        <TableCell align="center">{resultDate}</TableCell>
+        <TableCell align="center">{fDateTime(resultDate || null)}</TableCell>
 
         <TableCell align="center">
           <Typography variant="body2" sx={{ fontWeight: 600 }}>
@@ -94,23 +99,26 @@ export default function MarketResultTableRow({ row, onRevert }) {
           </Label>
         </TableCell>
 
-        <TableCell align="center">
-          <Button variant="outlined" size="small" color="primary" onClick={handleOpenConfirm}>
-            Revert
-          </Button>
-        </TableCell>
-
         <TableCell align="center" sx={{ whiteSpace: 'nowrap' }}>
           <Typography variant="body2" color="text.secondary">
-            {createdAt}
+            {fDateTime(createdAt)}
           </Typography>
         </TableCell>
       </StyledTableRow>
 
+      {/* MenuPopover anchored to the icon button */}
       <MenuPopover
-        open={openPopover}
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
         onClose={handleClosePopover}
-        arrow="right-top"
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
         sx={{ width: 140 }}
       >
         <MenuItem

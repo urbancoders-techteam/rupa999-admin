@@ -1,26 +1,23 @@
 import { Helmet } from 'react-helmet-async';
 import { paramCase } from 'change-case';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
 import {
   Card,
   Table,
   Button,
-  Tooltip,
   TableBody,
   Container,
-  IconButton,
   TableContainer,
   useMediaQuery,
 } from '@mui/material';
 // routes
 import { useTheme } from '@mui/system';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllMarketResultsAsync } from '../../redux/services/market_result_services';
 import { PATH_DASHBOARD } from '../../routes/paths';
-// _mock_
-import { previousResults } from '../../_mock/arrays';
 // components
-import Iconify from '../../components/iconify';
 import Scrollbar from '../../components/scrollbar';
 import ConfirmDialog from '../../components/confirm-dialog';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
@@ -32,7 +29,6 @@ import {
   TableNoData,
   TableEmptyRows,
   TableHeadCustom,
-  TableSelectedAction,
   TablePaginationCustom,
 } from '../../components/table';
 // sections
@@ -46,7 +42,6 @@ import MarketResultTableRow from '../../sections/_previous_results/components/Ma
 
 const TABLE_HEAD = [
   { id: 'action', label: 'Action', align: 'left' },
-  { id: 'id', label: 'ID', align: 'left' },
   { id: 'name', label: 'Game Name', align: 'left' },
   { id: 'resultDate', label: 'Result Date', align: 'left' },
   { id: 'result', label: 'Result', align: 'left' },
@@ -70,7 +65,6 @@ export default function MarketResultListPage() {
     selected,
     setSelected,
     onSelectRow,
-    onSelectAllRows,
     //
     onSort,
     onChangeDense,
@@ -80,12 +74,16 @@ export default function MarketResultListPage() {
 
   const { themeStretch } = useSettingsContext();
 
-  const navigate = useNavigate();
+  const { resultList } = useSelector((state) => state.marketResult);
+  console.log('resultList :>> ', resultList);
 
   const theme = useTheme();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const [tableData, setTableData] = useState(previousResults);
+  const [tableData, setTableData] = useState(resultList);
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
@@ -99,13 +97,16 @@ export default function MarketResultListPage() {
     filterName,
   });
 
+  console.log('dataFiltered :>> ', dataFiltered);
+  console.log('tableData :>> ', tableData);
+
   const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   const denseHeight = dense ? 52 : 72;
 
   const isFiltered = filterName !== '';
 
-  const isNotFound = !dataFiltered.length && !!filterName;
+  const isNotFound = !resultList.length && !!filterName;
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
@@ -162,6 +163,9 @@ export default function MarketResultListPage() {
     setShowWinner(!showWinner);
   }
 
+  useEffect(() => {
+    dispatch(getAllMarketResultsAsync());
+  }, [dispatch]);
 
 
   return (
@@ -185,7 +189,7 @@ export default function MarketResultListPage() {
 
         {isMobile ? (
           <PreviousResultMobileViewCardLayout
-            data={dataFiltered}
+            data={resultList}
             onEditRow={handleEditRow}
             onDeleteRow={(id) => handleDeleteRow(id)}
           />
@@ -199,7 +203,7 @@ export default function MarketResultListPage() {
             />
 
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
-              <TableSelectedAction
+              {/* <TableSelectedAction
                 dense={dense}
                 numSelected={selected.length}
                 rowCount={tableData.length}
@@ -209,14 +213,14 @@ export default function MarketResultListPage() {
                     tableData.map((row) => row.id)
                   )
                 }
-                action={
-                  <Tooltip title="Delete">
-                    <IconButton color="primary" onClick={handleOpenConfirm}>
-                      <Iconify icon="eva:trash-2-outline" />
-                    </IconButton>
-                  </Tooltip>
-                }
-              />
+                // action={
+                //   <Tooltip title="Delete">
+                //     <IconButton color="primary" onClick={handleOpenConfirm}>
+                //       <Iconify icon="eva:trash-2-outline" />
+                //     </IconButton>
+                //   </Tooltip>
+                // }
+              /> */}
 
               <Scrollbar>
                 <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
@@ -230,8 +234,8 @@ export default function MarketResultListPage() {
                   />
 
                   <TableBody>
-                    {dataFiltered
-                      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    {resultList
+                      // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                       .map((row) => (
                         <MarketResultTableRow
                           key={row.id}

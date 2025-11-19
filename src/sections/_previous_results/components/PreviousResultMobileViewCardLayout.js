@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import {
   Typography,
   Stack,
-  IconButton,
   Box,
   CircularProgress,
   MenuItem,
@@ -15,6 +14,7 @@ import Iconify from '../../../components/iconify';
 import MenuPopover from '../../../components/menu-popover';
 import ConfirmDialog from '../../../components/confirm-dialog';
 import Label from '../../../components/label';
+import { fDateTime } from '../../../utils/formatTime';
 
 function PreviousResultMobileViewCardLayout({
   data = [],
@@ -104,16 +104,14 @@ function PreviousResultMobileViewCardLayout({
               mb={1}
             >
               <Typography variant="subtitle1" fontWeight={600}>
-                {row.gameName}
+                {row.market.name}
               </Typography>
-              <IconButton size="small" onClick={(e) => handleOpenPopover(e, row)}>
-                <Iconify icon="eva:more-vertical-fill" />
-              </IconButton>
+             
             </Stack>
 
             {/* Details */}
             <Typography variant="body2" color="text.secondary">
-              Date: <strong>{row.resultDate}</strong>
+              Date: <strong>{fDateTime(row.resultDate)}</strong>
             </Typography>
             <Typography variant="body2" sx={{ mt: 0.5 }}>
               Result: <strong>{row.result}</strong>
@@ -137,7 +135,7 @@ function PreviousResultMobileViewCardLayout({
               color="text.secondary"
               sx={{ mt: 1, display: 'block' }}
             >
-              Created: {row.createdAt}
+              Created: {fDateTime(row.createdAt)}
             </Typography>
 
             <Button

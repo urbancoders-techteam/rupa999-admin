@@ -1,116 +1,362 @@
 /* eslint-disable no-lonely-if */
-import React from 'react';
 import PropTypes from 'prop-types';
-import { Box, Card, Grid, Button, Typography, TextField } from '@mui/material';
+import { useMemo, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Box, Card, Grid, Button, Typography, TextField, Stack } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import { useForm, FormProvider, useWatch, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import { RHFTextField, RHFAutocomplete } from '../../../components/hook-form'; // <-- update this import path
-import { marketEnum } from '../../../assets/data/marketEnum';
+import dayjs from 'dayjs';
+import { useDispatch, useSelector } from 'react-redux';
+import { useSnackbar } from '../../../components/snackbar';
+import { getAllMarketsAsync } from '../../../redux/services/market_services';
+import { createMarketResultAsync, updateMarketResultAsync } from '../../../redux/services/market_result_services';
+import { RHFTextField, RHFAutocomplete } from '../../../components/hook-form';
+import RHFDatePicker from '../../../components/hook-form/RHFDatePicker';
+import { PATH_DASHBOARD } from '../../../routes/paths';
 
 // ----------------------------------------------------------------------
 
-const sessions = ['Open', 'Close'];
+const SESSIONS = ['Open', 'Close'];
 
 // Helper function to check if digits are in non-decreasing order
-// Special case: if last digit is 0, allow it even if it doesn't follow non-decreasing rule
-// Also allows second digit to be 0 when last digit is 0 (e.g., 000, 100, 200, 500)
 const isNonDecreasing = (value) => {
-  if (!value || value.length !== 3) return true; // Allow incomplete input
+  if (!value || value.length !== 3) return true;
   const digits = value.split('').map(Number);
-  
-  // Special condition: if last digit is 0, allow it (e.g., 500, 560, 050, 000, 100, 200)
-  // This also allows second digit to be 0 when last digit is 0
-  if (digits[2] === 0) {
-    return true;
-  }
-  
-  // Otherwise, check non-decreasing order
+  if (digits[2] === 0) return true; // Allow numbers ending in 0
   return digits[0] <= digits[1] && digits[1] <= digits[2];
 };
 
-const validationSchema = Yup.object({
-  date: Yup.string().required('Date is required'),
-  market: Yup.string().required('Market is required'),
-  session: Yup.string().required('Session is required'),
+// Market autocomplete helpers
+const getMarketOptionLabel = (option) => {
+  if (typeof option === 'string') return option;
+  if (option && typeof option === 'object') return option.name || '';
+  return '';
+};
 
-  // drives conditional UI/validation
-  usePercentage: Yup.boolean().required(),
+const isMarketOptionEqualToValue = (option, value) => {
+  if (!option || !value) return false;
+  if (typeof option === 'string' && typeof value === 'string') return option === value;
+  const optionId = typeof option === 'object' ? option._id : option;
+  const valueId = typeof value === 'object' ? value._id : value;
+  return optionId === valueId;
+};
 
-  // conditional fields
-  percentage: Yup.string().when('usePercentage', {
-    is: true,
-    then: (s) => s.required('Percentage is required'),
-    otherwise: (s) => s.notRequired(),
-  }),
-  pana: Yup.string().when('usePercentage', {
-    is: false,
-    then: (s) =>
-      s
-        .required('Pana is required')
-        .matches(/^\d{3}$/, 'Pana must be exactly 3 digits')
-        .test('non-decreasing', 'Digits must be in non-decreasing order (e.g., 789, 778, 056). Numbers ending in 0 are allowed (e.g., 500, 560, 050, 000, 100, 200)', isNonDecreasing),
-    otherwise: (s) => s.notRequired(),
-  }),
-  // digit: Yup.string().when('usePercentage', {
-  //   is: false,
-  //   then: (s) => s.required('Digit is required'),
-  //   otherwise: (s) => s.notRequired(),
-  // }),
-});
+const renderMarketOption = (props, option) => (
+  <li {...props} key={option._id || option}>
+    {typeof option === 'object' ? option.name : option}
+  </li>
+);
+
+// Pana input validation helper
+const validatePanaInput = (value) => {
+  let validValue = value.replace(/[^0-9]/g, '').slice(0, 3);
+  
+  if (validValue.length > 0) {
+    const digits = validValue.split('').map(Number);
+    validValue = digits[0].toString();
+    
+    if (digits.length >= 2) {
+      if (digits[1] >= digits[0] || digits[1] === 0) {
+        validValue += digits[1].toString();
+      } else {
+        validValue = digits[0].toString();
+      }
+    }
+    
+    if (digits.length === 3 && validValue.length === 2) {
+      const secondDigit = Number(validValue[1]);
+      if (secondDigit === 0) {
+  if (digits[2] === 0) {
+          validValue += digits[2].toString();
+        }
+      } else if (digits[2] >= digits[1] || digits[2] === 0) {
+        validValue += digits[2].toString();
+      }
+    }
+  }
+  
+  return validValue;
+};
+
+// Calculate last digit of sum
+const calculateLastDigit = (pana) => {
+  if (!pana || pana.length !== 3 || !/^\d{3}$/.test(pana)) return '';
+  const sum = pana.split('').map(Number).reduce((acc, digit) => acc + digit, 0);
+  return (sum % 10).toString();
+};
+
+// Extract market ID helper
+const extractMarketId = (market) => (typeof market === 'object' && market?._id ? market._id : market);
+
+// Transform session to lowercase
+const normalizeSession = (session) => (session ? session.toLowerCase() : '');
 
 GeneralCreateResultForm.propTypes = {
+  isEdit: PropTypes.bool,
+  isView: PropTypes.bool,
+  currentResult: PropTypes.object,
   showWinner: PropTypes.bool,
   onHandleShowWinner: PropTypes.func,
 };
 
-export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner }) {
-  const methods = useForm({
-    resolver: yupResolver(validationSchema),
-    defaultValues: {
-      date: new Date().toISOString().split('T')[0],
+export default function GeneralCreateResultForm({
+  isEdit = false,
+  isView = false,
+  currentResult,
+  showWinner,
+  onHandleShowWinner,
+}) {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { enqueueSnackbar } = useSnackbar();
+
+  const { marketList, loading: marketLoading } = useSelector((state) => state.market);
+  const { loading: marketResultLoading } = useSelector((state) => state.marketResult);
+
+  // Validation schema
+  const validationSchema = useMemo(
+    () =>
+      Yup.object({
+        date: Yup.mixed()
+          .required('Date is required')
+          .test('date-valid', 'Date is required', (value) => {
+            if (!value) return false;
+            if (dayjs.isDayjs(value)) return value.isValid();
+            return dayjs(value).isValid();
+          }),
+        market: Yup.mixed()
+          .required('Market is required')
+          .test('market-required', 'Market is required', (value) => {
+            if (!value) return false;
+            if (typeof value === 'string') return value.trim() !== '';
+            return typeof value === 'object' && !!value._id;
+          }),
+        session: Yup.string().required('Session is required'),
+        usePercentage: Yup.boolean().required(),
+        percentage: Yup.string().when('usePercentage', {
+          is: true,
+          then: (s) => s.required('Percentage is required'),
+          otherwise: (s) => s.notRequired(),
+        }),
+        pana: Yup.string().when('usePercentage', {
+          is: false,
+          then: (s) =>
+            s
+              .required('Pana is required')
+              .matches(/^\d{3}$/, 'Pana must be exactly 3 digits')
+              .test(
+                'non-decreasing',
+                'Digits must be in non-decreasing order (e.g., 789, 778, 056). Numbers ending in 0 are allowed (e.g., 500, 560, 050, 000, 100, 200)',
+                isNonDecreasing
+              ),
+          otherwise: (s) => s.notRequired(),
+        }),
+      }),
+    []
+  );
+
+  // Default values based on edit mode
+  const defaultValues = useMemo(() => {
+    if (isEdit && currentResult) {
+      // For edit mode, map from API response to form values
+      const hasPercentage = currentResult.percentage === 'yes' || !!currentResult.percentage;
+      return {
+        date: currentResult.date ? dayjs(currentResult.date) : dayjs(),
+        market: currentResult.marketsId || currentResult.market?._id || '',
+        session: currentResult.session ? currentResult.session.charAt(0).toUpperCase() + currentResult.session.slice(1) : '',
+        usePercentage: hasPercentage,
+        percentage: hasPercentage ? (currentResult.percentage || '') : '',
+        pana: currentResult.openPana?.toString() || currentResult.closePana?.toString() || currentResult.pana?.toString() || '',
+        digit: currentResult.openDigit?.toString() || currentResult.closeDigit?.toString() || currentResult.digit?.toString() || '',
+      };
+    }
+    return {
+      date: dayjs(),
       market: '',
       session: '',
-      usePercentage: false, // false = "No", true = "Yes"
+      usePercentage: false,
       percentage: '',
       pana: '',
       digit: '',
-    },
+    };
+  }, [isEdit, currentResult]);
+
+  const methods = useForm({
+    resolver: yupResolver(validationSchema),
+    defaultValues,
     mode: 'onSubmit',
   });
 
-  const { handleSubmit, setValue, control } = methods;
-
-  // React Hook Form-aware watch (do NOT use useState for this toggle)
+  const { handleSubmit, setValue, control, reset, formState: { isSubmitting } } = methods;
   const usePercentage = useWatch({ control, name: 'usePercentage' });
   const panaValue = useWatch({ control, name: 'pana' });
 
-  // Calculate sum of digits when pana changes
-  // Show only the last digit of the sum (e.g., 789 => 7+8+9=24 => 4)
-  React.useEffect(() => {
-    if (panaValue && panaValue.length === 3 && /^\d{3}$/.test(panaValue)) {
-      const sum = panaValue
-        .split('')
-        .map(Number)
-        .reduce((acc, digit) => acc + digit, 0);
-      // Get only the last digit of the sum
-      const lastDigit = sum % 10;
-      setValue('digit', lastDigit.toString(), { shouldValidate: true });
-    } else if (!panaValue || panaValue.length === 0) {
-      setValue('digit', '', { shouldValidate: true });
-    }
-  }, [panaValue, setValue]);
+  // Fetch markets on mount
+  useEffect(() => {
+    dispatch(getAllMarketsAsync());
+  }, [dispatch]);
 
-  const onSubmit = (data) => {
-    // you asked to "handle this form using react-hook-form", so we submit RHF data directly
-    console.log(data);
-    alert('Form Submitted Successfully!');
-  };
+  // Reset form when currentResult changes (for edit mode)
+  useEffect(() => {
+    if ((isEdit || isView) && currentResult?._id) {
+      reset(defaultValues);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEdit, isView, currentResult?._id, reset]);
+
+  // Calculate and update digit when pana changes (only for create mode)
+  useEffect(() => {
+    if (!isEdit && panaValue) {
+      const digit = calculateLastDigit(panaValue);
+      setValue('digit', digit, { shouldValidate: true });
+    }
+  }, [panaValue, setValue, isEdit]);
+
+  // Memoized handlers
+  const handlePercentageToggle = useCallback(
+    (value) => () => {
+      setValue('usePercentage', value, { shouldValidate: true });
+    },
+    [setValue]
+  );
+
+  const handlePanaChange = useCallback(
+    (field) => (e) => {
+      const validValue = validatePanaInput(e.target.value);
+      field.onChange(validValue);
+      // Auto-calculate digit for create mode
+      if (!isEdit && validValue.length === 3) {
+        const digit = calculateLastDigit(validValue);
+        setValue('digit', digit, { shouldValidate: true });
+      }
+    },
+    [setValue, isEdit]
+  );
+
+  // Prepare payload for POST API
+  const preparePostPayload = useCallback((data) => {
+    const marketsId = extractMarketId(data.market);
+    const session = normalizeSession(data.session);
+    
+    // Format date - handle both dayjs object and string
+    const formattedDate = dayjs.isDayjs(data.date) 
+      ? data.date.format('YYYY-MM-DD')
+      : dayjs(data.date).format('YYYY-MM-DD');
+
+    const payload = {
+      date: formattedDate,
+      marketsId,
+      session,
+    };
+
+    if (data.usePercentage) {
+      // When percentage is "yes", include percentage value
+      payload.percentage = data.percentage || 'yes';
+    } else {
+      // When percentage is "no", include pana and digit
+      payload.percentage = 'no';
+      payload.pana = parseInt(data.pana, 10);
+      payload.digit = parseInt(data.digit, 10);
+    }
+
+    return payload;
+  }, []);
+
+  // Prepare payload for PATCH API
+  const preparePatchPayload = useCallback((data) => {
+    const marketsId = extractMarketId(data.market);
+    const session = normalizeSession(data.session);
+    
+    // Format date - handle both dayjs object and string
+    const formattedDate = dayjs.isDayjs(data.date) 
+      ? data.date.format('YYYY-MM-DD')
+      : dayjs(data.date).format('YYYY-MM-DD');
+
+    const payload = {
+      date: formattedDate,
+      marketsId,
+      session,
+    };
+
+    if (data.usePercentage) {
+      // When percentage is "yes"
+      payload.percentage = data.percentage || 'yes';
+      // For PATCH with percentage, include session-specific fields if pana/digit are provided
+      if (data.pana && data.digit) {
+        if (session === 'open') {
+          payload.openPana = parseInt(data.pana, 10);
+          payload.openDigit = parseInt(data.digit, 10);
+        } else if (session === 'close') {
+          payload.closePana = parseInt(data.pana, 10);
+          payload.closeDigit = parseInt(data.digit, 10);
+        }
+      }
+    } else {
+      // When percentage is "no", include pana and digit based on session
+      payload.percentage = 'no';
+      if (session === 'open') {
+        payload.openPana = parseInt(data.pana, 10);
+        payload.openDigit = parseInt(data.digit, 10);
+      } else if (session === 'close') {
+        payload.closePana = parseInt(data.pana, 10);
+        payload.closeDigit = parseInt(data.digit, 10);
+      }
+    }
+
+    return payload;
+  }, []);
+
+  const onSubmit = useCallback(
+    async (data) => {
+      try {
+        let payload;
+        
+        if (isEdit && currentResult?._id) {
+          // PATCH request
+          payload = preparePatchPayload(data);
+          await dispatch(updateMarketResultAsync({ id: currentResult._id, data: payload })).unwrap();
+          enqueueSnackbar('Market result updated successfully!', { variant: 'success' });
+          navigate(PATH_DASHBOARD.markets.marketresults.list);
+        } else {
+          // POST request
+          payload = preparePostPayload(data);
+          await dispatch(createMarketResultAsync(payload)).unwrap();
+          enqueueSnackbar('Market result created successfully!', { variant: 'success' });
+          // Reset form after successful creation
+          reset({
+            date: dayjs(),
+            market: '',
+            session: '',
+            usePercentage: false,
+            percentage: '',
+            pana: '',
+            digit: '',
+          });
+          // Optionally refresh the list
+          dispatch(getAllMarketsAsync());
+        }
+      } catch (error) {
+        console.error('Error submitting form:', error);
+        const errorMessage =
+          error?.response?.data?.message || error?.message || 'An error occurred while saving market result';
+        enqueueSnackbar(errorMessage, { variant: 'error' });
+      }
+    },
+    [isEdit, currentResult, dispatch, navigate, enqueueSnackbar, preparePostPayload, preparePatchPayload, reset]
+  );
+
+  const handleBack = useCallback(() => {
+    navigate(PATH_DASHBOARD.markets.marketresults.list);
+  }, [navigate]);
+
+  const isLoading = marketLoading || marketResultLoading;
 
   return (
     <Card sx={{ p: 3, borderRadius: 2, mb: 2 }}>
       <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
-        General Create Result
+        {isEdit ? 'Edit Market Result' : 'Create Market Result'}
       </Typography>
 
       <FormProvider {...methods}>
@@ -118,13 +364,13 @@ export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner
           <Grid container spacing={2}>
             {/* Date */}
             <Grid item xs={12} md={4}>
-              <RHFTextField
+              <RHFDatePicker
                 name="date"
                 label="Date"
-                type="date"
                 size="small"
-                InputLabelProps={{ shrink: true }}
-                fullWidth
+                format="DD/MM/YYYY"
+                disabled={isView}
+                required
               />
             </Grid>
 
@@ -135,10 +381,12 @@ export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner
                 label="Markets"
                 size="small"
                 fullWidth
-                options={marketEnum}
-                // optional helpers to keep Autocomplete happy with strings
-                getOptionLabel={(opt) => (typeof opt === 'string' ? opt : '')}
-                isOptionEqualToValue={(opt, val) => opt === val}
+                disabled={isView || marketLoading}
+                options={marketList || []}
+                loading={marketLoading}
+                getOptionLabel={getMarketOptionLabel}
+                isOptionEqualToValue={isMarketOptionEqualToValue}
+                renderOption={renderMarketOption}
               />
             </Grid>
 
@@ -149,7 +397,8 @@ export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner
                 label="Session"
                 size="small"
                 fullWidth
-                options={sessions}
+                disabled={isView}
+                options={SESSIONS}
                 getOptionLabel={(opt) => (typeof opt === 'string' ? opt : '')}
                 isOptionEqualToValue={(opt, val) => opt === val}
               />
@@ -168,7 +417,8 @@ export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner
                 <Button
                   variant={usePercentage ? 'contained' : 'outlined'}
                   color={usePercentage ? 'success' : 'inherit'}
-                  onClick={() => setValue('usePercentage', true, { shouldValidate: true })}
+                  onClick={handlePercentageToggle(true)}
+                  disabled={isView}
                   sx={{
                     flex: 1,
                     maxWidth: '100px',
@@ -184,7 +434,8 @@ export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner
                 <Button
                   variant={!usePercentage ? 'contained' : 'outlined'}
                   color={!usePercentage ? 'error' : 'inherit'}
-                  onClick={() => setValue('usePercentage', false, { shouldValidate: true })}
+                  onClick={handlePercentageToggle(false)}
+                  disabled={isView}
                   sx={{
                     flex: 1,
                     maxWidth: '100px',
@@ -208,6 +459,7 @@ export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner
                   placeholder="Enter Percentage"
                   size="small"
                   fullWidth
+                  disabled={isView}
                 />
               </Grid>
             ) : (
@@ -223,6 +475,7 @@ export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner
                         placeholder="Enter Pana (3 digits)"
                         size="small"
                         fullWidth
+                        disabled={isView}
                         error={!!error}
                         helperText={error?.message}
                         inputProps={{
@@ -230,49 +483,7 @@ export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner
                           pattern: '[0-9]*',
                           inputMode: 'numeric',
                         }}
-                        onChange={(e) => {
-                          // Only allow numeric input, max 3 digits
-                          let value = e.target.value.replace(/[^0-9]/g, '').slice(0, 3);
-                          
-                          // Validate non-decreasing order as user types
-                          if (value.length > 0) {
-                            const digits = value.split('').map(Number);
-                            let validValue = digits[0].toString();
-                            
-                            // For second digit: must be >= first digit OR be 0 (special case when last digit is 0)
-                            if (digits.length >= 2) {
-                              if (digits[1] >= digits[0] || digits[1] === 0) {
-                                validValue += digits[1].toString();
-                              } else {
-                                // Reject if second digit is less than first and not 0
-                                validValue = digits[0].toString();
-                              }
-                            }
-                            
-                            // For third digit: must be >= second digit OR be 0 (special case)
-                            // If second digit is 0, only allow 0 as third digit (e.g., 000, 100, 200, 500)
-                            // If second digit is not 0, allow 0 or >= second digit (e.g., 050, 560, 789)
-                            if (digits.length === 3 && validValue.length === 2) {
-                              const secondDigit = Number(validValue[1]);
-                              if (secondDigit === 0) {
-                                // If second digit is 0, only allow 0 as third digit
-                                if (digits[2] === 0) {
-                                  validValue += digits[2].toString();
-                                }
-                              } else {
-                                // If second digit is not 0, allow 0 or >= second digit
-                                if (digits[2] >= digits[1] || digits[2] === 0) {
-                                  validValue += digits[2].toString();
-                                }
-                              }
-                              // If third digit is less than second and not 0, don't add it
-                            }
-                            
-                            value = validValue;
-                          }
-                          
-                          field.onChange(value);
-                        }}
+                        onChange={handlePanaChange(field)}
                       />
                     )}
                   />
@@ -282,11 +493,12 @@ export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner
                   <RHFTextField
                     name="digit"
                     label="Digit"
-                    placeholder="Auto-calculated"
+                    placeholder={isEdit ? 'Enter Digit' : 'Auto-calculated'}
                     size="small"
                     fullWidth
+                    disabled={isView}
                     InputProps={{
-                      readOnly: true,
+                      readOnly: !isEdit && !isView,
                     }}
                   />
                 </Grid>
@@ -295,14 +507,35 @@ export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner
           </Grid>
 
           {/* Buttons */}
-          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-            <Button variant="outlined" color="primary" onClick={() => onHandleShowWinner()}>
-              {showWinner ? 'Hide Winners' : 'Show Winners'}
-            </Button>
-            <Button variant="contained" color="primary" type="submit">
-              Save
-            </Button>
-          </Box>
+          <Stack
+            direction="row"
+            spacing={2}
+            justifyContent="flex-end"
+            sx={{ mt: 3 }}
+          >
+            {!isView && (
+              <>
+                {!isEdit && onHandleShowWinner && (
+                  <Button variant="outlined" color="primary" onClick={onHandleShowWinner} type="button">
+                    {showWinner ? 'Hide Winners' : 'Show Winners'}
+                  </Button>
+                )}
+                <LoadingButton
+                  type="submit"
+                  variant="contained"
+                  loading={isSubmitting || isLoading}
+                  disabled={isLoading || (marketList.length === 0 && marketLoading)}
+                >
+                  {isEdit ? 'Update Result' : 'Create Result'}
+                </LoadingButton>
+              </>
+            )}
+            {(isView || isEdit) && (
+              <LoadingButton variant="outlined" onClick={handleBack} type="button">
+                {isView ? 'Back' : 'Cancel'}
+              </LoadingButton>
+            )}
+          </Stack>
         </Box>
       </FormProvider>
     </Card>
