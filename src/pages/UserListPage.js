@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
@@ -16,12 +16,13 @@ import {
   Tooltip,
 } from '@mui/material';
 import { Box } from '@mui/system';
+// redux
+import { useDispatch, useSelector } from 'react-redux';
 import useResponsive from '../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
-// _mock_
-import { _userDataList } from '../_mock/arrays';
 // components
+import ConfirmDialog from '../components/confirm-dialog';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
@@ -37,7 +38,10 @@ import {
   useTable,
 } from '../components/table';
 // sections
+import { useSnackbar } from '../components/snackbar';
 import CustomTableToolbar from '../components/table/CustomTableToolBar';
+import { getBankDetailsByUserIdAsync } from '../redux/services/bank_details_services';
+import { changeUserPasswordAsync, deleteUserAsync, getAllUsersAsync, updateUserStatusAsync } from '../redux/services/user_services';
 import { UserTableRow } from '../sections/_users/list';
 import UserMobileViewCardLayout from '../sections/_users/list/UserMobileViewCardLayout';
 
@@ -50,7 +54,6 @@ const TABLE_HEAD = [
   { id: 'id', label: 'ID', align: 'left' },
   { id: 'name', label: 'Name', align: 'left' },
   { id: 'company', label: 'Phone', align: 'left' },
-  { id: 'company', label: 'Password', align: 'left' },
   { id: 'role', label: 'Balance', align: 'left' },
   { id: 'isVerified', label: 'Total Game Amt', align: 'center' },
   { id: 'totalWon', label: 'Total Won', align: 'left' },
@@ -58,7 +61,6 @@ const TABLE_HEAD = [
   { id: 'Bonus', label: 'Total Bonus', align: 'left' },
   { id: 'status', label: 'Blocked Status', align: 'left' },
   { id: 'createdAt', label: 'createdAt', align: 'left' },
-
 ];
 
 // ----------------------------------------------------------------------
@@ -83,19 +85,57 @@ export default function UserListPage() {
   } = useTable();
 
   const { themeStretch } = useSettingsContext();
-
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  // const theme = useTheme();
+  const { enqueueSnackbar } = useSnackbar();
 
-  const [tableData, setTableData] = useState(_userDataList);
+  // Redux state
+  const { userList, loading, pagination } = useSelector((state) => state.user);
 
   const [openConfirm, setOpenConfirm] = useState(false);
-
+  const [deleteId, setDeleteId] = useState(null);
   const [filterName, setFilterName] = useState('');
-
   const [filterRole, setFilterRole] = useState('all');
-
   const [filterStatus, setFilterStatus] = useState('all');
+  const [bankDetails, setBankDetails] = useState(null);
+  const [bankDetailsLoading, setBankDetailsLoading] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [changePasswordLoading, setChangePasswordLoading] = useState(false);
+
+  // Fetch users on component mount and when filters change
+  useEffect(() => {
+    dispatch(
+      getAllUsersAsync({
+        page: page + 1, // API uses 1-based pagination
+        limit: rowsPerPage,
+        search: filterName,
+        status: filterStatus !== 'all' ? filterStatus : '',
+      })
+    );
+  }, [dispatch, page, rowsPerPage, filterName, filterStatus]);
+
+  // Transform API data to table format
+  const tableData = userList.map((user, index) => ({
+    id: user._id || user.id || index + 1,
+    _id: user._id,
+    name: user.name,
+    phone: user.number || user.whatsappNumber,
+    balance: user.balance || 0,
+    totalGameAmt: user.totalGameAmt || 0,
+    totalWon: user.totalWon || 0,
+    totalWithdraw: user.totalWithdraw || 0,
+    totalBonus: user.totalBonus || 0,
+    status: user.status === 'active', // Boolean for StatusToggleCell: true = Active, false = InActive/Banned
+    statusLabel: (() => {
+      if (user.status === 'banned') return 'Blocked';
+      if (user.status === 'active') return 'Active';
+      return 'InActive';
+    })(),
+    statusValue: user.status,
+    isVerified: user.isVerified || false,
+    createdAt: user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-',
+    ...user,
+  }));
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -136,30 +176,115 @@ export default function UserListPage() {
     setFilterName(event.target.value);
   };
 
-  const handleDeleteRow = (id) => {
-    const deleteRow = tableData.filter((row) => row.id !== id);
-    setSelected([]);
-    setTableData(deleteRow);
-
-    if (page > 0) {
-      if (dataInPage.length < 2) {
+  const handleDeleteRow = async (id) => {
+    try {
+      await dispatch(deleteUserAsync(id)).unwrap();
+      enqueueSnackbar('User deleted successfully!', { variant: 'success' });
+      // Refresh the list
+      dispatch(
+        getAllUsersAsync({
+          page: page + 1,
+          limit: rowsPerPage,
+          search: filterName,
+          status: filterStatus !== 'all' ? filterStatus : '',
+        })
+      );
+      setSelected([]);
+      if (page > 0 && dataInPage.length < 2) {
         setPage(page - 1);
       }
+    } catch (error) {
+      enqueueSnackbar(error?.message || 'Failed to delete user', { variant: 'error' });
     }
+  };
+
+  const handleOpenDeleteConfirm = (id) => {
+    setDeleteId(id);
+    setOpenConfirm(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteId) {
+      handleDeleteRow(deleteId);
+      setDeleteId(null);
+    }
+    setOpenConfirm(false);
+  };
+
+  const handleStatusChange = async (id, status) => {
+    try {
+      const statusValue = status ? 'active' : 'banned';
+      await dispatch(updateUserStatusAsync({ id, status: statusValue })).unwrap();
+      enqueueSnackbar(`User ${status ? 'activated' : 'blocked'} successfully!`, { variant: 'success' });
+      // Refresh the list
+      dispatch(
+        getAllUsersAsync({
+          page: page + 1,
+          limit: rowsPerPage,
+          search: filterName,
+          status: filterStatus !== 'all' ? filterStatus : '',
+        })
+      );
+    } catch (error) {
+      enqueueSnackbar(error?.message || 'Failed to update user status', { variant: 'error' });
+      throw error; // Re-throw to let StatusToggleCell revert the UI
+    }
+  };
+
+  const handleResetFilter = () => {
+    setFilterName('');
+    setFilterRole('all');
+    setFilterStatus('all');
+    setPage(0);
   };
 
   const handleEditRow = (id) => {
     navigate(PATH_DASHBOARD.user.edit(id));
   };
+
   const handleTransactionRow = (id) => {
     navigate(PATH_DASHBOARD.user.transactions(id));
   };
+
   const handleWithdrawalRequestRow = (id) => {
     navigate(PATH_DASHBOARD.user.withdrawalrequest(id));
   };
 
-  const handleResetFilter = () => {
-    setFilterName('');
+  const handleViewBankDetails = async (userId) => {
+    setSelectedUserId(userId);
+    setBankDetailsLoading(true);
+    setBankDetails(null);
+    try {
+      const response = await dispatch(getBankDetailsByUserIdAsync(userId)).unwrap();
+      // Handle response structure: { data: {...} } or direct data object
+      const bankDetailsData = response?.data || response;
+      setBankDetails(bankDetailsData || null);
+      if (!bankDetailsData) {
+        enqueueSnackbar('No bank details found for this user', { variant: 'info' });
+      }
+    } catch (error) {
+      setBankDetails(null);
+      if (error?.status !== 404 && error?.response?.status !== 404) {
+        enqueueSnackbar(error?.message || 'Failed to fetch bank details', { variant: 'error' });
+      } else {
+        enqueueSnackbar('No bank details found for this user', { variant: 'info' });
+      }
+    } finally {
+      setBankDetailsLoading(false);
+    }
+  };
+
+  const handleChangePassword = async (userId, password, cpassword) => {
+    setChangePasswordLoading(true);
+    try {
+      await dispatch(changeUserPasswordAsync({ id: userId, password, cpassword })).unwrap();
+      enqueueSnackbar('Password changed successfully', { variant: 'success' });
+    } catch (error) {
+      enqueueSnackbar(error?.message || 'Failed to change password', { variant: 'error' });
+      throw error; // Re-throw to prevent dialog from closing on error
+    } finally {
+      setChangePasswordLoading(false);
+    }
   };
 
   return (
@@ -232,8 +357,12 @@ export default function UserListPage() {
               data={dataFiltered}
               onEditRow={handleEditRow}
               onDeleteRow={(id) => handleDeleteRow(id)}
-            // onSelectRow={(id) => onSelectRow(id)}
-            // selected={selected}
+              onStatusChange={handleStatusChange}
+              onChangePassword={(id, password, cpassword) => handleChangePassword(id, password, cpassword)}
+              changePasswordLoading={changePasswordLoading}
+              onViewBankDetails={handleViewBankDetails}
+              bankDetails={bankDetails}
+              bankDetailsLoading={bankDetailsLoading}
             />
           </>
         ) : (
@@ -293,15 +422,22 @@ export default function UserListPage() {
                   <TableBody>
                     {dataFiltered
                       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((row) => (
+                      .map((row, index) => (
                         <UserTableRow
-                          key={row.id}
+                          key={row._id || row.id}
+                          index={index}
                           row={row}
                           // selected={selected.includes(row.id)}
-                          onTransationRow={() => handleTransactionRow(row.id)}
-                          onWithdrawalRequestRow={() => handleWithdrawalRequestRow(row.id)}
-                          onDeleteRow={() => handleDeleteRow(row.id)}
-                          onEditRow={() => handleEditRow(row.name)}
+                          onTransationRow={() => handleTransactionRow(row._id || row.id)}
+                          onWithdrawalRequestRow={() => handleWithdrawalRequestRow(row._id || row.id)}
+                          onDeleteRow={() => handleOpenDeleteConfirm(row._id || row.id)}
+                          onEditRow={() => handleEditRow(row._id || row.id)}
+                          onStatusChange={(_id, status) => handleStatusChange(_id, status)}
+                          onViewBankDetails={handleViewBankDetails}
+                          bankDetails={selectedUserId === (row._id || row.id) ? bankDetails : null}
+                          bankDetailsLoading={selectedUserId === (row._id || row.id) && bankDetailsLoading}
+                          onChangePassword={(id, password, cpassword) => handleChangePassword(id, password, cpassword)}
+                          changePasswordLoading={changePasswordLoading}
                         />
                       ))}
 
@@ -317,7 +453,7 @@ export default function UserListPage() {
             </TableContainer>
 
             <TablePaginationCustom
-              count={dataFiltered.length}
+              count={pagination?.total || dataFiltered.length}
               page={page}
               rowsPerPage={rowsPerPage}
               onPageChange={onChangePage}
@@ -328,6 +464,21 @@ export default function UserListPage() {
             />
           </Card>
         )}
+
+        <ConfirmDialog
+          open={openConfirm}
+          onClose={() => {
+            setOpenConfirm(false);
+            setDeleteId(null);
+          }}
+          title="Delete User"
+          content="Are you sure you want to delete this user? This action cannot be undone."
+          action={
+            <Button variant="contained" color="error" onClick={handleConfirmDelete}>
+              Delete
+            </Button>
+          }
+        />
       </Container>
     </>
   );
@@ -353,7 +504,7 @@ function applyFilter({ inputData, comparator, filterName, filterStatus, filterRo
   }
 
   if (filterStatus !== 'all') {
-    inputData = inputData.filter((user) => user.status === filterStatus);
+    inputData = inputData.filter((user) => user.statusLabel === filterStatus);
   }
 
   if (filterRole !== 'all') {

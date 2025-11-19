@@ -79,19 +79,6 @@ export default function StatusToggleCell({
           transition: 'opacity 0.2s ease',
         }}
       >
-        {/* Status Label */}
-        <Typography
-          variant="body2"
-          sx={{
-            fontWeight: 600,
-            color: isActive ? 'success.main' : 'error.main',
-            transition: 'color 0.2s ease',
-            textAlign: 'left',
-          }}
-        >
-          {isActive ? 'Active' : 'InActive'}
-        </Typography>
-
         {/* Switch with smooth animation */}
         {isLoading ? (
           <CircularProgress
@@ -145,6 +132,18 @@ export default function StatusToggleCell({
             }}
           />
         )}
+
+        <Typography
+          variant="body2"
+          sx={{
+            fontWeight: 600,
+            color: isActive ? 'success.main' : 'error.main',
+            transition: 'color 0.2s ease',
+            textAlign: 'left',
+          }}
+        >
+          {isActive ? 'Active' : 'InActive'}
+        </Typography>
       </Stack>
     </TableCell>
   );

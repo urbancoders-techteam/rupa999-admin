@@ -1,18 +1,21 @@
-import PropTypes from 'prop-types';
-import { useState } from 'react';
 import {
-  Stack,
   Button,
-  TableRow,
-  TableCell,
   IconButton,
+  MenuItem,
+  Stack,
+  TableCell,
+  TableRow,
   Typography,
   styled,
-  MenuItem,
 } from '@mui/material';
+import PropTypes from 'prop-types';
+import { useState } from 'react';
+import BankDetailsDialog from '../../../components/bank-details-dialog/BankDetailsDialog';
+import ChangePasswordDialog from '../../../components/change-password-dialog/ChangePasswordDialog';
+import ConfirmDialog from '../../../components/confirm-dialog';
 import Iconify from '../../../components/iconify';
 import MenuPopover from '../../../components/menu-popover';
-import ConfirmDialog from '../../../components/confirm-dialog';
+import { fDateTime } from '../../../utils/formatTime';
 import StatusToggleCell from './StatusToggledCell';
 
 // ----------------------------------------------------------------------
@@ -29,17 +32,17 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 UserTableRow.propTypes = {
+  index: PropTypes.number,
   row: PropTypes.shape({
-    id: PropTypes.number,
+    _id: PropTypes.string,
     name: PropTypes.string,
     phone: PropTypes.string,
-    password: PropTypes.string,
     balance: PropTypes.number,
     totalGameAmt: PropTypes.number,
     totalWon: PropTypes.number,
     totalWithdraw: PropTypes.number,
     totalBonus: PropTypes.number,
-    status: PropTypes.string,
+    status: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
     createdAt: PropTypes.string,
   }),
   selected: PropTypes.bool,
@@ -47,14 +50,19 @@ UserTableRow.propTypes = {
   onTransationRow: PropTypes.func,
   onWithdrawalRequestRow: PropTypes.func,
   onDeleteRow: PropTypes.func,
+  onStatusChange: PropTypes.func,
+  onViewBankDetails: PropTypes.func,
+  bankDetails: PropTypes.object,
+  bankDetailsLoading: PropTypes.bool,
+  onChangePassword: PropTypes.func,
+  changePasswordLoading: PropTypes.bool,
 };
 
-export default function UserTableRow({ row, selected, onEditRow, onTransationRow, onWithdrawalRequestRow, onDeleteRow }) {
+export default function UserTableRow({ index, row, selected, onEditRow, onTransationRow, onWithdrawalRequestRow, onDeleteRow, onStatusChange, onViewBankDetails, bankDetails, bankDetailsLoading, onChangePassword, changePasswordLoading }) {
   const {
-    id,
+    _id,
     name,
     phone,
-    password,
     balance,
     totalGameAmt,
     totalWon,
@@ -65,6 +73,8 @@ export default function UserTableRow({ row, selected, onEditRow, onTransationRow
   } = row;
 
   const [openConfirm, setOpenConfirm] = useState(false);
+  const [openBankDetails, setOpenBankDetails] = useState(false);
+  const [openChangePassword, setOpenChangePassword] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleOpenConfirm = () => setOpenConfirm(true);
@@ -76,6 +86,34 @@ export default function UserTableRow({ row, selected, onEditRow, onTransationRow
 
   const handleClosePopover = () => setAnchorEl(null);
 
+  const handleViewBankDetails = () => {
+    if (onViewBankDetails) {
+      onViewBankDetails(_id);
+    }
+    setOpenBankDetails(true);
+    handleClosePopover();
+  };
+
+  const handleCloseBankDetails = () => {
+    setOpenBankDetails(false);
+  };
+
+  const handleOpenChangePassword = () => {
+    setOpenChangePassword(true);
+    handleClosePopover();
+  };
+
+  const handleCloseChangePassword = () => {
+    setOpenChangePassword(false);
+  };
+
+  const handleChangePasswordSubmit = async (data) => {
+    if (onChangePassword) {
+      await onChangePassword(_id, data.password, data.cpassword);
+      handleCloseChangePassword();
+    }
+  };
+
   return (
     <>
       <StyledTableRow hover>
@@ -85,7 +123,7 @@ export default function UserTableRow({ row, selected, onEditRow, onTransationRow
           </IconButton>
         </TableCell>
 
-        <TableCell align="left">{id}</TableCell>
+        <TableCell align="left">{index + 1}</TableCell>
 
         <TableCell align="left">
           <Stack direction="row" alignItems="center" spacing={2}>
@@ -97,12 +135,6 @@ export default function UserTableRow({ row, selected, onEditRow, onTransationRow
 
         <TableCell align="left">
           <Typography variant="body2">{phone}</Typography>
-        </TableCell>
-
-        <TableCell align="left">
-          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-            {password}
-          </Typography>
         </TableCell>
 
         <TableCell align="left">₹{balance?.toLocaleString('en-IN')}</TableCell>
@@ -123,11 +155,15 @@ export default function UserTableRow({ row, selected, onEditRow, onTransationRow
           ₹{totalBonus?.toLocaleString('en-IN')}
         </TableCell>
 
-        <StatusToggleCell id={id} status={status} />
+        <StatusToggleCell
+          id={_id}
+          status={typeof status === 'boolean' ? status : status === 'Active' || status === 'active'}
+          onStatusChange={onStatusChange}
+        />
 
         <TableCell align="left" sx={{ minWidth: '140px' }}>
           <Typography variant="body2" color="text.secondary">
-            {createdAt}
+            {fDateTime(createdAt)}
           </Typography>
         </TableCell>
       </StyledTableRow>
@@ -146,16 +182,6 @@ export default function UserTableRow({ row, selected, onEditRow, onTransationRow
           horizontal: 'right',
         }}
       >
-        <MenuItem
-          onClick={() => {
-            onEditRow();
-            handleClosePopover();
-          }}
-        >
-          <Iconify icon="eva:edit-fill" />
-          Edit
-        </MenuItem>
-
         <MenuItem
           onClick={() => {
             onTransationRow();
@@ -177,14 +203,17 @@ export default function UserTableRow({ row, selected, onEditRow, onTransationRow
         </MenuItem>
 
         <MenuItem
-          onClick={() => {
-            handleOpenConfirm();
-            handleClosePopover();
-          }}
-          sx={{ color: 'error.main' }}
+          onClick={handleViewBankDetails}
         >
-          <Iconify icon="eva:trash-2-outline" />
-          Delete
+          <Iconify icon="mdi:bank" />
+          Bank Details
+        </MenuItem>
+
+        <MenuItem
+          onClick={handleOpenChangePassword}
+        >
+          <Iconify icon="mdi:lock-reset" />
+          Change Password
         </MenuItem>
       </MenuPopover>
 
@@ -199,6 +228,23 @@ export default function UserTableRow({ row, selected, onEditRow, onTransationRow
             Delete
           </Button>
         }
+      />
+
+      {/* Bank Details Dialog */}
+      <BankDetailsDialog
+        open={openBankDetails}
+        onClose={handleCloseBankDetails}
+        bankDetails={bankDetails}
+        loading={bankDetailsLoading}
+      />
+
+      {/* Change Password Dialog */}
+      <ChangePasswordDialog
+        open={openChangePassword}
+        onClose={handleCloseChangePassword}
+        onSubmit={handleChangePasswordSubmit}
+        loading={changePasswordLoading}
+        userName={name}
       />
     </>
   );
