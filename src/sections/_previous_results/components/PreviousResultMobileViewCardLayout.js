@@ -104,7 +104,7 @@ function PreviousResultMobileViewCardLayout({
               mb={1}
             >
               <Typography variant="subtitle1" fontWeight={600}>
-                {row.market.name}
+                {row?.market?.name}
               </Typography>
              
             </Stack>

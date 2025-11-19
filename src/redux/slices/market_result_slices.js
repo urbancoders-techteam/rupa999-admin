@@ -5,6 +5,7 @@ import {
   createMarketResultAsync,
   updateMarketResultAsync,
   deleteMarketResultAsync,
+  revertMarketResultAsync,
 } from '../services/market_result_services';
 
 const initialState = {
@@ -72,10 +73,7 @@ const marketResultSlice = createSlice({
       })
       .addCase(createMarketResultAsync.fulfilled, (state, action) => {
         state.loading = false;
-        const newResult = action.payload?.data || action.payload?.result;
-        if (newResult) {
-          state.resultList.unshift(newResult); // Add to beginning of list
-        }
+         state.resultList = action.payload?.data || action.payload?.result;
       })
       .addCase(createMarketResultAsync.rejected, (state, action) => {
         state.loading = false;
@@ -123,6 +121,30 @@ const marketResultSlice = createSlice({
       .addCase(deleteMarketResultAsync.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || 'Failed to delete market result';
+      });
+
+    // Revert market result
+    builder
+      .addCase(revertMarketResultAsync.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(revertMarketResultAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        const revertedResult = action.payload?.data || action.payload?.result;
+        if (revertedResult) {
+          const index = state.resultList.findIndex((result) => result._id === revertedResult._id);
+          if (index !== -1) {
+            state.resultList[index] = revertedResult;
+          }
+          if (state.resultById?._id === revertedResult._id) {
+            state.resultById = revertedResult;
+          }
+        }
+      })
+      .addCase(revertMarketResultAsync.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Failed to revert market result';
       });
   },
 });
