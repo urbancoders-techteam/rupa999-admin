@@ -1,19 +1,19 @@
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useState, useEffect } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
 import {
-  Tab,
-  Tabs,
-  Card,
-  Table,
   Button,
-  Tooltip,
-  Divider,
-  TableBody,
+  Card,
   Container,
+  Divider,
   IconButton,
+  Tab,
+  Table,
+  TableBody,
   TableContainer,
+  Tabs,
+  Tooltip,
 } from '@mui/material';
 import { Box } from '@mui/system';
 // redux
@@ -22,26 +22,26 @@ import useResponsive from '../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
 // components
-import Iconify from '../components/iconify';
-import Scrollbar from '../components/scrollbar';
 import ConfirmDialog from '../components/confirm-dialog';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
+import Iconify from '../components/iconify';
+import Scrollbar from '../components/scrollbar';
 import { useSettingsContext } from '../components/settings';
 import {
-  useTable,
-  getComparator,
   emptyRows,
-  TableNoData,
+  getComparator,
   TableEmptyRows,
   TableHeadCustom,
-  TableSelectedAction,
+  TableNoData,
   TablePaginationCustom,
+  TableSelectedAction,
+  useTable,
 } from '../components/table';
 // sections
-import CustomTableToolbar from '../components/table/CustomTableToolBar';
-import DesignationTableRow from '../sections/_staff/list/DesignationTableRow';
-import { getAllRolesAsync, deleteRoleAsync } from '../redux/services/role_services';
 import { useSnackbar } from '../components/snackbar';
+import CustomTableToolbar from '../components/table/CustomTableToolBar';
+import { deleteRoleAsync, getAllRolesAsync } from '../redux/services/role_services';
+import DesignationTableRow from '../sections/_staff/list/DesignationTableRow';
 
 // ----------------------------------------------------------------------
 
@@ -310,18 +310,18 @@ export default function DesignationListPage() {
                 />
 
                 <TableBody>
-                      {dataFiltered
-                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                        .map((row, index) => (
-                          <DesignationTableRow
-                            key={row.id}
-                            index={index}
-                            row={row}
-                            onEditRow={() => handleEditRow(row._id || row.id, row)}
-                            onViewRow={() => handleViewRow(row._id || row.id, row)}
-                            onDeleteRow={() => handleOpenDeleteConfirm(row._id || row.id)}
-                          />
-                        ))}
+                  {dataFiltered
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row, index) => (
+                      <DesignationTableRow
+                        key={row.id}
+                        index={index}
+                        row={row}
+                        onEditRow={() => handleEditRow(row._id || row.id, row)}
+                        onViewRow={() => handleViewRow(row._id || row.id, row)}
+                        onDeleteRow={() => handleOpenDeleteConfirm(row._id || row.id)}
+                      />
+                    ))}
 
                   <TableEmptyRows
                     height={denseHeight}
@@ -334,36 +334,36 @@ export default function DesignationListPage() {
             </Scrollbar>
           </TableContainer>
 
-            <TablePaginationCustom
-              count={pagination?.total || dataFiltered.length}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              onPageChange={onChangePage}
-              onRowsPerPageChange={onChangeRowsPerPage}
-              //
-              dense={dense}
-              onChangeDense={onChangeDense}
-            />
-          </Card>
-
-          <ConfirmDialog
-            open={openConfirm}
-            onClose={() => {
-              setOpenConfirm(false);
-              setDeleteId(null);
-            }}
-            title="Delete Designation"
-            content="Are you sure you want to delete this designation? This action cannot be undone."
-            action={
-              <Button variant="contained" color="error" onClick={handleConfirmDelete}>
-                Delete
-              </Button>
-            }
+          <TablePaginationCustom
+            count={pagination?.total || dataFiltered.length}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onPageChange={onChangePage}
+            onRowsPerPageChange={onChangeRowsPerPage}
+            //
+            dense={dense}
+            onChangeDense={onChangeDense}
           />
-        </Container>
-      </>
-    );
-  }
+        </Card>
+
+        <ConfirmDialog
+          open={openConfirm}
+          onClose={() => {
+            setOpenConfirm(false);
+            setDeleteId(null);
+          }}
+          title="Delete Designation"
+          content="Are you sure you want to delete this designation? This action cannot be undone."
+          action={
+            <Button variant="contained" color="error" onClick={handleConfirmDelete}>
+              Delete
+            </Button>
+          }
+        />
+      </Container>
+    </>
+  );
+}
 
 // ----------------------------------------------------------------------
 

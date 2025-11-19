@@ -1,14 +1,14 @@
-import { Helmet } from 'react-helmet-async';
 import { paramCase } from 'change-case';
-import { useState, useEffect } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useNavigate } from 'react-router-dom';
 // @mui
 import {
-  Card,
-  Table,
   Button,
-  TableBody,
+  Card,
   Container,
+  Table,
+  TableBody,
   TableContainer,
   useMediaQuery,
 } from '@mui/material';
@@ -18,25 +18,25 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getAllMarketResultsAsync } from '../../redux/services/market_result_services';
 import { PATH_DASHBOARD } from '../../routes/paths';
 // components
-import Scrollbar from '../../components/scrollbar';
 import ConfirmDialog from '../../components/confirm-dialog';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
+import Scrollbar from '../../components/scrollbar';
 import { useSettingsContext } from '../../components/settings';
 import {
-  useTable,
-  getComparator,
   emptyRows,
-  TableNoData,
+  getComparator,
   TableEmptyRows,
   TableHeadCustom,
+  TableNoData,
   TablePaginationCustom,
+  useTable,
 } from '../../components/table';
 // sections
-import GeneralCreateResultForm from '../../sections/_previous_results/components/GeneralCreateResultForm';
-import ResultTable from '../../sections/_previous_results/components/ResultTable';
-import PreviousResultMobileViewCardLayout from '../../sections/_previous_results/components/PreviousResultMobileViewCardLayout';
 import CustomTableToolbar from '../../components/table/CustomTableToolBar';
+import GeneralCreateResultForm from '../../sections/_previous_results/components/GeneralCreateResultForm';
 import MarketResultTableRow from '../../sections/_previous_results/components/MarketResultTableRow';
+import PreviousResultMobileViewCardLayout from '../../sections/_previous_results/components/PreviousResultMobileViewCardLayout';
+import ResultTable from '../../sections/_previous_results/components/ResultTable';
 
 // ----------------------------------------------------------------------
 
@@ -48,7 +48,7 @@ const TABLE_HEAD = [
   { id: 'openPana', label: 'Open Pana', align: 'center' },
   { id: 'closePana', label: 'Close Pana', align: 'center' },
   { id: 'createdAt', label: 'Created At', align: 'left' },
-  { id: '' },
+
 ];
 
 // ----------------------------------------------------------------------

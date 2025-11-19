@@ -1,22 +1,21 @@
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { paramCase } from 'change-case';
-import { useState, useEffect } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
 import {
-  Tab,
-  Tabs,
-  Card,
-  Table,
   Button,
-  Tooltip,
-  Divider,
-  TableBody,
+  Card,
   Container,
+  Divider,
   IconButton,
+  Tab,
+  Table,
+  TableBody,
   TableContainer,
+  Tabs,
+  Tooltip,
 } from '@mui/material';
-import { Box, useTheme } from '@mui/system';
+import { Box } from '@mui/system';
 // redux
 import { useDispatch, useSelector } from 'react-redux';
 import useResponsive from '../hooks/useResponsive';
@@ -25,27 +24,27 @@ import { PATH_DASHBOARD } from '../routes/paths';
 // _mock_
 // import { _userDataList } from '../_mock/arrays';
 // components
-import Iconify from '../components/iconify';
-import Scrollbar from '../components/scrollbar';
 import ConfirmDialog from '../components/confirm-dialog';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
+import Iconify from '../components/iconify';
+import Scrollbar from '../components/scrollbar';
 import { useSettingsContext } from '../components/settings';
 import {
-  useTable,
-  getComparator,
   emptyRows,
-  TableNoData,
+  getComparator,
   TableEmptyRows,
   TableHeadCustom,
-  TableSelectedAction,
+  TableNoData,
   TablePaginationCustom,
+  TableSelectedAction,
+  useTable,
 } from '../components/table';
 // sections
-import CustomTableToolbar from '../components/table/CustomTableToolBar';
-import UserMobileViewCardLayout from '../sections/_users/list/UserMobileViewCardLayout';
-import StaffTableRow from '../sections/_staff/list/StaffTableRow';
-import { getAllStaffAsync, deleteStaffAsync } from '../redux/services/staff_services';
 import { useSnackbar } from '../components/snackbar';
+import CustomTableToolbar from '../components/table/CustomTableToolBar';
+import { deleteStaffAsync, getAllStaffAsync, updateStaffStatusAsync } from '../redux/services/staff_services';
+import StaffTableRow from '../sections/_staff/list/StaffTableRow';
+import UserMobileViewCardLayout from '../sections/_users/list/UserMobileViewCardLayout';
 
 // ----------------------------------------------------------------------
 
@@ -55,12 +54,11 @@ const TABLE_HEAD = [
   { id: 'Action', label: 'Action', align: 'left' },
   { id: 'srNo', label: 'Sr. No.', align: 'left' },
   { id: 'name', label: 'Name', align: 'left' },
-  { id: 'company', label: 'Designation', align: 'left' },
+  { id: 'role', label: 'Role', align: 'left' },
   { id: 'company', label: 'Contact No.', align: 'left' },
-  { id: 'role', label: 'Email', align: 'left' },
+  { id: 'email', label: 'Email', align: 'left' },
   { id: 'status', label: 'Status', align: 'left' },
   { id: 'createdAt', label: 'createdAt', align: 'left' },
-  { id: '' },
 ];
 
 // ----------------------------------------------------------------------
@@ -111,6 +109,8 @@ export default function StaffListPage() {
     email: staff.email,
     mobileNumber: staff.mobile,
     designation: staff.roleId?.roleName || 'N/A',
+    roleId: staff.roleId?._id || staff.roleId || null,
+    roleName: staff.roleId?.roleName || 'N/A',
     status: staff.status ? 'Active' : 'InActive',
     createdAt: staff.createdAt ? new Date(staff.createdAt).toLocaleDateString() : '-',
     ...staff,
@@ -191,6 +191,18 @@ export default function StaffListPage() {
   };
   const handleWithdrawalRequestRow = (id) => {
     navigate(PATH_DASHBOARD.staff.withdrawalrequest(id));
+  };
+
+  const handleStatusChange = async (id, status) => {
+    try {
+      await dispatch(updateStaffStatusAsync({ id, status })).unwrap();
+      enqueueSnackbar(`Staff ${status ? 'activated' : 'deactivated'} successfully!`, { variant: 'success' });
+      // Refresh the list
+      dispatch(getAllStaffAsync());
+    } catch (error) {
+      enqueueSnackbar(error?.message || 'Failed to update staff status', { variant: 'error' });
+      throw error; // Re-throw to let StatusToggleCell revert the UI
+    }
   };
 
   const handleResetFilter = () => {
@@ -366,14 +378,15 @@ export default function StaffListPage() {
                       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                       .map((row, index) => (
                         <StaffTableRow
-                          key={row.id}
+                          key={row._id}
                           row={row}
                           index={index}
                           // selected={selected.includes(row.id)}
                           onTransationRow={() => handleTransactionRow(row.id)}
-                          onWithdrawalRequestRow={() => handleWithdrawalRequestRow(row.id)}
-                          onDeleteRow={() => handleOpenDeleteConfirm(row._id || row.id)}
-                          onEditRow={() => handleEditRow(row._id || row.id)}
+                          onWithdrawalRequestRow={() => handleWithdrawalRequestRow(row._id)}
+                          onDeleteRow={() => handleOpenDeleteConfirm(row._id)}
+                          onEditRow={() => handleEditRow(row._id)}
+                          onStatusChange={(_id, status) => handleStatusChange(_id, status)}
                         />
                       ))}
 

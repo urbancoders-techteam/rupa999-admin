@@ -1,42 +1,40 @@
-import { Helmet } from 'react-helmet-async';
-import { paramCase } from 'change-case';
 import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
 import {
-  Tab,
-  Tabs,
-  Card,
-  Table,
   Button,
-  Tooltip,
-  Divider,
-  TableBody,
+  Card,
   Container,
+  Divider,
   IconButton,
+  Tab,
+  Table,
+  TableBody,
   TableContainer,
+  Tabs,
+  Tooltip,
 } from '@mui/material';
-import { Box, useTheme } from '@mui/system';
+import { Box } from '@mui/system';
 import useResponsive from '../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
 // _mock_
 import { _userDataList } from '../_mock/arrays';
 // components
+import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
-import ConfirmDialog from '../components/confirm-dialog';
-import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 import { useSettingsContext } from '../components/settings';
 import {
-  useTable,
-  getComparator,
   emptyRows,
-  TableNoData,
+  getComparator,
   TableEmptyRows,
   TableHeadCustom,
-  TableSelectedAction,
+  TableNoData,
   TablePaginationCustom,
+  TableSelectedAction,
+  useTable,
 } from '../components/table';
 // sections
 import CustomTableToolbar from '../components/table/CustomTableToolBar';
@@ -60,7 +58,7 @@ const TABLE_HEAD = [
   { id: 'Bonus', label: 'Total Bonus', align: 'left' },
   { id: 'status', label: 'Blocked Status', align: 'left' },
   { id: 'createdAt', label: 'createdAt', align: 'left' },
-  { id: '' },
+
 ];
 
 // ----------------------------------------------------------------------
@@ -234,8 +232,8 @@ export default function UserListPage() {
               data={dataFiltered}
               onEditRow={handleEditRow}
               onDeleteRow={(id) => handleDeleteRow(id)}
-              // onSelectRow={(id) => onSelectRow(id)}
-              // selected={selected}
+            // onSelectRow={(id) => onSelectRow(id)}
+            // selected={selected}
             />
           </>
         ) : (

@@ -1,13 +1,13 @@
-import { Helmet } from 'react-helmet-async';
 import { paramCase } from 'change-case';
 import { useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
+import { useNavigate } from 'react-router-dom';
 // @mui
 import {
   Card,
+  Container,
   Table,
   TableBody,
-  Container,
   TableContainer,
 } from '@mui/material';
 import { Box } from '@mui/system';
@@ -17,17 +17,17 @@ import { PATH_DASHBOARD } from '../routes/paths';
 // _mock_
 import { _userDataList } from '../_mock/arrays';
 // components
-import Scrollbar from '../components/scrollbar';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
+import Scrollbar from '../components/scrollbar';
 import { useSettingsContext } from '../components/settings';
 import {
-  useTable,
-  getComparator,
   emptyRows,
-  TableNoData,
+  getComparator,
   TableEmptyRows,
   TableHeadCustom,
+  TableNoData,
   TablePaginationCustom,
+  useTable,
 } from '../components/table';
 // sections
 import CustomTableToolbar from '../components/table/CustomTableToolBar';
@@ -43,7 +43,7 @@ const TABLE_HEAD = [
   { id: 'digit', label: 'Digit', align: 'left' },
   { id: 'point', label: 'Point', align: 'left' },
   { id: 'date', label: 'Date', align: 'left' },
-  { id: '' },
+
 ];
 
 // ----------------------------------------------------------------------
@@ -97,9 +97,9 @@ export default function UserBidHistoryListPage() {
   const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
   const isNotFound = true
-    // (!tableData.length && !!filterName) ||
-    // (!tableData.length && !!filterRole) ||
-    // (!tableData.length && !!filterStatus);
+  // (!tableData.length && !!filterName) ||
+  // (!tableData.length && !!filterRole) ||
+  // (!tableData.length && !!filterStatus);
 
   const handleFilterName = (event) => {
     setPage(0);
@@ -181,8 +181,8 @@ export default function UserBidHistoryListPage() {
               data={dataFiltered}
               onEditRow={handleEditRow}
               onDeleteRow={(id) => handleDeleteRow(id)}
-              // onSelectRow={(id) => onSelectRow(id)}
-              // selected={selected}
+            // onSelectRow={(id) => onSelectRow(id)}
+            // selected={selected}
             />
           </>
         ) : (

@@ -1,20 +1,20 @@
-import PropTypes from 'prop-types';
-import { useState } from 'react';
 import {
-  Stack,
   Button,
-  TableRow,
-  TableCell,
   IconButton,
+  MenuItem,
+  Stack,
+  TableCell,
+  TableRow,
   Typography,
   styled,
-  MenuItem,
 } from '@mui/material';
+import PropTypes from 'prop-types';
+import { useState } from 'react';
+import ConfirmDialog from '../../../components/confirm-dialog';
 import Iconify from '../../../components/iconify';
 import MenuPopover from '../../../components/menu-popover';
-import ConfirmDialog from '../../../components/confirm-dialog';
-import StatusToggleCell from '../../_users/list/StatusToggledCell';
 import { fDateTime } from '../../../utils/formatTime';
+import StatusToggleCell from './StatusToggledCell';
 
 // ----------------------------------------------------------------------
 // ✅ Move this styled component OUTSIDE of StaffTableRow
@@ -31,11 +31,11 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 StaffTableRow.propTypes = {
   row: PropTypes.shape({
-    id: PropTypes.number,
+    _id: PropTypes.string,
     name: PropTypes.string,
     email: PropTypes.string,
     mobile: PropTypes.string,
-    designation: PropTypes.string,
+    roleId: PropTypes.object,
     password: PropTypes.string,
     status: PropTypes.string,
     createdAt: PropTypes.string,
@@ -46,16 +46,16 @@ StaffTableRow.propTypes = {
   onTransationRow: PropTypes.func,
   onWithdrawalRequestRow: PropTypes.func,
   onDeleteRow: PropTypes.func,
+  onStatusChange: PropTypes.func,
 };
 
-export default function StaffTableRow({ index, row, selected, onEditRow, onTransationRow, onWithdrawalRequestRow, onDeleteRow }) {
+export default function StaffTableRow({ index, row, selected, onEditRow, onTransationRow, onWithdrawalRequestRow, onDeleteRow, onStatusChange }) {
   const {
-    id,
+    _id,
     name,
     email,
     mobile,
-    designation,
-    password,
+    roleId,
     status,
     createdAt,
   } = row;
@@ -91,9 +91,10 @@ export default function StaffTableRow({ index, row, selected, onEditRow, onTrans
           </Stack>
         </TableCell>
 
-
         <TableCell align="left">
-          <Typography variant="body2">{designation || 'NA'}</Typography>
+          <Typography variant="body2">
+            {roleId ? `${roleId.roleName}` : 'N/A'}
+          </Typography>
         </TableCell>
 
         <TableCell align="left">
@@ -103,13 +104,12 @@ export default function StaffTableRow({ index, row, selected, onEditRow, onTrans
         <TableCell align="left">
           <Typography variant="body2">{email}</Typography>
         </TableCell>
-        {/* <TableCell align="left">
-          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-            {password}
-          </Typography>
-        </TableCell> */}
 
-        <StatusToggleCell id={id} status={status} />
+        <StatusToggleCell
+          id={_id}
+          status={typeof status === 'boolean' ? status : status === 'Active'}
+          onStatusChange={onStatusChange}
+        />
 
         <TableCell align="left" sx={{ minWidth: '140px' }}>
           <Typography variant="body2" color="text.secondary">

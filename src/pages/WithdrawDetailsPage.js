@@ -1,32 +1,32 @@
-import { Helmet } from 'react-helmet-async';
 import { paramCase } from 'change-case';
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 // @mui
-import { Card, Table, Button, TableBody, Container, TableContainer, Box } from '@mui/material';
+import { Box, Button, Card, Container, Table, TableBody, TableContainer } from '@mui/material';
 import useResponsive from '../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
 // _mock_
 import { _userDataList } from '../_mock/arrays';
 // components
-import Scrollbar from '../components/scrollbar';
 import ConfirmDialog from '../components/confirm-dialog';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
+import Scrollbar from '../components/scrollbar';
 import { useSettingsContext } from '../components/settings';
 import {
-  useTable,
-  getComparator,
   emptyRows,
-  TableNoData,
+  getComparator,
   TableEmptyRows,
   TableHeadCustom,
+  TableNoData,
   TablePaginationCustom,
+  useTable,
 } from '../components/table';
 // sections
+import WithdrawMobileViewCardLayout from '../sections/_withdraw_details/components/WithdrawDetailsMobileViewCardLayout';
 import WithdrawDetailsTableRow from '../sections/_withdraw_details/components/WithdrawDetailsTableRow';
 import WithdrawDetailsToolbar from '../sections/_withdraw_details/components/WithdrawDetailsToolbar';
-import WithdrawMobileViewCardLayout from '../sections/_withdraw_details/components/WithdrawDetailsMobileViewCardLayout';
 
 // ----------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ const TABLE_HEAD = [
   { id: 'UPIId', label: 'UPI Id', align: 'left' },
   { id: 'CeatedAt', label: 'Ceated At', align: 'left' },
   { id: 'action', label: 'Action', align: 'left' },
-  { id: '' },
+
 ];
 
 // ----------------------------------------------------------------------
@@ -101,7 +101,7 @@ export default function WithdrawDetailsPage() {
     (!dataFiltered.length && !!filterName) ||
     (!dataFiltered.length && !!filterRole) ||
     (!dataFiltered.length && !!filterStatus);
-    
+
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
   };

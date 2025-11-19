@@ -1,17 +1,17 @@
-import { Helmet } from 'react-helmet-async';
 import { paramCase } from 'change-case';
 import { useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
+import { useNavigate } from 'react-router-dom';
 // @mui
 import {
-  Card,
-  Table,
   Button,
-  Tooltip,
-  TableBody,
+  Card,
   Container,
   IconButton,
+  Table,
+  TableBody,
   TableContainer,
+  Tooltip,
   useMediaQuery,
 } from '@mui/material';
 // routes
@@ -20,24 +20,24 @@ import { PATH_DASHBOARD } from '../../routes/paths';
 // _mock_
 import { previousResults } from '../../_mock/arrays';
 // components
-import Iconify from '../../components/iconify';
-import Scrollbar from '../../components/scrollbar';
 import ConfirmDialog from '../../components/confirm-dialog';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
+import Iconify from '../../components/iconify';
+import Scrollbar from '../../components/scrollbar';
 import { useSettingsContext } from '../../components/settings';
 import {
-  useTable,
-  getComparator,
   emptyRows,
-  TableNoData,
+  getComparator,
   TableEmptyRows,
   TableHeadCustom,
-  TableSelectedAction,
+  TableNoData,
   TablePaginationCustom,
+  TableSelectedAction,
+  useTable,
 } from '../../components/table';
 // sections
-import PreviousResultMobileViewCardLayout from '../../sections/_previous_results/components/PreviousResultMobileViewCardLayout';
 import CustomTableToolbar from '../../components/table/CustomTableToolBar';
+import PreviousResultMobileViewCardLayout from '../../sections/_previous_results/components/PreviousResultMobileViewCardLayout';
 import CreateResultForm from '../../sections/_starline_market_results/CreateResultForm';
 import StarLineMarketResultsTableRow from '../../sections/_starline_market_results/StarLineMarketResultsTableRow';
 
@@ -52,7 +52,7 @@ const TABLE_HEAD = [
   { id: 'openDigits', label: 'Open Digits', align: 'center' },
   { id: 'revert', label: 'Revert', align: 'left' },
   { id: 'createdAt', label: 'Created At', align: 'left' },
-  { id: '' },
+
 ];
 
 // ----------------------------------------------------------------------

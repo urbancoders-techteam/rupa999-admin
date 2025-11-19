@@ -1,41 +1,32 @@
-import { Helmet } from 'react-helmet-async';
 import { paramCase } from 'change-case';
 import { useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
+import { useNavigate } from 'react-router-dom';
 // @mui
 import {
-  Tab,
-  Tabs,
   Card,
-  Table,
-  Button,
-  Tooltip,
-  Divider,
-  TableBody,
   Container,
-  IconButton,
-  TableContainer,
+  Table, TableBody,
+  TableContainer
 } from '@mui/material';
-import { Box, useTheme } from '@mui/system';
+import { Box } from '@mui/system';
 import useResponsive from '../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
 // _mock_
 import { _userDataList } from '../_mock/arrays';
 // components
-import Iconify from '../components/iconify';
-import Scrollbar from '../components/scrollbar';
-import ConfirmDialog from '../components/confirm-dialog';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
+import Scrollbar from '../components/scrollbar';
 import { useSettingsContext } from '../components/settings';
 import {
-  useTable,
-  getComparator,
   emptyRows,
-  TableNoData,
+  getComparator,
   TableEmptyRows,
   TableHeadCustom,
+  TableNoData,
   TablePaginationCustom,
+  useTable,
 } from '../components/table';
 // sections
 import CustomTableToolbar from '../components/table/CustomTableToolBar';
@@ -55,7 +46,7 @@ const TABLE_HEAD = [
   { id: 'point', label: 'Date', align: 'left' },
   { id: 'point', label: 'Status', align: 'left' },
   { id: 'date', label: 'Created At', align: 'left' },
-  { id: '' },
+
 ];;
 
 // ----------------------------------------------------------------------
@@ -110,9 +101,9 @@ export default function WithdrawalResquestListPage() {
   const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
   const isNotFound = true
-    // (!dataFiltered.length && !!filterName) ||
-    // (!dataFiltered.length && !!filterRole) ||
-    // (!dataFiltered.length && !!filterStatus);
+  // (!dataFiltered.length && !!filterName) ||
+  // (!dataFiltered.length && !!filterRole) ||
+  // (!dataFiltered.length && !!filterStatus);
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
@@ -181,25 +172,25 @@ export default function WithdrawalResquestListPage() {
             links={[
               { name: 'Dashboard', href: PATH_DASHBOARD.root },
               { name: 'User List', href: PATH_DASHBOARD.user.list },
-              { name: 'Withdrawal Requests'},
+              { name: 'Withdrawal Requests' },
             ]}
-            // action={
-            //   <Button
-            //     component={RouterLink}
-            //     variant="contained"
-            //     startIcon={<Iconify icon="eva:plus-fill" />}
-            //     // to={PATH_DASHBOARD.user.new}
-            //     sx={{
-            //       [(theme) => theme.breakpoints.down('sm')]: {
-            //         fontSize: '0.75rem',
-            //         py: 0.5,
-            //         px: 1.5,
-            //       },
-            //     }}
-            //   >
-            //     Add / Deduct 
-            //   </Button>
-            // }
+          // action={
+          //   <Button
+          //     component={RouterLink}
+          //     variant="contained"
+          //     startIcon={<Iconify icon="eva:plus-fill" />}
+          //     // to={PATH_DASHBOARD.user.new}
+          //     sx={{
+          //       [(theme) => theme.breakpoints.down('sm')]: {
+          //         fontSize: '0.75rem',
+          //         py: 0.5,
+          //         px: 1.5,
+          //       },
+          //     }}
+          //   >
+          //     Add / Deduct 
+          //   </Button>
+          // }
           />
         </Box>
 
@@ -223,8 +214,8 @@ export default function WithdrawalResquestListPage() {
               data={dataFiltered}
               onEditRow={handleEditRow}
               onDeleteRow={(id) => handleDeleteRow(id)}
-              // onSelectRow={(id) => onSelectRow(id)}
-              // selected={selected}
+            // onSelectRow={(id) => onSelectRow(id)}
+            // selected={selected}
             />
           </>
         ) : (

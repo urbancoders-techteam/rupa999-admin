@@ -70,3 +70,15 @@ export const getStaffProfileAsync = createAsyncThunk(
     })
 );
 
+// Update staff status (active/inactive)
+export const updateStaffStatusAsync = createAsyncThunk(
+  'staff/updateStatus',
+  async ({ id, status }, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: `/admin/${id}/status`,
+      method: 'patch',
+      data: { status },
+    })
+);
+

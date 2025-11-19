@@ -1,18 +1,18 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
-import { Box, Card, Grid, Stack, Container, MenuItem } from '@mui/material';
-import * as Yup from 'yup';
+import { Box, Card, Container, Grid, Stack } from '@mui/material';
 import PropTypes from 'prop-types';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useSnackbar } from '../../../components/snackbar';
-import FormProvider, { RHFTextField, RHFSelect, RHFSwitch, RHFAutocomplete } from '../../../components/hook-form';
-import { PATH_DASHBOARD } from '../../../routes/paths';
+import * as Yup from 'yup';
+import FormProvider, { RHFAutocomplete, RHFSwitch, RHFTextField } from '../../../components/hook-form';
 import { useSettingsContext } from '../../../components/settings';
+import { useSnackbar } from '../../../components/snackbar';
 import { getAllRolesAsync } from '../../../redux/services/role_services';
 import { createStaffAsync, updateStaffAsync } from '../../../redux/services/staff_services';
+import { PATH_DASHBOARD } from '../../../routes/paths';
 
 // -------------------------------------------------------------
 
@@ -49,24 +49,45 @@ export default function StaffForm({ isEdit = false, isView = false, currentStaff
     password: isEdit
       ? Yup.string()
       : Yup.string()
-          .min(6, 'Password must be at least 6 characters')
-          .required('Password is required'),
-    roleId: Yup.string().required('Role/Designation is required'),
-    isSuperAdmin: Yup.boolean(),
+        .min(6, 'Password must be at least 6 characters')
+        .required('Password is required'),
+    roleId: Yup.mixed()
+      .required('Role/Designation is required')
+      .test('is-valid-role', 'Please select a valid role', (value) => {
+        if (!value) return false;
+        // Accept both object (with _id) or string
+        if (typeof value === 'object' && value._id) return true;
+        if (typeof value === 'string' && value.length > 0) return true;
+        return false;
+      }),
     status: Yup.boolean(),
   });
 
   const defaultValues = useMemo(
-    () => ({
-      name: currentStaff?.name || '',
-      mobile: currentStaff?.mobile || currentStaff?.mobileNumber || '',
-      email: currentStaff?.email || '',
-      password: '',
-      roleId: currentStaff?.roleId?._id || currentStaff?.roleId || '',
-      isSuperAdmin: currentStaff?.isSuperAdmin ?? false,
-      status: currentStaff?.status !== undefined ? currentStaff.status : true,
-    }),
-    [currentStaff]
+    () => {
+      // Handle roleId - if it's an object with _id, use that; otherwise find in roleList
+      let roleIdValue = '';
+      if (currentStaff?.roleId) {
+        if (typeof currentStaff.roleId === 'object' && currentStaff.roleId._id) {
+          // If it's already an object with _id, use it directly
+          roleIdValue = currentStaff.roleId;
+        } else if (typeof currentStaff.roleId === 'string') {
+          // If it's a string ID, find the matching role object from roleList
+          const foundRole = roleList.find((role) => role._id === currentStaff.roleId);
+          roleIdValue = foundRole || '';
+        }
+      }
+
+      return {
+        name: currentStaff?.name || '',
+        mobile: currentStaff?.mobile || currentStaff?.mobileNumber || '',
+        email: currentStaff?.email || '',
+        password: '',
+        roleId: roleIdValue,
+        status: currentStaff?.status !== undefined ? currentStaff.status : true,
+      };
+    },
+    [currentStaff, roleList]
   );
 
   const methods = useForm({
@@ -80,28 +101,46 @@ export default function StaffForm({ isEdit = false, isView = false, currentStaff
     formState: { isSubmitting },
   } = methods;
 
-  // Reset form when staff data changes (for edit mode)
+  // Reset form when staff data changes (for edit mode) or when roleList loads
   useEffect(() => {
     if (isEdit || isView) {
       if (currentStaff && currentStaff._id) {
-        reset(defaultValues);
+        // Find role object if roleId is a string
+        if (currentStaff?.roleId && typeof currentStaff.roleId === 'string' && roleList.length > 0) {
+          const foundRole = roleList.find((role) => role._id === currentStaff.roleId);
+          if (foundRole) {
+            reset({
+              ...defaultValues,
+              roleId: foundRole,
+            });
+          } else {
+            reset(defaultValues);
+          }
+        } else {
+          reset(defaultValues);
+        }
       }
     } else {
       // Reset to empty form for create mode
       reset(defaultValues);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEdit, isView, currentStaff?._id, reset]);
+  }, [isEdit, isView, currentStaff?._id, roleList, reset]);
 
   const onSubmit = async (data) => {
     try {
+      // Extract roleId - handle both object and string
+      let roleIdValue = data.roleId;
+      if (roleIdValue && typeof roleIdValue === 'object') {
+        roleIdValue = roleIdValue._id || roleIdValue.id || roleIdValue;
+      }
+
       // Prepare submit data - map roleId correctly
       const submitData = {
         name: data.name.trim(),
         mobile: parseInt(data.mobile.trim(), 10), // Convert to number
         email: data.email.trim().toLowerCase(),
-        roleId: data.roleId,
-        isSuperAdmin: data.isSuperAdmin ?? false,
+        roleId: roleIdValue, // Ensure it's a string
         status: data.status !== undefined ? data.status : true,
       };
 
@@ -195,14 +234,6 @@ export default function StaffForm({ isEdit = false, isView = false, currentStaff
                 )}
               />
 
-              <Box>
-                <RHFSwitch
-                  name="isSuperAdmin"
-                  label="Super Admin"
-                  disabled={isView}
-                  sx={{ mt: 1 }}
-                />
-              </Box>
               <Box>
                 <RHFSwitch
                   name="status"

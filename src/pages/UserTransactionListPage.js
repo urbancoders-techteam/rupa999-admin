@@ -1,41 +1,38 @@
-import { Helmet } from 'react-helmet-async';
 import { paramCase } from 'change-case';
 import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
 import {
-  Tab,
-  Tabs,
-  Card,
-  Table,
   Button,
-  Tooltip,
-  Divider,
-  TableBody,
+  Card,
   Container,
-  IconButton,
+  Divider,
+  Tab,
+  Table,
+  TableBody,
   TableContainer,
+  Tabs
 } from '@mui/material';
-import { Box, useTheme } from '@mui/system';
+import { Box } from '@mui/system';
 import useResponsive from '../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
 // _mock_
 import { _userDataList } from '../_mock/arrays';
 // components
+import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
-import ConfirmDialog from '../components/confirm-dialog';
-import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 import { useSettingsContext } from '../components/settings';
 import {
-  useTable,
-  getComparator,
   emptyRows,
-  TableNoData,
+  getComparator,
   TableEmptyRows,
   TableHeadCustom,
+  TableNoData,
   TablePaginationCustom,
+  useTable,
 } from '../components/table';
 // sections
 import CustomTableToolbar from '../components/table/CustomTableToolBar';
@@ -56,7 +53,7 @@ const TABLE_HEAD = [
   { id: 'point', label: 'Type', align: 'left' },
   { id: 'point', label: 'Details', align: 'left' },
   { id: 'date', label: 'Created At', align: 'left' },
-  { id: '' },
+
 ];;
 
 // ----------------------------------------------------------------------
@@ -111,9 +108,9 @@ export default function UserTransactionListPage() {
   const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
   const isNotFound = true
-    // (!dataFiltered.length && !!filterName) ||
-    // (!dataFiltered.length && !!filterRole) ||
-    // (!dataFiltered.length && !!filterStatus);
+  // (!dataFiltered.length && !!filterName) ||
+  // (!dataFiltered.length && !!filterRole) ||
+  // (!dataFiltered.length && !!filterStatus);
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
@@ -182,7 +179,7 @@ export default function UserTransactionListPage() {
             links={[
               { name: 'Dashboard', href: PATH_DASHBOARD.root },
               { name: 'User List', href: PATH_DASHBOARD.user.list },
-              { name: 'Transactions List'},
+              { name: 'Transactions List' },
             ]}
             action={
               <Button
@@ -198,7 +195,7 @@ export default function UserTransactionListPage() {
                   },
                 }}
               >
-                Add / Deduct 
+                Add / Deduct
               </Button>
             }
           />
@@ -224,8 +221,8 @@ export default function UserTransactionListPage() {
               data={dataFiltered}
               onEditRow={handleEditRow}
               onDeleteRow={(id) => handleDeleteRow(id)}
-              // onSelectRow={(id) => onSelectRow(id)}
-              // selected={selected}
+            // onSelectRow={(id) => onSelectRow(id)}
+            // selected={selected}
             />
           </>
         ) : (
