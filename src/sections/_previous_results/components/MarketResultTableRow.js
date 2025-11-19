@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { useDispatch } from 'react-redux';
 import {
   Button,
   TableRow,
@@ -9,16 +10,19 @@ import {
   styled,
   MenuItem,
 } from '@mui/material';
+import { useSnackbar } from '../../../components/snackbar';
 import { fDateTime } from '../../../utils/formatTime';
 import Iconify from '../../../components/iconify';
 import MenuPopover from '../../../components/menu-popover';
 import ConfirmDialog from '../../../components/confirm-dialog';
 import Label from '../../../components/label';
+import { revertMarketResultAsync, getAllMarketResultsAsync } from '../../../redux/services/market_result_services';
 
 // ----------------------------------------------------------------------
 
 MarketResultTableRow.propTypes = {
   row: PropTypes.shape({
+    _id: PropTypes.string,
     market: PropTypes.object,
     resultDate: PropTypes.string,
     result: PropTypes.string,
@@ -27,7 +31,6 @@ MarketResultTableRow.propTypes = {
     action: PropTypes.string,
     createdAt: PropTypes.string,
   }),
-  onRevert: PropTypes.func,
 };
 
 // ----------------------------------------------------------------------
@@ -42,8 +45,10 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-export default function MarketResultTableRow({ row, onRevert }) {
-  const { market, resultDate, result, openPana, closePana, createdAt } = row;
+export default function MarketResultTableRow({ row }) {
+  const dispatch = useDispatch();
+  const { enqueueSnackbar } = useSnackbar();
+  const { _id, market, resultDate, result, openPana, closePana, createdAt } = row;
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [openConfirm, setOpenConfirm] = useState(false);
@@ -59,6 +64,22 @@ export default function MarketResultTableRow({ row, onRevert }) {
   const handleOpenConfirm = () => setOpenConfirm(true);
   const handleCloseConfirm = () => setOpenConfirm(false);
 
+  const handleRevert = useCallback(async () => {
+    if (!_id) return;
+
+    try {
+      await dispatch(revertMarketResultAsync(_id)).unwrap();
+      enqueueSnackbar('Market result reverted successfully!', { variant: 'success' });
+      dispatch(getAllMarketResultsAsync());
+      handleCloseConfirm();
+    } catch (error) {
+      const errorMessage =
+        error?.response?.data?.message || error?.message || 'Failed to revert market result';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+      handleCloseConfirm();
+    }
+  }, [_id, dispatch, enqueueSnackbar]);
+
   // Desktop layout (TableRow)
   return (
     <>
@@ -71,7 +92,7 @@ export default function MarketResultTableRow({ row, onRevert }) {
         
         <TableCell align="left">
           <Typography variant="subtitle2" noWrap>
-            {market.name}
+            {market?.name}
           </Typography>
         </TableCell>
 
@@ -139,14 +160,7 @@ export default function MarketResultTableRow({ row, onRevert }) {
         title="Revert Result"
         content="Are you sure you want to revert this result?"
         action={
-          <Button
-            variant="contained"
-            color="error"
-            onClick={() => {
-              onRevert?.(row);
-              handleCloseConfirm();
-            }}
-          >
+          <Button variant="contained" color="error" onClick={handleRevert}>
             Revert
           </Button>
         }

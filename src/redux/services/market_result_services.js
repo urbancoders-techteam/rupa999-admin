@@ -59,6 +59,17 @@ export const deleteMarketResultAsync = createAsyncThunk(
     })
 );
 
+// Revert market result
+export const revertMarketResultAsync = createAsyncThunk(
+  'marketResult/revert',
+  async (id, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: `/market-results/${id}/revert`,
+      method: 'post',
+    })
+);
+
 // // Get market results by date and market
 // export const getMarketResultsByFiltersAsync = createAsyncThunk(
 //   'marketResult/getByFilters',
