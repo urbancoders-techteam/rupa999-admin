@@ -1,13 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
-import {
-  Box,
-  Card,
-  Grid,
-  Stack,
-  Container,
-  MenuItem,
-} from '@mui/material';
+import { Box, Card, Grid, Stack, Container, MenuItem } from '@mui/material';
 import * as Yup from 'yup';
 import PropTypes from 'prop-types';
 import { useEffect, useMemo } from 'react';
@@ -15,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from '../../../components/snackbar';
-import FormProvider, { RHFTextField, RHFSelect, RHFSwitch } from '../../../components/hook-form';
+import FormProvider, { RHFTextField, RHFSelect, RHFSwitch, RHFAutocomplete } from '../../../components/hook-form';
 import { PATH_DASHBOARD } from '../../../routes/paths';
 import { useSettingsContext } from '../../../components/settings';
 import { getAllRolesAsync } from '../../../redux/services/role_services';
@@ -52,18 +45,12 @@ export default function StaffForm({ isEdit = false, isView = false, currentStaff
     mobile: Yup.string()
       .matches(/^[0-9]{10}$/, 'Enter a valid 10-digit mobile number')
       .required('Mobile number is required'),
-    email: Yup.string()
-      .email('Enter a valid email address')
-      .required('Email is required'),
+    email: Yup.string().email('Enter a valid email address').required('Email is required'),
     password: isEdit
       ? Yup.string()
-        .test('password-length', 'Password must be at least 6 characters', (value) => {
-          if (!value || value.length === 0) return true; // Allow empty in edit mode
-          return value.length >= 6;
-        })
       : Yup.string()
-        .min(6, 'Password must be at least 6 characters')
-        .required('Password is required'),
+          .min(6, 'Password must be at least 6 characters')
+          .required('Password is required'),
     roleId: Yup.string().required('Role/Designation is required'),
     isSuperAdmin: Yup.boolean(),
     status: Yup.boolean(),
@@ -133,25 +120,21 @@ export default function StaffForm({ isEdit = false, isView = false, currentStaff
 
       if (isEdit && currentStaff?._id) {
         // Update existing staff
-        await dispatch(
-          updateStaffAsync({ id: currentStaff._id, data: submitData })
-        ).unwrap();
-        
+        await dispatch(updateStaffAsync({ id: currentStaff._id, data: submitData })).unwrap();
+
         enqueueSnackbar('Staff updated successfully!', { variant: 'success' });
         navigate(PATH_DASHBOARD.staff.list);
       } else {
         // Create new staff
         await dispatch(createStaffAsync(submitData)).unwrap();
-        
+
         enqueueSnackbar('Staff created successfully!', { variant: 'success' });
         navigate(PATH_DASHBOARD.staff.list);
       }
     } catch (error) {
       console.error('Error submitting form:', error);
-      const errorMessage = 
-        error?.response?.data?.message || 
-        error?.message || 
-        'An error occurred while saving staff';
+      const errorMessage =
+        error?.response?.data?.message || error?.message || 'An error occurred while saving staff';
       enqueueSnackbar(errorMessage, { variant: 'error' });
     }
   };
@@ -182,34 +165,36 @@ export default function StaffForm({ isEdit = false, isView = false, currentStaff
               }}
             >
               <RHFTextField name="name" label="Name" disabled={isView} />
-              <RHFTextField 
-                name="mobile" 
-                label="Mobile Number" 
+              <RHFTextField
+                name="mobile"
+                label="Mobile Number"
                 disabled={isView}
                 inputProps={{ maxLength: 10 }}
               />
               <RHFTextField name="email" label="Email" disabled={isView} />
-              <RHFTextField
-                name="password"
-                label={isEdit ? "Password (leave blank to keep current)" : "Password"}
-                type="password"
-                disabled={isView}
-              />
-              <RHFSelect
+              {!isEdit && (
+                <RHFTextField
+                  name="password"
+                  label={isEdit ? 'Password (leave blank to keep current)' : 'Password'}
+                  type="password"
+                  disabled={isView}
+                />
+              )}
+              <RHFAutocomplete
                 name="roleId"
-                label="Select Designation/Role"
+                label="Role"
+                size="small"
+                options={roleList}
                 disabled={isView || roleLoading}
-                helperText={roleLoading ? 'Loading roles...' : ''}
-              >
-                <MenuItem value="">
-                  <em>Select Role</em>
-                </MenuItem>
-                {roleList.map((role) => (
-                  <MenuItem key={role._id} value={role._id}>
-                    {role.roleName || role.designationName}
-                  </MenuItem>
-                ))}
-              </RHFSelect>
+                getOptionLabel={(option) => option.roleName || option.designationName || ''}
+                isOptionEqualToValue={(option, value) => option._id === value._id}
+                loading={roleLoading}
+                placeholder="Select Role"
+                renderOption={(props, option) => (
+                  <li {...props}>{option.roleName || option.designationName}</li>
+                )}
+              />
+
               <Box>
                 <RHFSwitch
                   name="isSuperAdmin"
@@ -231,21 +216,12 @@ export default function StaffForm({ isEdit = false, isView = false, currentStaff
             {/* Action Buttons */}
             {isView ? (
               <Stack alignItems="flex-end" sx={{ mt: 3 }}>
-                <LoadingButton
-                  onClick={handleBack}
-                  type="button"
-                  variant="contained"
-                >
+                <LoadingButton onClick={handleBack} type="button" variant="contained">
                   Back
                 </LoadingButton>
               </Stack>
             ) : (
-              <Stack
-                gap="10px"
-                justifyContent="flex-end"
-                flexDirection="row"
-                sx={{ mt: 3 }}
-              >
+              <Stack gap="10px" justifyContent="flex-end" flexDirection="row" sx={{ mt: 3 }}>
                 <LoadingButton
                   type="submit"
                   variant="contained"
@@ -255,12 +231,7 @@ export default function StaffForm({ isEdit = false, isView = false, currentStaff
                   {isEdit ? 'Save Changes' : 'Create Staff'}
                 </LoadingButton>
 
-                <LoadingButton
-                  onClick={handleBack}
-                  type="button"
-                  variant="contained"
-                  color="error"
-                >
+                <LoadingButton onClick={handleBack} type="button" variant="contained" color="error">
                   Cancel
                 </LoadingButton>
               </Stack>
@@ -271,4 +242,3 @@ export default function StaffForm({ isEdit = false, isView = false, currentStaff
     </Container>
   );
 }
-
