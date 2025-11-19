@@ -40,7 +40,7 @@ import {
 // sections
 import { useSnackbar } from '../components/snackbar';
 import CustomTableToolbar from '../components/table/CustomTableToolBar';
-import { deleteRoleAsync, getAllRolesAsync } from '../redux/services/role_services';
+import { deleteRoleAsync, getAllRolesAsync, updateRoleStatusAsync } from '../redux/services/role_services';
 import DesignationTableRow from '../sections/_staff/list/DesignationTableRow';
 
 // ----------------------------------------------------------------------
@@ -105,7 +105,8 @@ export default function DesignationListPage() {
     id: role._id || role.id || index + 1,
     _id: role._id,
     designationName: role.roleName,
-    status: role.status ? 'Active' : 'InActive',
+    status: role.status, // Keep boolean status for StatusToggleCell
+    statusLabel: role.status ? 'Active' : 'InActive', // String label for filtering
     createdAt: role.createdAt ? new Date(role.createdAt).toLocaleDateString() : '-',
     ...role,
   }));
@@ -187,6 +188,24 @@ export default function DesignationListPage() {
 
   const handleViewRow = (id, rowData) => {
     navigate(PATH_DASHBOARD.designation.view(id), { state: rowData });
+  };
+
+  const handleStatusChange = async (id, status) => {
+    try {
+      await dispatch(updateRoleStatusAsync({ id, status })).unwrap();
+      enqueueSnackbar(`Designation ${status ? 'activated' : 'deactivated'} successfully!`, { variant: 'success' });
+      // Refresh the list
+      dispatch(
+        getAllRolesAsync({
+          page: page + 1,
+          limit: rowsPerPage,
+          search: filterName,
+        })
+      );
+    } catch (error) {
+      enqueueSnackbar(error?.message || 'Failed to update designation status', { variant: 'error' });
+      throw error; // Re-throw to let StatusToggleCell revert the UI
+    }
   };
 
   const handleResetFilter = () => {
@@ -320,6 +339,7 @@ export default function DesignationListPage() {
                         onEditRow={() => handleEditRow(row._id || row.id, row)}
                         onViewRow={() => handleViewRow(row._id || row.id, row)}
                         onDeleteRow={() => handleOpenDeleteConfirm(row._id || row.id)}
+                        onStatusChange={(_id, status) => handleStatusChange(_id, status)}
                       />
                     ))}
 
@@ -386,7 +406,7 @@ function applyFilter({ inputData, comparator, filterName, filterStatus }) {
   }
 
   if (filterStatus !== 'all') {
-    inputData = inputData.filter((designation) => designation.status === filterStatus);
+    inputData = inputData.filter((designation) => designation.statusLabel === filterStatus);
   }
 
   return inputData;

@@ -1,19 +1,19 @@
-import PropTypes from 'prop-types';
-import { useState } from 'react';
 import {
-  Stack,
   Button,
-  TableRow,
-  TableCell,
   IconButton,
+  MenuItem,
+  Stack,
+  TableCell,
+  TableRow,
   Typography,
   styled,
-  MenuItem,
 } from '@mui/material';
+import PropTypes from 'prop-types';
+import { useState } from 'react';
+import ConfirmDialog from '../../../components/confirm-dialog';
 import Iconify from '../../../components/iconify';
 import MenuPopover from '../../../components/menu-popover';
-import ConfirmDialog from '../../../components/confirm-dialog';
-import StatusToggleCell from '../../_users/list/StatusToggledCell';
+import StatusToggleCell from './StatusToggledCell';
 
 // ----------------------------------------------------------------------
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
@@ -31,19 +31,22 @@ DesignationTableRow.propTypes = {
   index: PropTypes.number,
   row: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    _id: PropTypes.string,
     designationName: PropTypes.string,
-    status: PropTypes.string,
+    status: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
     createdAt: PropTypes.string,
   }),
   selected: PropTypes.bool,
   onEditRow: PropTypes.func,
   onViewRow: PropTypes.func,
   onDeleteRow: PropTypes.func,
+  onStatusChange: PropTypes.func,
 };
 
-export default function DesignationTableRow({ index, row, selected, onEditRow, onViewRow, onDeleteRow }) {
+export default function DesignationTableRow({ index, row, selected, onEditRow, onViewRow, onDeleteRow, onStatusChange }) {
   const {
     id,
+    _id,
     designationName,
     status,
     createdAt,
@@ -80,7 +83,11 @@ export default function DesignationTableRow({ index, row, selected, onEditRow, o
           </Stack>
         </TableCell>
 
-        <StatusToggleCell id={id} status={status} align="left" justifyContent="left" />
+        <StatusToggleCell
+          id={_id || id}
+          status={typeof status === 'boolean' ? status : status === 'Active'}
+          onStatusChange={onStatusChange}
+        />
 
         <TableCell align="left" sx={{ minWidth: '140px' }}>
           <Typography variant="body2" color="text.secondary">

@@ -56,6 +56,18 @@ export const updateRoleAsync = createAsyncThunk(
     })
 );
 
+// Update role status
+export const updateRoleStatusAsync = createAsyncThunk(
+  'role/updateStatus',
+  async ({ id, status }, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: `/roles/${id}/status`,
+      method: 'patch',
+      data: { status },
+    })
+);
+
 // Delete role
 export const deleteRoleAsync = createAsyncThunk(
   'role/delete',
