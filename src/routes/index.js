@@ -56,6 +56,7 @@ import {
   DesignationListPage,
   MarketDataListPage,
   BidRecordListPage,
+  RegisterPage,
   //
 } from './elements';
 
@@ -79,14 +80,14 @@ export default function Router() {
             </GuestGuard>
           ),
         },
-        // {
-        //   path: 'register',
-        //   element: (
-        //     <GuestGuard>
-        //       <RegisterPage />
-        //     </GuestGuard>
-        //   ),
-        // },
+        {
+          path: 'register',
+          element: (
+            <GuestGuard>
+              <RegisterPage />
+            </GuestGuard>
+          ),
+        },
         // { path: 'login-unprotected', element: <LoginPage /> },
         // { path: 'register-unprotected', element: <RegisterPage /> },
         // {

@@ -51,7 +51,9 @@ export default function AccountPopover() {
 
   const handleLogout = async () => {
     try {
-      logout();
+      // logout();
+      localStorage.removeItem('token');
+      // window.location.href = PATH_AUTH.login;
       navigate(PATH_AUTH.login, { replace: true });
       handleClosePopover();
     } catch (error) {

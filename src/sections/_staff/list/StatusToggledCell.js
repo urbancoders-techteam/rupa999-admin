@@ -68,7 +68,7 @@ export default function StatusToggleCell({
   const isLoading = loading || externalLoading;
 
   return (
-    <TableCell align={align} sx={{ minWidth: 160 }}>
+    <TableCell align={align} sx={{ minWidth: 160, padding: 0, margin: 0 }}>
       <Stack
         direction="row"
         alignItems="center"
@@ -77,13 +77,15 @@ export default function StatusToggleCell({
         sx={{
           opacity: isLoading ? 0.7 : 1,
           transition: 'opacity 0.2s ease',
+          padding: 0,
+          margin: 0,
         }}
       >
         {/* Switch with smooth animation */}
         {isLoading ? (
           <CircularProgress
             size={20}
-            thickness={5}
+            // thickness={5}
             sx={{
               color: isActive ? 'success.main' : 'error.main',
             }}
@@ -98,6 +100,7 @@ export default function StatusToggleCell({
               role: 'switch',
             }}
             sx={{
+              
               '& .MuiSwitch-switchBase': {
                 transition: 'transform 0.2s ease-in-out, color 0.2s ease',
               },

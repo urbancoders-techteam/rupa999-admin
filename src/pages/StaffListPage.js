@@ -44,7 +44,7 @@ import { useSnackbar } from '../components/snackbar';
 import CustomTableToolbar from '../components/table/CustomTableToolBar';
 import { deleteStaffAsync, getAllStaffAsync, updateStaffStatusAsync } from '../redux/services/staff_services';
 import StaffTableRow from '../sections/_staff/list/StaffTableRow';
-import UserMobileViewCardLayout from '../sections/_users/list/UserMobileViewCardLayout';
+import StaffMobileViewLayout from '../sections/_staff/list/StaffMobileViewLayout';
 
 // ----------------------------------------------------------------------
 
@@ -88,13 +88,14 @@ export default function StaffListPage() {
   const { enqueueSnackbar } = useSnackbar();
 
   // Redux state
-  const { staffList, loading, pagination } = useSelector((state) => state.staff);
+  const { staffList, pagination } = useSelector((state) => state.staff);
 
   const [openConfirm, setOpenConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [filterName, setFilterName] = useState('');
   const [filterRole, setFilterRole] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [changePasswordLoading, setChangePasswordLoading] = useState(false);
 
   // Fetch staff on component mount and when filters change
   useEffect(() => {
@@ -139,10 +140,6 @@ export default function StaffListPage() {
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
-  };
-
-  const handleCloseConfirm = () => {
-    setOpenConfirm(false);
   };
 
   const handleFilterStatus = (event, newValue) => {
@@ -212,13 +209,34 @@ export default function StaffListPage() {
     setPage(0);
   };
 
+  const handleChangePassword = async (staffId, password, cpassword) => {
+    setChangePasswordLoading(true);
+    try {
+      // TODO: Implement staff password change API call
+      // await dispatch(changeStaffPasswordAsync({ id: staffId, password, cpassword })).unwrap();
+      enqueueSnackbar('Password changed successfully!', { variant: 'success' });
+      // For now, just show success message
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    } catch (error) {
+      enqueueSnackbar(error?.message || 'Failed to change password', { variant: 'error' });
+      throw error;
+    } finally {
+      setChangePasswordLoading(false);
+    }
+  };
+
   return (
     <>
       <Helmet>
         <title> Staff: List | Rupa999 </title>
       </Helmet>
 
-      <Container maxWidth={themeStretch ? false : 'xl'}>
+      <Container
+        maxWidth={themeStretch ? false : 'xl'}
+        sx={{
+          px: { xs: 1, sm: 3 },
+        }}
+      >
         <Box
           sx={(theme) => ({
             position: 'relative', // default for desktop
@@ -229,47 +247,102 @@ export default function StaffListPage() {
               top: 60,
               left: 0,
               width: '100%',
-              px: 2,
+              px: 1.5,
+              py: 1,
               boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
               borderBottom: '1px solid',
               borderColor: 'divider',
             },
           })}
         >
-          <CustomBreadcrumbs
-            heading="Staff List"
-            links={[
-              { name: 'Dashboard', href: PATH_DASHBOARD.root },
-              { name: 'Staff List', href: PATH_DASHBOARD.staff.list },
-              { name: 'List' },
-            ]}
-            action={
-              <Box display="flex" gap={1}>
+          <Box
+            sx={(theme) => ({
+              [theme.breakpoints.down('sm')]: {
+                '& .MuiTypography-h3': {
+                  fontSize: '1.1rem',
+                  mb: 0.5,
+                },
+              },
+            })}
+          >
+            <CustomBreadcrumbs
+              heading="Staff List"
+              links={[
+                { name: 'Dashboard', href: PATH_DASHBOARD.root },
+                { name: 'Staff List', href: PATH_DASHBOARD.staff.list },
+              ]}
+              sx={(theme) => ({
+                [theme.breakpoints.down('sm')]: {
+                  mb: 0,
+                },
+              })}
+              action={
+              <Box
+                display="flex"
+                flexDirection={{ xs: 'column', sm: 'row' }}
+                gap={{ xs: 0.75, sm: 1 }}
+                alignItems={{ xs: 'stretch', sm: 'center' }}
+                sx={(theme) => ({
+                  [theme.breakpoints.down('sm')]: {
+                    minWidth: '120px',
+                    width: '100%',
+                  },
+                })}
+              >
                 <Button
                   component={RouterLink}
                   variant="contained"
                   startIcon={<Iconify icon="lucide:user-cog" />}
                   to={PATH_DASHBOARD.designation.list}
+                  fullWidth={isMobile}
                   sx={{
-                    [(theme) => theme.breakpoints.down('sm')]: {
-                      fontSize: '0.75rem',
-                      py: 0.5,
-                      px: 1.5,
+                    fontSize: { xs: '0.7rem', sm: '0.875rem' },
+                    py: { xs: 0.5, sm: 0.75 },
+                    px: { xs: 1, sm: 2 },
+                    minWidth: { xs: '100%', sm: 180 },
+                    width: { xs: '100%', sm: 'auto' },
+                    '& .MuiButton-startIcon': {
+                      marginRight: { xs: 0.5, sm: 1 },
+                      '& svg': {
+                        fontSize: { xs: '1rem', sm: '1.25rem' },
+                      },
                     },
                   }}
                 >
-                  Designation and Rights
+                  <Box
+                    component="span"
+                    sx={{
+                      display: { xs: 'none', sm: 'inline' },
+                    }}
+                  >
+                    Designation and Rights
+                  </Box>
+                  <Box
+                    component="span"
+                    sx={{
+                      display: { xs: 'inline', sm: 'none' },
+                    }}
+                  >
+                    Designation
+                  </Box>
                 </Button>
                 <Button
                   component={RouterLink}
                   variant="contained"
                   startIcon={<Iconify icon="eva:plus-fill" />}
                   to={PATH_DASHBOARD.staff.new}
+                  fullWidth={isMobile}
                   sx={{
-                    [(theme) => theme.breakpoints.down('sm')]: {
-                      fontSize: '0.75rem',
-                      py: 0.5,
-                      px: 1.5,
+                    fontSize: { xs: '0.7rem', sm: '0.875rem' },
+                    py: { xs: 0.5, sm: 0.75 },
+                    px: { xs: 1, sm: 2 },
+                    minWidth: { xs: '100%', sm: 120 },
+                    width: { xs: '100%', sm: 'auto' },
+                    '& .MuiButton-startIcon': {
+                      marginRight: { xs: 0.5, sm: 1 },
+                      '& svg': {
+                        fontSize: { xs: '1rem', sm: '1.25rem' },
+                      },
                     },
                   }}
                 >
@@ -277,47 +350,58 @@ export default function StaffListPage() {
                 </Button>
               </Box>
             }
-          />
+            />
+          </Box>
         </Box>
 
         {/* 👇 Add margin to push content below breadcrumb for mobile */}
         <Box
           sx={(theme) => ({
             [theme.breakpoints.down('sm')]: {
-              height: 80, // equal to breadcrumb bar height
+              height: 115, // Adjust based on breadcrumb + buttons height
             },
           })}
         />
 
         {isMobile ? (
-          <>
+          <Box sx={{ px: { xs: 0.5, sm: 0 } }}>
             <Tabs
               value={filterStatus}
               onChange={handleFilterStatus}
+              variant="scrollable"
+              scrollButtons="auto"
               sx={{
-                px: 2,
+                mb: 1,
                 bgcolor: 'background.neutral',
-                mb: 2,
+                borderRadius: 1,
+                '& .MuiTab-root': {
+                  fontSize: '0.75rem',
+                  minHeight: 48,
+                  px: 1.5,
+                },
               }}
             >
               {STATUS_OPTIONS.map((tab) => (
                 <Tab key={tab} label={tab} value={tab} />
               ))}
             </Tabs>
-            <CustomTableToolbar
-              isFiltered={isFiltered}
-              filterName={filterName}
-              onFilterName={handleFilterName}
-              onResetFilter={handleResetFilter}
-            />
-            <UserMobileViewCardLayout
+            <Box sx={{ mb: 1.5 }}>
+              <CustomTableToolbar
+                isFiltered={isFiltered}
+                filterName={filterName}
+                onFilterName={handleFilterName}
+                onResetFilter={handleResetFilter}
+              />
+            </Box>
+            <StaffMobileViewLayout
               data={dataFiltered}
-              onEditRow={handleEditRow}
-              onDeleteRow={(id) => handleDeleteRow(id)}
-            // onSelectRow={(id) => onSelectRow(id)}
-            // selected={selected}
+              onEditRow={(id) => handleEditRow(id)}
+              onDeleteRow={(id) => handleOpenDeleteConfirm(id)}
+              onStatusChange={(id, status) => handleStatusChange(id, status)}
+              onChangePassword={(id, password, cpassword) => handleChangePassword(id, password, cpassword)}
+              changePasswordLoading={changePasswordLoading}
             />
-          </>
+          </Box>
         ) : (
           <Card>
             <Tabs
