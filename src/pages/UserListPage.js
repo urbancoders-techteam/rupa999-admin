@@ -41,7 +41,7 @@ import {
 import { useSnackbar } from '../components/snackbar';
 import CustomTableToolbar from '../components/table/CustomTableToolBar';
 import { getBankDetailsByUserIdAsync } from '../redux/services/bank_details_services';
-import { changeUserPasswordAsync, deleteUserAsync, getAllUsersAsync, updateUserStatusAsync } from '../redux/services/user_services';
+import { addDeductBalanceAsync, changeUserPasswordAsync, deleteUserAsync, getAllUsersAsync, updateUserStatusAsync } from '../redux/services/user_services';
 import { UserTableRow } from '../sections/_users/list';
 import UserMobileViewCardLayout from '../sections/_users/list/UserMobileViewCardLayout';
 
@@ -101,6 +101,7 @@ export default function UserListPage() {
   const [bankDetailsLoading, setBankDetailsLoading] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [changePasswordLoading, setChangePasswordLoading] = useState(false);
+  const [addDeductBalanceLoading, setAddDeductBalanceLoading] = useState(false);
 
   // Fetch users on component mount and when filters change
   useEffect(() => {
@@ -287,6 +288,29 @@ export default function UserListPage() {
     }
   };
 
+  const handleAddDeductBalance = async (userId, amount, action) => {
+    setAddDeductBalanceLoading(true);
+    try {
+      await dispatch(addDeductBalanceAsync({ id: userId, amount, action })).unwrap();
+      enqueueSnackbar(`Balance ${action === 'add' ? 'added' : 'deducted'} successfully`, { variant: 'success' });
+      // Refresh user list to get updated balance
+      dispatch(
+        getAllUsersAsync({
+          page: page + 1,
+          limit: rowsPerPage,
+          search: filterName,
+          status: filterStatus !== 'all' ? filterStatus : '',
+        })
+      );
+      return true;
+    } catch (error) {
+      enqueueSnackbar(error?.message || `Failed to ${action === 'add' ? 'add' : 'deduct'} balance`, { variant: 'error' });
+      throw error; // Re-throw to prevent dialog from closing on error
+    } finally {
+      setAddDeductBalanceLoading(false);
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -363,6 +387,8 @@ export default function UserListPage() {
               onViewBankDetails={handleViewBankDetails}
               bankDetails={bankDetails}
               bankDetailsLoading={bankDetailsLoading}
+              onAddDeductBalance={(id, amount, action) => handleAddDeductBalance(id, amount, action)}
+              addDeductBalanceLoading={addDeductBalanceLoading}
             />
           </>
         ) : (
@@ -438,6 +464,8 @@ export default function UserListPage() {
                           bankDetailsLoading={selectedUserId === (row._id || row.id) && bankDetailsLoading}
                           onChangePassword={(id, password, cpassword) => handleChangePassword(id, password, cpassword)}
                           changePasswordLoading={changePasswordLoading}
+                          onAddDeductBalance={(id, amount, action) => handleAddDeductBalance(id, amount, action)}
+                          addDeductBalanceLoading={addDeductBalanceLoading}
                         />
                       ))}
 

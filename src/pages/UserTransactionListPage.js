@@ -1,28 +1,26 @@
-import { paramCase } from 'change-case';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 // @mui
 import {
-  Button,
   Card,
   Container,
-  Divider,
-  Tab,
+  MenuItem,
+  Stack,
   Table,
   TableBody,
+  TableCell,
   TableContainer,
-  Tabs
+  TableRow,
+  TextField,
 } from '@mui/material';
-import { Box } from '@mui/system';
+// redux
+import { useDispatch, useSelector } from 'react-redux';
 import useResponsive from '../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
-// _mock_
-import { _userDataList } from '../_mock/arrays';
 // components
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
-import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 import { useSettingsContext } from '../components/settings';
 import {
@@ -36,25 +34,29 @@ import {
 } from '../components/table';
 // sections
 import CustomTableToolbar from '../components/table/CustomTableToolBar';
+import { getUserLedgersAsync } from '../redux/services/user_services';
 import TransactionMobileViewCardLayout from '../sections/_users/transactions/list/TransactionMobileViewCardLayout';
+import TransactionTableRow from '../sections/_users/transactions/list/TransactionTableRow';
 
 // ----------------------------------------------------------------------
 
-const STATUS_OPTIONS = ['Creadit', 'Debit'];
+const PARTICULAR_OPTIONS = [
+  { value: 'All', label: 'All' },
+  { value: 'Deposit', label: 'Deposit', },
+  { value: 'Game Amount', label: 'Game Amount' },
+  { value: 'Win Amount', label: 'Win Amount' },
+  { value: 'Withdrawal', label: 'Withdrawal' },
+];
 
 const TABLE_HEAD = [
-  { id: 'Action', label: 'Action', align: 'left' },
   { id: 'id', label: 'ID', align: 'left' },
-  { id: 'name', label: 'Name', align: 'left' },
-  { id: 'name', label: 'Phone', align: 'left' },
-  { id: 'digit', label: 'Previous Amt', align: 'left' },
-  { id: 'point', label: 'Transaction Amt', align: 'left' },
-  { id: 'point', label: 'Current Amt', align: 'left' },
-  { id: 'point', label: 'Type', align: 'left' },
-  { id: 'point', label: 'Details', align: 'left' },
-  { id: 'date', label: 'Created At', align: 'left' },
-
-];;
+  { id: 'date', label: 'Date', align: 'left' },
+  { id: 'particulars', label: 'Particulars', align: 'left' },
+  { id: 'debit', label: 'Debit', align: 'left' },
+  { id: 'credit', label: 'Credit', align: 'left' },
+  { id: 'balance', label: 'Balance', align: 'left' },
+  { id: 'Created By', label: 'Created By', align: 'left' },
+];
 
 // ----------------------------------------------------------------------
 
@@ -66,10 +68,6 @@ export default function UserTransactionListPage() {
     orderBy,
     rowsPerPage,
     setPage,
-    //
-    selected,
-    setSelected,
-    onSelectAllRows,
     onSort,
     onChangeDense,
     onChangePage,
@@ -77,77 +75,73 @@ export default function UserTransactionListPage() {
   } = useTable();
 
   const { themeStretch } = useSettingsContext();
+  const dispatch = useDispatch();
+  const { id: userId } = useParams();
 
-  const navigate = useNavigate();
-  // const theme = useTheme();
+  // Redux state
+  const { transactionsList, transactionsLoading, transactionsPagination } = useSelector(
+    (state) => state.user
+  );
 
-  const [tableData, setTableData] = useState(_userDataList);
+  const [filterParticulars, setFilterParticulars] = useState('All');
 
-  const [openConfirm, setOpenConfirm] = useState(false);
+  // Fetch ledgers on component mount and when filters change
+  useEffect(() => {
+    if (userId) {
+      dispatch(
+        getUserLedgersAsync({
+          userId,
+          page: page + 1, // API uses 1-based pagination
+          limit: rowsPerPage,
+          particulars: filterParticulars,
+        })
+      );
+    }
+  }, [dispatch, userId, page, rowsPerPage, filterParticulars]);
 
-  const [filterName, setFilterName] = useState('');
+  // Transform API data to table format
+  const tableData = useMemo(
+    () =>
+      transactionsList.map((transaction, index) => ({
+        id: transaction._id || index + 1,
+        _id: transaction._id,
+        date: transaction.date,
+        particulars: transaction.particulars,
+        debit: transaction.debit || 0,
+        credit: transaction.credit || 0,
+        balance: transaction.balance || 0,
+        user: transaction.user,
+        admin: transaction.admin,
+        remarks: transaction.remarks,
+        ...transaction,
+      })),
+    [transactionsList]
+  );
 
-  const [filterRole, setFilterRole] = useState('all');
-
-  const [filterStatus, setFilterStatus] = useState('all');
-
-  const dataFiltered = applyFilter({
-    inputData: tableData,
-    comparator: getComparator(order, orderBy),
-    filterName,
-    filterRole,
-    filterStatus,
-  });
-
-  const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const dataFiltered = useMemo(
+    () =>
+      applyFilter({
+        inputData: tableData,
+        comparator: getComparator(order, orderBy),
+      }),
+    [tableData, order, orderBy]
+  );
 
   const denseHeight = dense ? 52 : 72;
 
   const isMobile = useResponsive('down', 'sm');
 
-  const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
+  const isFiltered = filterParticulars !== 'all';
 
-  const isNotFound = true
-  // (!dataFiltered.length && !!filterName) ||
-  // (!dataFiltered.length && !!filterRole) ||
-  // (!dataFiltered.length && !!filterStatus);
+  const isNotFound = !transactionsLoading && !tableData.length;
 
-  const handleOpenConfirm = () => {
-    setOpenConfirm(true);
-  };
-
-  const handleCloseConfirm = () => {
-    setOpenConfirm(false);
-  };
-
-  const handleFilterStatus = (event, newValue) => {
+  const handleFilterParticulars = (event) => {
     setPage(0);
-    setFilterStatus(newValue);
-  };
-
-  const handleFilterName = (event) => {
-    setPage(0);
-    setFilterName(event.target.value);
-  };
-
-  const handleDeleteRow = (id) => {
-    const deleteRow = tableData.filter((row) => row.id !== id);
-    setSelected([]);
-    setTableData(deleteRow);
-
-    if (page > 0) {
-      if (dataInPage.length < 2) {
-        setPage(page - 1);
-      }
-    }
-  };
-
-  const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
+    setFilterParticulars(event.target.value);
   };
 
   const handleResetFilter = () => {
-    setFilterName('');
+    setFilterParticulars('All');
   };
 
   return (
@@ -157,160 +151,112 @@ export default function UserTransactionListPage() {
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
-        <Box
-          sx={(theme) => ({
-            position: 'relative', // default for desktop
-            bgcolor: 'background.paper',
-            zIndex: 10,
-            [theme.breakpoints.down('sm')]: {
-              position: 'fixed',
-              top: 60,
-              left: 0,
-              width: '100%',
-              px: 2,
-              boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-              borderBottom: '1px solid',
-              borderColor: 'divider',
-            },
-          })}
-        >
-          <CustomBreadcrumbs
-            heading=" Transctions List"
-            links={[
-              { name: 'Dashboard', href: PATH_DASHBOARD.root },
-              { name: 'User List', href: PATH_DASHBOARD.user.list },
-              { name: 'Transactions List' },
-            ]}
-            action={
-              <Button
-                component={RouterLink}
-                variant="contained"
-                startIcon={<Iconify icon="eva:plus-fill" />}
-                // to={PATH_DASHBOARD.user.new}
-                sx={{
-                  [(theme) => theme.breakpoints.down('sm')]: {
-                    fontSize: '0.75rem',
-                    py: 0.5,
-                    px: 1.5,
-                  },
-                }}
-              >
-                Add / Deduct
-              </Button>
-            }
-          />
-        </Box>
-
-        {/* 👇 Add margin to push content below breadcrumb for mobile */}
-        <Box
-          sx={(theme) => ({
-            [theme.breakpoints.down('sm')]: {
-              height: 120, // equal to breadcrumb bar height
-            },
-          })}
+        <CustomBreadcrumbs
+          heading="Ledgers List"
+          links={[
+            { name: 'Dashboard', href: PATH_DASHBOARD.root },
+            { name: 'User List', href: PATH_DASHBOARD.user.list },
+            { name: 'Ledgers List' },
+          ]}
         />
 
         {isMobile ? (
           <>
+            <Stack direction="row" spacing={2} sx={{ mx: 1.5 }}>
+              <TextField
+                select
+                label="Particulars"
+                size="small"
+                fullWidth
+                value={filterParticulars}
+                onChange={handleFilterParticulars}
+                sx={{ minWidth: 150 }}
+              >
+                {PARTICULAR_OPTIONS.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Stack>
             <CustomTableToolbar
               isFiltered={isFiltered}
-              filterName={filterName}
-              onFilterName={handleFilterName}
+              onResetFilter={handleResetFilter}
             />
             <TransactionMobileViewCardLayout
-              data={dataFiltered}
-              onEditRow={handleEditRow}
-              onDeleteRow={(id) => handleDeleteRow(id)}
-            // onSelectRow={(id) => onSelectRow(id)}
-            // selected={selected}
+              data={tableData}
+              loading={transactionsLoading}
             />
           </>
         ) : (
           <Card>
-            <Tabs
-              value={filterStatus}
-              onChange={handleFilterStatus}
-              sx={{
-                px: 2,
-                bgcolor: 'background.neutral',
-              }}
-            >
-              {STATUS_OPTIONS.map((tab) => (
-                <Tab key={tab} label={tab} value={tab} />
-              ))}
-            </Tabs>
-
-            <Divider />
+            <Stack direction="row" spacing={2} sx={{ p: 2, pb: 0 }}>
+              <TextField
+                select
+                size="small"
+                label="Particulars"
+                value={filterParticulars}
+                onChange={handleFilterParticulars}
+                sx={{ minWidth: 180 }}
+              >
+                {PARTICULAR_OPTIONS.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Stack>
 
             <CustomTableToolbar
               isFiltered={isFiltered}
-              filterName={filterName}
-              onFilterName={handleFilterName}
+              onResetFilter={handleResetFilter}
             />
 
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
-              {/* <TableSelectedAction
-                dense={dense}
-                numSelected={selected.length}
-                rowCount={tableData.length}
-                onSelectAllRows={(checked) =>
-                  onSelectAllRows(
-                    checked,
-                    tableData.map((row) => row.id)
-                  )
-                }
-                action={
-                  <Tooltip title="Delete">
-                    <IconButton color="primary" onClick={handleOpenConfirm}>
-                      <Iconify icon="eva:trash-2-outline" />
-                    </IconButton>
-                  </Tooltip>
-                }
-              /> */}
-
               <Scrollbar>
-                <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
+                <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
                   <TableHeadCustom
                     order={order}
                     orderBy={orderBy}
                     headLabel={TABLE_HEAD}
                     rowCount={tableData.length}
-                    numSelected={selected.length}
                     onSort={onSort}
                   />
 
                   <TableBody>
-                    {/* {dataFiltered
-                      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((row) => (
-                        <UserTableRow
-                          key={row.id}
-                          row={row}
-                          // selected={selected.includes(row.id)}
-                          // onSelectRow={() => onSelectRow(row.id)}
-                          onDeleteRow={() => handleDeleteRow(row.id)}
-                          onEditRow={() => handleEditRow(row.name)}
+                    {transactionsLoading ? (
+                      <TableRow>
+                        <TableCell colSpan={TABLE_HEAD.length} align="center">
+                          Loading...
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      <>
+                        {tableData.length > 0 ? (
+                          tableData.map((row, index) => (
+                            <TransactionTableRow key={row.id} row={row} index={index} />
+                          ))
+                        ) : (
+                          <TableNoData isNotFound={isNotFound} />
+                        )}
+
+                        <TableEmptyRows
+                          height={denseHeight}
+                          emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
                         />
-                      ))} */}
-
-                    <TableEmptyRows
-                      height={denseHeight}
-                      emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
-                    />
-
-                    <TableNoData isNotFound={isNotFound} />
+                      </>
+                    )}
                   </TableBody>
                 </Table>
               </Scrollbar>
             </TableContainer>
 
             <TablePaginationCustom
-              count={dataFiltered.length}
+              count={transactionsPagination?.total || 0}
               page={page}
               rowsPerPage={rowsPerPage}
               onPageChange={onChangePage}
               onRowsPerPageChange={onChangeRowsPerPage}
-              //
               dense={dense}
               onChangeDense={onChangeDense}
             />
@@ -323,7 +269,7 @@ export default function UserTransactionListPage() {
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, comparator, filterName, filterStatus, filterRole }) {
+function applyFilter({ inputData, comparator }) {
   const stabilizedThis = inputData.map((el, index) => [el, index]);
 
   stabilizedThis.sort((a, b) => {
@@ -333,20 +279,6 @@ function applyFilter({ inputData, comparator, filterName, filterStatus, filterRo
   });
 
   inputData = stabilizedThis.map((el) => el[0]);
-
-  if (filterName) {
-    inputData = inputData.filter(
-      (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
-    );
-  }
-
-  if (filterStatus !== 'all') {
-    inputData = inputData.filter((user) => user.status === filterStatus);
-  }
-
-  if (filterRole !== 'all') {
-    inputData = inputData.filter((user) => user.role === filterRole);
-  }
 
   return inputData;
 }

@@ -64,3 +64,31 @@ export const changeUserPasswordAsync = createAsyncThunk(
     })
 );
 
+// Get user ledgers
+export const getUserLedgersAsync = createAsyncThunk(
+  'user/getUserLedgers',
+  async ({ userId, ...params } = {}, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: `/users/${userId}/ledgers`,
+      method: 'get',
+      params: {
+        page: params.page || 1,
+        limit: params.limit || 10,
+        particulars: params.particulars || '',
+      },
+    })
+);
+
+// Add or deduct balance (Admin only)
+export const addDeductBalanceAsync = createAsyncThunk(
+  'user/addDeductBalance',
+  async ({ id, amount, action }, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: `/users/${id}/balance`,
+      method: 'put',
+      data: { amount, action },
+    })
+);
+

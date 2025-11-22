@@ -4,14 +4,25 @@ import {
   getAllUsersAsync,
   getUserByIdAsync,
   updateUserStatusAsync,
+  getUserLedgersAsync,
+  addDeductBalanceAsync,
 } from '../services/user_services';
 
 const initialState = {
   userList: [],
   userById: null,
+  transactionsList: [],
   loading: false,
+  transactionsLoading: false,
   error: null,
+  transactionsError: null,
   pagination: {
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+  },
+  transactionsPagination: {
     page: 1,
     limit: 10,
     total: 0,
@@ -106,6 +117,51 @@ const userSlice = createSlice({
       .addCase(deleteUserAsync.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || 'Failed to delete user';
+      });
+
+    // Get user ledgers
+    builder
+      .addCase(getUserLedgersAsync.pending, (state) => {
+        state.transactionsLoading = true;
+        state.transactionsError = null;
+      })
+      .addCase(getUserLedgersAsync.fulfilled, (state, action) => {
+        state.transactionsLoading = false;
+        state.transactionsList = action.payload?.data || [];
+        if (action.payload) {
+          state.transactionsPagination = {
+            page: action.payload.currentPage || 1,
+            limit: action.payload.limit || 10,
+            total: action.payload.totalItems || 0,
+            totalPages: action.payload.totalPages || 0,
+          };
+        }
+      })
+      .addCase(getUserLedgersAsync.rejected, (state, action) => {
+        state.transactionsLoading = false;
+        state.transactionsError = action.payload?.message || 'Failed to fetch ledgers';
+      });
+
+    // Add or deduct balance
+    builder
+      .addCase(addDeductBalanceAsync.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addDeductBalanceAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        // Update user balance in list if exists
+        const updatedUser = action.payload?.user;
+        if (updatedUser) {
+          const index = state.userList.findIndex((user) => user._id === updatedUser._id);
+          if (index !== -1) {
+            state.userList[index] = { ...state.userList[index], ...updatedUser };
+          }
+        }
+      })
+      .addCase(addDeductBalanceAsync.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Failed to update balance';
       });
   },
 });

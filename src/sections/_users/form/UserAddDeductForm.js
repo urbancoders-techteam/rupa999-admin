@@ -27,9 +27,10 @@ AddDeductBalanceModal.propTypes = {
   handleClose: PropTypes.func,
   currentBalance: PropTypes.number,
   onSubmit: PropTypes.func,
+  loading: PropTypes.bool,
 };
 
-export default function AddDeductBalanceModal({ open, handleClose, currentBalance = 0, onSubmit }) {
+export default function AddDeductBalanceModal({ open, handleClose, currentBalance = 0, onSubmit, loading = false }) {
   const theme = useTheme();
   const [action, setAction] = useState('add');
 
@@ -177,13 +178,14 @@ export default function AddDeductBalanceModal({ open, handleClose, currentBalanc
               type="submit"
               variant="outlined"
               size="medium"
+              disabled={loading}
               sx={{
                 textTransform: 'none',
                 borderRadius: 1.5,
                 px: 3,
               }}
             >
-              Submit
+              {loading ? 'Processing...' : 'Submit'}
             </Button>
           </Box>
         </FormProvider>

@@ -1,81 +1,57 @@
-/* eslint-disable no-nested-ternary */
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import PropTypes from 'prop-types';
 import {
-  Typography,
-  Stack,
-  IconButton,
   Box,
   CircularProgress,
-  MenuItem,
-  Button,
+  Stack,
+  Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import Iconify from '../../../../components/iconify';
-import MenuPopover from '../../../../components/menu-popover';
-import ConfirmDialog from '../../../../components/confirm-dialog';
+import PropTypes from 'prop-types';
+import { fCurrency } from '../../../../utils/formatNumber';
+import { fDateTime } from '../../../../utils/formatTime';
 
 function TransactionMobileViewCardLayout({
   data = [],
-  onEditRow,
-  onDeleteRow,
-  onSelectRow,
-  selected = [],
+  loading = false,
 }) {
   const theme = useTheme();
-  const [visibleData, setVisibleData] = useState(data.slice(0, 10));
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(data.length > 10);
-  const containerRef = useRef(null);
 
-  // Popover and Confirm
-  const [openPopover, setOpenPopover] = useState(null);
-  const [openConfirm, setOpenConfirm] = useState(false);
-  const [selectedRow, setSelectedRow] = useState(null);
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: 200,
+          p: 2,
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
-  const handleOpenPopover = (event, row) => {
-    setSelectedRow(row);
-    setOpenPopover(event.currentTarget);
-  };
-
-  const handleClosePopover = () => setOpenPopover(null);
-  const handleOpenConfirm = () => setOpenConfirm(true);
-  const handleCloseConfirm = () => setOpenConfirm(false);
-
-  // Infinite Scroll Logic
-  const handleScroll = useCallback(() => {
-    if (!containerRef.current || loading || !hasMore) return;
-    const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
-    if (scrollHeight - scrollTop - clientHeight < 50) {
-      setLoading(true);
-      setTimeout(() => {
-        const nextLength = visibleData.length + 10;
-        const newData = data.slice(0, nextLength);
-        setVisibleData(newData);
-        setHasMore(newData.length < data.length);
-        setLoading(false);
-      }, 1200);
-    }
-  }, [loading, hasMore, visibleData.length, data]);
-
-  useEffect(() => {
-    const ref = containerRef.current;
-    if (!ref) return undefined;
-    ref.addEventListener('scroll', handleScroll);
-    return () => ref.removeEventListener('scroll', handleScroll);
-  }, [handleScroll]);
-
-  useEffect(() => {
-    setVisibleData(data.slice(0, 10));
-    setHasMore(data.length > 10);
-  }, [data]);
+  if (!data || data.length === 0) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: 200,
+          p: 2,
+        }}
+      >
+        <Typography variant="body2" color="text.secondary">
+          No transactions found
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box
-      ref={containerRef}
       sx={{
-        maxHeight: 600,
-        overflowY: 'auto',
         p: 2,
         borderRadius: 2,
         boxShadow: 1,
@@ -83,16 +59,15 @@ function TransactionMobileViewCardLayout({
       }}
     >
       <Stack spacing={2}>
-        {visibleData.map((row) => (
+        {data.map((row) => (
           <Box
-            key={row.id}
+            key={row.id || row._id}
             sx={{
               display: 'flex',
               flexDirection: 'column',
               borderRadius: 2,
               border: `1px solid ${theme.palette.divider}`,
               p: 2,
-              mb: 1,
               boxShadow: theme.shadows[1],
             }}
           >
@@ -101,118 +76,72 @@ function TransactionMobileViewCardLayout({
               direction="row"
               justifyContent="space-between"
               alignItems="center"
-              mb={1}
+              mb={1.5}
             >
-              <Typography variant="subtitle1" fontWeight={600}>
-                {row.name || 'SUPREME NIGHT'}
+              <Typography variant="body2" fontWeight={600}>
+                {row.particulars || 'Transaction'}
               </Typography>
-              <IconButton
-                size="small"
-                onClick={(e) => handleOpenPopover(e, row)}
-              >
-                <Iconify icon="eva:more-vertical-fill" />
-              </IconButton>
+              <Typography variant="caption" color="text.secondary" sx={{ mt: -1 }}>
+                Date: {row.date ? fDateTime(row.date) : '—'}
+              </Typography>
             </Stack>
 
-            {/* Basic Info */}
-            <Typography variant="body2" color="text.secondary">
-              Phone. : <strong>{row.phone || '—'}</strong>
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Previous Amt. : <strong>{row.resultDate || '—'}</strong>
-            </Typography>
-            <Typography variant="body2" sx={{ mt: 0.5 }}>
-              Trans. Amt. : <strong>{row.digits || '—'}</strong>
-            </Typography>
-            <Typography variant="body2" sx={{ mt: 0.5 }}>
-              Current Amt: <strong>{row.points || '—'}</strong>
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Type: <strong>{row.date || '—'}</strong>
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Details: <strong>{row.date || '—'}</strong>
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Created At: <strong>{row.createdAt || '—'}</strong>
-            </Typography>
+            <Stack spacing={1}>
 
-            {selected.includes(row.id) && (
-              <Typography
-                variant="caption"
-                sx={{ color: 'text.secondary', mt: 0.5 }}
-              >
-                Selected
-              </Typography>
-            )}
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="body2" color="text.secondary">
+                  Debit:
+                </Typography>
+                <Typography
+                  variant="body2"
+                  fontWeight={600}
+                  color={row.debit > 0 ? 'error.main' : 'text.secondary'}
+                >
+                  {row.debit > 0 ? fCurrency(row.debit) : '—'}
+                </Typography>
+              </Stack>
+
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="body2" color="text.secondary">
+                  Credit:
+                </Typography>
+                <Typography
+                  variant="body2"
+                  fontWeight={600}
+                  color={row.credit > 0 ? 'success.main' : 'text.secondary'}
+                >
+                  {row.credit > 0 ? fCurrency(row.credit) : '—'}
+                </Typography>
+              </Stack>
+
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="body2" color="text.secondary">
+                  Balance:
+                </Typography>
+                <Typography variant="body2" fontWeight={700}>
+                  {fCurrency(row.balance || 0)}
+                </Typography>
+              </Stack>
+
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="body2" color="text.secondary">
+                  Created By:
+                </Typography>
+                <Typography variant="body2" fontWeight={700}>
+                  {row.admin.name || '—'}
+                </Typography>
+              </Stack>
+            </Stack>
           </Box>
         ))}
-
-        {loading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
-            <CircularProgress size={32} color="primary" />
-          </Box>
-        )}
-
-        {!hasMore && !loading && (
-          <Typography
-            align="center"
-            variant="body2"
-            sx={{ color: 'text.secondary', py: 2 }}
-          >
-            No more data
-          </Typography>
-        )}
       </Stack>
-
-      {/* Popover */}
-      <MenuPopover
-        open={openPopover}
-        onClose={handleClosePopover}
-        arrow="right-top"
-        sx={{ width: 140 }}
-      >
-        <MenuItem
-          onClick={() => {
-            handleOpenConfirm();
-            handleClosePopover();
-          }}
-          sx={{ color: 'error.main' }}
-        >
-          <Iconify icon="eva:refresh-outline" />
-          Revert
-        </MenuItem>
-      </MenuPopover>
-
-      {/* Confirm Dialog */}
-      <ConfirmDialog
-        open={openConfirm}
-        onClose={handleCloseConfirm}
-        title="Revert Result"
-        content="Are you sure you want to revert this result?"
-        action={
-          <Button
-            variant="contained"
-            color="error"
-            onClick={() => {
-              onSelectRow?.(selectedRow);
-              handleCloseConfirm();
-            }}
-          >
-            Revert
-          </Button>
-        }
-      />
     </Box>
   );
 }
 
 TransactionMobileViewCardLayout.propTypes = {
   data: PropTypes.array,
-  onEditRow: PropTypes.func,
-  onDeleteRow: PropTypes.func,
-  onSelectRow: PropTypes.func,
-  selected: PropTypes.array,
+  loading: PropTypes.bool,
 };
 
 export default TransactionMobileViewCardLayout;

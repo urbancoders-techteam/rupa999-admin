@@ -20,7 +20,7 @@ import { PATH_DASHBOARD } from '../../../routes/paths';
 import AddDeductBalanceModal from '../form/UserAddDeductForm';
 import StatusToggleCell from './StatusToggledCell';
 
-function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange, onChangePassword, changePasswordLoading, onViewBankDetails, bankDetails, bankDetailsLoading }) {
+function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange, onChangePassword, changePasswordLoading, onViewBankDetails, bankDetails, bankDetailsLoading, onAddDeductBalance, addDeductBalanceLoading }) {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
@@ -29,13 +29,35 @@ function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange
   const totalPages = Math.ceil(data.length / rowsPerPage);
   const [paginatedData, setPaginatedData] = useState([]);
 
-  const [open, setOpen] = useState(false);
+  const [openAddDeduct, setOpenAddDeduct] = useState(false);
   const [openChangePassword, setOpenChangePassword] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [selectedUserName, setSelectedUserName] = useState(null);
+  const [selectedUserBalance, setSelectedUserBalance] = useState(0);
 
-  const handleSubmit = (values) => {
-    console.log('Submitted:', values);
+  const handleSubmit = async (values) => {
+    if (onAddDeductBalance && selectedUserId) {
+      try {
+        await onAddDeductBalance(selectedUserId, values.amount, values.action);
+        setOpenAddDeduct(false);
+        setSelectedUserId(null);
+        setSelectedUserBalance(0);
+      } catch (error) {
+        // Error is already handled in the parent component
+      }
+    }
+  };
+
+  const handleOpenAddDeduct = (userId, userBalance) => {
+    setSelectedUserId(userId);
+    setSelectedUserBalance(userBalance || 0);
+    setOpenAddDeduct(true);
+  };
+
+  const handleCloseAddDeduct = () => {
+    setOpenAddDeduct(false);
+    setSelectedUserId(null);
+    setSelectedUserBalance(0);
   };
 
   const handleOpenChangePassword = (userId, userName) => {
@@ -261,7 +283,7 @@ function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange
                       </Accordion>
 
                       <Stack spacing={1}>
-                        <Button variant="contained" onClick={() => setOpen(true)}>
+                        <Button variant="contained" onClick={() => handleOpenAddDeduct(row._id, row.balance)}>
                           <b>Add / Deduct Money</b>
                         </Button>
 
@@ -307,10 +329,11 @@ function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange
       )}
 
       <AddDeductBalanceModal
-        open={open}
-        handleClose={() => setOpen(false)}
-        currentBalance={2.01}
+        open={openAddDeduct}
+        handleClose={handleCloseAddDeduct}
+        currentBalance={selectedUserBalance}
         onSubmit={handleSubmit}
+        loading={addDeductBalanceLoading}
       />
 
       <ChangePasswordDialog
@@ -334,6 +357,8 @@ UserMobileViewCardLayout.propTypes = {
   bankDetails: PropTypes.object,
   bankDetailsLoading: PropTypes.bool,
   onViewBankDetails: PropTypes.func,
+  onAddDeductBalance: PropTypes.func,
+  addDeductBalanceLoading: PropTypes.bool,
 };
 
 export default UserMobileViewCardLayout;

@@ -16,8 +16,8 @@ import ConfirmDialog from '../../../components/confirm-dialog';
 import Iconify from '../../../components/iconify';
 import MenuPopover from '../../../components/menu-popover';
 import { fDateTime } from '../../../utils/formatTime';
-import StatusToggleCell from './StatusToggledCell';
 import AddDeductBalanceModal from '../form/UserAddDeductForm';
+import StatusToggleCell from './StatusToggledCell';
 
 // ----------------------------------------------------------------------
 // ✅ Move this styled component OUTSIDE of UserTableRow
@@ -57,6 +57,8 @@ UserTableRow.propTypes = {
   bankDetailsLoading: PropTypes.bool,
   onChangePassword: PropTypes.func,
   changePasswordLoading: PropTypes.bool,
+  onAddDeductBalance: PropTypes.func,
+  addDeductBalanceLoading: PropTypes.bool,
 };
 
 export default function UserTableRow({
@@ -73,6 +75,8 @@ export default function UserTableRow({
   bankDetailsLoading,
   onChangePassword,
   changePasswordLoading,
+  onAddDeductBalance,
+  addDeductBalanceLoading,
 }) {
   const {
     _id,
@@ -90,11 +94,27 @@ export default function UserTableRow({
   const [openConfirm, setOpenConfirm] = useState(false);
   const [openBankDetails, setOpenBankDetails] = useState(false);
   const [openChangePassword, setOpenChangePassword] = useState(false);
+  const [openAddDeduct, setOpenAddDeduct] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [open, setOpen] = useState(false);
 
-  const handleSubmit = (values) => {
-    console.log('Submitted:', values);
+  const handleSubmit = async (values) => {
+    if (onAddDeductBalance) {
+      try {
+        await onAddDeductBalance(_id, values.amount, values.action);
+        setOpenAddDeduct(false);
+      } catch (error) {
+        // Error is already handled in the parent component
+      }
+    }
+  };
+
+  const handleOpenAddDeduct = () => {
+    setOpenAddDeduct(true);
+    handleClosePopover();
+  };
+
+  const handleCloseAddDeduct = () => {
+    setOpenAddDeduct(false);
   };
 
   const handleOpenConfirm = () => setOpenConfirm(true);
@@ -203,7 +223,7 @@ export default function UserTableRow({
         }}
       >
         <MenuItem
-          onClick={() => setOpen(true)}
+          onClick={handleOpenAddDeduct}
         >
           <Iconify icon="solar:wallet-bold" />
           Add / Deduct Money
@@ -215,11 +235,11 @@ export default function UserTableRow({
             handleClosePopover();
           }}
         >
-          <Iconify icon="solar:wallet-bold" />
-          Transactions
+          <Iconify icon="mdi:bank-transfer" />
+          Ledgers
         </MenuItem>
 
-        <MenuItem
+        {/* <MenuItem
           onClick={() => {
             onWithdrawalRequestRow();
             handleClosePopover();
@@ -227,7 +247,7 @@ export default function UserTableRow({
         >
           <Iconify icon="mdi:bank-transfer" />
           Withdrawal Details
-        </MenuItem>
+        </MenuItem> */}
 
         <MenuItem onClick={handleViewBankDetails}>
           <Iconify icon="mdi:bank" />
@@ -274,10 +294,11 @@ export default function UserTableRow({
       />
 
       <AddDeductBalanceModal
-        open={open}
-        handleClose={() => setOpen(false)}
-        currentBalance={2.01}
+        open={openAddDeduct}
+        handleClose={handleCloseAddDeduct}
+        currentBalance={balance || 0}
         onSubmit={handleSubmit}
+        loading={addDeductBalanceLoading}
       />
 
       {/* Bank Details Dialog */}
