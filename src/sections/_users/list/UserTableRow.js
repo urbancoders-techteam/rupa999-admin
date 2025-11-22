@@ -215,6 +215,17 @@ export default function UserTableRow({ index, row, selected, onEditRow, onTransa
           <Iconify icon="mdi:lock-reset" />
           Change Password
         </MenuItem>
+
+        <MenuItem
+          onClick={() => {
+            handleOpenConfirm();
+            handleClosePopover();
+          }}
+          sx={{ color: 'error.main' }}
+        >
+          <Iconify icon="eva:trash-2-outline" />
+          Delete
+        </MenuItem>
       </MenuPopover>
 
       {/* Confirm Delete */}
@@ -222,9 +233,18 @@ export default function UserTableRow({ index, row, selected, onEditRow, onTransa
         open={openConfirm}
         onClose={handleCloseConfirm}
         title="Delete User"
-        content="Are you sure you want to delete this user?"
+        content="Are you sure you want to delete this user? This action cannot be undone."
         action={
-          <Button variant="contained" color="error" onClick={onDeleteRow}>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => {
+              if (onDeleteRow) {
+                onDeleteRow();
+              }
+              handleCloseConfirm();
+            }}
+          >
             Delete
           </Button>
         }

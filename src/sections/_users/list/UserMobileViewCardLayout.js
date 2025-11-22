@@ -285,7 +285,7 @@ function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange
                         <IconButton size="small" color="primary" onClick={() => onEditRow(row.name)}>
                           <EditIcon fontSize="small" />
                         </IconButton>
-                        <IconButton size="small" color="error" onClick={() => onDeleteRow(row.id)}>
+                        <IconButton size="small" color="error" onClick={() => onDeleteRow(row._id || row.id)}>
                           <DeleteIcon fontSize="small" />
                         </IconButton>
                       </Stack>
