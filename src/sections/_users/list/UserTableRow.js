@@ -17,6 +17,7 @@ import Iconify from '../../../components/iconify';
 import MenuPopover from '../../../components/menu-popover';
 import { fDateTime } from '../../../utils/formatTime';
 import StatusToggleCell from './StatusToggledCell';
+import AddDeductBalanceModal from '../form/UserAddDeductForm';
 
 // ----------------------------------------------------------------------
 // ✅ Move this styled component OUTSIDE of UserTableRow
@@ -58,7 +59,21 @@ UserTableRow.propTypes = {
   changePasswordLoading: PropTypes.bool,
 };
 
-export default function UserTableRow({ index, row, selected, onEditRow, onTransationRow, onWithdrawalRequestRow, onDeleteRow, onStatusChange, onViewBankDetails, bankDetails, bankDetailsLoading, onChangePassword, changePasswordLoading }) {
+export default function UserTableRow({
+  index,
+  row,
+  selected,
+  onEditRow,
+  onTransationRow,
+  onWithdrawalRequestRow,
+  onDeleteRow,
+  onStatusChange,
+  onViewBankDetails,
+  bankDetails,
+  bankDetailsLoading,
+  onChangePassword,
+  changePasswordLoading,
+}) {
   const {
     _id,
     name,
@@ -76,6 +91,11 @@ export default function UserTableRow({ index, row, selected, onEditRow, onTransa
   const [openBankDetails, setOpenBankDetails] = useState(false);
   const [openChangePassword, setOpenChangePassword] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [open, setOpen] = useState(false);
+
+  const handleSubmit = (values) => {
+    console.log('Submitted:', values);
+  };
 
   const handleOpenConfirm = () => setOpenConfirm(true);
   const handleCloseConfirm = () => setOpenConfirm(false);
@@ -183,6 +203,13 @@ export default function UserTableRow({ index, row, selected, onEditRow, onTransa
         }}
       >
         <MenuItem
+          onClick={() => setOpen(true)}
+        >
+          <Iconify icon="solar:wallet-bold" />
+          Add / Deduct Money
+        </MenuItem>
+
+        <MenuItem
           onClick={() => {
             onTransationRow();
             handleClosePopover();
@@ -202,16 +229,12 @@ export default function UserTableRow({ index, row, selected, onEditRow, onTransa
           Withdrawal Details
         </MenuItem>
 
-        <MenuItem
-          onClick={handleViewBankDetails}
-        >
+        <MenuItem onClick={handleViewBankDetails}>
           <Iconify icon="mdi:bank" />
           Bank Details
         </MenuItem>
 
-        <MenuItem
-          onClick={handleOpenChangePassword}
-        >
+        <MenuItem onClick={handleOpenChangePassword}>
           <Iconify icon="mdi:lock-reset" />
           Change Password
         </MenuItem>
@@ -248,6 +271,13 @@ export default function UserTableRow({ index, row, selected, onEditRow, onTransa
             Delete
           </Button>
         }
+      />
+
+      <AddDeductBalanceModal
+        open={open}
+        handleClose={() => setOpen(false)}
+        currentBalance={2.01}
+        onSubmit={handleSubmit}
       />
 
       {/* Bank Details Dialog */}
