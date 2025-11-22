@@ -2,23 +2,23 @@ import PropTypes from 'prop-types';
 import { useState } from 'react';
 // @mui
 import {
-  Stack,
   Avatar,
-  TableRow,
-  MenuItem,
-  TableCell,
   IconButton,
+  MenuItem,
+  Stack,
+  TableCell,
+  TableRow,
   Typography,
 } from '@mui/material';
 // components
-import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
+import Label from '../../../components/label';
 import MenuPopover from '../../../components/menu-popover';
 
 // ----------------------------------------------------------------------
 
 WithdrawDetailsTableRow.propTypes = {
-  index : PropTypes.number,
+  index: PropTypes.number,
   row: PropTypes.object,
   onEditRow: PropTypes.func,
 };
@@ -38,7 +38,7 @@ export default function WithdrawDetailsTableRow({ index, row, onEditRow }) {
 
   return (
     <>
-      <TableRow hover   sx={{ '&:last-child td, &:last-child th': { border: .5}}}>
+      <TableRow hover sx={{ '&:last-child td, &:last-child th': { border: .5 } }}>
         {/* <TableCell align="left">{" "}</TableCell> */}
         <TableCell align="center" >{index}</TableCell>
 
@@ -69,17 +69,17 @@ export default function WithdrawDetailsTableRow({ index, row, onEditRow }) {
             }}
           />
         </TableCell>
-            <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
-              {role}
-            </TableCell>
-            <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
-              {upi}
-            </TableCell>
+        <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
+          {role}
+        </TableCell>
+        <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
+          {upi}
+        </TableCell>
 
         <TableCell align="left">
           <Label
             variant="soft"
-            color={(status === 'banned' && 'error') || 'success'}
+            color={(status === 'inactive' && 'error') || 'success'}
             sx={{ textTransform: 'capitalize' }}
           >
             {status}

@@ -1,6 +1,5 @@
 /* eslint-disable no-nested-ternary */
 import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
 import {
   Accordion,
@@ -8,9 +7,7 @@ import {
   AccordionSummary,
   Box,
   Button,
-  Divider,
-  IconButton,
-  Pagination,
+  Divider, Pagination,
   Paper,
   Stack,
   Typography
@@ -178,9 +175,9 @@ function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange
 
                       <Typography
                         variant="subtitle2"
-                        color={row.status === 'Active' ? 'primary' : 'error'}
+                        color={row.status === 'active' ? 'primary' : 'error'}
                       >
-                        {row.status}
+                        {row.status === 'active' ? 'Active' : 'InActive'}
                       </Typography>
                     </Stack>
                   </AccordionSummary>
@@ -275,19 +272,15 @@ function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange
 
                       <Divider sx={{ my: 1 }} />
 
-                      <Stack direction="row" justifyContent="space-between" spacing={1}>
+                      <Stack direction="row" justifyContent="flex-end" spacing={1}>
                         <StatusToggleCell
                           id={row._id}
                           status={typeof row.status === 'boolean' ? row.status : row.status === 'Active' || row.status === 'active'}
                           onStatusChange={onStatusChange}
                         />
-
-                        <IconButton size="small" color="primary" onClick={() => onEditRow(row.name)}>
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                        <IconButton size="small" color="error" onClick={() => onDeleteRow(row._id || row.id)}>
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
+                        <Button startIcon={<DeleteIcon fontSize="small" />} variant='text' color="error" onClick={() => onDeleteRow(row._id || row.id)} sx={{ px: 2 }}>
+                          <Typography variant="body2">Delete</Typography>
+                        </Button>
                       </Stack>
                     </Stack>
                   </AccordionDetails>

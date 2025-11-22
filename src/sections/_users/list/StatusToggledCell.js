@@ -68,7 +68,7 @@ export default function StatusToggleCell({
   const isLoading = loading || externalLoading;
 
   return (
-    <TableCell align={align} sx={{ minWidth: 160 }}>
+    <TableCell align={align} sx={{ minWidth: 160, p: 0, m: 0 }}>
       <Stack
         direction="row"
         alignItems="center"

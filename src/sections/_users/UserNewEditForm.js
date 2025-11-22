@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types';
-import * as Yup from 'yup';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import * as Yup from 'yup';
 // form
-import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { Controller, useForm } from 'react-hook-form';
 // @mui
 import { LoadingButton } from '@mui/lab';
-import { Box, Card, Grid, Stack, Switch, Typography, FormControlLabel } from '@mui/material';
+import { Box, Card, FormControlLabel, Grid, Stack, Switch, Typography } from '@mui/material';
 // utils
 import { fData } from '../../utils/formatNumber';
 // routes
@@ -15,14 +15,14 @@ import { PATH_DASHBOARD } from '../../routes/paths';
 // assets
 import { countries } from '../../assets/data';
 // components
-import Label from '../../components/label';
-import { useSnackbar } from '../../components/snackbar';
 import FormProvider, {
   RHFSelect,
   RHFSwitch,
   RHFTextField,
   RHFUploadAvatar,
 } from '../../components/hook-form';
+import Label from '../../components/label';
+import { useSnackbar } from '../../components/snackbar';
 
 // ----------------------------------------------------------------------
 
@@ -171,7 +171,7 @@ export default function UserNewEditForm({ isEdit = false, currentUser }) {
                         {...field}
                         checked={field.value !== 'active'}
                         onChange={(event) =>
-                          field.onChange(event.target.checked ? 'banned' : 'active')
+                          field.onChange(event.target.checked ? 'inactive' : 'active')
                         }
                       />
                     )}
@@ -180,7 +180,7 @@ export default function UserNewEditForm({ isEdit = false, currentUser }) {
                 label={
                   <>
                     <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                      Banned
+                      InActive
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                       Apply disable account

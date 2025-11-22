@@ -125,11 +125,11 @@ export default function UserListPage() {
     totalWon: user.totalWon || 0,
     totalWithdraw: user.totalWithdraw || 0,
     totalBonus: user.totalBonus || 0,
-    status: user.status === 'active', // Boolean for StatusToggleCell: true = Active, false = InActive/Banned
+    status: user.status === 'active', // Boolean for StatusToggleCell: true = Active false = inactive
     statusLabel: (() => {
-      if (user.status === 'banned') return 'Blocked';
+      if (user.status === 'inactive') return 'Blocked';
       if (user.status === 'active') return 'Active';
-      return 'InActive';
+      return 'inactive';
     })(),
     statusValue: user.status,
     isVerified: user.isVerified || false,
@@ -213,7 +213,7 @@ export default function UserListPage() {
 
   const handleStatusChange = async (id, status) => {
     try {
-      const statusValue = status ? 'active' : 'banned';
+      const statusValue = status ? 'active' : 'inactive';
       await dispatch(updateUserStatusAsync({ id, status: statusValue })).unwrap();
       enqueueSnackbar(`User ${status ? 'activated' : 'blocked'} successfully!`, { variant: 'success' });
       // Refresh the list
