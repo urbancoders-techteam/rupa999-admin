@@ -99,7 +99,7 @@ const navConfig = [
         icon: ICONS.banking,
       },
       {
-        title: 'Diposit History',
+        title: 'Deposit History',
         path: PATH_DASHBOARD.diposithistory.list,
         icon: ICONS.banking,
       },

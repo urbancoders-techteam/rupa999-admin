@@ -16,7 +16,6 @@ import {
 } from '@mui/material';
 // redux
 import { useDispatch, useSelector } from 'react-redux';
-import useResponsive from '../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
 // components
@@ -25,7 +24,6 @@ import Scrollbar from '../components/scrollbar';
 import { useSettingsContext } from '../components/settings';
 import {
   emptyRows,
-  getComparator,
   TableEmptyRows,
   TableHeadCustom,
   TableNoData,
@@ -35,7 +33,6 @@ import {
 // sections
 import CustomTableToolbar from '../components/table/CustomTableToolBar';
 import { getUserLedgersAsync } from '../redux/services/user_services';
-import TransactionMobileViewCardLayout from '../sections/_users/transactions/list/TransactionMobileViewCardLayout';
 import TransactionTableRow from '../sections/_users/transactions/list/TransactionTableRow';
 
 // ----------------------------------------------------------------------
@@ -118,18 +115,7 @@ export default function UserTransactionListPage() {
     [transactionsList]
   );
 
-  const dataFiltered = useMemo(
-    () =>
-      applyFilter({
-        inputData: tableData,
-        comparator: getComparator(order, orderBy),
-      }),
-    [tableData, order, orderBy]
-  );
-
   const denseHeight = dense ? 52 : 72;
-
-  const isMobile = useResponsive('down', 'sm');
 
   const isFiltered = filterParticulars !== 'all';
 
@@ -152,43 +138,14 @@ export default function UserTransactionListPage() {
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <CustomBreadcrumbs
-          heading="Ledgers List"
+          heading="Transaction List"
           links={[
             { name: 'Dashboard', href: PATH_DASHBOARD.root },
             { name: 'User List', href: PATH_DASHBOARD.user.list },
-            { name: 'Ledgers List' },
+            { name: 'Transaction List' },
           ]}
         />
 
-        {isMobile ? (
-          <>
-            <Stack direction="row" spacing={2} sx={{ mx: 1.5 }}>
-              <TextField
-                select
-                label="Particulars"
-                size="small"
-                fullWidth
-                value={filterParticulars}
-                onChange={handleFilterParticulars}
-                sx={{ minWidth: 150 }}
-              >
-                {PARTICULAR_OPTIONS.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Stack>
-            <CustomTableToolbar
-              isFiltered={isFiltered}
-              onResetFilter={handleResetFilter}
-            />
-            <TransactionMobileViewCardLayout
-              data={tableData}
-              loading={transactionsLoading}
-            />
-          </>
-        ) : (
           <Card>
             <Stack direction="row" spacing={2} sx={{ p: 2, pb: 0 }}>
               <TextField
@@ -207,10 +164,7 @@ export default function UserTransactionListPage() {
               </TextField>
             </Stack>
 
-            <CustomTableToolbar
-              isFiltered={isFiltered}
-              onResetFilter={handleResetFilter}
-            />
+            <CustomTableToolbar isFiltered={isFiltered} onResetFilter={handleResetFilter} />
 
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
               <Scrollbar>
@@ -261,7 +215,6 @@ export default function UserTransactionListPage() {
               onChangeDense={onChangeDense}
             />
           </Card>
-        )}
       </Container>
     </>
   );
@@ -269,16 +222,3 @@ export default function UserTransactionListPage() {
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, comparator }) {
-  const stabilizedThis = inputData.map((el, index) => [el, index]);
-
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-
-  inputData = stabilizedThis.map((el) => el[0]);
-
-  return inputData;
-}

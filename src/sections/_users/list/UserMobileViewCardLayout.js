@@ -14,14 +14,11 @@ import {
 } from '@mui/material';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
 import ChangePasswordDialog from '../../../components/change-password-dialog/ChangePasswordDialog';
-import { PATH_DASHBOARD } from '../../../routes/paths';
 import AddDeductBalanceModal from '../form/UserAddDeductForm';
 import StatusToggleCell from './StatusToggledCell';
 
-function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange, onChangePassword, changePasswordLoading, onViewBankDetails, onAddDeductBalance, addDeductBalanceLoading }) {
-  const navigate = useNavigate();
+function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange, onChangePassword, changePasswordLoading, onViewBankDetails, onAddDeductBalance, addDeductBalanceLoading, onTransactionRow, onWithdrawalRequestsRow, onBidHistoryRow }) {
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
 
@@ -89,19 +86,6 @@ function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange
   const handlePageChange = (event, value) => {
     setPage(value);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  //   const viewUserBidHistory = (userId) => {
-  //     navigate(PATH_DASHBOARD.user.bidhistory(userId));
-  //   };
-  const viewTransaction = (userId) => {
-    navigate(PATH_DASHBOARD.user.transactions(userId));
-  };
-  const viewGameRecord = (userId) => {
-    navigate(PATH_DASHBOARD.user.bidhistory(userId));
-  };
-  const viewWithdrawalRequests = (userId) => {
-    navigate(PATH_DASHBOARD.user.withdrawalrequest(userId));
   };
 
   return (
@@ -211,15 +195,21 @@ function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange
                     }}
                   >
                     <Box flex={1} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                      <Button variant="contained" onClick={viewTransaction}>
-                        <Typography variant="body2"> Transaction</Typography>
-                      </Button>
-                      <Button variant="contained" onClick={viewWithdrawalRequests}>
-                        <Typography variant="body2">Withdrawal</Typography>
-                      </Button>
-                      <Button variant="contained" onClick={viewGameRecord}>
-                        <Typography variant="body2">Game</Typography>
-                      </Button>
+                      {onTransactionRow && (
+                        <Button variant="contained" onClick={() => onTransactionRow(row._id || row.id)}>
+                          <Typography variant="body2"> Transaction</Typography>
+                        </Button>
+                      )}
+                      {onWithdrawalRequestsRow && (
+                        <Button variant="contained" onClick={() => onWithdrawalRequestsRow(row._id || row.id)}>
+                          <Typography variant="body2">Withdrawal</Typography>
+                        </Button>
+                      )}
+                      {onBidHistoryRow && (
+                        <Button variant="contained" onClick={() => onBidHistoryRow(row._id || row.id)}>
+                          <Typography variant="body2">Bid History</Typography>
+                        </Button>
+                      )}
                     </Box>
                     <Stack spacing={0.5}>
                       <Typography variant="body2">
@@ -356,6 +346,9 @@ UserMobileViewCardLayout.propTypes = {
   onViewBankDetails: PropTypes.func,
   onAddDeductBalance: PropTypes.func,
   addDeductBalanceLoading: PropTypes.bool,
+  onTransactionRow: PropTypes.func,
+  onWithdrawalRequestsRow: PropTypes.func,
+  onBidHistoryRow: PropTypes.func,
 };
 
 export default UserMobileViewCardLayout;

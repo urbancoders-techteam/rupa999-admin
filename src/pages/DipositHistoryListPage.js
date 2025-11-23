@@ -134,17 +134,17 @@ export default function DipositHistoryListPage() {
   return (
     <>
       <Helmet>
-        <title> Diposit History : List | Rupa999 </title>
+        <title> Deposit History : List | Rupa999 </title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         {!isMobile ? (
           <Box sx={{ position: 'sticky', top: 0, zIndex: 10, bgcolor: 'background.paper' }}>
             <CustomBreadcrumbs
-              heading="Diposit History List"
+              heading="Deposit History List"
               links={[
                 { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                { name: 'Diposit History List', href: PATH_DASHBOARD.diposithistory.root },
+                { name: 'Deposit History List', href: PATH_DASHBOARD.diposithistory.root },
               ]}
             />
             <CustomTableToolbar
@@ -158,10 +158,10 @@ export default function DipositHistoryListPage() {
         ) : (
           <>
             <CustomBreadcrumbs
-              heading="Diposit History List"
+              heading="Deposit History List"
               links={[
                 { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                { name: 'Diposit History List', href: PATH_DASHBOARD.marketrecords.root },
+                { name: 'Deposit History List', href: PATH_DASHBOARD.marketrecords.root },
               ]}
             />
             <CustomTableToolbar

@@ -9,14 +9,18 @@ import Iconify from '../../../components/iconify';
 WithdrawDetailsToolbar.propTypes = {
   isFiltered: PropTypes.bool,
   filterName: PropTypes.string,
+  filterUserId: PropTypes.string,
   onFilterName: PropTypes.func,
+  onFilterUserId: PropTypes.func,
   onResetFilter: PropTypes.func,
 };
 
 export default function WithdrawDetailsToolbar({
   isFiltered,
   filterName,
+  filterUserId,
   onFilterName,
+  onFilterUserId,
   onResetFilter,
 }) {
   return (
@@ -29,42 +33,6 @@ export default function WithdrawDetailsToolbar({
       }}
       sx={{ px: {xs: 0.5, md: 2.5}, py: {xs: 0, md: 3 }}}
     >
-      {/* <TextField
-        fullWidth
-        select
-        label="Role"
-        value={filterRole}
-        onChange={onFilterRole}
-        SelectProps={{
-          MenuProps: {
-            PaperProps: {
-              sx: {
-                maxHeight: 260,
-              },
-            },
-          },
-        }}
-        sx={{
-          maxWidth: { sm: 240 },
-          textTransform: 'capitalize',
-        }}
-      >
-        {optionsRole.map((option) => (
-          <MenuItem
-            key={option}
-            value={option}
-            sx={{
-              mx: 1,
-              borderRadius: 0.75,
-              typography: 'body2',
-              textTransform: 'capitalize',
-            }}
-          >
-            {option}
-          </MenuItem>
-        ))}
-      </TextField> */}
-
       <TextField
         fullWidth
         value={filterName}
@@ -78,6 +46,22 @@ export default function WithdrawDetailsToolbar({
           ),
         }}
       />
+
+      {onFilterUserId && (
+        <TextField
+          fullWidth
+          value={filterUserId}
+          onChange={onFilterUserId}
+          placeholder="Filter by User ID..."
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Iconify icon="eva:person-fill" sx={{ color: 'text.disabled' }} />
+              </InputAdornment>
+            ),
+          }}
+        />
+      )}
 
       {isFiltered && (
         <Button

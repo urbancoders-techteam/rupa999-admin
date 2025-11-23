@@ -182,17 +182,17 @@ export default function GeneralWithdrawHistoryListPage() {
   return (
     <>
       <Helmet>
-        <title> General Withdraw History List : List | Rupa999 </title>
+        <title> Main Withdraw History List : List | Rupa999 </title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         {isMobile ? (
           <Box sx={{ position: 'sticky', top: 0, zIndex: 10, bgcolor: 'background.paper' }}>
             <CustomBreadcrumbs
-              heading="General Withdraw History List"
+              heading="Main Withdraw History List"
               links={[
                 { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                { name: 'General Withdraw History List', href: PATH_DASHBOARD.generalwithdrawhistory.list },
+                { name: 'Main Withdraw History List', href: PATH_DASHBOARD.generalwithdrawhistory.list },
               ]}
             />
             <WithdrawDetailsToolbar
@@ -206,10 +206,10 @@ export default function GeneralWithdrawHistoryListPage() {
         ) : (
           <>
             <CustomBreadcrumbs
-              heading="General Withdraw History List"
+              heading="Main Withdraw History List"
               links={[
                 { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                { name: 'General Withdraw History List', href: PATH_DASHBOARD.generalwithdrawhistory.list },
+                { name: 'Main Withdraw History List', href: PATH_DASHBOARD.generalwithdrawhistory.list },
               ]}
             />
             <CustomTableToolbar

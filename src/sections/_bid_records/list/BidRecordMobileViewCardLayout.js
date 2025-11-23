@@ -9,16 +9,16 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { fDateTime } from '../../../../utils/formatTime';
+import { fDateTime } from '../../../utils/formatTime';
+import Label from '../../../components/label';
 
-function BidHostoryMobileViewCardLayout({
+function BidRecordMobileViewCardLayout({
   data = [],
   loading = false,
 }) {
   const theme = useTheme();
 
   const getDisplayDate = (row) => {
-    if (row.date) return fDateTime(row.date);
     if (row.createdAt) return fDateTime(row.createdAt);
     return 'N/A';
   };
@@ -51,7 +51,7 @@ function BidHostoryMobileViewCardLayout({
         }}
       >
         <Typography variant="body2" color="text.secondary">
-          No bid history found
+          No bid records found
         </Typography>
       </Box>
     );
@@ -72,9 +72,18 @@ function BidHostoryMobileViewCardLayout({
           >
             {/* Header */}
             <Box mb={1.5}>
-              <Typography variant="subtitle1" fontWeight={600} noWrap>
-                {row.marketName || 'N/A'}
-              </Typography>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" mb={0.5}>
+                <Typography variant="subtitle1" fontWeight={600} noWrap>
+                  {row.marketName || 'N/A'}
+                </Typography>
+                <Label
+                  variant="soft"
+                  color={row.userName === 'Open' ? 'success' : 'warning'}
+                  sx={{ textTransform: 'capitalize', fontSize: '0.75rem' }}
+                >
+                  {row.userName || 'N/A'}
+                </Label>
+              </Stack>
               <Typography variant="caption" color="text.secondary">
                 ID: {row.id || '—'}
               </Typography>
@@ -82,14 +91,14 @@ function BidHostoryMobileViewCardLayout({
 
             <Divider sx={{ my: 1.5 }} />
 
-            {/* Bid Details */}
+            {/* Bid Record Details */}
             <Stack spacing={1}>
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2" color="text.secondary">
-                  Game Name:
+                  Game:
                 </Typography>
                 <Typography variant="body2" fontWeight={500}>
-                  {row.name || '—'}
+                  {row.session || '—'}
                 </Typography>
               </Stack>
 
@@ -98,22 +107,35 @@ function BidHostoryMobileViewCardLayout({
                   Digit:
                 </Typography>
                 <Typography variant="body2" fontWeight={500}>
-                  {row.digit || '—'}
+                  {row.number || '—'}
                 </Typography>
               </Stack>
 
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2" color="text.secondary">
-                  Point:
+                  Amount:
                 </Typography>
                 <Typography variant="body2" fontWeight={500}>
-                  {row.point || '—'}
+                  ₹{row.amount?.toLocaleString('en-IN') || '0'}
                 </Typography>
               </Stack>
 
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2" color="text.secondary">
-                  Date:
+                  Win Amount:
+                </Typography>
+                <Typography 
+                  variant="body2" 
+                  fontWeight={500}
+                  sx={{ color: row.winAmount > 0 ? 'success.main' : 'text.primary' }}
+                >
+                  ₹{row.winAmount?.toLocaleString('en-IN') || '0'}
+                </Typography>
+              </Stack>
+
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="body2" color="text.secondary">
+                  Created At:
                 </Typography>
                 <Typography variant="body2" fontWeight={500}>
                   {getDisplayDate(row)}
@@ -127,9 +149,10 @@ function BidHostoryMobileViewCardLayout({
   );
 }
 
-BidHostoryMobileViewCardLayout.propTypes = {
+BidRecordMobileViewCardLayout.propTypes = {
   data: PropTypes.array,
   loading: PropTypes.bool,
 };
 
-export default BidHostoryMobileViewCardLayout;
+export default BidRecordMobileViewCardLayout;
+

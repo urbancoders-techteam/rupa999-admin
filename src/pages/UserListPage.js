@@ -57,7 +57,7 @@ const TABLE_HEAD = [
   { id: 'isVerified', label: 'Total Game Amt', align: 'center' },
   { id: 'totalWon', label: 'Total Won', align: 'left' },
   { id: 'Withdraw', label: 'Total Withdraw', align: 'left' },
-  { id: 'diposit', label: 'Total Diposit', align: 'left' },
+  { id: 'diposit', label: 'Total Deposit', align: 'left' },
   { id: 'status', label: 'Blocked Status', align: 'left' },
   { id: 'createdAt', label: 'createdAt', align: 'left' },
 ];
@@ -89,12 +89,12 @@ export default function UserListPage() {
   const { enqueueSnackbar } = useSnackbar();
 
   // Redux state
-  const { userList, loading, pagination } = useSelector((state) => state.user);
+  const { userList, pagination } = useSelector((state) => state.user);
 
   const [openConfirm, setOpenConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [filterName, setFilterName] = useState('');
-  const [filterRole, setFilterRole] = useState('all');
+  const [filterRole] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [changePasswordLoading, setChangePasswordLoading] = useState(false);
   const [addDeductBalanceLoading, setAddDeductBalanceLoading] = useState(false);
@@ -158,10 +158,6 @@ export default function UserListPage() {
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
-  };
-
-  const handleCloseConfirm = () => {
-    setOpenConfirm(false);
   };
 
   const handleFilterStatus = (event, newValue) => {
@@ -229,13 +225,6 @@ export default function UserListPage() {
     }
   };
 
-  const handleResetFilter = () => {
-    setFilterName('');
-    setFilterRole('all');
-    setFilterStatus('all');
-    setPage(0);
-  };
-
   const handleEditRow = (id) => {
     navigate(PATH_DASHBOARD.user.edit(id));
   };
@@ -248,10 +237,8 @@ export default function UserListPage() {
     navigate(PATH_DASHBOARD.user.withdrawalrequest(id));
   };
 
-  const handleViewBankDetails = (userId) => {
-    // Bank details are now included in the user object, no API call needed
-    // This function is kept for compatibility with child components
-    // The actual bank details will be accessed from row.bankDetails
+  const handleBidHistoryRow = (userId) => {
+    navigate(PATH_DASHBOARD.user.bidhistory(userId));
   };
 
   const handleChangePassword = async (userId, password, cpassword) => {
@@ -361,9 +348,11 @@ export default function UserListPage() {
               onEditRow={handleEditRow}
               onDeleteRow={(id) => handleDeleteRow(id)}
               onStatusChange={handleStatusChange}
+              onTransactionRow={handleTransactionRow}
+              onBidHistoryRow={handleBidHistoryRow}
+              onWithdrawalRequestsRow={handleWithdrawalRequestRow}
               onChangePassword={(id, password, cpassword) => handleChangePassword(id, password, cpassword)}
               changePasswordLoading={changePasswordLoading}
-              onViewBankDetails={handleViewBankDetails}
               onAddDeductBalance={(id, amount, action) => handleAddDeductBalance(id, amount, action)}
               addDeductBalanceLoading={addDeductBalanceLoading}
             />
@@ -430,13 +419,12 @@ export default function UserListPage() {
                           key={row._id || row.id}
                           index={index}
                           row={row}
-                          // selected={selected.includes(row.id)}
                           onTransationRow={() => handleTransactionRow(row._id || row.id)}
                           onWithdrawalRequestRow={() => handleWithdrawalRequestRow(row._id || row.id)}
+                          onBidHistoryRow={() => handleBidHistoryRow(row._id || row.id)}
                           onDeleteRow={() => handleOpenDeleteConfirm(row._id || row.id)}
                           onEditRow={() => handleEditRow(row._id || row.id)}
                           onStatusChange={(_id, status) => handleStatusChange(_id, status)}
-                          onViewBankDetails={handleViewBankDetails}
                           onChangePassword={(id, password, cpassword) => handleChangePassword(id, password, cpassword)}
                           changePasswordLoading={changePasswordLoading}
                           onAddDeductBalance={(id, amount, action) => handleAddDeductBalance(id, amount, action)}

@@ -1,7 +1,6 @@
-import { paramCase } from 'change-case';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 // @mui
 import {
   Card,
@@ -11,11 +10,11 @@ import {
   TableContainer,
 } from '@mui/material';
 import { Box } from '@mui/system';
+// redux
+import { useDispatch, useSelector } from 'react-redux';
 import useResponsive from '../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
-// _mock_
-import { _userDataList } from '../_mock/arrays';
 // components
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 import Scrollbar from '../components/scrollbar';
@@ -27,23 +26,24 @@ import {
   TableHeadCustom,
   TableNoData,
   TablePaginationCustom,
+  TableSkeleton,
   useTable,
 } from '../components/table';
 // sections
-import CustomTableToolbar from '../components/table/CustomTableToolBar';
+import UserBidHistoryTableToolbar from '../sections/_users/bid-history/list/UserBidHistoryTableToolbar';
 import BidHostoryMobileViewCardLayout from '../sections/_users/bid-history/list/BidHostoryMobileViewCardLayout';
+import UserBidHistoryTableRow from '../sections/_users/bid-history/list/UserBidHistoryTableRow';
+import { getUserBidsAsync } from '../redux/services/user_services';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'Action', label: 'Action', align: 'left' },
-  { id: 'id', label: 'ID', align: 'left' },
+  { id: 'sNo.', label: 'S.No.', align: 'left' },
+  { id: 'marketName', label: 'Market Name', align: 'left' },
   { id: 'name', label: 'Game Name', align: 'left' },
-  { id: 'name', label: 'Game Type', align: 'left' },
   { id: 'digit', label: 'Digit', align: 'left' },
   { id: 'point', label: 'Point', align: 'left' },
   { id: 'date', label: 'Date', align: 'left' },
-
 ];
 
 // ----------------------------------------------------------------------
@@ -58,7 +58,6 @@ export default function UserBidHistoryListPage() {
     setPage,
     //
     selected,
-    setSelected,
     //
     onSort,
     onChangeDense,
@@ -67,63 +66,86 @@ export default function UserBidHistoryListPage() {
   } = useTable();
 
   const { themeStretch } = useSettingsContext();
+  const dispatch = useDispatch();
+  const { id: userId } = useParams();
 
-  const navigate = useNavigate();
-  // const theme = useTheme();
-
-  const [tableData, setTableData] = useState(_userDataList);
-
+  // Redux state
+  const { bidHistoryList, bidHistoryLoading, bidHistoryPagination } = useSelector(
+    (state) => state.user
+  );
 
   const [filterName, setFilterName] = useState('');
+  const [filterGameType, setFilterGameType] = useState(null);
+  const [filterStatus, setFilterStatus] = useState(null);
 
-  const [filterRole, setFilterRole] = useState('all');
+  const [filterRole] = useState('all');
 
-  const [filterStatus, setFilterStatus] = useState('all');
+  // Fetch bids on component mount and when filters change
+  useEffect(() => {
+    if (userId) {
+      dispatch(
+        getUserBidsAsync({
+          userId,
+          page: page + 1, // API uses 1-based pagination
+          limit: rowsPerPage,
+          search: filterName,
+          gameType: filterGameType?.value || '',
+          status: filterStatus?.value || '',
+        })
+      );
+    }
+  }, [dispatch, userId, page, rowsPerPage, filterName, filterGameType, filterStatus]);
+
+  // Transform API data to table format
+  const tableData = useMemo(
+    () =>
+      bidHistoryList.map((bid, index) => ({
+        id: bid._id || index + 1,
+        _id: bid._id,
+        marketName: bid.marketName || bid.market?.name || '-',
+        name: bid.gameName || bid.gameType || bid.name || '-',
+        digit: bid.digit || bid.number || '-',
+        point: bid.point || bid.amount || 0,
+        date: bid.date || bid.createdAt || '-',
+        gameType: bid.gameType,
+        status: bid.status,
+        ...bid,
+      })),
+    [bidHistoryList]
+  );
 
   const dataFiltered = applyFilter({
     inputData: tableData,
     comparator: getComparator(order, orderBy),
-    filterName,
-    filterRole,
-    filterStatus,
   });
-
-  const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   const denseHeight = dense ? 52 : 72;
 
   const isMobile = useResponsive('down', 'sm');
 
-  const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
+  const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== null || filterGameType !== null;
 
-  const isNotFound = true
-  // (!tableData.length && !!filterName) ||
-  // (!tableData.length && !!filterRole) ||
-  // (!tableData.length && !!filterStatus);
+  const isNotFound = !bidHistoryLoading && !tableData.length;
 
   const handleFilterName = (event) => {
     setPage(0);
     setFilterName(event.target.value);
   };
 
-  const handleDeleteRow = (id) => {
-    const deleteRow = tableData.filter((row) => row.id !== id);
-    setSelected([]);
-    setTableData(deleteRow);
-
-    if (page > 0) {
-      if (dataInPage.length < 2) {
-        setPage(page - 1);
-      }
-    }
+  const handleGameTypeChange = (gameType) => {
+    setPage(0);
+    setFilterGameType(gameType);
   };
 
-  const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
+  const handleStatusChange = (status) => {
+    setPage(0);
+    setFilterStatus(status);
   };
 
   const handleResetFilter = () => {
     setFilterName('');
+    setFilterGameType(null);
+    setFilterStatus(null);
   };
 
   return (
@@ -171,49 +193,47 @@ export default function UserBidHistoryListPage() {
 
         {isMobile ? (
           <>
-            <CustomTableToolbar
+            <UserBidHistoryTableToolbar
               isFiltered={isFiltered}
               filterName={filterName}
+              selectedGameType={filterGameType}
+              selectedStatus={filterStatus}
               onFilterName={handleFilterName}
+              onGameTypeChange={handleGameTypeChange}
+              onStatusChange={handleStatusChange}
               onResetFilter={handleResetFilter}
             />
             <BidHostoryMobileViewCardLayout
               data={dataFiltered}
-              onEditRow={handleEditRow}
-              onDeleteRow={(id) => handleDeleteRow(id)}
-            // onSelectRow={(id) => onSelectRow(id)}
-            // selected={selected}
+              loading={bidHistoryLoading}
+            />
+            <TablePaginationCustom
+              count={bidHistoryPagination?.total || dataFiltered.length}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={onChangePage}
+              onRowsPerPageChange={onChangeRowsPerPage}
+              dense={dense}
+              onChangeDense={onChangeDense}
             />
           </>
         ) : (
-          <Card>
-
-            <CustomTableToolbar
+          <>
+            <UserBidHistoryTableToolbar
               isFiltered={isFiltered}
               filterName={filterName}
+              selectedGameType={filterGameType}
+              selectedStatus={filterStatus}
               onFilterName={handleFilterName}
+              onGameTypeChange={handleGameTypeChange}
+              onStatusChange={handleStatusChange}
               onResetFilter={handleResetFilter}
             />
+            <Card>
+
+        
 
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
-              {/* <TableSelectedAction
-                dense={dense}
-                numSelected={selected.length}
-                rowCount={tableData.length}
-                onSelectAllRows={(checked) =>
-                  onSelectAllRows(
-                    checked,
-                    tableData.map((row) => row.id)
-                  )
-                }
-                action={
-                  <Tooltip title="Delete">
-                    <IconButton color="primary" onClick={handleOpenConfirm}>
-                      <Iconify icon="eva:trash-2-outline" />
-                    </IconButton>
-                  </Tooltip>
-                }
-              /> */}
 
               <Scrollbar>
                 <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
@@ -227,41 +247,45 @@ export default function UserBidHistoryListPage() {
                   />
 
                   <TableBody>
-                    {/* {dataFiltered
-                      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((row) => (
-                        <UserTableRow
-                          key={row.id}
-                          row={row}
-                          // selected={selected.includes(row.id)}
-                          // onSelectRow={() => onSelectRow(row.id)}
-                          onDeleteRow={() => handleDeleteRow(row.id)}
-                          onEditRow={() => handleEditRow(row.name)}
+                    {bidHistoryLoading ? (
+                      <TableSkeleton />
+                    ) : (
+                      <>
+                        {tableData.length > 0 ? (
+                          tableData.map((row, index) => (
+                            <UserBidHistoryTableRow
+                              key={row._id || row.id || index}
+                              index={index}
+                              row={row}
+                              selected={selected.includes(row.id)}
+                            />
+                          ))
+                        ) : (
+                          <TableNoData isNotFound={isNotFound} />
+                        )}
+
+                        <TableEmptyRows
+                          height={denseHeight}
+                          emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
                         />
-                      ))} */}
-
-                    <TableEmptyRows
-                      height={denseHeight}
-                      emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
-                    />
-
-                    <TableNoData isNotFound={isNotFound} />
+                      </>
+                    )}
                   </TableBody>
                 </Table>
               </Scrollbar>
             </TableContainer>
 
             <TablePaginationCustom
-              count={dataFiltered.length}
+              count={bidHistoryPagination?.total || tableData.length}
               page={page}
               rowsPerPage={rowsPerPage}
               onPageChange={onChangePage}
               onRowsPerPageChange={onChangeRowsPerPage}
-              //
               dense={dense}
               onChangeDense={onChangeDense}
             />
           </Card>
+          </>
         )}
       </Container>
     </>
@@ -270,7 +294,7 @@ export default function UserBidHistoryListPage() {
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, comparator, filterName, filterStatus, filterRole }) {
+function applyFilter({ inputData, comparator }) {
   const stabilizedThis = inputData.map((el, index) => [el, index]);
 
   stabilizedThis.sort((a, b) => {
@@ -279,21 +303,5 @@ function applyFilter({ inputData, comparator, filterName, filterStatus, filterRo
     return a[1] - b[1];
   });
 
-  inputData = stabilizedThis.map((el) => el[0]);
-
-  if (filterName) {
-    inputData = inputData.filter(
-      (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
-    );
-  }
-
-  if (filterStatus !== 'all') {
-    inputData = inputData.filter((user) => user.status === filterStatus);
-  }
-
-  if (filterRole !== 'all') {
-    inputData = inputData.filter((user) => user.role === filterRole);
-  }
-
-  return inputData;
+  return stabilizedThis.map((el) => el[0]);
 }

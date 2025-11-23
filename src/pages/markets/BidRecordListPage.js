@@ -3,14 +3,13 @@ import { paramCase } from 'change-case';
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 // @mui
-import { Card, Table, Button, TableBody, Container, TableContainer, Box } from '@mui/material';
+import { Card, Table, TableBody, Container, TableContainer, Box } from '@mui/material';
 import useResponsive from '../../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
 // _mock_
 // components
 import Scrollbar from '../../components/scrollbar';
-import ConfirmDialog from '../../components/confirm-dialog';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
 import {
@@ -24,8 +23,8 @@ import {
 } from '../../components/table';
 // sections
 import WithdrawDetailsToolbar from '../../sections/_withdraw_details/components/WithdrawDetailsToolbar';
-import WithdrawMobileViewCardLayout from '../../sections/_withdraw_details/components/WithdrawDetailsMobileViewCardLayout';
 import WinHistoryTableRow from '../../sections/_win_history/list/WinHistoryTableRow';
+import BidRecordMobileViewCardLayout from '../../sections/_bid_records/list/BidRecordMobileViewCardLayout';
 
 // ----------------------------------------------------------------------
 
@@ -33,6 +32,7 @@ import WinHistoryTableRow from '../../sections/_win_history/list/WinHistoryTable
 const bidRecordData = [
   {
     id: 1,
+    userId: 'user001',
     marketName: 'RAJDHANI DAY',
     userName: 'Open',
     session: 'Jodi Digit',
@@ -43,6 +43,7 @@ const bidRecordData = [
   },
   {
     id: 2,
+    userId: 'user002',
     marketName: 'RAJDHANI DAY',
     userName: 'Open',
     session: 'Single Pana',
@@ -53,6 +54,7 @@ const bidRecordData = [
   },
   {
     id: 3,
+    userId: 'user001',
     marketName: 'RAJDHANI DAY',
     userName: 'Close',
     session: 'Jodi Digit',
@@ -63,6 +65,7 @@ const bidRecordData = [
   },
   {
     id: 4,
+    userId: 'user003',
     marketName: 'RAJDHANI DAY',
     userName: 'Open',
     session: 'Jodi Digit',
@@ -73,6 +76,7 @@ const bidRecordData = [
   },
   {
     id: 5,
+    userId: 'user002',
     marketName: 'RAJDHANI DAY',
     userName: 'Close',
     session: 'Single Digit',
@@ -83,6 +87,7 @@ const bidRecordData = [
   },
   {
     id: 6,
+    userId: 'user001',
     marketName: 'RAJDHANI DAY',
     userName: 'Close',
     session: 'Double Pana',
@@ -93,6 +98,7 @@ const bidRecordData = [
   },
   {
     id: 7,
+    userId: 'user003',
     marketName: 'RAJDHANI DAY',
     userName: 'Close',
     session: 'Jodi Digit',
@@ -103,6 +109,7 @@ const bidRecordData = [
   },
   {
     id: 8,
+    userId: 'user002',
     marketName: 'RAJDHANI DAY',
     userName: 'Close',
     session: 'Triple Pana',
@@ -113,6 +120,7 @@ const bidRecordData = [
   },
   {
     id: 9,
+    userId: 'user001',
     marketName: 'RAJDHANI DAY',
     userName: 'Open',
     session: 'Single Pana',
@@ -123,6 +131,7 @@ const bidRecordData = [
   },
   {
     id: 10,
+    userId: 'user003',
     marketName: 'RAJDHANI DAY',
     userName: 'Open',
     session: 'Jodi Digit',
@@ -133,6 +142,7 @@ const bidRecordData = [
   },
   {
     id: 11,
+    userId: 'user002',
     marketName: 'RAJDHANI DAY',
     userName: 'Close',
     session: 'Half Sangam A',
@@ -143,6 +153,7 @@ const bidRecordData = [
   },
   {
     id: 12,
+    userId: 'user001',
     marketName: 'RAJDHANI DAY',
     userName: 'Close',
     session: 'Full Sangam',
@@ -153,6 +164,7 @@ const bidRecordData = [
   },
   {
     id: 13,
+    userId: 'user003',
     marketName: 'RAJDHANI DAY',
     userName: 'Open',
     session: 'Jodi Digit',
@@ -163,6 +175,7 @@ const bidRecordData = [
   },
   {
     id: 14,
+    userId: 'user002',
     marketName: 'RAJDHANI DAY',
     userName: 'Open',
     session: 'Single Digit',
@@ -173,6 +186,7 @@ const bidRecordData = [
   },
   {
     id: 15,
+    userId: 'user001',
     marketName: 'RAJDHANI DAY',
     userName: 'Close',
     session: 'Double Pana',
@@ -195,8 +209,8 @@ const TABLE_HEAD = [
   { id: 'createdAt', label: 'Created At', align: 'left' },
 ];
 
-// ----------------------------------------------------------------------
 
+// ----------------------------------------------------------------------
 export default function BidRecordListPage() {
   const {
     dense,
@@ -221,10 +235,10 @@ export default function BidRecordListPage() {
   const navigate = useNavigate();
 
   const [tableData, setTableData] = useState(bidRecordData);
-
-  const [openConfirm, setOpenConfirm] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [filterName, setFilterName] = useState('');
+  const [filterUserId, setFilterUserId] = useState('');
 
   const [filterRole, setFilterRole] = useState('all');
 
@@ -237,10 +251,11 @@ export default function BidRecordListPage() {
         inputData: tableData,
         comparator: getComparator(order, orderBy),
         filterName,
+        filterUserId,
         filterRole,
         filterStatus,
       }),
-    [tableData, order, orderBy, filterName, filterRole, filterStatus]
+    [tableData, order, orderBy, filterName, filterUserId, filterRole, filterStatus]
   );
 
   // Memoized paginated data
@@ -253,7 +268,7 @@ export default function BidRecordListPage() {
 
   const isMobile = useResponsive('down', 'sm');
 
-  const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
+  const isFiltered = filterName !== '' || filterUserId !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
   const isNotFound =
     (!dataFiltered.length && !!filterName) ||
@@ -261,13 +276,14 @@ export default function BidRecordListPage() {
     (!dataFiltered.length && !!filterStatus);
 
 
-  const handleCloseConfirm = () => {
-    setOpenConfirm(false);
-  };
-
   const handleFilterName = (event) => {
     setPage(0);
     setFilterName(event.target.value);
+  };
+
+  const handleFilterUserId = (event) => {
+    setPage(0);
+    setFilterUserId(event.target.value);
   };
 
   const handleDeleteRow = (id) => {
@@ -282,39 +298,13 @@ export default function BidRecordListPage() {
     }
   };
 
-  const handleDeleteRows = (selectedRows) => {
-    const deleteRows = tableData.filter((row) => !selectedRows.includes(row.id));
-    setSelected([]);
-    setTableData(deleteRows);
-
-    if (page > 0) {
-      if (selectedRows.length === dataInPage.length) {
-        setPage(page - 1);
-      } else if (selectedRows.length === dataFiltered.length) {
-        setPage(0);
-      } else if (selectedRows.length > dataInPage.length) {
-        <TablePaginationCustom
-          count={dataFiltered.length}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={onChangePage}
-          onRowsPerPageChange={onChangeRowsPerPage}
-          //
-          dense={dense}
-          onChangeDense={onChangeDense}
-        />;
-        const newPage = Math.ceil((tableData.length - selectedRows.length) / rowsPerPage) - 1;
-        setPage(newPage);
-      }
-    }
-  };
-
   const handleEditRow = (id) => {
     navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
   };
 
   const handleResetFilter = () => {
     setFilterName('');
+    setFilterUserId('');
     setFilterRole('all');
     setFilterStatus('all');
   };
@@ -340,7 +330,9 @@ export default function BidRecordListPage() {
             <WithdrawDetailsToolbar
               isFiltered={isFiltered}
               filterName={filterName}
+              filterUserId={filterUserId}
               onFilterName={handleFilterName}
+              onFilterUserId={handleFilterUserId}
               onResetFilter={handleResetFilter}
               sx={{ mt: 1 }}
             />
@@ -361,7 +353,9 @@ export default function BidRecordListPage() {
             <WithdrawDetailsToolbar
               isFiltered={isFiltered}
               filterName={filterName}
+              filterUserId={filterUserId}
               onFilterName={handleFilterName}
+              onFilterUserId={handleFilterUserId}
               onResetFilter={handleResetFilter}
               sx={{ mt: 1 }}
             />
@@ -370,13 +364,21 @@ export default function BidRecordListPage() {
 
         {/* Render mobile card layout for small screens, otherwise render the table */}
         {isMobile ? (
-          <WithdrawMobileViewCardLayout
-            data={dataFiltered}
-            onEditRow={(id) => handleEditRow(id)}
-            onDeleteRow={(id) => handleDeleteRow(id)}
-            onSelectRow={(id) => onSelectRow(id)}
-            selected={selected}
-          />
+          <>
+            <BidRecordMobileViewCardLayout
+              data={dataInPage}
+              loading={loading}
+            />
+            <TablePaginationCustom
+              count={dataFiltered.length}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={onChangePage}
+              onRowsPerPageChange={onChangeRowsPerPage}
+              dense={dense}
+              onChangeDense={onChangeDense}
+            />
+          </>
         ) : (
           <Card>
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
@@ -430,7 +432,7 @@ export default function BidRecordListPage() {
         )}
       </Container>
 
-      <ConfirmDialog
+      {/* <ConfirmDialog
         open={openConfirm}
         onClose={handleCloseConfirm}
         title="Delete"
@@ -451,14 +453,14 @@ export default function BidRecordListPage() {
             Delete
           </Button>
         }
-      />
+      /> */}
     </>
   );
 }
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, comparator, filterName, filterStatus, filterRole }) {
+function applyFilter({ inputData, comparator, filterName, filterUserId, filterStatus, filterRole }) {
   const stabilizedThis = inputData.map((el, index) => [el, index]);
 
   stabilizedThis.sort((a, b) => {
@@ -471,16 +473,27 @@ function applyFilter({ inputData, comparator, filterName, filterStatus, filterRo
 
   if (filterName) {
     inputData = inputData.filter(
-      (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+      (record) => 
+        (record.marketName && record.marketName.toLowerCase().indexOf(filterName.toLowerCase()) !== -1) ||
+        (record.session && record.session.toLowerCase().indexOf(filterName.toLowerCase()) !== -1) ||
+        (record.number && record.number.toLowerCase().indexOf(filterName.toLowerCase()) !== -1)
+    );
+  }
+
+  if (filterUserId) {
+    inputData = inputData.filter(
+      (record) => 
+        record.userId && 
+        record.userId.toLowerCase().indexOf(filterUserId.toLowerCase()) !== -1
     );
   }
 
   if (filterStatus !== 'all') {
-    inputData = inputData.filter((user) => user.status === filterStatus);
+    inputData = inputData.filter((record) => record.status === filterStatus);
   }
 
   if (filterRole !== 'all') {
-    inputData = inputData.filter((user) => user.role === filterRole);
+    inputData = inputData.filter((record) => record.role === filterRole);
   }
 
   return inputData;

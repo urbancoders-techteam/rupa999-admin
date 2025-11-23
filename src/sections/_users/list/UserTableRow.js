@@ -39,16 +39,17 @@ UserTableRow.propTypes = {
     name: PropTypes.string,
     phone: PropTypes.string,
     balance: PropTypes.number,
-    totalGameAmt: PropTypes.number,
-    totalWon: PropTypes.number,
-    totalWithdraw: PropTypes.number,
-    totalBonus: PropTypes.number,
+    totalGameAmount: PropTypes.number,
+    totalWonAmount: PropTypes.number,
+    totalWithdrawals: PropTypes.number,
+    totalDeposits: PropTypes.number,
     status: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
     createdAt: PropTypes.string,
   }),
   selected: PropTypes.bool,
   onEditRow: PropTypes.func,
   onTransationRow: PropTypes.func,
+  onBidHistoryRow: PropTypes.func,
   onWithdrawalRequestRow: PropTypes.func,
   onDeleteRow: PropTypes.func,
   onStatusChange: PropTypes.func,
@@ -66,6 +67,7 @@ export default function UserTableRow({
   onEditRow,
   onTransationRow,
   onWithdrawalRequestRow,
+  onBidHistoryRow,
   onDeleteRow,
   onStatusChange,
   onViewBankDetails,
@@ -79,10 +81,10 @@ export default function UserTableRow({
     name,
     phone,
     balance,
-    totalGameAmt,
-    totalWon,
-    totalWithdraw,
-    totalBonus,
+    totalGameAmount,
+    totalWonAmount,
+    totalWithdrawals,
+    totalDeposits,
     status,
     createdAt,
     bankDetails = {},
@@ -177,19 +179,19 @@ export default function UserTableRow({
         <TableCell align="left">₹{balance?.toLocaleString('en-IN')}</TableCell>
 
         <TableCell align="center" sx={{ minWidth: '140px' }}>
-          ₹{totalGameAmt?.toLocaleString('en-IN')}
+          ₹{totalGameAmount?.toLocaleString('en-IN')}
         </TableCell>
 
         <TableCell align="center" sx={{ minWidth: '100px' }}>
-          ₹{totalWon?.toLocaleString('en-IN')}
+          ₹{totalWonAmount?.toLocaleString('en-IN')}
         </TableCell>
 
         <TableCell align="center" sx={{ minWidth: '140px' }}>
-          ₹{totalWithdraw?.toLocaleString('en-IN')}
+          ₹{totalWithdrawals?.toLocaleString('en-IN')}
         </TableCell>
 
         <TableCell align="center" sx={{ minWidth: '140px' }}>
-          ₹{totalBonus?.toLocaleString('en-IN')}
+          ₹{totalDeposits?.toLocaleString('en-IN')}
         </TableCell>
 
         <StatusToggleCell
@@ -219,9 +221,7 @@ export default function UserTableRow({
           horizontal: 'right',
         }}
       >
-        <MenuItem
-          onClick={handleOpenAddDeduct}
-        >
+        <MenuItem onClick={handleOpenAddDeduct}>
           <Iconify icon="solar:wallet-bold" />
           Add / Deduct Money
         </MenuItem>
@@ -233,10 +233,20 @@ export default function UserTableRow({
           }}
         >
           <Iconify icon="mdi:bank-transfer" />
-          Ledgers
+          Transaction
         </MenuItem>
 
-        {/* <MenuItem
+        <MenuItem
+          onClick={() => {
+            onBidHistoryRow();
+            handleClosePopover();
+          }}
+        >
+          <Iconify icon="mdi:bank-transfer" />
+          Bid History
+        </MenuItem>
+
+        <MenuItem
           onClick={() => {
             onWithdrawalRequestRow();
             handleClosePopover();
@@ -244,7 +254,7 @@ export default function UserTableRow({
         >
           <Iconify icon="mdi:bank-transfer" />
           Withdrawal Details
-        </MenuItem> */}
+        </MenuItem>
 
         <MenuItem onClick={handleViewBankDetails}>
           <Iconify icon="mdi:bank" />

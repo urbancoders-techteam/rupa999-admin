@@ -92,3 +92,21 @@ export const addDeductBalanceAsync = createAsyncThunk(
     })
 );
 
+// Get user bids
+export const getUserBidsAsync = createAsyncThunk(
+  'user/getUserBids',
+  async ({ userId, ...params } = {}, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: `/users/${userId}/bids`,
+      method: 'get',
+      params: {
+        page: params.page || 1,
+        limit: params.limit || 10,
+        search: params.search || '',
+        gameType: params.gameType || '',
+        status: params.status || '',
+      },
+    })
+);
+

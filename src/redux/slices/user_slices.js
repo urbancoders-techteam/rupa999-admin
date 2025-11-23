@@ -6,6 +6,7 @@ import {
   updateUserStatusAsync,
   getUserLedgersAsync,
   addDeductBalanceAsync,
+  getUserBidsAsync,
 } from '../services/user_services';
 
 const initialState = {
@@ -23,6 +24,15 @@ const initialState = {
     totalPages: 0,
   },
   transactionsPagination: {
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+  },
+  bidHistoryList: [],
+  bidHistoryLoading: false,
+  bidHistoryError: null,
+  bidHistoryPagination: {
     page: 1,
     limit: 10,
     total: 0,
@@ -162,6 +172,29 @@ const userSlice = createSlice({
       .addCase(addDeductBalanceAsync.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || 'Failed to update balance';
+      });
+
+    // Get user bids
+    builder
+      .addCase(getUserBidsAsync.pending, (state) => {
+        state.bidHistoryLoading = true;
+        state.bidHistoryError = null;
+      })
+      .addCase(getUserBidsAsync.fulfilled, (state, action) => {
+        state.bidHistoryLoading = false;
+        state.bidHistoryList = action.payload?.data || [];
+        if (action.payload) {
+          state.bidHistoryPagination = {
+            page: action.payload.currentPage || 1,
+            limit: action.payload.limit || 10,
+            total: action.payload.totalItems || 0,
+            totalPages: action.payload.totalPages || 0,
+          };
+        }
+      })
+      .addCase(getUserBidsAsync.rejected, (state, action) => {
+        state.bidHistoryLoading = false;
+        state.bidHistoryError = action.payload?.message || 'Failed to fetch bid history';
       });
   },
 });

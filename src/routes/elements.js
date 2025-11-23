@@ -92,7 +92,7 @@ export const StarLineWinHistoryListPage = Loadable(lazy(() => import('../pages/s
 // DASHBOARD: Withdraw History
 export const GeneralWithdrawHistoryListPage = Loadable(lazy(() => import('../pages/GeneralWithdrawHistoryListPage')));
 
-// DASHBOARD: Diposit History
+// DASHBOARD: Deposit History
 export const DipositHistoryListPage = Loadable(lazy(() => import('../pages/DipositHistoryListPage')));
 
 // DASHBOARD: Game Types
