@@ -27,6 +27,7 @@ import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
 // sections
 import MarketDataTableRow from '../../sections/_market_data/components/MarketDataTableRow';
+import { PATH_DASHBOARD } from '../../routes/paths';
 
 // ----------------------------------------------------------------------
 
@@ -167,9 +168,9 @@ export default function MarketDataListPage() {
           <CustomBreadcrumbs
             heading={`Market Data (${selectedDate.format('DD-MM-YYYY')})`}
             links={[
-              { name: 'Dashboard', href: '/' },
-              { name: 'Market Data', href: '#' },
-              { name: 'List', href: '#' },
+              { name: 'Dashboard', href: PATH_DASHBOARD.home.list },
+              { name: 'Market Data', href: PATH_DASHBOARD.markets.marketdata.list },
+              { name: 'List' },
             ]}
           />
 

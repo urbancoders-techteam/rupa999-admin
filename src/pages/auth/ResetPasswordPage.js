@@ -29,12 +29,7 @@ export default function ResetPasswordPage() {
           ]}
         />
 
-        {/* <Box sx={{ display: 'flex', alignItems : 'center', my:3, flexDirection: 'column', gap:1 }}> */}
         <PasswordIcon sx={{ height: { xs: 40, sm: 78 }, my: 1 }} />
-        {/* </Box> */}
-        <Typography variant="h4" gutterBottom>
-          Forgot your password?
-        </Typography>
 
         <AuthResetPasswordForm />
       </Container>

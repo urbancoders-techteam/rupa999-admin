@@ -4,7 +4,7 @@ import { staffLoginAsync } from '../services/auth_services';
 const initialState = {
   token: false,
   isSubmitting: false,
-  user: {},
+  admin: {},
 };
 
 const authSlice = createSlice({
@@ -18,7 +18,7 @@ const authSlice = createSlice({
     builder.addMatcher(isAnyOf(staffLoginAsync.fulfilled), (state, { payload }) => {
       state.isSubmitting = false;
       state.token = payload?.access_token || false;
-      state.user = payload?.admin || payload?.data?.admin || {};
+      state.admin = payload?.admin || payload?.data?.admin || {};
       // Store token in localStorage if not already stored
       if (payload?.access_token && !localStorage.getItem('token')) {
         localStorage.setItem('token', payload.access_token);

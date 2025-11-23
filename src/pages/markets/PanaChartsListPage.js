@@ -10,9 +10,6 @@ import {
   Drawer,
   useMediaQuery,
   Typography,
-  Grid,
-  Autocomplete,
-  TextField,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 // routes
@@ -22,11 +19,8 @@ import { PATH_DASHBOARD } from '../../routes/paths';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
 // sections
-import DoublePanaTable from '../../sections/_panaChart/components/DoublePanaTable';
 import PanaChartToolBar from '../../sections/_panaChart/components/PanaChartToolBar';
 import JodiResultTable from '../../sections/_charts/JodiResultTable';
-import SinglePanaChart from '../../sections/_charts/SinglePanaChart';
-import { RHFAutocomplete } from '../../components/hook-form';
 import SinglePanaChartTable from '../../sections/_charts/SinglePanaChartTable';
 
 // ----------------------------------------------------------------------
@@ -63,10 +57,10 @@ export default function PanaChartsListPage() {
             heading="Pana Chart Tables"
             links={[
               { name: 'Dashboard', href: PATH_DASHBOARD.root },
-              { name: 'Pana Chart Tables', href: PATH_DASHBOARD.withdrawdetails.root },
+              { name: 'Pana Chart Tables', href: PATH_DASHBOARD.withdrawdetails.list },
             ]}
           />
-          {isMobile ? (
+          {isMobile && (
             <>
               <IconButton color="primary" onClick={handleDrawerOpen} sx={{ ml: 1 }}>
                 <MenuIcon />
@@ -76,28 +70,26 @@ export default function PanaChartsListPage() {
                   Tool Bar
                 </Typography>
                 <Box sx={{ width: 280, p: 2 }}>
-                  <PanaChartToolBar handleDrawerClose={handleDrawerClose} />
+                  <PanaChartToolBar 
+                    handleDrawerClose={handleDrawerClose}
+                    selectedGame={selectedGame} 
+                    onGameChange={setSelectedGame}
+                  />
                 </Box>
               </Drawer>
             </>
-          ) : (
-            <Box sx={{ minWidth: 320 }}>
-              <PanaChartToolBar />
-            </Box>
+          // ) : (
+            
           )}
         </Paper>
-        <Grid container spacing={2} alignItems="center" sx={{ my: 2 }}>
-          <Grid item xs={12} sm={6} md={3}>
-            <Autocomplete
-              size="small"
-              fullWidth
-              options={['Jodi', 'Single Pana']}
-              value={selectedGame}
-              onChange={(_, newValue) => setSelectedGame(newValue)}
-              renderInput={(params) => <TextField {...params} label="Select Game" fullWidth />}
+        <Box sx={{ my: 2, width: '100%' }}>
+          {!isMobile && (
+            <PanaChartToolBar 
+              selectedGame={selectedGame} 
+              onGameChange={setSelectedGame}
             />
-          </Grid>
-        </Grid>
+          )}
+        </Box>
         <Stack spacing={3} mb={3}>
           {selectedGame === 'Jodi' && <JodiResultTable />}
           {selectedGame === 'Single Pana' && <SinglePanaChartTable />}

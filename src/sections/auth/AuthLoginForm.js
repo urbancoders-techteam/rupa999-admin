@@ -44,26 +44,10 @@ export default function AuthLoginForm() {
   });
 
   const {
-    reset,
     setError,
     handleSubmit,
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = methods;
-
-  // const onSubmit = async (data) => {
-  //   console.log(data);
-  //   navigate(PATH_DASHBOARD.home.root);
-  //   // try {
-  //   //   await login(data.email, data.password);
-  //   // } catch (error) {
-  //   //   console.error(error);
-  //   //   reset();
-  //   //   setError('afterSubmit', {
-  //   //     ...error,
-  //   //     message: error.message,
-  //   //   });
-  //   // }
-  // };
 
   const onSubmit = async (data) => {
     try {
@@ -73,6 +57,8 @@ export default function AuthLoginForm() {
 
       if (res?.payload?.success && res.payload.admin) {
         localStorage.setItem('token', res.payload.access_token);
+        localStorage.setItem('admin', JSON.stringify(res.payload.admin));
+        toast.success('Logged in successfully, Welcome to Tied Admin Panel.');
 
         if (res?.payload?.admin?._id || res) {
           const isSuperAdmin = res?.payload?.admin?.isSuperAdmin === true;
@@ -97,8 +83,7 @@ export default function AuthLoginForm() {
           }
           
           navigate(PATH_DASHBOARD.home.root);
-          toast.success('Logged in successfully, Welcome to Tied Admin Panel.');
-          localStorage.setItem('login', JSON.stringify(res?.payload?.data));
+          // localStorage.setItem('login', JSON.stringify(res?.payload?.data));
         }
       } else {
         throw new Error(res.payload?.message || 'Login failed');
@@ -133,18 +118,6 @@ export default function AuthLoginForm() {
         />
       </Stack>
 
-      <Stack alignItems="flex-end" sx={{ my: 2 }}>
-        <Link
-          component={RouterLink}
-          to={PATH_AUTH.resetPassword}
-          variant="body2"
-          color="inherit"
-          underline="always"
-        >
-          Forgot password?
-        </Link>
-      </Stack>
-
       <LoadingButton
         fullWidth
         color="inherit"
@@ -153,6 +126,7 @@ export default function AuthLoginForm() {
         variant="contained"
         loading={isSubmitSuccessful || isSubmitting}
         sx={{
+          mt:3,
           bgcolor: 'text.primary',
           color: (theme) => (theme.palette.mode === 'light' ? 'common.white' : 'grey.800'),
           '&:hover': {

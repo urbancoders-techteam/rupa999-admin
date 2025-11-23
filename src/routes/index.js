@@ -11,11 +11,6 @@ import { PATH_AFTER_LOGIN } from '../config-global';
 import {
   // Auth
   LoginPage,
-  // RegisterPage,
-  // VerifyCodePage,
-  // NewPasswordPage,
-  // ResetPasswordPage,
-  // Dashboard: General
   GeneralDashboardPage,
 
   // Error Handling Pages
@@ -56,7 +51,6 @@ import {
   DesignationListPage,
   MarketDataListPage,
   BidRecordListPage,
-  RegisterPage,
   //
 } from './elements';
 
@@ -80,24 +74,7 @@ export default function Router() {
             </GuestGuard>
           ),
         },
-        {
-          path: 'register',
-          element: (
-            <GuestGuard>
-              <RegisterPage />
-            </GuestGuard>
-          ),
-        },
-        // { path: 'login-unprotected', element: <LoginPage /> },
-        // { path: 'register-unprotected', element: <RegisterPage /> },
-        // {
-        //   element: <CompactLayout />,
-        //   children: [
-        //     { path: 'reset-password', element: <ResetPasswordPage /> },
-        //     { path: 'new-password', element: <NewPasswordPage /> },
-        //     { path: 'verify', element: <VerifyCodePage /> },
-        //   ],
-        // },
+      
       ],
     },
 

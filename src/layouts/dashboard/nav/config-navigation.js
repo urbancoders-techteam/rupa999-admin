@@ -42,43 +42,23 @@ const navConfig = [
     items: [
       { title: 'dashboard', path: PATH_DASHBOARD.home.root, icon: ICONS.dashboard },
       {
-        title: 'staff',
-        path: PATH_DASHBOARD.staff.root,
-        icon: ICONS.user,
-      },
-      {
         title: 'user',
         path: PATH_DASHBOARD.user.root,
         icon: ICONS.user,
       },
+    
       {
         title: 'withdraw details',
         path: PATH_DASHBOARD.withdrawdetails.root,
         icon: ICONS.banking,
       },
+
       { title: 'profits', path: PATH_DASHBOARD.profit.root, icon: ICONS.analytics },
 
-      {
-        title: 'settings',
-        path: PATH_DASHBOARD.settings.root,
-        icon: ICONS.setting,
-        children: [
-          {
-            title: 'change password',
-            path: PATH_DASHBOARD.changepassword.form,
-          },
-          { title: 'slider images', path: PATH_DASHBOARD.sliderimage.root },
-          {
-            title: 'Help and Support',
-            //  path: PATH_DASHBOARD.helpsupport.list
-          },
-        ],
-      },
-
-      { title: 'gift', path: PATH_DASHBOARD.gift.root, icon: ICONS.booking },
+      // { title: 'gift', path: PATH_DASHBOARD.gift.root, icon: ICONS.booking },
 
       {
-        title: 'general markets',
+        title: 'Main Market',
         path: PATH_DASHBOARD.markets.root,
         icon: ICONS.user,
         children: [
@@ -86,7 +66,6 @@ const navConfig = [
           { title: 'Charts', path: PATH_DASHBOARD.markets.panacharts.list },
           { title: 'Records', path: PATH_DASHBOARD.markets.marketrecords.list },
           { title: 'market results', path: PATH_DASHBOARD.markets.marketresults.list },
-          // { title: 'General Predict Result', path: PATH_DASHBOARD.markets.predictionform.form },
           { title: 'Win History', path: PATH_DASHBOARD.markets.winhistory.list },
           { title: 'Data', path: PATH_DASHBOARD.markets.marketdata.list },
         ],
@@ -110,7 +89,12 @@ const navConfig = [
         icon: ICONS.banking,
       },
       {
-        title: 'Game Types',
+        title: 'Transaction Details',
+        path: PATH_DASHBOARD.generalwithdrawhistory.list,
+        icon: ICONS.banking,
+      },
+      {
+        title: 'Rate Card',
         path: PATH_DASHBOARD.gametypes.root,
         icon: ICONS.banking,
       },
@@ -118,6 +102,29 @@ const navConfig = [
         title: 'Diposit History',
         path: PATH_DASHBOARD.diposithistory.list,
         icon: ICONS.banking,
+      },
+
+      {
+        title: 'staff',
+        path: PATH_DASHBOARD.staff.root,
+        icon: ICONS.user,
+      },
+
+      {
+        title: 'settings',
+        path: PATH_DASHBOARD.settings.root,
+        icon: ICONS.setting,
+        children: [
+          {
+            title: 'change password',
+            path: PATH_DASHBOARD.changepassword.form,
+          },
+          { title: 'slider images', path: PATH_DASHBOARD.sliderimage.root },
+          {
+            title: 'Help and Support',
+            //  path: PATH_DASHBOARD.helpsupport.list
+          },
+        ],
       },
     ],
   },

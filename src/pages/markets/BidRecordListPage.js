@@ -333,7 +333,7 @@ export default function BidRecordListPage() {
               links={[
                 { name: 'Dashboard', href: PATH_DASHBOARD.root },
                 { name: 'Market Data', href: PATH_DASHBOARD.markets.marketdata.list },
-                { name: 'Bid Record Data', href: PATH_DASHBOARD.markets.winhistory.root },
+                { name: 'Bid Record Data', href: PATH_DASHBOARD.markets.winhistory.list },
                 { name: 'List' },
               ]}
             />

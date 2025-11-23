@@ -20,7 +20,7 @@ import { PATH_DASHBOARD } from '../../../routes/paths';
 import AddDeductBalanceModal from '../form/UserAddDeductForm';
 import StatusToggleCell from './StatusToggledCell';
 
-function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange, onChangePassword, changePasswordLoading, onViewBankDetails, bankDetails, bankDetailsLoading, onAddDeductBalance, addDeductBalanceLoading }) {
+function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange, onChangePassword, changePasswordLoading, onViewBankDetails, onAddDeductBalance, addDeductBalanceLoading }) {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
@@ -138,7 +138,6 @@ function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange
                   overflow: 'hidden',
                   boxShadow: '0px 2px 6px rgba(0,0,0,0.08)',
                 }}
-                onClick={() => onViewBankDetails(row._id)}
               >
                 <Accordion
                   disableGutters
@@ -265,18 +264,18 @@ function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange
                         >
                           <Box>
                             <Typography variant="body2" sx={{ mb: 0.5 }}>
-                              <strong>Bank Name:</strong> {bankDetails?.bankName || '—'}
+                              <strong>Bank Name:</strong> {row.bankDetails?.bankName || '—'}
                             </Typography>
                             <Typography variant="body2" sx={{ mb: 0.5 }}>
                               <strong>Account No:</strong>{' '}
-                              {bankDetails?.accountNumber || '—'}
+                              {row.bankDetails?.accountNumber || '—'}
                             </Typography>
                             <Typography variant="body2" sx={{ mb: 0.5 }}>
-                              <strong>IFSC Code:</strong> {bankDetails?.ifscCode || '—'}
+                              <strong>IFSC Code:</strong> {row.bankDetails?.ifscCode || '—'}
                             </Typography>
                             <Typography variant="body2">
                               <strong>Account Holder:</strong>{' '}
-                              {bankDetails?.accountHolderName || '—'}
+                              {row.bankDetails?.accountHolderName || '—'}
                             </Typography>
                           </Box>
                         </AccordionDetails>
@@ -354,8 +353,6 @@ UserMobileViewCardLayout.propTypes = {
   onStatusChange: PropTypes.func,
   onChangePassword: PropTypes.func,
   changePasswordLoading: PropTypes.bool,
-  bankDetails: PropTypes.object,
-  bankDetailsLoading: PropTypes.bool,
   onViewBankDetails: PropTypes.func,
   onAddDeductBalance: PropTypes.func,
   addDeductBalanceLoading: PropTypes.bool,

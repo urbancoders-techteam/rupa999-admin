@@ -40,7 +40,6 @@ import {
 // sections
 import { useSnackbar } from '../components/snackbar';
 import CustomTableToolbar from '../components/table/CustomTableToolBar';
-import { getBankDetailsByUserIdAsync } from '../redux/services/bank_details_services';
 import { addDeductBalanceAsync, changeUserPasswordAsync, deleteUserAsync, getAllUsersAsync, updateUserStatusAsync } from '../redux/services/user_services';
 import { UserTableRow } from '../sections/_users/list';
 import UserMobileViewCardLayout from '../sections/_users/list/UserMobileViewCardLayout';
@@ -58,7 +57,7 @@ const TABLE_HEAD = [
   { id: 'isVerified', label: 'Total Game Amt', align: 'center' },
   { id: 'totalWon', label: 'Total Won', align: 'left' },
   { id: 'Withdraw', label: 'Total Withdraw', align: 'left' },
-  { id: 'Bonus', label: 'Total Bonus', align: 'left' },
+  { id: 'diposit', label: 'Total Diposit', align: 'left' },
   { id: 'status', label: 'Blocked Status', align: 'left' },
   { id: 'createdAt', label: 'createdAt', align: 'left' },
 ];
@@ -97,9 +96,6 @@ export default function UserListPage() {
   const [filterName, setFilterName] = useState('');
   const [filterRole, setFilterRole] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [bankDetails, setBankDetails] = useState(null);
-  const [bankDetailsLoading, setBankDetailsLoading] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState(null);
   const [changePasswordLoading, setChangePasswordLoading] = useState(false);
   const [addDeductBalanceLoading, setAddDeductBalanceLoading] = useState(false);
 
@@ -135,6 +131,7 @@ export default function UserListPage() {
     statusValue: user.status,
     isVerified: user.isVerified || false,
     createdAt: user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-',
+    bankDetails: user.bankDetails || null,
     ...user,
   }));
 
@@ -251,28 +248,10 @@ export default function UserListPage() {
     navigate(PATH_DASHBOARD.user.withdrawalrequest(id));
   };
 
-  const handleViewBankDetails = async (userId) => {
-    setSelectedUserId(userId);
-    setBankDetailsLoading(true);
-    setBankDetails(null);
-    try {
-      const response = await dispatch(getBankDetailsByUserIdAsync(userId)).unwrap();
-      // Handle response structure: { data: {...} } or direct data object
-      const bankDetailsData = response?.data || response;
-      setBankDetails(bankDetailsData || null);
-      if (!bankDetailsData) {
-        enqueueSnackbar('No bank details found for this user', { variant: 'info' });
-      }
-    } catch (error) {
-      setBankDetails(null);
-      if (error?.status !== 404 && error?.response?.status !== 404) {
-        enqueueSnackbar(error?.message || 'Failed to fetch bank details', { variant: 'error' });
-      } else {
-        enqueueSnackbar('No bank details found for this user', { variant: 'info' });
-      }
-    } finally {
-      setBankDetailsLoading(false);
-    }
+  const handleViewBankDetails = (userId) => {
+    // Bank details are now included in the user object, no API call needed
+    // This function is kept for compatibility with child components
+    // The actual bank details will be accessed from row.bankDetails
   };
 
   const handleChangePassword = async (userId, password, cpassword) => {
@@ -385,8 +364,6 @@ export default function UserListPage() {
               onChangePassword={(id, password, cpassword) => handleChangePassword(id, password, cpassword)}
               changePasswordLoading={changePasswordLoading}
               onViewBankDetails={handleViewBankDetails}
-              bankDetails={bankDetails}
-              bankDetailsLoading={bankDetailsLoading}
               onAddDeductBalance={(id, amount, action) => handleAddDeductBalance(id, amount, action)}
               addDeductBalanceLoading={addDeductBalanceLoading}
             />
@@ -460,8 +437,6 @@ export default function UserListPage() {
                           onEditRow={() => handleEditRow(row._id || row.id)}
                           onStatusChange={(_id, status) => handleStatusChange(_id, status)}
                           onViewBankDetails={handleViewBankDetails}
-                          bankDetails={selectedUserId === (row._id || row.id) ? bankDetails : null}
-                          bankDetailsLoading={selectedUserId === (row._id || row.id) && bankDetailsLoading}
                           onChangePassword={(id, password, cpassword) => handleChangePassword(id, password, cpassword)}
                           changePasswordLoading={changePasswordLoading}
                           onAddDeductBalance={(id, amount, action) => handleAddDeductBalance(id, amount, action)}

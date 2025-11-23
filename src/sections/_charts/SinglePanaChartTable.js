@@ -9,6 +9,8 @@ import {
   Paper,
   Box,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 
 const data = [
@@ -101,41 +103,89 @@ const data = [
 const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 const SinglePanaChartTable = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
   const cellBaseSx = {
     border: '1px solid #e0e0e0',
-    padding: { xs: '2px 4px', sm: '4px 8px' }, // Responsive padding
+    padding: { xs: '2px 4px', sm: '4px 6px', md: '6px 8px' },
     textAlign: 'center',
   };
 
   return (
-    <Box sx={{ p: { xs: 1, sm: 2 }, backgroundColor: '#f9fafb', minHeight: '100vh' }}>
+    <Box 
+      sx={{ 
+        p: { xs: 0.5, sm: 1, md: 2 }, 
+        backgroundColor: '#f9fafb', 
+        minHeight: '100vh',
+        width: '100%',
+        overflow: 'hidden',
+      }}
+    >
       <Typography
         variant="h5"
         gutterBottom
         sx={{
-          py: { xs: 0.5, sm: 1 },
+          py: { xs: 0.5, sm: 0.75, md: 1 },
+          px: { xs: 1, sm: 2 },
           fontWeight: 'bold',
           textAlign: 'center',
           color: '#fff',
           backgroundColor: '#1b3153ff',
-          fontSize: { xs: '0.9rem', sm: '1.25rem' },
-          borderRadius: 2,
+          fontSize: { xs: '0.875rem', sm: '1.1rem', md: '1.25rem' },
+          borderRadius: { xs: 1, sm: 2 },
+          mb: { xs: 1, sm: 2 },
         }}
       >
         Single Pana Chart
       </Typography>
 
-      <TableContainer component={Paper} sx={{ boxShadow: 3, overflowX: 'auto' }}>
-        <Table aria-label="responsive table" size="small">
-          <TableHead sx={{ backgroundColor: '#f3f4f6' }}>
+      <TableContainer 
+        component={Paper} 
+        sx={{ 
+          boxShadow: 3, 
+          overflowX: 'auto',
+          overflowY: 'auto',
+          maxWidth: '100%',
+          '&::-webkit-scrollbar': {
+            height: { xs: '4px', sm: '6px' },
+            width: { xs: '4px', sm: '6px' },
+          },
+          '&::-webkit-scrollbar-track': {
+            backgroundColor: '#f1f1f1',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: '#888',
+            borderRadius: '3px',
+            '&:hover': {
+              backgroundColor: '#555',
+            },
+          },
+        }}
+      >
+        <Table 
+          aria-label="responsive table" 
+          size={isMobile ? 'small' : 'medium'}
+          sx={{
+            minWidth: { xs: '600px', sm: '800px' },
+            width: '100%',
+          }}
+        >
+          <TableHead sx={{ backgroundColor: '#f3f4f6', position: 'sticky', top: 0, zIndex: 10 }}>
             <TableRow>
               <TableCell
                 sx={{
                   ...cellBaseSx,
-                  width: '12%',
+                  width: { xs: '100px', sm: '120px', md: '140px' },
+                  minWidth: { xs: '100px', sm: '120px', md: '140px' },
                   fontWeight: 'medium',
-                  fontSize: { xs: '0.65rem', sm: '0.875rem' },
+                  fontSize: { xs: '0.6rem', sm: '0.75rem', md: '0.875rem' },
                   whiteSpace: 'nowrap',
+                  backgroundColor: '#f3f4f6',
+                  position: 'sticky',
+                  left: 0,
+                  zIndex: 11,
+                  boxShadow: '2px 0 4px rgba(0,0,0,0.1)',
                 }}
               >
                 Date Range
@@ -145,10 +195,12 @@ const SinglePanaChartTable = () => {
                   key={day}
                   sx={{
                     ...cellBaseSx,
-                    width: '11%',
+                    minWidth: { xs: '80px', sm: '100px', md: '110px' },
+                    width: { xs: '80px', sm: '100px', md: '110px' },
                     fontWeight: 'medium',
-                    fontSize: { xs: '0.65rem', sm: '0.875rem' },
+                    fontSize: { xs: '0.6rem', sm: '0.7rem', md: '0.875rem' },
                     whiteSpace: 'nowrap',
+                    backgroundColor: '#f3f4f6',
                   }}
                 >
                   {day}
@@ -164,8 +216,14 @@ const SinglePanaChartTable = () => {
                   sx={{
                     ...cellBaseSx,
                     verticalAlign: 'center',
-                    fontSize: { xs: '0.65rem', sm: '0.75rem' },
+                    fontSize: { xs: '0.6rem', sm: '0.7rem', md: '0.75rem' },
                     backgroundColor: '#f9fafb',
+                    position: 'sticky',
+                    left: 0,
+                    zIndex: 5,
+                    boxShadow: '2px 0 4px rgba(0,0,0,0.1)',
+                    minWidth: { xs: '100px', sm: '120px', md: '140px' },
+                    width: { xs: '100px', sm: '120px', md: '140px' },
                   }}
                 >
                   <Box
@@ -174,66 +232,168 @@ const SinglePanaChartTable = () => {
                       flexDirection: 'column',
                       justifyContent: 'center',
                       alignItems: 'center',
-                      gap: 0.2,
+                      gap: { xs: 0.1, sm: 0.2 },
                     }}
                   >
-                    <Typography sx={{ fontSize: { xs: '0.65rem', sm: '0.8rem' } }}>
+                    <Typography sx={{ 
+                      fontSize: { xs: '0.55rem', sm: '0.65rem', md: '0.75rem' },
+                      lineHeight: 1.2,
+                    }}>
                       {item.dateStart}
                     </Typography>
-                    <Typography sx={{ fontWeight: 'bold', my: '1px', fontSize: '0.7rem' }}>
+                    <Typography sx={{ 
+                      fontWeight: 'bold', 
+                      my: '1px', 
+                      fontSize: { xs: '0.5rem', sm: '0.6rem', md: '0.7rem' },
+                      lineHeight: 1,
+                    }}>
                       -
                     </Typography>
-                    <Typography sx={{ fontSize: { xs: '0.65rem', sm: '0.8rem' } }}>
+                    <Typography sx={{ 
+                      fontSize: { xs: '0.55rem', sm: '0.65rem', md: '0.75rem' },
+                      lineHeight: 1.2,
+                    }}>
                       {item.dateEnd}
                     </Typography>
                   </Box>
                 </TableCell>
 
-                {item.days.map((dayData, i) => (
-                  <TableCell
-                    key={i}
-                    sx={{
-                      ...cellBaseSx,
-                      fontSize: { xs: '0.6rem', sm: '0.75rem' },
-                      verticalAlign: 'center',
-                    }}
-                  >
-                    <Box
+                {item.days.map((dayData, i) => {
+                  // Convert top and bottom to string and split into digits/characters
+                  const topStr = String(dayData.top);
+                  const bottomStr = String(dayData.bottom);
+                  const topDigits = topStr.split('').slice(0, 3);
+                  const bottomDigits = bottomStr.split('').slice(0, 3);
+                  
+                  // Pad arrays to ensure 3 items for consistent layout
+                  while (topDigits.length < 3) topDigits.push('');
+                  while (bottomDigits.length < 3) bottomDigits.push('');
+                  
+                  return (
+                    <TableCell
+                      key={i}
                       sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: { xs: '2px', sm: '4px' },
-                        py: { xs: 0.5, sm: 1 },
+                        ...cellBaseSx,
+                        fontSize: { xs: '0.5rem', sm: '0.65rem', md: '0.75rem' },
+                        verticalAlign: 'center',
+                        position: 'relative',
+                        minWidth: { xs: '80px', sm: '100px', md: '120px' },
+                        width: { xs: '80px', sm: '100px', md: '120px' },
+                        minHeight: { xs: '60px', sm: '75px', md: '90px' },
+                        padding: { xs: '2px 4px', sm: '4px 6px', md: '6px 8px' },
                       }}
                     >
-                      <Typography
-                        variant="caption"
-                        sx={{ color: '#374151', fontSize: { xs: '0.6rem', sm: '0.7rem' } }}
-                      >
-                        {dayData.top}
-                      </Typography>
-
-                      <Typography
-                        variant="h5"
+                      <Box
                         sx={{
-                          fontSize: { xs: '1rem', sm: '1.5rem' },
-                          fontWeight: '800',
-                          color: dayData.isRed ? '#dc2626' : '#111827',
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: { xs: 0.25, sm: 0.5, md: 0.75 },
+                          py: { xs: 0.25, sm: 0.5, md: 0.75 },
+                          height: '100%',
+                          width: '100%',
+                          minHeight: { xs: '56px', sm: '67px', md: '78px' },
                         }}
                       >
-                        {dayData.middle}
-                      </Typography>
+                        {/* Left side - Top digits stacked vertically */}
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: { xs: 0.1, sm: 0.15, md: 0.2 },
+                            flex: '0 0 auto',
+                            minWidth: { xs: '16px', sm: '20px', md: '24px' },
+                            width: { xs: '16px', sm: '20px', md: '24px' },
+                          }}
+                        >
+                          {topDigits.map((digit, idx) => (
+                            <Typography
+                              key={idx}
+                              sx={{
+                                fontSize: { xs: '0.6rem', sm: '0.75rem', md: '0.9rem' },
+                                fontWeight: '700',
+                                color: digit ? '#666' : 'transparent',
+                                lineHeight: 1,
+                                minHeight: { xs: '12px', sm: '15px', md: '18px' },
+                                height: { xs: '12px', sm: '15px', md: '18px' },
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '100%',
+                              }}
+                            >
+                              {digit || ' '}
+                            </Typography>
+                          ))}
+                        </Box>
 
-                      <Typography
-                        variant="caption"
-                        sx={{ color: '#6b7280', fontSize: { xs: '0.6rem', sm: '0.7rem' } }}
-                      >
-                        {dayData.bottom}
-                      </Typography>
-                    </Box>
-                  </TableCell>
-                ))}
+                        {/* Center - Middle number (large) */}
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flex: '1 1 auto',
+                            minWidth: 0,
+                            maxWidth: '100%',
+                          }}
+                        >
+                          <Typography
+                            sx={{
+                              fontSize: { xs: '1rem', sm: '1.4rem', md: '1.8rem' },
+                              fontWeight: '900',
+                              color: dayData.isRed ? '#dc2626' : '#111827',
+                              lineHeight: 1,
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              maxWidth: '100%',
+                            }}
+                          >
+                            {dayData.middle}
+                          </Typography>
+                        </Box>
+
+                        {/* Right side - Bottom digits stacked vertically */}
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: { xs: 0.1, sm: 0.15, md: 0.2 },
+                            flex: '0 0 auto',
+                            minWidth: { xs: '16px', sm: '20px', md: '24px' },
+                            width: { xs: '16px', sm: '20px', md: '24px' },
+                          }}
+                        >
+                          {bottomDigits.map((digit, idx) => (
+                            <Typography
+                              key={idx}
+                              sx={{
+                                fontSize: { xs: '0.6rem', sm: '0.75rem', md: '0.9rem' },
+                                fontWeight: '700',
+                                color: digit ? '#666' : 'transparent',
+                                lineHeight: 1,
+                                minHeight: { xs: '12px', sm: '15px', md: '18px' },
+                                height: { xs: '12px', sm: '15px', md: '18px' },
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '100%',
+                              }}
+                            >
+                              {digit || ' '}
+                            </Typography>
+                          ))}
+                        </Box>
+                      </Box>
+                    </TableCell>
+                  );
+                })}
               </TableRow>
             ))}
           </TableBody>

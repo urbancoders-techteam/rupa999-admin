@@ -53,8 +53,6 @@ UserTableRow.propTypes = {
   onDeleteRow: PropTypes.func,
   onStatusChange: PropTypes.func,
   onViewBankDetails: PropTypes.func,
-  bankDetails: PropTypes.object,
-  bankDetailsLoading: PropTypes.bool,
   onChangePassword: PropTypes.func,
   changePasswordLoading: PropTypes.bool,
   onAddDeductBalance: PropTypes.func,
@@ -71,8 +69,6 @@ export default function UserTableRow({
   onDeleteRow,
   onStatusChange,
   onViewBankDetails,
-  bankDetails,
-  bankDetailsLoading,
   onChangePassword,
   changePasswordLoading,
   onAddDeductBalance,
@@ -89,7 +85,8 @@ export default function UserTableRow({
     totalBonus,
     status,
     createdAt,
-  } = row;
+    bankDetails = {},
+  } = row || {};
 
   const [openConfirm, setOpenConfirm] = useState(false);
   const [openBankDetails, setOpenBankDetails] = useState(false);
@@ -191,7 +188,7 @@ export default function UserTableRow({
           ₹{totalWithdraw?.toLocaleString('en-IN')}
         </TableCell>
 
-        <TableCell align="center" sx={{ minWidth: '110px' }}>
+        <TableCell align="center" sx={{ minWidth: '140px' }}>
           ₹{totalBonus?.toLocaleString('en-IN')}
         </TableCell>
 
@@ -306,7 +303,7 @@ export default function UserTableRow({
         open={openBankDetails}
         onClose={handleCloseBankDetails}
         bankDetails={bankDetails}
-        loading={bankDetailsLoading}
+        loading={false}
       />
 
       {/* Change Password Dialog */}
