@@ -1,18 +1,16 @@
 import { useState } from 'react';
 import * as Yup from 'yup';
 import { useDispatch } from 'react-redux';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 // form
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import toast from 'react-hot-toast';
-import { Link, Stack, Alert, IconButton, InputAdornment } from '@mui/material';
+import { Stack, Alert, IconButton, InputAdornment } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // routes
-import { PATH_AUTH, PATH_DASHBOARD } from '../../routes/paths';
-// auth
-import { useAuthContext } from '../../auth/useAuthContext';
+import { PATH_DASHBOARD } from '../../routes/paths';
 // components
 import Iconify from '../../components/iconify';
 import FormProvider, { RHFTextField } from '../../components/hook-form';
@@ -22,7 +20,6 @@ import { getPermissionByRoleIdAsync } from '../../redux/services/auth_role_permi
 // ----------------------------------------------------------------------
 
 export default function AuthLoginForm() {
-  const { login } = useAuthContext();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -52,39 +49,35 @@ export default function AuthLoginForm() {
   const onSubmit = async (data) => {
     try {
       const res = await dispatch(staffLoginAsync({ email: data?.email, password: data?.password }));
-      console.log('res', res);
-      navigate(PATH_DASHBOARD.home.root);
 
       if (res?.payload?.success && res.payload.admin) {
         localStorage.setItem('token', res.payload.access_token);
         localStorage.setItem('admin', JSON.stringify(res.payload.admin));
-        toast.success('Logged in successfully, Welcome to Tied Admin Panel.');
+        
+        const { isSuperAdmin = false, roleId } = res.payload.admin || {};
 
-        if (res?.payload?.admin?._id || res) {
-          const isSuperAdmin = res?.payload?.admin?.isSuperAdmin === true;
-          
-          // Skip permission fetching for super admin - they have full access
-          if (!isSuperAdmin) {
-            // const id = res?.payload?.admin.role;
-            // const initialUserData = {
-            //   user: res?.payload?.admin,
-            // };
-            // dispatch(getPermissionByRoleIdAsync({ id })).then((permission) => {
-            //   console.log('permission', permission)
-            //   if (permission.payload.status === 200) {
-            //     const updatedUserData = {
-            //       ...initialUserData,
-            //       route: permission?.payload?.data,
-            //     };
-            //     localStorage.setItem('user', JSON.stringify(updatedUserData));
-            //     dispatch(setUserInfoRedux(updatedUserData));
-            //   }
-            // });
+        // Fetch permissions for non-super-admin users if roleId exists
+        if (!isSuperAdmin && roleId && roleId !== null) {
+          try {
+            const permissionRes = await dispatch(getPermissionByRoleIdAsync(roleId));
+
+            console.log('permissionRes', permissionRes);
+            
+            if (permissionRes.type === 'permission/permissionByRoleId/fulfilled') {
+              // Permissions are automatically stored in Redux via the slice
+              console.log('Permissions loaded successfully', permissionRes.payload);
+            } else if (permissionRes.type === 'permission/permissionByRoleId/rejected') {
+              console.warn('Failed to fetch permissions:', permissionRes.error);
+              // Continue login even if permission fetch fails
+            }
+          } catch (permissionError) {
+            console.error('Error fetching permissions:', permissionError);
+            // Continue login even if permission fetch fails
           }
-          
-          navigate(PATH_DASHBOARD.home.root);
-          // localStorage.setItem('login', JSON.stringify(res?.payload?.data));
         }
+
+        toast.success('Logged in successfully, Welcome to Tied Admin Panel.');
+        navigate(PATH_DASHBOARD.home.root);
       } else {
         throw new Error(res.payload?.message || 'Login failed');
       }
