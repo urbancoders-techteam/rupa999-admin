@@ -57,7 +57,7 @@ export default function TransactionTableRow({ row, index }) {
       </TableCell>
 
       <TableCell align="left">
-        <Typography variant="body2">{admin.name}</Typography>
+        <Typography variant="body2">{admin?.name || '—'}</Typography>
       </TableCell>
     </TableRow>
   );

@@ -16,24 +16,27 @@ const AxiosClient = async (args) => {
     },
   })
     .then((response) => toolkit.fulfillWithValue(response.data))
-    .catch((error) => toolkit.rejectWithValue(error.response.data));
+    .catch((error) => toolkit.rejectWithValue(error.response?.data || error.message || 'Something went wrong'));
 };
 
 axios.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.log("error>>>>>>>>>>>>",error.response.data.message)
-    toast.error(error.response.data.message, {
+    const errorMessage = error.response?.data?.message || error.message || 'Something went wrong';
+
+    console.log("error>>>>>>>>>>>>", errorMessage);
+
+    toast.error(errorMessage, {
       position: 'top-right',
     });
- 
 
-    if (error.response.status === 401) {
+    if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('auth');
       window.location.href = '/';
     }
-    return Promise.reject((error.response && error.response.data) || 'Something went wrong');
+
+    return Promise.reject((error.response && error.response.data) || { message: errorMessage });
   }
 );
 

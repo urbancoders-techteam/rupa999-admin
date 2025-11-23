@@ -128,7 +128,7 @@ function TransactionMobileViewCardLayout({
                   Created By:
                 </Typography>
                 <Typography variant="body2" fontWeight={700}>
-                  {row.admin.name || '—'}
+                  {row?.admin?.name || '—'}
                 </Typography>
               </Stack>
             </Stack>
