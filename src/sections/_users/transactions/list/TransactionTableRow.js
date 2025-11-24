@@ -18,12 +18,12 @@ TransactionTableRow.propTypes = {
     admin: PropTypes.object,
     remarks: PropTypes.string,
     marketName: PropTypes.string,
-    wonAmount: PropTypes.number,
+    gameName: PropTypes.string,
   }),
 };
 
 export default function TransactionTableRow({ row, index }) {
-  const { date, particulars, debit, credit, balance, admin, marketName, wonAmount } = row;
+  const { date, particulars, debit, credit, balance, admin, marketName, gameName } = row;
 
   return (
     <TableRow 
@@ -212,7 +212,7 @@ export default function TransactionTableRow({ row, index }) {
               {marketName || '—'}
             </Typography>
           )}
-          {wonAmount && (
+          {debit && (
             <Typography 
               variant="subtitle2" 
               color="text.secondary"
@@ -232,7 +232,7 @@ export default function TransactionTableRow({ row, index }) {
                 },
               })}
             >
-              {wonAmount ? fCurrency(wonAmount) : '—'}
+              {debit ? `${gameName} - ${fCurrency(debit)}` : '—'}
             </Typography>
           )}
         </Stack>

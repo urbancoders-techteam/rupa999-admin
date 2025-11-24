@@ -22,6 +22,7 @@ export default function UserBidHistoryTableRow({ index, row, selected }) {
     marketId,
     name,
     bidTable,
+    debit,
     totalPoints,
     date,
     createdAt,
@@ -32,6 +33,12 @@ export default function UserBidHistoryTableRow({ index, row, selected }) {
     if (createdAt) return fDateTime(createdAt);
     return '—';
   };
+
+  const formatText = text =>
+    text
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
 
   return (
     <TableRow hover>
@@ -49,13 +56,13 @@ export default function UserBidHistoryTableRow({ index, row, selected }) {
 
         <TableCell align="left">
           <Typography variant="body2" noWrap>
-            {name || '—'}
+            {formatText(name) || '—'}
           </Typography>
         </TableCell>
 
         <TableCell align="left">
           <Typography variant="body2">
-            {fBidDigit(bidTable?.digit)}
+            {fBidDigit(debit)}
           </Typography>
         </TableCell>
 
