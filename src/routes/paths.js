@@ -178,6 +178,11 @@ export const PATH_DASHBOARD = {
   gametypes: {
     root: path(ROOTS_DASHBOARD, '/gametypes'),
   },
+
+  maintransaction: {
+    root: path(ROOTS_DASHBOARD, '/maintransaction'),
+    list: path(ROOTS_DASHBOARD, '/maintransaction/list'),
+  },
 };
 
 export const PATH_ZONE_ON_STORE = 'https://mui.com/store/items/zone-landing-page/';

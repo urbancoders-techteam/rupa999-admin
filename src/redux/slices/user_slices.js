@@ -7,6 +7,7 @@ import {
   getUserLedgersAsync,
   addDeductBalanceAsync,
   getUserBidsAsync,
+  getAllLedgersAsync,
 } from '../services/user_services';
 
 const initialState = {
@@ -33,6 +34,15 @@ const initialState = {
   bidHistoryLoading: false,
   bidHistoryError: null,
   bidHistoryPagination: {
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+  },
+  allLedgersList: [],
+  allLedgersLoading: false,
+  allLedgersError: null,
+  allLedgersPagination: {
     page: 1,
     limit: 10,
     total: 0,
@@ -208,6 +218,31 @@ const userSlice = createSlice({
     builder.addMatcher(isAnyOf(getUserBidsAsync.rejected), (state, { payload }) => {
       state.bidHistoryLoading = false;
       state.bidHistoryError = payload?.message || 'Failed to fetch bid history';
+    });
+    // -------------
+
+    // Get all ledgers ----------
+    builder.addMatcher(isAnyOf(getAllLedgersAsync.pending), (state) => {
+      state.allLedgersLoading = true;
+      state.allLedgersError = null;
+    });
+
+    builder.addMatcher(isAnyOf(getAllLedgersAsync.fulfilled), (state, { payload }) => {
+      state.allLedgersLoading = false;
+      state.allLedgersList = payload?.data || [];
+      if (payload?.pagination) {
+        state.allLedgersPagination = {
+          page: payload.pagination.page || 1,
+          limit: payload.pagination.limit || 10,
+          total: payload.pagination.total || 0,
+          totalPages: payload.pagination.totalPages || 0,
+        };
+      }
+    });
+
+    builder.addMatcher(isAnyOf(getAllLedgersAsync.rejected), (state, { payload }) => {
+      state.allLedgersLoading = false;
+      state.allLedgersError = payload?.message || 'Failed to fetch ledgers';
     });
     // -------------
   },

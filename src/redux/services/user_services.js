@@ -110,3 +110,19 @@ export const getUserBidsAsync = createAsyncThunk(
     })
 );
 
+// Get all ledgers (Admin only)
+export const getAllLedgersAsync = createAsyncThunk(
+  'user/getAllLedgers',
+  async (params = {}, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: '/admin/ledgers',
+      method: 'get',
+      params: {
+        page: params.page || 1,
+        limit: params.limit || 10,
+        particulars: params.particulars || '',
+      },
+    })
+);
+

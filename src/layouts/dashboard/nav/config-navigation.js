@@ -90,7 +90,7 @@ const navConfig = [
       },
       {
         title: 'Transaction Details',
-        path: PATH_DASHBOARD.generalwithdrawhistory.list,
+        path: PATH_DASHBOARD.maintransaction.list,
         icon: ICONS.banking,
       },
       {

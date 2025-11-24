@@ -14,7 +14,12 @@ TransactionTableRow.propTypes = {
     debit: PropTypes.number,
     credit: PropTypes.number,
     balance: PropTypes.number,
-    user: PropTypes.object,
+    user: PropTypes.shape({
+      name: PropTypes.string,
+      userName: PropTypes.string,
+      number: PropTypes.string,
+      mobile: PropTypes.string,
+    }),
     admin: PropTypes.object,
     remarks: PropTypes.string,
     marketName: PropTypes.string,
@@ -23,10 +28,10 @@ TransactionTableRow.propTypes = {
 };
 
 export default function TransactionTableRow({ row, index }) {
-  const { date, particulars, debit, credit, balance, admin, marketName, gameName } = row;
+  const { date, particulars, debit, credit, balance, admin, marketName, gameName, user } = row;
 
   return (
-    <TableRow 
+    <TableRow
       hover
       sx={(theme) => ({
         '&:hover': {
@@ -35,6 +40,7 @@ export default function TransactionTableRow({ row, index }) {
       })}
     >
       <TableCell
+        align="center"
         sx={(theme) => ({
           padding: theme.spacing(1, 1.5),
           [theme.breakpoints.down('sm')]: {
@@ -48,7 +54,7 @@ export default function TransactionTableRow({ row, index }) {
           },
         })}
       >
-        <Typography 
+        <Typography
           variant="body2"
           sx={(theme) => ({
             fontSize: '0.875rem',
@@ -63,22 +69,19 @@ export default function TransactionTableRow({ row, index }) {
             },
           })}
         >
-          {index + 1}
+          {index + 1}.
         </Typography>
       </TableCell>
 
-      <TableCell 
-        width="200px"
+      <TableCell
         sx={(theme) => ({
           padding: theme.spacing(1, 1.5),
           [theme.breakpoints.down('sm')]: {
             padding: theme.spacing(0.75, 0.5),
-            width: '120px',
             minWidth: '120px',
           },
           [theme.breakpoints.between('sm', 'md')]: {
             padding: theme.spacing(0.875, 1),
-            width: '160px',
           },
           [theme.breakpoints.up('lg')]: {
             padding: theme.spacing(1.25, 2),
@@ -87,7 +90,7 @@ export default function TransactionTableRow({ row, index }) {
       >
         {date ? (
           <Stack spacing={{ xs: 0.25, sm: 0.5 }}>
-            <Typography 
+            <Typography
               variant="body2"
               sx={(theme) => ({
                 fontSize: '0.875rem',
@@ -106,7 +109,7 @@ export default function TransactionTableRow({ row, index }) {
             >
               {fDateTimeSplit(date).date}
             </Typography>
-            <Typography 
+            <Typography
               variant="body2"
               color="text.secondary"
               sx={(theme) => ({
@@ -127,7 +130,7 @@ export default function TransactionTableRow({ row, index }) {
             </Typography>
           </Stack>
         ) : (
-          <Typography 
+          <Typography
             variant="body2"
             sx={(theme) => ({
               fontSize: '0.875rem',
@@ -147,27 +150,91 @@ export default function TransactionTableRow({ row, index }) {
         )}
       </TableCell>
 
+      {/* User Name Column */}
+      {user.name && (
+        <TableCell
+          sx={(theme) => ({
+            padding: theme.spacing(1, 1.5),
+            [theme.breakpoints.down('sm')]: {
+              padding: theme.spacing(0.5, 0.25),
+              maxWidth: '130px',
+              paddingRight: '15px',
+            },
+            [theme.breakpoints.between('sm', 'md')]: {
+              padding: theme.spacing(0.75, 0.75),
+            },
+            [theme.breakpoints.up('lg')]: {
+              padding: theme.spacing(1.25, 2),
+            },
+          })}
+        >
+          <Typography
+            variant="subtitle2"
+            sx={(theme) => ({
+              fontSize: '0.875rem',
+              whiteSpace: { xs: 'nowrap', sm: 'normal' },
+              overflow: { xs: 'hidden', sm: 'visible' },
+              textOverflow: { xs: 'ellipsis', sm: 'clip' },
+              [theme.breakpoints.down('sm')]: {
+                fontSize: '0.65rem',
+              },
+              [theme.breakpoints.between('sm', 'md')]: {
+                fontSize: '0.75rem',
+              },
+              [theme.breakpoints.up('lg')]: {
+                fontSize: '0.9375rem',
+              },
+            })}
+          >
+            {user?.name || user?.userName || '—'}
+          </Typography>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={(theme) => ({
+              fontSize: '0.75rem',
+              whiteSpace: { xs: 'nowrap', sm: 'normal' },
+              overflow: { xs: 'hidden', sm: 'visible' },
+              textOverflow: { xs: 'ellipsis', sm: 'clip' },
+              [theme.breakpoints.down('sm')]: {
+                fontSize: '0.625rem',
+              },
+              [theme.breakpoints.between('sm', 'md')]: {
+                fontSize: '0.7rem',
+              },
+              [theme.breakpoints.up('lg')]: {
+                fontSize: '0.8125rem',
+              },
+            })}
+          >
+            {user?.number || user?.mobile || '—'}
+          </Typography>
+        </TableCell>
+      )}
+
       <TableCell
         sx={(theme) => ({
           padding: theme.spacing(1, 1.5),
           [theme.breakpoints.down('sm')]: {
-            padding: theme.spacing(0.75, 0.5),
+            padding: theme.spacing(0.5, 0.25),
+            maxWidth: '120px',
+            paddingRight: '10px',
           },
           [theme.breakpoints.between('sm', 'md')]: {
-            padding: theme.spacing(0.875, 1),
+            padding: theme.spacing(0.75, 0.75),
           },
           [theme.breakpoints.up('lg')]: {
             padding: theme.spacing(1.25, 2),
           },
         })}
       >
-        <Stack 
-          spacing={{ xs: 0.25, sm: 0.5 }}
+        <Stack
+          spacing={{ xs: 0.125, sm: 0.5 }}
           sx={{
             overflow: 'hidden',
           }}
         >
-          <Typography 
+          <Typography
             variant="subtitle1"
             sx={(theme) => ({
               fontSize: '0.9375rem',
@@ -189,9 +256,10 @@ export default function TransactionTableRow({ row, index }) {
           >
             {particulars}
           </Typography>
+
           {marketName && (
-            <Typography 
-              variant="subtitle2" 
+            <Typography
+              variant="subtitle2"
               color="text.secondary"
               sx={(theme) => ({
                 fontSize: '0.8125rem',
@@ -213,8 +281,8 @@ export default function TransactionTableRow({ row, index }) {
             </Typography>
           )}
           {debit && (
-            <Typography 
-              variant="subtitle2" 
+            <Typography
+              variant="subtitle2"
               color="text.secondary"
               sx={(theme) => ({
                 fontSize: '0.75rem',
@@ -238,12 +306,13 @@ export default function TransactionTableRow({ row, index }) {
         </Stack>
       </TableCell>
 
-      <TableCell 
+      <TableCell
         align="left"
         sx={(theme) => ({
           padding: theme.spacing(1, 1.5),
           [theme.breakpoints.down('sm')]: {
             padding: theme.spacing(0.75, 0.5),
+            minWidth: '50px',
           },
           [theme.breakpoints.between('sm', 'md')]: {
             padding: theme.spacing(0.875, 1),
@@ -253,8 +322,8 @@ export default function TransactionTableRow({ row, index }) {
           },
         })}
       >
-        <Typography 
-          variant="body2" 
+        <Typography
+          variant="body2"
           color={debit > 0 ? 'error.main' : 'text.secondary'}
           sx={(theme) => ({
             fontSize: '0.875rem',
@@ -276,12 +345,13 @@ export default function TransactionTableRow({ row, index }) {
         </Typography>
       </TableCell>
 
-      <TableCell 
+      <TableCell
         align="left"
         sx={(theme) => ({
           padding: theme.spacing(1, 1.5),
           [theme.breakpoints.down('sm')]: {
             padding: theme.spacing(0.75, 0.5),
+            minWidth: '50px',
           },
           [theme.breakpoints.between('sm', 'md')]: {
             padding: theme.spacing(0.875, 1),
@@ -291,8 +361,8 @@ export default function TransactionTableRow({ row, index }) {
           },
         })}
       >
-        <Typography 
-          variant="body2" 
+        <Typography
+          variant="body2"
           color={credit > 0 ? 'success.main' : 'text.secondary'}
           sx={(theme) => ({
             fontSize: '0.875rem',
@@ -310,16 +380,17 @@ export default function TransactionTableRow({ row, index }) {
             },
           })}
         >
-          { fCurrency(credit > 0 ? credit : '0')}
+          {fCurrency(credit > 0 ? credit : '0')}
         </Typography>
       </TableCell>
 
-      <TableCell 
+      <TableCell
         align="left"
         sx={(theme) => ({
           padding: theme.spacing(1, 1.5),
           [theme.breakpoints.down('sm')]: {
             padding: theme.spacing(0.75, 0.5),
+            minWidth: '50px',
           },
           [theme.breakpoints.between('sm', 'md')]: {
             padding: theme.spacing(0.875, 1),
@@ -329,8 +400,8 @@ export default function TransactionTableRow({ row, index }) {
           },
         })}
       >
-        <Typography 
-          variant="body2" 
+        <Typography
+          variant="body2"
           fontWeight="fontWeightMedium"
           sx={(theme) => ({
             fontSize: '0.875rem',
@@ -353,7 +424,7 @@ export default function TransactionTableRow({ row, index }) {
         </Typography>
       </TableCell>
 
-      <TableCell 
+      <TableCell
         align="left"
         sx={(theme) => ({
           padding: theme.spacing(1, 1.5),
@@ -368,7 +439,7 @@ export default function TransactionTableRow({ row, index }) {
           },
         })}
       >
-        <Typography 
+        <Typography
           variant="body2"
           sx={(theme) => ({
             fontSize: '0.875rem',
@@ -392,4 +463,3 @@ export default function TransactionTableRow({ row, index }) {
     </TableRow>
   );
 }
-

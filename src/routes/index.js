@@ -51,6 +51,7 @@ import {
   DesignationListPage,
   MarketDataListPage,
   BidRecordListPage,
+  MainTransactionListPage,
   //
 } from './elements';
 
@@ -132,8 +133,18 @@ export default function Router() {
             { path: 'list', element: <WithdrawDetailsPage /> },
           ],
         },
-
+        
         { path: 'profit', element: <ProfitPage />, index: true },
+        {
+          path: 'maintransaction',
+          children: [
+            {
+              element: <Navigate to="/dashboard/maintransaction/list" replace />,
+              index: true,
+            },
+            { path: 'list', element: <MainTransactionListPage /> },
+          ],
+        },
 
         // General Settings
         {
