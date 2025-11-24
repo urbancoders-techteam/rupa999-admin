@@ -63,7 +63,7 @@ export default function useTable(props) {
 
   const onChangeRowsPerPage = useCallback((event) => {
     setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
+    setRowsPerPage(parseInt(event.target.value, 5));
   }, []);
 
   const onChangeDense = useCallback((event) => {

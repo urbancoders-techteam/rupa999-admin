@@ -80,6 +80,8 @@ export default function UserTransactionListPage() {
     (state) => state.user
   );
 
+  console.log('transactionsPagination', transactionsPagination)
+
   const [filterParticulars, setFilterParticulars] = useState('All');
 
   // Fetch ledgers on component mount and when filters change
@@ -110,6 +112,8 @@ export default function UserTransactionListPage() {
         user: transaction.user,
         admin: transaction.admin,
         remarks: transaction.remarks,
+        marketName: transaction.marketName || transaction.market?.name || null,
+        wonAmount: transaction.wonAmount || transaction.won || null,
         ...transaction,
       })),
     [transactionsList]
@@ -168,7 +172,7 @@ export default function UserTransactionListPage() {
 
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
               <Scrollbar>
-                <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
+                <Table size={dense ? 'small' : 'medium'} sx={{ minWidth:{xs: 500, sm: 800 }}}>
                   <TableHeadCustom
                     order={order}
                     orderBy={orderBy}

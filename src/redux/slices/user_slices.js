@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, isAnyOf } from '@reduxjs/toolkit';
 import {
   deleteUserAsync,
   getAllUsersAsync,
@@ -52,150 +52,164 @@ const userSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // Get all users
-    builder
-      .addCase(getAllUsersAsync.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(getAllUsersAsync.fulfilled, (state, action) => {
-        state.loading = false;
-        state.userList = action.payload?.data || [];
-        if (action.payload) {
-          state.pagination = {
-            page: action.payload.currentPage || 1,
-            limit: action.payload.limit || 10,
-            total: action.payload.totalItems || 0,
-            totalPages: action.payload.totalPages || 0,
-          };
+    // Get all users ----------
+    builder.addMatcher(isAnyOf(getAllUsersAsync.pending), (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+
+    builder.addMatcher(isAnyOf(getAllUsersAsync.fulfilled), (state, { payload }) => {
+      state.loading = false;
+      state.userList = payload?.data || [];
+      if (payload) {
+        state.pagination = {
+          page: payload.currentPage || 1,
+          limit: payload.limit || 10,
+          total: payload.totalItems || 0,
+          totalPages: payload.totalPages || 0,
+        };
+      }
+    });
+
+    builder.addMatcher(isAnyOf(getAllUsersAsync.rejected), (state, { payload }) => {
+      state.loading = false;
+      state.error = payload?.message || 'Failed to fetch users';
+    });
+    // -------------
+
+    // Get user by ID ----------
+    builder.addMatcher(isAnyOf(getUserByIdAsync.pending), (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+
+    builder.addMatcher(isAnyOf(getUserByIdAsync.fulfilled), (state, { payload }) => {
+      state.loading = false;
+      state.userById = payload?.data || payload?.user || null;
+    });
+
+    builder.addMatcher(isAnyOf(getUserByIdAsync.rejected), (state, { payload }) => {
+      state.loading = false;
+      state.error = payload?.message || 'Failed to fetch user';
+    });
+    // -------------
+
+    // Update user status ----------
+    builder.addMatcher(isAnyOf(updateUserStatusAsync.pending), (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+
+    builder.addMatcher(isAnyOf(updateUserStatusAsync.fulfilled), (state, { payload }) => {
+      state.loading = false;
+      // Update user in list if exists
+      const updatedUser = payload?.user || payload?.data;
+      if (updatedUser) {
+        const index = state.userList.findIndex((user) => user._id === updatedUser._id);
+        if (index !== -1) {
+          state.userList[index] = updatedUser;
         }
-      })
-      .addCase(getAllUsersAsync.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload?.message || 'Failed to fetch users';
-      });
+      }
+    });
 
-    // Get user by ID
-    builder
-      .addCase(getUserByIdAsync.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(getUserByIdAsync.fulfilled, (state, action) => {
-        state.loading = false;
-        state.userById = action.payload?.data || action.payload?.user || null;
-      })
-      .addCase(getUserByIdAsync.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload?.message || 'Failed to fetch user';
-      });
+    builder.addMatcher(isAnyOf(updateUserStatusAsync.rejected), (state, { payload }) => {
+      state.loading = false;
+      state.error = payload?.message || 'Failed to update user status';
+    });
+    // -------------
 
-    // Update user status
-    builder
-      .addCase(updateUserStatusAsync.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(updateUserStatusAsync.fulfilled, (state, action) => {
-        state.loading = false;
-        // Update user in list if exists
-        const updatedUser = action.payload?.user || action.payload?.data;
-        if (updatedUser) {
-          const index = state.userList.findIndex((user) => user._id === updatedUser._id);
-          if (index !== -1) {
-            state.userList[index] = updatedUser;
-          }
+    // Delete user ----------
+    builder.addMatcher(isAnyOf(deleteUserAsync.pending), (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+
+    builder.addMatcher(isAnyOf(deleteUserAsync.fulfilled), (state, { meta }) => {
+      state.loading = false;
+      // Remove user from list
+      const deletedId = meta.arg;
+      state.userList = state.userList.filter((user) => user._id !== deletedId);
+    });
+
+    builder.addMatcher(isAnyOf(deleteUserAsync.rejected), (state, { payload }) => {
+      state.loading = false;
+      state.error = payload?.message || 'Failed to delete user';
+    });
+    // -------------
+
+    // Get user ledgers ----------
+    builder.addMatcher(isAnyOf(getUserLedgersAsync.pending), (state) => {
+      state.transactionsLoading = true;
+      state.transactionsError = null;
+    });
+
+    builder.addMatcher(isAnyOf(getUserLedgersAsync.fulfilled), (state, { payload }) => {
+      state.transactionsLoading = false;
+      state.transactionsList = payload?.data || [];
+      if (payload) {
+        state.transactionsPagination = {
+          page: payload.pagination.page || 1,
+          limit: payload.pagination.limit || 10,
+          total: payload.pagination.total || 0,
+          totalPages: payload.pagination.totalPages || 0,
+        };
+      }
+    });
+
+    builder.addMatcher(isAnyOf(getUserLedgersAsync.rejected), (state, { payload }) => {
+      state.transactionsLoading = false;
+      state.transactionsError = payload?.message || 'Failed to fetch ledgers';
+    });
+    // -------------
+
+    // Add or deduct balance ----------
+    builder.addMatcher(isAnyOf(addDeductBalanceAsync.pending), (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+
+    builder.addMatcher(isAnyOf(addDeductBalanceAsync.fulfilled), (state, { payload }) => {
+      state.loading = false;
+      // Update user balance in list if exists
+      const updatedUser = payload?.user;
+      if (updatedUser) {
+        const index = state.userList.findIndex((user) => user._id === updatedUser._id);
+        if (index !== -1) {
+          state.userList[index] = { ...state.userList[index], ...updatedUser };
         }
-      })
-      .addCase(updateUserStatusAsync.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload?.message || 'Failed to update user status';
-      });
+      }
+    });
 
-    // Delete user
-    builder
-      .addCase(deleteUserAsync.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(deleteUserAsync.fulfilled, (state, action) => {
-        state.loading = false;
-        // Remove user from list
-        const deletedId = action.meta.arg;
-        state.userList = state.userList.filter((user) => user._id !== deletedId);
-      })
-      .addCase(deleteUserAsync.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload?.message || 'Failed to delete user';
-      });
+    builder.addMatcher(isAnyOf(addDeductBalanceAsync.rejected), (state, { payload }) => {
+      state.loading = false;
+      state.error = payload?.message || 'Failed to update balance';
+    });
+    // -------------
 
-    // Get user ledgers
-    builder
-      .addCase(getUserLedgersAsync.pending, (state) => {
-        state.transactionsLoading = true;
-        state.transactionsError = null;
-      })
-      .addCase(getUserLedgersAsync.fulfilled, (state, action) => {
-        state.transactionsLoading = false;
-        state.transactionsList = action.payload?.data || [];
-        if (action.payload) {
-          state.transactionsPagination = {
-            page: action.payload.currentPage || 1,
-            limit: action.payload.limit || 10,
-            total: action.payload.totalItems || 0,
-            totalPages: action.payload.totalPages || 0,
-          };
-        }
-      })
-      .addCase(getUserLedgersAsync.rejected, (state, action) => {
-        state.transactionsLoading = false;
-        state.transactionsError = action.payload?.message || 'Failed to fetch ledgers';
-      });
+    // Get user bids ----------
+    builder.addMatcher(isAnyOf(getUserBidsAsync.pending), (state) => {
+      state.bidHistoryLoading = true;
+      state.bidHistoryError = null;
+    });
 
-    // Add or deduct balance
-    builder
-      .addCase(addDeductBalanceAsync.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(addDeductBalanceAsync.fulfilled, (state, action) => {
-        state.loading = false;
-        // Update user balance in list if exists
-        const updatedUser = action.payload?.user;
-        if (updatedUser) {
-          const index = state.userList.findIndex((user) => user._id === updatedUser._id);
-          if (index !== -1) {
-            state.userList[index] = { ...state.userList[index], ...updatedUser };
-          }
-        }
-      })
-      .addCase(addDeductBalanceAsync.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload?.message || 'Failed to update balance';
-      });
+    builder.addMatcher(isAnyOf(getUserBidsAsync.fulfilled), (state, { payload }) => {
+      state.bidHistoryLoading = false;
+      state.bidHistoryList = payload?.data || [];
+      if (payload) {
+        state.bidHistoryPagination = {
+          page: payload.currentPage || 1,
+          limit: payload.limit || 10,
+          total: payload.totalItems || 0,
+          totalPages: payload.totalPages || 0,
+        };
+      }
+    });
 
-    // Get user bids
-    builder
-      .addCase(getUserBidsAsync.pending, (state) => {
-        state.bidHistoryLoading = true;
-        state.bidHistoryError = null;
-      })
-      .addCase(getUserBidsAsync.fulfilled, (state, action) => {
-        state.bidHistoryLoading = false;
-        state.bidHistoryList = action.payload?.data || [];
-        if (action.payload) {
-          state.bidHistoryPagination = {
-            page: action.payload.currentPage || 1,
-            limit: action.payload.limit || 10,
-            total: action.payload.totalItems || 0,
-            totalPages: action.payload.totalPages || 0,
-          };
-        }
-      })
-      .addCase(getUserBidsAsync.rejected, (state, action) => {
-        state.bidHistoryLoading = false;
-        state.bidHistoryError = action.payload?.message || 'Failed to fetch bid history';
-      });
+    builder.addMatcher(isAnyOf(getUserBidsAsync.rejected), (state, { payload }) => {
+      state.bidHistoryLoading = false;
+      state.bidHistoryError = payload?.message || 'Failed to fetch bid history';
+    });
+    // -------------
   },
 });
 

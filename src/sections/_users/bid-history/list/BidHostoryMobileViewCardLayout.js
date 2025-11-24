@@ -73,10 +73,7 @@ function BidHostoryMobileViewCardLayout({
             {/* Header */}
             <Box mb={1.5}>
               <Typography variant="subtitle1" fontWeight={600} noWrap>
-                {row.marketName || 'N/A'}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                ID: {row.id || '—'}
+                {row.marketId.name || 'N/A'}
               </Typography>
             </Box>
 
@@ -98,7 +95,7 @@ function BidHostoryMobileViewCardLayout({
                   Digit:
                 </Typography>
                 <Typography variant="body2" fontWeight={500}>
-                  {row.digit || '—'}
+                  {row.bidTable.digit || '—'}
                 </Typography>
               </Stack>
 
@@ -107,7 +104,7 @@ function BidHostoryMobileViewCardLayout({
                   Point:
                 </Typography>
                 <Typography variant="body2" fontWeight={500}>
-                  {row.point || '—'}
+                  {row.totalPoints || '—'}
                 </Typography>
               </Stack>
 

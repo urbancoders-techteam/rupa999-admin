@@ -54,6 +54,22 @@ export default function TableHeadCustom({
     [`&.${tableCellClasses.head}`]: {
       backgroundColor: theme.palette.primary.main,
       color: theme.palette.common.white,
+      padding: theme.spacing(1, 1.5),
+      fontSize: '0.875rem',
+      fontWeight: 600,
+      [theme.breakpoints.down('sm')]: {
+        padding: theme.spacing(0.75, 0.5),
+        fontSize: '0.7rem',
+        fontWeight: 500,
+      },
+      [theme.breakpoints.between('sm', 'md')]: {
+        padding: theme.spacing(0.875, 1),
+        fontSize: '0.8rem',
+      },
+      [theme.breakpoints.up('lg')]: {
+        padding: theme.spacing(1.25, 2),
+        fontSize: '0.9375rem',
+      },
     },
     [`&.${tableCellClasses.body}`]: {
       fontSize: 14,
@@ -75,11 +91,31 @@ export default function TableHeadCustom({
     <TableHead sx={sx}>
       <StyledTableRow>
         {onSelectAllRows && (
-          <StyledTableCell padding="checkbox">
+          <StyledTableCell 
+            padding="checkbox"
+            sx={(theme) => ({
+              padding: theme.spacing(1, 0.5),
+              [theme.breakpoints.down('sm')]: {
+                padding: theme.spacing(0.5, 0.25),
+                '& .MuiCheckbox-root': {
+                  padding: theme.spacing(0.5),
+                  '& svg': {
+                    fontSize: '1.125rem',
+                  },
+                },
+              },
+            })}
+          >
             <Checkbox
               indeterminate={numSelected > 0 && numSelected < rowCount}
               checked={rowCount > 0 && numSelected === rowCount}
               onChange={(event) => onSelectAllRows(event.target.checked)}
+              size="small"
+              sx={(theme) => ({
+                [theme.breakpoints.down('sm')]: {
+                  padding: theme.spacing(0.5),
+                },
+              })}
             />
           </StyledTableCell>
         )}
@@ -92,7 +128,10 @@ export default function TableHeadCustom({
             sx={(theme) => ({ 
               width: headCell.width, 
               minWidth: headCell.minWidth,
-              color: theme.palette.common.white
+              color: theme.palette.common.white,
+              whiteSpace: { xs: 'nowrap', sm: 'normal' },
+              overflow: { xs: 'hidden', sm: 'visible' },
+              textOverflow: { xs: 'ellipsis', sm: 'clip' },
             })}
           >
             {onSort ? (
@@ -104,12 +143,23 @@ export default function TableHeadCustom({
                 sx={(theme) => ({ 
                   textTransform: 'capitalize',
                   color: theme.palette.common.white,
+                  fontSize: 'inherit',
+                  fontWeight: 'inherit',
+                  '&:hover': {
+                    color: theme.palette.common.white,
+                    opacity: 0.8,
+                  },
                   '&.Mui-active': {
                     color: theme.palette.common.white,
-                    fontWeight: 800,
+                    fontWeight: { xs: 700, sm: 800 },
                   },
                   '& .MuiTableSortLabel-icon': {
                     color: theme.palette.common.white,
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
+                  },
+                  [theme.breakpoints.down('sm')]: {
+                    fontSize: '0.7rem',
+                    padding: theme.spacing(0.25, 0),
                   },
                 })}
               >
@@ -122,7 +172,18 @@ export default function TableHeadCustom({
                 ) : null}
               </TableSortLabel>
             ) : (
-              headCell.label
+              <Box
+                component="span"
+                sx={(theme) => ({
+                  fontSize: 'inherit',
+                  fontWeight: 'inherit',
+                  [theme.breakpoints.down('sm')]: {
+                    fontSize: '0.7rem',
+                  },
+                })}
+              >
+                {headCell.label}
+              </Box>
             )}
           </StyledTableCell>
         ))}
