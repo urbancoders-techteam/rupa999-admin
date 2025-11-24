@@ -19,10 +19,11 @@ MainBidHistoryTableRow.propTypes = {
 
 export default function MainBidHistoryTableRow({ index, row, selected }) {
   const {
-    marketName,
+    marketId,
     name,
-    digit,
-    point,
+    bidTable,
+    totalPoints,
+    userId,
     date,
     createdAt,
   } = row || {};
@@ -51,7 +52,19 @@ export default function MainBidHistoryTableRow({ index, row, selected }) {
 
       <TableCell align="left">
         <Typography variant="subtitle2" noWrap>
-          {marketName || '—'}
+          {userId.name || '—'}
+        </Typography>
+      </TableCell>
+     
+      <TableCell align="left">
+        <Typography variant="body2" noWrap>
+          {userId.number || '—'}
+        </Typography>
+      </TableCell>
+
+      <TableCell align="left">
+        <Typography variant="subtitle2" noWrap>
+          {marketId.name || '—'}
         </Typography>
       </TableCell>
 
@@ -63,13 +76,13 @@ export default function MainBidHistoryTableRow({ index, row, selected }) {
 
       <TableCell align="left">
         <Typography variant="body2">
-          {fBidDigit(digit) || '—'}
+          {fBidDigit(bidTable.digit) || '—'}
         </Typography>
       </TableCell>
 
       <TableCell align="left">
         <Typography variant="body2">
-          {point || '—'}
+          {totalPoints || '—'}
         </Typography>
       </TableCell>
 

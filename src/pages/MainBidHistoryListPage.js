@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useParams } from 'react-router-dom';
 // @mui
 import {
   Card,
@@ -33,12 +32,14 @@ import {
 import UserBidHistoryTableToolbar from '../sections/_users/bid-history/list/UserBidHistoryTableToolbar';
 import BidHostoryMobileViewCardLayout from '../sections/_users/bid-history/list/BidHostoryMobileViewCardLayout';
 import MainBidHistoryTableRow from '../sections/_main_bid_history/list/MainBidHistoryTableRow';
-import { getUserBidsAsync } from '../redux/services/user_services';
+import { getAllBidsAsync } from '../redux/services/user_services';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
   { id: 'sNo.', label: 'S.No.', align: 'left' },
+  { id: 'userName', label: 'User Name', align: 'left' },
+  { id: 'phoneNumber', label: 'Phone', align: 'left' },
   { id: 'marketName', label: 'Market Name', align: 'left' },
   { id: 'name', label: 'Game Name', align: 'left' },
   { id: 'digit', label: 'Digit', align: 'left' },
@@ -67,10 +68,9 @@ export default function MainBidHistoryListPage() {
 
   const { themeStretch } = useSettingsContext();
   const dispatch = useDispatch();
-  const { id: userId } = useParams();
 
   // Redux state
-  const { bidHistoryList, bidHistoryLoading, bidHistoryPagination } = useSelector(
+  const { allBidsList, allBidsLoading, allBidsPagination } = useSelector(
     (state) => state.user
   );
 
@@ -82,24 +82,21 @@ export default function MainBidHistoryListPage() {
 
   // Fetch bids on component mount and when filters change
   useEffect(() => {
-    if (userId) {
-      dispatch(
-        getUserBidsAsync({
-          userId,
-          page: page + 1, // API uses 1-based pagination
-          limit: rowsPerPage,
-          search: filterName,
-          gameType: filterGameType?.value || '',
-          status: filterStatus?.value || '',
-        })
-      );
-    }
-  }, [dispatch, userId, page, rowsPerPage, filterName, filterGameType, filterStatus]);
+    dispatch(
+      getAllBidsAsync({
+        page: page + 1, // API uses 1-based pagination
+        limit: rowsPerPage,
+        search: filterName,
+        gameType: filterGameType?.value || '',
+        status: filterStatus?.value || '',
+      })
+    );
+  }, [dispatch, page, rowsPerPage, filterName, filterGameType, filterStatus]);
 
   // Transform API data to table format
   const tableData = useMemo(
     () =>
-      bidHistoryList.map((bid, index) => ({
+      allBidsList.map((bid, index) => ({
         id: bid._id || index + 1,
         _id: bid._id,
         marketName: bid.marketName || bid.market?.name || '-',
@@ -111,7 +108,7 @@ export default function MainBidHistoryListPage() {
         status: bid.status,
         ...bid,
       })),
-    [bidHistoryList]
+    [allBidsList]
   );
 
   const dataFiltered = applyFilter({
@@ -125,7 +122,7 @@ export default function MainBidHistoryListPage() {
 
   const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== null || filterGameType !== null;
 
-  const isNotFound = !bidHistoryLoading && !tableData.length;
+  const isNotFound = !allBidsLoading && !tableData.length;
 
   const handleFilterName = (event) => {
     setPage(0);
@@ -204,10 +201,10 @@ export default function MainBidHistoryListPage() {
             />
             <BidHostoryMobileViewCardLayout
               data={dataFiltered}
-              loading={bidHistoryLoading}
+              loading={allBidsLoading}
             />
             <TablePaginationCustom
-              count={bidHistoryPagination?.total || dataFiltered.length}
+              count={allBidsPagination?.total || dataFiltered.length}
               page={page}
               rowsPerPage={rowsPerPage}
               onPageChange={onChangePage}
@@ -246,7 +243,7 @@ export default function MainBidHistoryListPage() {
                   />
 
                   <TableBody>
-                    {bidHistoryLoading ? (
+                    {allBidsLoading ? (
                       <TableSkeleton />
                     ) : (
                       <>
@@ -265,7 +262,11 @@ export default function MainBidHistoryListPage() {
 
                         <TableEmptyRows
                           height={denseHeight}
-                          emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
+                          emptyRows={emptyRows(
+                            page,
+                            rowsPerPage,
+                            allBidsPagination?.total || tableData.length
+                          )}
                         />
                       </>
                     )}
@@ -275,7 +276,7 @@ export default function MainBidHistoryListPage() {
             </TableContainer>
 
             <TablePaginationCustom
-              count={bidHistoryPagination?.total || tableData.length}
+              count={allBidsPagination?.total || tableData.length}
               page={page}
               rowsPerPage={rowsPerPage}
               onPageChange={onChangePage}

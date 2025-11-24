@@ -5,6 +5,13 @@ import { Container, Grid, Box } from '@mui/material';
 import { useSettingsContext } from '../components/settings';
 import SingleAnkBidsTable from '../sections/_dashboard/SingleAnkBidsTable';
 import DashboardSummaryCard from '../sections/_dashboard/components/DashboardSummaryCard';
+import marketGif from '../assets/gifs/market.gif';
+import totalUsersGif from '../assets/gifs/user.gif';
+import bidAmtGif from '../assets/gifs/bidAmt.gif';
+import walletBalanceGif from '../assets/gifs/walletBalance.gif';
+import depositGif from '../assets/gifs/deposit.gif';
+import withdrawGif from '../assets/gifs/withdraw.gif';
+import winAmtGif from '../assets/gifs/winAmt.gif';
 
 // ----------------------------------------------------------------------
 
@@ -24,56 +31,59 @@ export default function GeneralDashboardPage() {
           <Grid item xs={12}>
             <Box
               display="grid"
-              rowGap={3}
-              columnGap={3}
-              gridTemplateColumns={{ xs: '1fr', sm: 'repeat(4, 1fr)' }}
+              rowGap={{ xs: 2, sm: 2.5, md: 3 }}
+              columnGap={{ xs: 2, sm: 2.5, md: 3 }}
+              gridTemplateColumns={{ 
+                xs: 'repeat(2, 1fr)', 
+                sm: 'repeat(2, 1fr)', 
+                md: 'repeat(3, 1fr)', 
+                lg: 'repeat(4, 1fr)' 
+              }}
             >
               <DashboardSummaryCard
-                // todayLabel="Today Market"
-                // todayValue={8230}
                 totalValue={32120}
                 totalLabel="Total Market"
-                // imageSrc="/assets/illustrations/deposit.svg" // your image path here
+                gifSrc={marketGif}
               />
               <DashboardSummaryCard
                 todayLabel="Total Users"
                 todayValue={8230}
                 totalValue={32120}
                 totalLabel="Today New Users"
-                // imageSrc="/assets/illustrations/deposit.svg" // your image path here
+                gifSrc={totalUsersGif}
               />
               <DashboardSummaryCard
                 todayLabel="Today Bid Amt"
                 todayValue={8230}
                 totalValue={32120}
                 totalLabel="Total Bid Amt"
-                // imageSrc="/assets/illustrations/deposit.svg" // your image path here
+                gifSrc={bidAmtGif}
               />
               <DashboardSummaryCard
                 todayLabel="Today Win Amt"
                 todayValue={8230}
                 totalValue={32120}
                 totalLabel="Total Win Amt"
-                // imageSrc="/assets/illustrations/deposit.svg" // your image path here
-              />
+                gifSrc={winAmtGif}
+                />
               <DashboardSummaryCard
                 todayLabel="Today Deposit"
                 todayValue={8230}
                 totalValue={32120}
                 totalLabel="Total Deposit"
-                // imageSrc="/assets/illustrations/deposit.svg" // your image path here
+                gifSrc={depositGif}
               />
               <DashboardSummaryCard
                 todayLabel="Today Withdraw"
                 todayValue={8230}
                 totalValue={32120}
                 totalLabel="Total Withdraw"
-                // imageSrc="/assets/illustrations/deposit.svg" // your image path here
+                gifSrc={withdrawGif}
               />
               <DashboardSummaryCard
                 totalLabel="Today Wallet Balance"
                 totalValue={32120}
-                // imageSrc="/assets/illustrations/deposit.svg" // your image path here
+                gifSrc={walletBalanceGif}
               />
             
             </Box>

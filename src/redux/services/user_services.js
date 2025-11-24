@@ -126,3 +126,21 @@ export const getAllLedgersAsync = createAsyncThunk(
     })
 );
 
+// Get all bids (Admin only)
+export const getAllBidsAsync = createAsyncThunk(
+  'user/getAllBids',
+  async (params = {}, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: '/admin/bids',
+      method: 'get',
+      params: {
+        page: params.page || 1,
+        limit: params.limit || 10,
+        search: params.search || '',
+        gameType: params.gameType || '',
+        status: params.status || '',
+      },
+    })
+);
+
