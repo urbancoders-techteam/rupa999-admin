@@ -1,15 +1,16 @@
 import { createSlice } from '@reduxjs/toolkit';
 import {
+  createMarketResultAsync,
+  deleteMarketResultAsync,
   getAllMarketResultsAsync,
   getMarketResultByIdAsync,
-  createMarketResultAsync,
-  updateMarketResultAsync,
-  deleteMarketResultAsync,
   revertMarketResultAsync,
+  updateMarketResultAsync,
 } from '../services/market_result_services';
 
 const initialState = {
   resultList: [],
+  resultData: null,
   resultById: null,
   loading: false,
   error: null,
@@ -40,9 +41,9 @@ const marketResultSlice = createSlice({
       })
       .addCase(getAllMarketResultsAsync.fulfilled, (state, action) => {
         state.loading = false;
-        state.resultList = action.payload?.data || [];
+        state.resultList = action?.payload?.data || [];
         if (action.payload?.pagination) {
-          state.pagination = action.payload.pagination;
+          state.pagination = action?.payload?.pagination;
         }
       })
       .addCase(getAllMarketResultsAsync.rejected, (state, action) => {
@@ -73,7 +74,7 @@ const marketResultSlice = createSlice({
       })
       .addCase(createMarketResultAsync.fulfilled, (state, action) => {
         state.loading = false;
-         state.resultList = action.payload?.data || action.payload?.result;
+        state.resultData = action.payload?.data || action.payload?.result;
       })
       .addCase(createMarketResultAsync.rejected, (state, action) => {
         state.loading = false;

@@ -1,17 +1,17 @@
-import PropTypes from 'prop-types';
-import { useMemo, useCallback, useEffect } from 'react';
-import { Box, Card, Grid, Button, Typography, TextField, Stack } from '@mui/material';
-import { LoadingButton } from '@mui/lab';
-import { useForm, FormProvider, useWatch, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
+import { LoadingButton } from '@mui/lab';
+import { Box, Button, Card, Grid, Stack, TextField, Typography } from '@mui/material';
 import dayjs from 'dayjs';
+import PropTypes from 'prop-types';
+import { useCallback, useEffect, useMemo } from 'react';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useSnackbar } from '../../../components/snackbar';
-import { getAllMarketsAsync } from '../../../redux/services/market_services';
-import { createMarketResultAsync } from '../../../redux/services/market_result_services';
-import { RHFTextField, RHFAutocomplete } from '../../../components/hook-form';
+import * as Yup from 'yup';
+import { RHFAutocomplete, RHFTextField } from '../../../components/hook-form';
 import RHFDatePicker from '../../../components/hook-form/RHFDatePicker';
+import { useSnackbar } from '../../../components/snackbar';
+import { createMarketResultAsync, getAllMarketResultsAsync } from '../../../redux/services/market_result_services';
+import { getAllMarketsAsync } from '../../../redux/services/market_services';
 
 // ----------------------------------------------------------------------
 
@@ -167,7 +167,7 @@ export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner
         await dispatch(createMarketResultAsync(payload)).unwrap();
         enqueueSnackbar('Market result created successfully!', { variant: 'success' });
         reset(INITIAL_FORM_VALUES);
-        dispatch(getAllMarketsAsync());
+        dispatch(getAllMarketResultsAsync());
       } catch (error) {
         const errorMessage = error?.response?.data?.message || error?.message || 'Failed to create market result';
         enqueueSnackbar(errorMessage, { variant: 'error' });
