@@ -46,16 +46,6 @@ const navConfig = [
         path: PATH_DASHBOARD.user.root,
         icon: ICONS.user,
       },
-    
-      {
-        title: 'withdraw details',
-        path: PATH_DASHBOARD.withdrawdetails.root,
-        icon: ICONS.banking,
-      },
-
-      { title: 'profits', path: PATH_DASHBOARD.profit.root, icon: ICONS.analytics },
-
-      // { title: 'gift', path: PATH_DASHBOARD.gift.root, icon: ICONS.booking },
 
       {
         title: 'Main Market',
@@ -84,15 +74,32 @@ const navConfig = [
         ],
       },
       {
+        title: 'Main Transaction Details',
+        path: PATH_DASHBOARD.maintransaction.list,
+        icon: ICONS.banking,
+      },
+
+      {
+        title: 'Main Bid History',
+        path: PATH_DASHBOARD.mainbidhistory.list,
+        icon: ICONS.banking,
+      },
+
+      {
+        title: 'withdraw details',
+        path: PATH_DASHBOARD.withdrawdetails.root,
+        icon: ICONS.banking,
+      },
+
+      { title: 'profits', path: PATH_DASHBOARD.profit.root, icon: ICONS.analytics },
+
+      // { title: 'gift', path: PATH_DASHBOARD.gift.root, icon: ICONS.booking },
+      {
         title: 'General Withdraw History',
         path: PATH_DASHBOARD.generalwithdrawhistory.list,
         icon: ICONS.banking,
       },
-      {
-        title: 'Transaction Details',
-        path: PATH_DASHBOARD.maintransaction.list,
-        icon: ICONS.banking,
-      },
+
       {
         title: 'Rate Card',
         path: PATH_DASHBOARD.gametypes.root,
@@ -103,13 +110,12 @@ const navConfig = [
         path: PATH_DASHBOARD.diposithistory.list,
         icon: ICONS.banking,
       },
-
       {
         title: 'staff',
         path: PATH_DASHBOARD.staff.root,
         icon: ICONS.user,
       },
-
+    
       {
         title: 'settings',
         path: PATH_DASHBOARD.settings.root,

@@ -76,11 +76,9 @@ export default function UserTransactionListPage() {
   const { id: userId } = useParams();
 
   // Redux state
-  const { transactionsList, transactionsLoading, transactionsPagination } = useSelector(
+  const { transactionsList, transactionsLoading, transactionsPagination, selectedUserName } = useSelector(
     (state) => state.user
   );
-
-  console.log('transactionsPagination', transactionsPagination)
 
   const [filterParticulars, setFilterParticulars] = useState('All');
 
@@ -142,7 +140,7 @@ export default function UserTransactionListPage() {
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <CustomBreadcrumbs
-          heading="Transaction List"
+          heading={selectedUserName ? `Transaction List - ${selectedUserName}` : 'Transaction List'}
           links={[
             { name: 'Dashboard', href: PATH_DASHBOARD.root },
             { name: 'User List', href: PATH_DASHBOARD.user.list },

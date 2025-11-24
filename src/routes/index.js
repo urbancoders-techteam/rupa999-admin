@@ -52,6 +52,7 @@ import {
   MarketDataListPage,
   BidRecordListPage,
   MainTransactionListPage,
+  MainBidHistoryListPage,
   //
 } from './elements';
 
@@ -135,6 +136,7 @@ export default function Router() {
         },
         
         { path: 'profit', element: <ProfitPage />, index: true },
+
         {
           path: 'maintransaction',
           children: [
@@ -143,6 +145,14 @@ export default function Router() {
               index: true,
             },
             { path: 'list', element: <MainTransactionListPage /> },
+          ],
+        },
+
+        {
+          path: 'mainbidhistory',
+          children: [
+            { element: <Navigate to="/dashboard/mainbidhistory/list" replace />, index: true },
+            { path: 'list', element: <MainBidHistoryListPage /> },
           ],
         },
 

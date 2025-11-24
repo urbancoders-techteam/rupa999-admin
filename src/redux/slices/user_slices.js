@@ -13,6 +13,7 @@ import {
 const initialState = {
   userList: [],
   userById: null,
+  selectedUserName: null,
   transactionsList: [],
   loading: false,
   transactionsLoading: false,
@@ -59,6 +60,12 @@ const userSlice = createSlice({
     },
     clearUserById: (state) => {
       state.userById = null;
+    },
+    setSelectedUserName: (state, action) => {
+      state.selectedUserName = action.payload;
+    },
+    clearSelectedUserName: (state) => {
+      state.selectedUserName = null;
     },
   },
   extraReducers: (builder) => {
@@ -248,6 +255,6 @@ const userSlice = createSlice({
   },
 });
 
-export const { clearUserError, clearUserById } = userSlice.actions;
+export const { clearUserError, clearUserById, setSelectedUserName, clearSelectedUserName } = userSlice.actions;
 export default userSlice.reducer;
 

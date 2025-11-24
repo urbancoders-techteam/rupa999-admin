@@ -22,7 +22,6 @@ export default function UserBidHistoryTableRow({ index, row, selected }) {
     marketId,
     name,
     bidTable,
-    debit,
     totalPoints,
     date,
     createdAt,
@@ -42,7 +41,7 @@ export default function UserBidHistoryTableRow({ index, row, selected }) {
 
   return (
     <TableRow hover>
-      <TableCell align="left">
+      <TableCell align="center">
           <Typography variant="subtitle2" noWrap>
             {index + 1 || '—'}
           </Typography>
@@ -62,7 +61,7 @@ export default function UserBidHistoryTableRow({ index, row, selected }) {
 
         <TableCell align="left">
           <Typography variant="body2">
-            {fBidDigit(debit)}
+            {fBidDigit(bidTable.digit)}
           </Typography>
         </TableCell>
 

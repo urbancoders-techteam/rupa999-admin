@@ -101,6 +101,9 @@ export const GameTypeFormPage = Loadable(lazy(() => import('../pages/GameTypeFor
 // DASHBOARD: Main Transaction
 export const MainTransactionListPage = Loadable(lazy(() => import('../pages/MainTransactionListPage')));
 
+// DASHBOARD: Main Bid History
+export const MainBidHistoryListPage = Loadable(lazy(() => import('../pages/MainBidHistoryListPage')));
+
 // BASIC PAGES
 export const Page500 = Loadable(lazy(() => import('../pages/errorHandlingPage/Page500')));
 export const Page403 = Loadable(lazy(() => import('../pages/errorHandlingPage/Page403')));

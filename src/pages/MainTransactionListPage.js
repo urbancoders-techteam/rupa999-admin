@@ -32,7 +32,7 @@ import {
 // sections
 import CustomTableToolbar from '../components/table/CustomTableToolBar';
 import { getAllLedgersAsync } from '../redux/services/user_services';
-import TransactionTableRow from '../sections/_users/transactions/list/TransactionTableRow';
+import MainTransactionTableRow from '../sections/_main_transaction/list/MainTransactionTableRow';
 
 // ----------------------------------------------------------------------
 
@@ -185,7 +185,7 @@ export default function MainTransactionListPage() {
                       <>
                         {tableData.length > 0 ? (
                           tableData.map((row, index) => (
-                            <TransactionTableRow key={row.id} row={row} index={index} />
+                            <MainTransactionTableRow key={row.id || index} row={row} index={index} />
                           ))
                         ) : (
                           <TableNoData isNotFound={isNotFound} />

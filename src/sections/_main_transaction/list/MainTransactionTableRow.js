@@ -1,11 +1,11 @@
 import { Stack, TableCell, TableRow, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
-import { fCurrency } from '../../../../utils/formatNumber';
-import { fDateTimeSplit } from '../../../../utils/formatTime';
+import { fCurrency } from '../../../utils/formatNumber';
+import { fDateTimeSplit } from '../../../utils/formatTime';
 
 // ----------------------------------------------------------------------
 
-TransactionTableRow.propTypes = {
+MainTransactionTableRow.propTypes = {
   index: PropTypes.number,
   row: PropTypes.shape({
     _id: PropTypes.string,
@@ -27,7 +27,7 @@ TransactionTableRow.propTypes = {
   }),
 };
 
-export default function TransactionTableRow({ row, index }) {
+export default function MainTransactionTableRow({ row, index }) {
   const { date, particulars, debit, credit, balance, admin, marketName, gameName, user } = row;
 
   return (
@@ -149,6 +149,68 @@ export default function TransactionTableRow({ row, index }) {
           </Typography>
         )}
       </TableCell>
+
+      {/* User Name Column */}
+      {user.name && (
+        <TableCell
+          sx={(theme) => ({
+            padding: theme.spacing(1, 1.5),
+            [theme.breakpoints.down('sm')]: {
+              padding: theme.spacing(0.5, 0.25),
+              maxWidth: '130px',
+              paddingRight: '15px',
+            },
+            [theme.breakpoints.between('sm', 'md')]: {
+              padding: theme.spacing(0.75, 0.75),
+            },
+            [theme.breakpoints.up('lg')]: {
+              padding: theme.spacing(1.25, 2),
+            },
+          })}
+        >
+          <Typography
+            variant="subtitle2"
+            sx={(theme) => ({
+              fontSize: '0.875rem',
+              whiteSpace: { xs: 'nowrap', sm: 'normal' },
+              overflow: { xs: 'hidden', sm: 'visible' },
+              textOverflow: { xs: 'ellipsis', sm: 'clip' },
+              [theme.breakpoints.down('sm')]: {
+                fontSize: '0.65rem',
+              },
+              [theme.breakpoints.between('sm', 'md')]: {
+                fontSize: '0.75rem',
+              },
+              [theme.breakpoints.up('lg')]: {
+                fontSize: '0.9375rem',
+              },
+            })}
+          >
+            {user?.name || user?.userName || '—'}
+          </Typography>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={(theme) => ({
+              fontSize: '0.75rem',
+              whiteSpace: { xs: 'nowrap', sm: 'normal' },
+              overflow: { xs: 'hidden', sm: 'visible' },
+              textOverflow: { xs: 'ellipsis', sm: 'clip' },
+              [theme.breakpoints.down('sm')]: {
+                fontSize: '0.625rem',
+              },
+              [theme.breakpoints.between('sm', 'md')]: {
+                fontSize: '0.7rem',
+              },
+              [theme.breakpoints.up('lg')]: {
+                fontSize: '0.8125rem',
+              },
+            })}
+          >
+            {user?.number || user?.mobile || '—'}
+          </Typography>
+        </TableCell>
+      )}
 
       <TableCell
         sx={(theme) => ({

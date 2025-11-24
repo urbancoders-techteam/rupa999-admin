@@ -196,7 +196,7 @@ function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange
                   >
                     <Box flex={1} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                       {onTransactionRow && (
-                        <Button variant="contained" onClick={() => onTransactionRow(row._id || row.id)}>
+                        <Button variant="contained" onClick={() => onTransactionRow(row._id || row.id, row.name || row.userName)}>
                           <Typography variant="body2"> Transaction</Typography>
                         </Button>
                       )}
