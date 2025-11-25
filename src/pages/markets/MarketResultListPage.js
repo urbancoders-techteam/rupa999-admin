@@ -90,6 +90,7 @@ export default function MarketResultListPage() {
   const [filterName, setFilterName] = useState('');
 
   const [showWinner, setShowWinner] = useState(false);
+  const [selectedMarketResultId, setSelectedMarketResultId] = useState(null);
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -163,6 +164,11 @@ export default function MarketResultListPage() {
     setShowWinner(!showWinner);
   }
 
+  const handleShowWinners = (marketResultId) => {
+    setSelectedMarketResultId(marketResultId);
+    setShowWinner(true);
+  }
+
   useEffect(() => {
     dispatch(getAllMarketResultsAsync());
   }, [dispatch]);
@@ -185,7 +191,7 @@ export default function MarketResultListPage() {
 
         <GeneralCreateResultForm showWinner={showWinner} onHandleShowWinner={onHandleShowWinner} />
 
-        {showWinner === true && <ResultTable />}
+        {showWinner === true && <ResultTable marketResultId={selectedMarketResultId} onClose={() => setShowWinner(false)} />}
 
         {isMobile ? (
           <PreviousResultMobileViewCardLayout
@@ -239,7 +245,7 @@ export default function MarketResultListPage() {
                       .map((row) => (
                         <MarketResultTableRow
                           key={row.id}
-                          row={row}
+                          row={{...row, onShowWinners: handleShowWinners}}
                           selected={selected.includes(row.id)}
                           onSelectRow={() => onSelectRow(row.id)}
                           onDeleteRow={() => handleDeleteRow(row.id)}

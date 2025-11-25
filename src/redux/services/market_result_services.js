@@ -70,3 +70,25 @@ export const revertMarketResultAsync = createAsyncThunk(
     })
 );
 
+// Calculate winners for a market result
+export const calculateWinnersAsync = createAsyncThunk(
+  'marketResult/calculateWinners',
+  async (id, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: `/market-results/${id}/calculate-winners`,
+      method: 'post',
+    })
+);
+
+// Get winners for a market result
+export const getWinnersAsync = createAsyncThunk(
+  'marketResult/getWinners',
+  async (id, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: `/market-results/${id}/winners`,
+      method: 'get',
+    })
+);
+
