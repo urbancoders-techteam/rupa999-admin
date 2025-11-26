@@ -30,7 +30,6 @@ MarketResultTableRow.propTypes = {
     closePana: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     action: PropTypes.string,
     createdAt: PropTypes.string,
-    onShowWinners: PropTypes.func,
   }),
 };
 
@@ -152,18 +151,6 @@ export default function MarketResultTableRow({ row }) {
         >
           <Iconify icon="eva:refresh-outline" />
           Revert
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            if (row.onShowWinners) {
-              row.onShowWinners(_id);
-            }
-            handleClosePopover();
-          }}
-          sx={{ color: 'success.main' }}
-        >
-          <Iconify icon="eva:eye-outline" />
-          Show Winners
         </MenuItem>
       </MenuPopover>
 
