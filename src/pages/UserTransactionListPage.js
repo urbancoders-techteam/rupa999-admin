@@ -148,75 +148,75 @@ export default function UserTransactionListPage() {
           ]}
         />
 
-          <Card>
-            <Stack direction="row" spacing={2} sx={{ p: 2, pb: 0 }}>
-              <TextField
-                select
-                size="small"
-                label="Particulars"
-                value={filterParticulars}
-                onChange={handleFilterParticulars}
-                sx={{ minWidth: 180 }}
-              >
-                {PARTICULAR_OPTIONS.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Stack>
+        <Card>
+          <Stack direction="row" spacing={2} sx={{ p: 2, pb: 0 }}>
+            <TextField
+              select
+              size="small"
+              label="Particulars"
+              value={filterParticulars}
+              onChange={handleFilterParticulars}
+              sx={{ minWidth: 180 }}
+            >
+              {PARTICULAR_OPTIONS.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Stack>
 
-            <CustomTableToolbar isFiltered={isFiltered} onResetFilter={handleResetFilter} />
+          <CustomTableToolbar isFiltered={isFiltered} onResetFilter={handleResetFilter} />
 
-            <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
-              <Scrollbar>
-                <Table size={dense ? 'small' : 'medium'} sx={{ minWidth:{xs: 500, sm: 800 }}}>
-                  <TableHeadCustom
-                    order={order}
-                    orderBy={orderBy}
-                    headLabel={TABLE_HEAD}
-                    rowCount={tableData.length}
-                    onSort={onSort}
-                  />
+          <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
+            <Scrollbar>
+              <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: { xs: 500, sm: 800 } }}>
+                <TableHeadCustom
+                  order={order}
+                  orderBy={orderBy}
+                  headLabel={TABLE_HEAD}
+                  rowCount={tableData.length}
+                  onSort={onSort}
+                />
 
-                  <TableBody>
-                    {transactionsLoading ? (
-                      <TableRow>
-                        <TableCell colSpan={TABLE_HEAD.length} align="center">
-                          Loading...
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      <>
-                        {tableData.length > 0 ? (
-                          tableData.map((row, index) => (
-                            <TransactionTableRow key={row.id} row={row} index={index} />
-                          ))
-                        ) : (
-                          <TableNoData isNotFound={isNotFound} />
-                        )}
+                <TableBody>
+                  {transactionsLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={TABLE_HEAD.length} align="center">
+                        Loading...
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    <>
+                      {tableData.length > 0 ? (
+                        tableData.map((row, index) => (
+                          <TransactionTableRow key={row.id} row={row} index={index} />
+                        ))
+                      ) : (
+                        <TableNoData isNotFound={isNotFound} />
+                      )}
 
-                        <TableEmptyRows
-                          height={denseHeight}
-                          emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
-                        />
-                      </>
-                    )}
-                  </TableBody>
-                </Table>
-              </Scrollbar>
-            </TableContainer>
+                      <TableEmptyRows
+                        height={denseHeight}
+                        emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
+                      />
+                    </>
+                  )}
+                </TableBody>
+              </Table>
+            </Scrollbar>
+          </TableContainer>
 
-            <TablePaginationCustom
-              count={transactionsPagination?.total || 0}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              onPageChange={onChangePage}
-              onRowsPerPageChange={onChangeRowsPerPage}
-              dense={dense}
-              onChangeDense={onChangeDense}
-            />
-          </Card>
+          <TablePaginationCustom
+            count={transactionsPagination?.total || 0}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onPageChange={onChangePage}
+            onRowsPerPageChange={onChangeRowsPerPage}
+            dense={dense}
+            onChangeDense={onChangeDense}
+          />
+        </Card>
       </Container>
     </>
   );

@@ -218,7 +218,7 @@ export default function TransactionTableRow({ row, index }) {
               {marketName || '—'}
             </Typography>
           )}
-          {debit && (
+          {debit ? (
             <Typography
               variant="subtitle2"
               color="text.secondary"
@@ -240,7 +240,7 @@ export default function TransactionTableRow({ row, index }) {
             >
               {debit ? `${gameName} - ${fCurrency(debit)}` : '—'}
             </Typography>
-          )}
+          ) : null}
         </Stack>
       </TableCell>
 
