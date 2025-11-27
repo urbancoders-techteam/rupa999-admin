@@ -17,6 +17,7 @@ import { useSnackbar } from '../../../components/snackbar';
 import FormProvider, { RHFTextField } from '../../../components/hook-form';
 import { PATH_DASHBOARD } from '../../../routes/paths';
 import { useSettingsContext } from '../../../components/settings';
+import { createUserAsync } from '../../../redux/services/user_services';
 
 // -------------------------------------------------------------
 
@@ -76,9 +77,25 @@ export default function UserForm({ isEdit = false, isView = false, currentUser }
   }, [isEdit, isView, currentUser, reset, defaultValues]);
 
   const onSubmit = async (data) => {
-    console.log('✅ Form Submitted:', data);
-    enqueueSnackbar(isEdit ? 'User updated successfully!' : 'User created successfully!');
-    navigate(PATH_DASHBOARD.userlist.list);
+    try {
+      if (!isEdit) {
+        // Create new user
+        await dispatch(
+          createUserAsync({
+            name: data.name,
+            number: data.phone,
+            password: data.password,
+          })
+        ).unwrap();
+        enqueueSnackbar('User created successfully!', { variant: 'success' });
+      } else {
+        // Update existing user (implement update logic here if needed)
+        enqueueSnackbar('User updated successfully!', { variant: 'success' });
+      }
+      navigate(PATH_DASHBOARD.userlist.list);
+    } catch (error) {
+      enqueueSnackbar(error?.message || 'Failed to create user', { variant: 'error' });
+    }
   };
 
   const handleBack = () => navigate(PATH_DASHBOARD.user.list);

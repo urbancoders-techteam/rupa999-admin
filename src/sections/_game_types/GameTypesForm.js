@@ -1,10 +1,13 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { Button, Grid, TextField } from '@mui/material';
-import { useForm, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { Button, Grid, TextField } from '@mui/material';
+import PropTypes from 'prop-types';
+import { useEffect } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
 import * as Yup from 'yup';
 import { RHFTextField } from '../../components/hook-form';
+import { useSnackbar } from '../../components/snackbar';
+import { bulkUpdateGameTypeRatesAsync } from '../../redux/services/game_type_rate_services';
 
 // ✅ Validation Schema
 const GameTypeSchema = Yup.object().shape({
@@ -12,24 +15,58 @@ const GameTypeSchema = Yup.object().shape({
     .typeError('Multiply By must be a number')
     .required('Multiply By is required')
     .positive('Value must be positive')
-    .integer('Value must be an integer'),
+    .min(1, 'Value must be at least 1'),
 });
 
-export default function GameTypeRowForm({ game }) {
+export default function GameTypeRowForm({ game, onUpdate, formRef }) {
+  const dispatch = useDispatch();
+  const { enqueueSnackbar } = useSnackbar();
+
   const methods = useForm({
     resolver: yupResolver(GameTypeSchema),
-    defaultValues: { multiplyBy: '' },
-    mode: 'onChange', // instant validation feedback
+    defaultValues: { multiplyBy: game.multiplyBy || '' },
+    mode: 'onChange',
   });
 
-  const { handleSubmit } = methods;
+  const { handleSubmit, reset } = methods;
 
-  const onSubmit = (data) => {
-    console.log('✅ Saved Game Type:', {
-      name: game.name,
-      type: game.type,
-      multiplyBy: data.multiplyBy,
-    });
+  useEffect(() => {
+    reset({ multiplyBy: game.multiplyBy || '' });
+  }, [game.multiplyBy, reset]);
+
+  // Expose form methods to parent via ref
+  useEffect(() => {
+    if (formRef) {
+      formRef(methods);
+    }
+  }, [formRef, methods]);
+
+  const onSubmit = async (data) => {
+    try {
+      const payload = {
+        name: game.name,
+        gameType: game.gameType,
+        type: game.type,
+        multiplyBy: Number(data.multiplyBy),
+      };
+
+      // Use bulk update which handles both create and update
+      const result = await dispatch(
+        bulkUpdateGameTypeRatesAsync({ rates: [payload] })
+      ).unwrap();
+
+      enqueueSnackbar('Game type rate saved successfully!', { variant: 'success' });
+
+      if (onUpdate) {
+        onUpdate({ ...game, multiplyBy: payload.multiplyBy });
+      }
+    } catch (error) {
+      console.error('Error saving game type rate:', error);
+      enqueueSnackbar(
+        error?.response?.data?.message || error?.message || 'Failed to save game type rate',
+        { variant: 'error' }
+      );
+    }
   };
 
   return (
@@ -75,5 +112,9 @@ GameTypeRowForm.propTypes = {
   game: PropTypes.shape({
     name: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
+    gameType: PropTypes.string.isRequired,
+    multiplyBy: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   }).isRequired,
+  onUpdate: PropTypes.func,
+  formRef: PropTypes.func,
 };

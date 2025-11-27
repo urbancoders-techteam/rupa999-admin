@@ -1,6 +1,22 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import AxiosClient from '../../utils/axios';
 
+// Create user (register)
+export const createUserAsync = createAsyncThunk(
+  'user/create',
+  async (data, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: '/users/register',
+      method: 'post',
+      data: {
+        name: data.name,
+        number: data.number,
+        password: data.password,
+      },
+    })
+);
+
 // Get all users (for admin)
 export const getAllUsersAsync = createAsyncThunk(
   'user/getAll',
