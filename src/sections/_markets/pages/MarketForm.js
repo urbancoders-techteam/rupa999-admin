@@ -16,10 +16,11 @@ import {
 import * as Yup from 'yup';
 import PropTypes from 'prop-types';
 import { useEffect, useMemo } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { Container, useTheme } from '@mui/system';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
 import { useSnackbar } from '../../../components/snackbar';
 import FormProvider, { RHFTextField } from '../../../components/hook-form';
 import RHFTimePicker from '../../../components/hook-form/RHFTimePicker';
@@ -43,8 +44,8 @@ export default function MarketForm({ isEdit = false, isView = false, currentUser
   // ✅ Validation Schema
   const MarketSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
-    openTime: Yup.string().required('Open Time is required'),
-    closeTime: Yup.string().required('Close Time is required'),
+    openTime: Yup.mixed().required('Open Time is required'),
+    closeTime: Yup.mixed().required('Close Time is required'),
     disableGame: Yup.string().oneOf(['yes', 'no'], 'Invalid option').required('Please select an option'),
     hideOpen: Yup.string().oneOf(['enable', 'disable'], 'Invalid option').required('Please select an option'),
     activeDays: Yup.array()
@@ -56,8 +57,8 @@ export default function MarketForm({ isEdit = false, isView = false, currentUser
   const defaultValues = useMemo(
     () => ({
       name: currentUser?.name || '',
-      openTime: currentUser?.openTime || '',
-      closeTime: currentUser?.closeTime || '',
+      openTime: currentUser?.openTime ? dayjs(currentUser.openTime) : null,
+      closeTime: currentUser?.closeTime ? dayjs(currentUser.closeTime) : null,
       disableGame: currentUser?.disableGame || 'no',
       hideOpen: currentUser?.hideOpen || 'disable',
       activeDays: currentUser?.activeDays || [],
@@ -73,7 +74,6 @@ export default function MarketForm({ isEdit = false, isView = false, currentUser
   const {
     reset,
     watch,
-    control,
     setValue,
     handleSubmit,
     formState: { isSubmitting, errors },
@@ -92,11 +92,18 @@ export default function MarketForm({ isEdit = false, isView = false, currentUser
 
   const onSubmit = async (data) => {
     try {
+      // Convert dayjs objects to ISO strings for API
+      const submitData = {
+        ...data,
+        openTime: data.openTime ? dayjs(data.openTime).toISOString() : null,
+        closeTime: data.closeTime ? dayjs(data.closeTime).toISOString() : null,
+      };
+
       if (isEdit && currentUser?._id) {
-        await dispatch(updateMarketAsync({ id: currentUser._id, data })).unwrap();
+        await dispatch(updateMarketAsync({ id: currentUser._id, data: submitData })).unwrap();
         enqueueSnackbar('Market updated successfully!', { variant: 'success' });
       } else {
-        await dispatch(createMarketAsync(data)).unwrap();
+        await dispatch(createMarketAsync(submitData)).unwrap();
         enqueueSnackbar('Market created successfully!', { variant: 'success' });
       }
       navigate(PATH_DASHBOARD.markets.marketlist.list);
@@ -126,8 +133,8 @@ export default function MarketForm({ isEdit = false, isView = false, currentUser
             >
               <RHFTextField name="name" label="Name" disabled={isView} />
 
-              <RHFTextField name="openTime" label="Open Time (e.g., 09:00)" disabled={isView} required />
-              <RHFTextField name="closeTime" label="Close Time (e.g., 21:00)" disabled={isView} required />
+              <RHFTimePicker name="openTime" label="Open Time" required disabled={isView} />
+              <RHFTimePicker name="closeTime" label="Close Time" required disabled={isView} />
             </Box>
 
             {/* Active Days */}

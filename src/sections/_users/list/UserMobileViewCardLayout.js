@@ -194,23 +194,7 @@ function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange
                       py: 1.5,
                     }}
                   >
-                    <Box flex={1} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                      {onTransactionRow && (
-                        <Button variant="contained" onClick={() => onTransactionRow(row._id || row.id)}>
-                          <Typography variant="body2"> Transaction</Typography>
-                        </Button>
-                      )}
-                      {onWithdrawalRequestsRow && (
-                        <Button variant="contained" onClick={() => onWithdrawalRequestsRow(row._id || row.id)}>
-                          <Typography variant="body2">Withdrawal</Typography>
-                        </Button>
-                      )}
-                      {onBidHistoryRow && (
-                        <Button variant="contained" onClick={() => onBidHistoryRow(row._id || row.id)}>
-                          <Typography variant="body2">Bid History</Typography>
-                        </Button>
-                      )}
-                    </Box>
+                   
                     <Stack spacing={0.5}>
                       <Typography variant="body2">
                         <b>Creation Date:</b>{' '}
@@ -281,6 +265,24 @@ function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange
                         </Button>
                       </Stack>
 
+                    <Box flex={1} sx={{ display: 'flex', alignItems: 'center', gap: 1, my: 1.5}}>
+                      {onTransactionRow && (
+                        <Button variant="contained" onClick={() => onTransactionRow(row._id || row.id)}>
+                          <Typography variant="body2"> Transaction</Typography>
+                        </Button>
+                      )}
+                      {onWithdrawalRequestsRow && (
+                        <Button variant="contained" onClick={() => onWithdrawalRequestsRow(row._id || row.id)}>
+                          <Typography variant="body2">Withdrawal</Typography>
+                        </Button>
+                      )}
+                      {onBidHistoryRow && (
+                        <Button variant="contained" onClick={() => onBidHistoryRow(row._id || row.id)}>
+                          <Typography variant="body2" textWrap='noWrap'>Bid</Typography>
+                        </Button>
+                      )}
+                    </Box>
+
                       <Divider sx={{ my: 1 }} />
 
                       <Stack direction="row" justifyContent="flex-end" spacing={1}>
@@ -289,7 +291,7 @@ function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange
                           status={typeof row.status === 'boolean' ? row.status : row.status === 'Active' || row.status === 'active'}
                           onStatusChange={onStatusChange}
                         />
-                        <Button startIcon={<DeleteIcon fontSize="small" />} variant='text' color="error" onClick={() => onDeleteRow(row._id || row.id)} sx={{ px: 2 }}>
+                        <Button startIcon={<DeleteIcon fontSize="small" />} variant='text' color="error" onClick={() => onDeleteRow(row._id || row.id)}>
                           <Typography variant="body2">Delete</Typography>
                         </Button>
                       </Stack>

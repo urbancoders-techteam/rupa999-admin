@@ -14,6 +14,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CircularProgress from '@mui/material/CircularProgress';
+import dayjs from 'dayjs';
 import Label from '../../../components/label';
 
 function MarketMobileViewCardLayout({
@@ -68,7 +69,7 @@ function MarketMobileViewCardLayout({
       }}
     >
       <Stack spacing={2}>
-        {visibleData.map((row, index) => (
+        {visibleData?.map((row, index) => (
           <Accordion
             key={row.id}
             sx={{ borderRadius: 2, boxShadow: 'none', border: '1px solid #e0e0e0' }}
@@ -99,25 +100,49 @@ function MarketMobileViewCardLayout({
 
             <AccordionDetails>
               <Stack spacing={0.5}>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Open Time: {row.openTime || '—'}
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Close Time: {row.closeTime || '—'}
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Created At: {row.createdAt ? new Date(row.createdAt).toLocaleString() : '—'}
-                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    Open Time:
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.primary', textAlign: 'right' }}>
+                    {dayjs(row.openTime).format("hh:mm A") || '—'}
+                  </Typography>
+                </Box>
 
-                <Stack direction="row" spacing={1}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    Close Time:
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.primary', textAlign: 'right' }}>
+                    {dayjs(row.closeTime).format("hh:mm A") || '—'}
+                  </Typography>
+                </Box>
+
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    Active Days:
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.primary', textAlign: 'right' }}>
+                    {Array.isArray(row.activeDays) && row.activeDays.length
+                      ? row.activeDays.map((d) => (typeof d === 'string' ? d.charAt(0).toUpperCase() + d.slice(1) : d)).join(', ')
+                      : '—'}
+                  </Typography>
+                </Box>
+
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    Created At:
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.primary', textAlign: 'right' }}>
+                    {row.createdAt ? new Date(row.createdAt).toLocaleString() : '—'}
+                  </Typography>
+                </Box>
+
+                <Stack direction="row" spacing={1} sx={{ justifyContent: 'flex-end', pt: 1 }}>
                   <IconButton size="small" color="primary" onClick={() => onEditRow(row.name)}>
                     <EditIcon fontSize="small" />
                   </IconButton>
-                  <IconButton
-                    size="small"
-                    color="error"
-                    onClick={() => onDeleteRow && onDeleteRow(row.id)}
-                  >
+                  <IconButton size="small" color="error" onClick={() => onDeleteRow && onDeleteRow(row.id)}>
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                 </Stack>

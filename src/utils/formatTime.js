@@ -36,3 +36,11 @@ export function fDateTimeSplit(date) {
     time: dayjsDate.format('hh:mm A'),
   };
 }
+
+export const formatTimeTo12Hour = (timeString) => {
+  if (!timeString) return "-";
+  const [hour, minute] = timeString.split(":");
+  const date = new Date();
+  date.setHours(+hour, +minute);
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+};

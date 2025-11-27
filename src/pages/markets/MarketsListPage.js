@@ -30,6 +30,7 @@ import MarketTableRow from '../../sections/_markets/components/MarketTableRow';
 import MarketMobileViewCardLayout from '../../sections/_markets/components/MarketMobileViewCardLayout';
 import { getAllMarketsAsync, deleteMarketAsync } from '../../redux/services/market_services';
 import { useSnackbar } from '../../components/snackbar';
+import { formatTimeTo12Hour } from '../../utils/formatTime';
 
 // ----------------------------------------------------------------------
 
@@ -91,11 +92,11 @@ export default function MarketDetailsPage() {
     _id: market._id,
     name: market.name,
     openTime: market.openTime,
-    closeTime: market.closeTime,
-    activeDays: market.activeDays?.join(', ') || 'N/A',
-    disableGame: market.disableGame || 'no',
-    hideOpen: market.hideOpen || 'disable',
-    createdAt: market.createdAt ? new Date(market.createdAt).toLocaleDateString() : '-',
+    closeTime: formatTimeTo12Hour(market.closeTime),
+    activeDays: market.activeDays?.join(", ") || "N/A",
+    disableGame: market.disableGame || "no",
+    hideOpen: market.hideOpen || "disable",
+    createdAt: market.createdAt ? new Date(market.createdAt).toLocaleDateString() : "-",
     ...market,
   }));
 

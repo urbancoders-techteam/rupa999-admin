@@ -9,6 +9,7 @@ import {
   Typography,
 } from '@mui/material';
 // components
+import dayjs from 'dayjs';
 import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
 import MenuPopover from '../../../components/menu-popover';
@@ -27,7 +28,6 @@ MarketTableRow.propTypes = {
 
 export default function MarketTableRow({ index, row, selected, onEditRow, onDeleteRow, onSelectRow }) {
   const {
-    id,
     name,
     openTime,
     closeTime,
@@ -66,8 +66,12 @@ export default function MarketTableRow({ index, row, selected, onEditRow, onDele
           </Typography>
         </TableCell>
 
-        <TableCell align="left" sx={{minWidth:'100px'}}>{openTime}</TableCell>
-        <TableCell align="left" sx={{minWidth:'100px'}}>{closeTime}</TableCell>
+        <TableCell align="left" sx={{ minWidth: '100px' }}>
+          {openTime ? dayjs(openTime).format('hh:mm A') : '-'}
+        </TableCell>
+        <TableCell align="left" sx={{ minWidth: '100px' }}>
+          {closeTime ? dayjs(closeTime).format('hh:mm A') : '-'}
+        </TableCell>
         <TableCell align="left" sx={{minWidth:'150px'}}>
           <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
             {activeDays.join(', ')}

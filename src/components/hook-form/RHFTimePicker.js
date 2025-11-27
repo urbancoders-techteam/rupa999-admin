@@ -5,7 +5,7 @@ import { TextField, Box } from "@mui/material";
 import { LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
-const RHFTimePicker = ({ name, label, width = "100%", required = false, onChange }) => {
+const RHFTimePicker = ({ name, label, width = "100%", required = false, disabled = false, onChange }) => {
   const {
     control,
     formState: { errors },
@@ -26,6 +26,7 @@ const RHFTimePicker = ({ name, label, width = "100%", required = false, onChange
               {...field}
               label={label}
               value={field.value || null}
+              disabled={disabled}
               onChange={(newValue) => {
                 field.onChange(newValue);
                 if (onChange) onChange(newValue);
@@ -36,6 +37,7 @@ const RHFTimePicker = ({ name, label, width = "100%", required = false, onChange
                   {...params}
                   fullWidth
                   size='small'
+                  disabled={disabled}
                   error={!!errorMessage}
                   helperText={errorMessage}
                   sx={{
@@ -51,6 +53,7 @@ const RHFTimePicker = ({ name, label, width = "100%", required = false, onChange
               slotProps={{
                 textField: {
                   fullWidth: true,
+                  disabled,
                   error: !!errorMessage,
                   helperText: errorMessage,
                   sx: {
@@ -77,6 +80,7 @@ RHFTimePicker.propTypes = {
   label: PropTypes.string,
   width: PropTypes.string,
   required: PropTypes.bool,
+  disabled: PropTypes.bool,
   onChange: PropTypes.func,
 };
 
