@@ -90,10 +90,10 @@ const userSlice = createSlice({
       state.userList = payload?.data || [];
       if (payload) {
         state.pagination = {
-          page: payload.currentPage || 1,
-          limit: payload.limit || 10,
-          total: payload.totalItems || 0,
-          totalPages: payload.totalPages || 0,
+          page: payload.pagination.page || 1,
+          limit: payload.pagination.limit || 10,
+          total: payload.pagination.total || 0,
+          totalPages: payload.pagination.totalPages || 0,
         };
       }
     });
@@ -224,10 +224,10 @@ const userSlice = createSlice({
       state.bidHistoryList = payload?.data || [];
       if (payload) {
         state.bidHistoryPagination = {
-          page: payload.currentPage || 1,
-          limit: payload.limit || 10,
-          total: payload.totalItems || 0,
-          totalPages: payload.totalPages || 0,
+          page: payload.pagination.page || 1,
+          limit: payload.pagination.limit || 10,
+          total: payload.pagination.total || 0,
+          totalPages: payload.pagination.totalPages || 0,
         };
       }
     });
@@ -282,10 +282,10 @@ const userSlice = createSlice({
       } else if (payload) {
         // Fallback for different response structure
         state.allBidsPagination = {
-          page: payload.currentPage || 1,
-          limit: payload.limit || 10,
-          total: payload.totalItems || 0,
-          totalPages: payload.totalPages || 0,
+          page: payload.pagination.page || 1,
+          limit: payload.pagination.limit || 10,
+          total: payload.pagination.total || 0,
+          totalPages: payload.pagination.totalPages || 0,
         };
       }
     });

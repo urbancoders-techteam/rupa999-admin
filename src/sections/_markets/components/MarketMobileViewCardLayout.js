@@ -16,6 +16,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CircularProgress from '@mui/material/CircularProgress';
 import dayjs from 'dayjs';
 import Label from '../../../components/label';
+import { fDateTimeOrdinal } from '../../../utils/formatTime';
 
 function MarketMobileViewCardLayout({
   data = [],
@@ -68,11 +69,11 @@ function MarketMobileViewCardLayout({
         bgcolor: 'background.paper',
       }}
     >
-      <Stack spacing={2}>
+      <Stack spacing={0.5}>
         {visibleData?.map((row, index) => (
           <Accordion
             key={row.id}
-            sx={{ borderRadius: 2, boxShadow: 'none', border: '1px solid #e0e0e0' }}
+            sx={{ borderRadius: 2, boxShadow: 'none',  }}
           >
             <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ px: 2, py: 1 }}>
               <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -134,7 +135,7 @@ function MarketMobileViewCardLayout({
                     Created At:
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'text.primary', textAlign: 'right' }}>
-                    {row.createdAt ? new Date(row.createdAt).toLocaleString() : '—'}
+                    {row.createdAt ? fDateTimeOrdinal(row.createdAt) : '—'}
                   </Typography>
                 </Box>
 

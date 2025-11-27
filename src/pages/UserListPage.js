@@ -15,6 +15,7 @@ import {
   Tabs,
   Tooltip,
 } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import { Box } from '@mui/system';
 // redux
 import { useDispatch, useSelector } from 'react-redux';
@@ -46,7 +47,7 @@ import UserMobileViewCardLayout from '../sections/_users/list/UserMobileViewCard
 
 // ----------------------------------------------------------------------
 
-const STATUS_OPTIONS = ['all', 'Blocked', 'Unblock'];
+const STATUS_OPTIONS = ['all', 'Active', 'InActive'];
 
 const TABLE_HEAD = [
   { id: 'Action', label: 'Action', align: 'left' },
@@ -98,6 +99,14 @@ export default function UserListPage() {
   const [filterStatus, setFilterStatus] = useState('all');
   const [changePasswordLoading, setChangePasswordLoading] = useState(false);
   const [addDeductBalanceLoading, setAddDeductBalanceLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // Map UI filter status to API format
+  const getStatusForAPI = (status) => {
+    if (status === 'Active') return 'active';
+    if (status === 'InActive') return 'inactive';
+    return '';
+  };
 
   // Fetch users on component mount and when filters change
   useEffect(() => {
@@ -106,12 +115,13 @@ export default function UserListPage() {
         page: page + 1, // API uses 1-based pagination
         limit: rowsPerPage,
         search: filterName,
-        status: filterStatus !== 'all' ? filterStatus : '',
+        status: filterStatus !== 'all' ? getStatusForAPI(filterStatus) : '',
       })
     );
   }, [dispatch, page, rowsPerPage, filterName, filterStatus]);
 
   // Transform API data to table format
+  // Note: API already handles pagination and filtering, so we use the data directly
   const tableData = userList.map((user, index) => ({
     id: user._id || user.id || index + 1,
     _id: user._id,
@@ -124,7 +134,7 @@ export default function UserListPage() {
     totalBonus: user.totalBonus || 0,
     status: user.status === 'active', // Boolean for StatusToggleCell: true = Active false = inactive
     statusLabel: (() => {
-      if (user.status === 'inactive') return 'Blocked';
+      if (user.status === 'inactive') return 'InActive';
       if (user.status === 'active') return 'Active';
       return 'inactive';
     })(),
@@ -135,15 +145,14 @@ export default function UserListPage() {
     ...user,
   }));
 
+  // Apply only client-side sorting since API handles pagination and filtering
   const dataFiltered = applyFilter({
     inputData: tableData,
     comparator: getComparator(order, orderBy),
-    filterName,
+    filterName: '', // Don't filter by name client-side, API handles it
     filterRole,
-    filterStatus,
+    filterStatus: 'all', // Don't filter by status client-side, API handles it
   });
-
-  const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   const denseHeight = dense ? 52 : 72;
 
@@ -151,10 +160,7 @@ export default function UserListPage() {
 
   const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
-  const isNotFound =
-    (!dataFiltered.length && !!filterName) ||
-    (!dataFiltered.length && !!filterRole) ||
-    (!dataFiltered.length && !!filterStatus);
+  const isNotFound = !tableData.length && (!!filterName || filterStatus !== 'all');
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
@@ -171,6 +177,7 @@ export default function UserListPage() {
   };
 
   const handleDeleteRow = async (id) => {
+    setDeleteLoading(true);
     try {
       await dispatch(deleteUserAsync(id)).unwrap();
       enqueueSnackbar('User deleted successfully!', { variant: 'success' });
@@ -180,21 +187,21 @@ export default function UserListPage() {
           page: page + 1,
           limit: rowsPerPage,
           search: filterName,
-          status: filterStatus !== 'all' ? filterStatus : '',
+          status: filterStatus !== 'all' ? getStatusForAPI(filterStatus) : '',
         })
       );
       setSelected([]);
-      if (page > 0 && dataInPage.length < 2) {
+      setOpenConfirm(false);
+      setDeleteId(null);
+      // Check if we need to go back a page after deletion
+      if (page > 0 && tableData.length === 0) {
         setPage(page - 1);
       }
     } catch (error) {
       enqueueSnackbar(error?.message || 'Failed to delete user', { variant: 'error' });
+    } finally {
+      setDeleteLoading(false);
     }
-  };
-
-  const handleOpenDeleteConfirm = (id) => {
-    setDeleteId(id);
-    setOpenConfirm(true);
   };
 
   const handleConfirmDelete = () => {
@@ -216,7 +223,7 @@ export default function UserListPage() {
           page: page + 1,
           limit: rowsPerPage,
           search: filterName,
-          status: filterStatus !== 'all' ? filterStatus : '',
+          status: filterStatus !== 'all' ? getStatusForAPI(filterStatus) : '',
         })
       );
     } catch (error) {
@@ -344,7 +351,7 @@ export default function UserListPage() {
               onFilterName={handleFilterName}
             />
             <UserMobileViewCardLayout
-              data={dataFiltered}
+              data={tableData}
               onEditRow={handleEditRow}
               onDeleteRow={(id) => handleDeleteRow(id)}
               onStatusChange={handleStatusChange}
@@ -412,9 +419,7 @@ export default function UserListPage() {
                   />
 
                   <TableBody>
-                    {dataFiltered
-                      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((row, index) => (
+                    {dataFiltered.map((row, index) => (
                         <UserTableRow
                           key={row._id || row.id}
                           index={index}
@@ -422,7 +427,7 @@ export default function UserListPage() {
                           onTransationRow={() => handleTransactionRow(row._id || row.id)}
                           onWithdrawalRequestRow={() => handleWithdrawalRequestRow(row._id || row.id)}
                           onBidHistoryRow={() => handleBidHistoryRow(row._id || row.id)}
-                          onDeleteRow={() => handleOpenDeleteConfirm(row._id || row.id)}
+                          onDeleteRow={async () => handleDeleteRow(row._id || row.id)}
                           onEditRow={() => handleEditRow(row._id || row.id)}
                           onStatusChange={(_id, status) => handleStatusChange(_id, status)}
                           onChangePassword={(id, password, cpassword) => handleChangePassword(id, password, cpassword)}
@@ -434,7 +439,7 @@ export default function UserListPage() {
 
                     <TableEmptyRows
                       height={denseHeight}
-                      emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
+                      emptyRows={emptyRows(0, rowsPerPage, tableData.length)}
                     />
 
                     <TableNoData isNotFound={isNotFound} />
@@ -444,7 +449,7 @@ export default function UserListPage() {
             </TableContainer>
 
             <TablePaginationCustom
-              count={pagination?.total || dataFiltered.length}
+              count={pagination?.total || tableData.length || 0}
               page={page}
               rowsPerPage={rowsPerPage}
               onPageChange={onChangePage}
@@ -465,9 +470,14 @@ export default function UserListPage() {
           title="Delete User"
           content="Are you sure you want to delete this user? This action cannot be undone."
           action={
-            <Button variant="contained" color="error" onClick={handleConfirmDelete}>
+            <LoadingButton
+              variant="contained"
+              color="error"
+              onClick={handleConfirmDelete}
+              loading={deleteLoading}
+            >
               Delete
-            </Button>
+            </LoadingButton>
           }
         />
       </Container>

@@ -92,7 +92,8 @@ export default function UserForm({ isEdit = false, isView = false, currentUser }
         // Update existing user (implement update logic here if needed)
         enqueueSnackbar('User updated successfully!', { variant: 'success' });
       }
-      navigate(PATH_DASHBOARD.userlist.list);
+      // Redirect to user list page after successful submission
+      navigate(PATH_DASHBOARD.user.list);
     } catch (error) {
       enqueueSnackbar(error?.message || 'Failed to create user', { variant: 'error' });
     }

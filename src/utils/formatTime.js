@@ -44,3 +44,27 @@ export const formatTimeTo12Hour = (timeString) => {
   date.setHours(+hour, +minute);
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 };
+
+// Get ordinal suffix for day (1st, 2nd, 3rd, 4th, etc.)
+const getOrdinalSuffix = (day) => {
+  if (day > 3 && day < 21) return 'th';
+  switch (day % 10) {
+    case 1: return 'st';
+    case 2: return 'nd';
+    case 3: return 'rd';
+    default: return 'th';
+  }
+};
+
+// Format date with ordinal suffix: "27th Nov, 2025, 10:30 Pm"
+export function fDateTimeOrdinal(date) {
+  if (!date) return '';
+  
+  const dayjsDate = dayjs(date);
+  const day = dayjsDate.date();
+  const ordinalSuffix = getOrdinalSuffix(day);
+  
+  // Format: Do MMM, YYYY, hh:mm A
+  // Note: Do is dayjs format for day with ordinal, but we'll build it manually for more control
+  return `${day}${ordinalSuffix} ${dayjsDate.format('MMM, YYYY, hh:mm A')}`;
+}

@@ -1,21 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
+  Card,
   Typography,
   Stack,
-  IconButton,
-  Divider,
   Box,
 } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { LoadingButton } from '@mui/lab';
 import CircularProgress from '@mui/material/CircularProgress';
 
-function WithdrawDetailsMobileViewCardLayout({ data = [], onEditRow, onDeleteRow, onSelectRow, selected = [] }) {
+function WithdrawDetailsMobileViewCardLayout({ 
+  data = [], 
+  onAccept, 
+  onReject,
+  acceptLoading = false,
+  rejectLoading = false,
+}) {
   const [visibleData, setVisibleData] = useState(data.slice(0, 10));
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(data.length > 10);
@@ -57,63 +57,102 @@ function WithdrawDetailsMobileViewCardLayout({ data = [], onEditRow, onDeleteRow
         maxHeight: 600,
         overflowY: 'auto',
         p: 2,
-        borderRadius: 2,
-        boxShadow: 1,
-        bgcolor: 'background.paper',
       }}
     >
-      <Stack spacing={2} >
+      <Stack spacing={2}>
         {visibleData.map((row) => (
-          <Accordion key={row.ID} sx={{ borderRadius: 2, boxShadow: 'none', border: 'none' }}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ px: 2, py: 1 }}>
-              <Box sx={{ width: '100%' }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                  {row.Name || '—'}
+          <Card
+            key={row.id || row.ID || row._id}
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              boxShadow: 2,
+            }}
+          >
+            <Stack spacing={1.5}>
+              {/* Name */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                  Name:
                 </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Account Holder: {row.AccountHolderName || '—'}
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Account No: {row.AccountNumber || '—'}
+                <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 500 }}>
+                  {row.name || row.Name || row.marketName || '—'}
                 </Typography>
               </Box>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Stack spacing={1}>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  UPI Name: {row.UpiName || '—'}
+
+              {/* Phone Number */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                  Phone No:
                 </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  IFSC Code: {row.AccountIFSCCode || '—'}
+                <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 500 }}>
+                  {row.phone || row.Phone || row.userPhone || row.phoneNumber || '—'}
                 </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  UPID: {row.UPID || '—'}
+              </Box>
+
+              {/* Amount */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                  Amount:
                 </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Created At: {row.CreatedAt ? new Date(row.CreatedAt).toLocaleString() : '—'}
+                <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 500 }}>
+                  {(() => {
+                    const amount = row.amount || row.Amount || 0;
+                    return amount ? `₹${Number(amount).toLocaleString('en-IN')}` : '—';
+                  })()}
                 </Typography>
-                <Divider sx={{ my: 1 }} />
-                <Stack direction="row" spacing={1}>
-                  <IconButton size="small" color="primary" onClick={() => onEditRow && onEditRow(row.ID)}>
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton size="small" color="error" onClick={() => onDeleteRow && onDeleteRow(row.ID)}>
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
-                </Stack>
-                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                  {selected.includes(row.ID) ? 'Selected' : ''}
+              </Box>
+
+              {/* Request Date */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                  Request Date:
                 </Typography>
+                <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 500 }}>
+                  {row.createdAt || row.CreatedAt || row.requestDate
+                    ? new Date(row.createdAt || row.CreatedAt || row.requestDate).toLocaleString('en-IN', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })
+                    : '—'}
+                </Typography>
+              </Box>
+
+              {/* Accept / Reject Buttons */}
+              <Stack direction="row" spacing={1} sx={{ mt: 2, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+                <LoadingButton
+                  fullWidth
+                  variant="contained"
+                  color="success"
+                  onClick={() => onAccept && onAccept(row.id || row.ID || row._id, row)}
+                  loading={acceptLoading}
+                  sx={{ flex: 1 }}
+                >
+                  Accept
+                </LoadingButton>
+                <LoadingButton
+                  fullWidth
+                  variant="contained"
+                  color="error"
+                  onClick={() => onReject && onReject(row.id || row.ID || row._id, row)}
+                  loading={rejectLoading}
+                  sx={{ flex: 1 }}
+                >
+                  Reject
+                </LoadingButton>
               </Stack>
-            </AccordionDetails>
-          </Accordion>
+            </Stack>
+          </Card>
         ))}
         {loading && (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
             <CircularProgress size={32} color="primary" />
           </Box>
         )}
-        {!hasMore && (
+        {!hasMore && visibleData.length > 0 && (
           <Typography align="center" variant="body2" sx={{ color: 'text.secondary', py: 2 }}>
             No more data
           </Typography>
@@ -125,10 +164,10 @@ function WithdrawDetailsMobileViewCardLayout({ data = [], onEditRow, onDeleteRow
 
 WithdrawDetailsMobileViewCardLayout.propTypes = {
   data: PropTypes.array,
-  onEditRow: PropTypes.func,
-  onDeleteRow: PropTypes.func,
-  onSelectRow: PropTypes.func,
-  selected: PropTypes.array,
+  onAccept: PropTypes.func,
+  onReject: PropTypes.func,
+  acceptLoading: PropTypes.bool,
+  rejectLoading: PropTypes.bool,
 };
 
 export default WithdrawDetailsMobileViewCardLayout;

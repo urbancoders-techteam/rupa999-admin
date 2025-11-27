@@ -1,5 +1,4 @@
 import {
-  Button,
   IconButton,
   MenuItem,
   Stack,
@@ -8,6 +7,7 @@ import {
   Typography,
   styled,
 } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 import BankDetailsDialog from '../../../components/bank-details-dialog/BankDetailsDialog';
@@ -95,6 +95,7 @@ export default function UserTableRow({
   const [openChangePassword, setOpenChangePassword] = useState(false);
   const [openAddDeduct, setOpenAddDeduct] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const handleSubmit = async (values) => {
     if (onAddDeductBalance) {
@@ -285,18 +286,28 @@ export default function UserTableRow({
         title="Delete User"
         content="Are you sure you want to delete this user? This action cannot be undone."
         action={
-          <Button
+          <LoadingButton
             variant="contained"
             color="error"
-            onClick={() => {
+            loading={deleteLoading}
+            onClick={async () => {
               if (onDeleteRow) {
-                onDeleteRow();
+                setDeleteLoading(true);
+                try {
+                  await onDeleteRow();
+                  handleCloseConfirm();
+                } catch (error) {
+                  // Error is handled in parent
+                } finally {
+                  setDeleteLoading(false);
+                }
+              } else {
+                handleCloseConfirm();
               }
-              handleCloseConfirm();
             }}
           >
             Delete
-          </Button>
+          </LoadingButton>
         }
       />
 

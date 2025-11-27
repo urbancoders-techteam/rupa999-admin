@@ -79,6 +79,9 @@ export default function WithdrawDetailsPage() {
 
   const [filterStatus, setFilterStatus] = useState('all');
 
+  const [acceptLoading, setAcceptLoading] = useState(false);
+  const [rejectLoading, setRejectLoading] = useState(false);
+
   // Memoized filtered data
   const dataFiltered = useMemo(() => applyFilter({
     inputData: tableData,
@@ -164,6 +167,38 @@ export default function WithdrawDetailsPage() {
     setFilterStatus('all');
   };
 
+  const handleAccept = async (id, row) => {
+    setAcceptLoading(true);
+    try {
+      // TODO: Implement accept logic here
+      console.log('Accept withdraw request:', id, row);
+      // Example: await dispatch(acceptWithdrawRequestAsync(id)).unwrap();
+      // After success, refresh the list or remove the item
+      // const updatedData = tableData.filter((item) => item.id !== id);
+      // setTableData(updatedData);
+    } catch (error) {
+      console.error('Failed to accept withdraw request:', error);
+    } finally {
+      setAcceptLoading(false);
+    }
+  };
+
+  const handleReject = async (id, row) => {
+    setRejectLoading(true);
+    try {
+      // TODO: Implement reject logic here
+      console.log('Reject withdraw request:', id, row);
+      // Example: await dispatch(rejectWithdrawRequestAsync(id)).unwrap();
+      // After success, refresh the list or remove the item
+      // const updatedData = tableData.filter((item) => item.id !== id);
+      // setTableData(updatedData);
+    } catch (error) {
+      console.error('Failed to reject withdraw request:', error);
+    } finally {
+      setRejectLoading(false);
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -211,10 +246,10 @@ export default function WithdrawDetailsPage() {
         {isMobile ? (
           <WithdrawMobileViewCardLayout
             data={dataFiltered}
-            onEditRow={(id) => handleEditRow(id)}
-            onDeleteRow={(id) => handleDeleteRow(id)}
-            onSelectRow={(id) => onSelectRow(id)}
-            selected={selected}
+            onAccept={handleAccept}
+            onReject={handleReject}
+            acceptLoading={acceptLoading}
+            rejectLoading={rejectLoading}
           />
         ) : (
           <Card>
