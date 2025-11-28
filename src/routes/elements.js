@@ -98,6 +98,10 @@ export const DipositHistoryListPage = Loadable(lazy(() => import('../pages/Dipos
 // DASHBOARD: Game Types
 export const GameTypeFormPage = Loadable(lazy(() => import('../pages/GameTypeFormPage')));
 
+// DASHBOARD: Notifications
+export const NotificationListPage = Loadable(lazy(() => import('../pages/NotificationListPage')));
+export const NotificationFormHandlePage = Loadable(lazy(() => import('../sections/_notification/pages/NotificationFormHandle')));
+
 // DASHBOARD: Main Transaction
 export const MainTransactionListPage = Loadable(lazy(() => import('../pages/MainTransactionListPage')));
 

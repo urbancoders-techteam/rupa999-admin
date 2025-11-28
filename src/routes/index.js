@@ -53,6 +53,8 @@ import {
   BidRecordListPage,
   MainTransactionListPage,
   MainBidHistoryListPage,
+  NotificationListPage,
+  NotificationFormHandlePage,
   //
 } from './elements';
 
@@ -212,6 +214,16 @@ export default function Router() {
                 },
                 { path: 'list', element: <MarketDataListPage /> },
                 // { path: ':id/view', element: <MarketFormHandlePage /> },
+              ],
+            },
+            {
+              path: 'notifications',
+              children: [
+                { element: <Navigate to="/dashboard/settings/notifications/list" replace />, index: true },
+                { path: 'list', element: <NotificationListPage /> },
+                { path: 'new', element: <NotificationFormHandlePage /> },
+                { path: ':id/edit', element: <NotificationFormHandlePage /> },
+                { path: ':id/view', element: <NotificationFormHandlePage /> },
               ],
             },
           ],

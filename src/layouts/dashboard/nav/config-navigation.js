@@ -122,6 +122,10 @@ const navConfig = [
         icon: ICONS.setting,
         children: [
           {
+            title: 'Notifications',
+            path: PATH_DASHBOARD.notifications.list,
+          },
+          {
             title: 'change password',
             path: PATH_DASHBOARD.changepassword.form,
           },

@@ -77,6 +77,13 @@ export const PATH_DASHBOARD = {
   settings: {
     root: path(ROOTS_DASHBOARD, '/settings'),
   },
+  notifications: {
+    root: path(ROOTS_DASHBOARD, '/settings/notifications'),
+    list: path(ROOTS_DASHBOARD, '/settings/notifications/list'),
+    new: path(ROOTS_DASHBOARD, '/settings/notifications/new'),
+    edit: (id) => path(ROOTS_DASHBOARD, `/settings/notifications/${id}/edit`),
+    view: (id) => path(ROOTS_DASHBOARD, `/settings/notifications/${id}/view`),
+  },
   changepassword: {
     root: path(ROOTS_DASHBOARD, '/settings/changepassword'),
     form: path(ROOTS_DASHBOARD, '/settings/changepassword/form'),
