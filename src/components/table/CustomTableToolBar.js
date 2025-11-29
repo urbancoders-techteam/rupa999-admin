@@ -11,10 +11,12 @@ CustomTableToolbar.propTypes = {
   selectedDate: PropTypes.object,
   selectedDropDown: PropTypes.string,
   onFilterName: PropTypes.func,
+  onSearch: PropTypes.func,
   onselectedDropDown: PropTypes.func,
   onResetFilter: PropTypes.func,
   onDateFilter: PropTypes.func,
   fileterOptions: PropTypes.arrayOf(PropTypes.string),
+  marketOptions: PropTypes.array,
 };
 
 export default function CustomTableToolbar({
@@ -23,11 +25,22 @@ export default function CustomTableToolbar({
   selectedDate,
   selectedDropDown,
   fileterOptions,
+  marketOptions,
   onFilterName,
+  onSearch,
   onDateFilter,
   onselectedDropDown,
   onResetFilter,
 }) {
+  const handleSearchClick = () => {
+    if (onSearch) {
+      onSearch();
+    }
+  };
+
+  // Use marketOptions if provided, otherwise fall back to fileterOptions
+  const dropdownOptions = marketOptions || fileterOptions || [];
+
   return (
     <Grid
       container
@@ -58,15 +71,19 @@ export default function CustomTableToolbar({
       </Grid>
 
       {/* Dropdown Field */}
-      {fileterOptions && (
+      {dropdownOptions.length > 0 && (
         <Grid item xs={12} sm={6} md={3}>
           <TextField
             select
             fullWidth
             size="small"
             label="Select Market"
-            value={selectedDropDown}
-            onChange={onselectedDropDown}
+            value={selectedDropDown || ''}
+            onChange={(e) => {
+              if (onselectedDropDown) {
+                onselectedDropDown(e);
+              }
+            }}
             SelectProps={{
               MenuProps: {
                 PaperProps: {
@@ -75,20 +92,28 @@ export default function CustomTableToolbar({
               },
             }}
           >
-            {fileterOptions.map((option) => (
-              <MenuItem
-                key={option}
-                value={option}
-                sx={{
-                  mx: 1,
-                  borderRadius: 0.75,
-                  typography: 'body2',
-                  textTransform: 'capitalize',
-                }}
-              >
-                {option}
-              </MenuItem>
-            ))}
+            <MenuItem value="">
+              <em>All Markets</em>
+            </MenuItem>
+            {dropdownOptions.map((option) => {
+              // Handle both string options and object options with id/name
+              const value = typeof option === 'object' ? option.id || option._id : option;
+              const label = typeof option === 'object' ? option.name : option;
+              return (
+                <MenuItem
+                  key={value}
+                  value={value}
+                  sx={{
+                    mx: 1,
+                    borderRadius: 0.75,
+                    typography: 'body2',
+                    textTransform: 'capitalize',
+                  }}
+                >
+                  {label}
+                </MenuItem>
+              );
+            })}
           </TextField>
         </Grid>
       )}
@@ -105,6 +130,20 @@ export default function CustomTableToolbar({
               textField: { size: 'small', fullWidth: true },
             }}
           />
+        </Grid>
+      )}
+
+      {/* Search Button */}
+      {onSearch && (
+        <Grid item xs={12} sm={6} md={2}>
+          <Button
+            variant="contained"
+            onClick={handleSearchClick}
+            startIcon={<Iconify icon="eva:search-fill" />}
+            sx={{ height: '40px' }}
+          >
+            Search
+          </Button>
         </Grid>
       )}
 

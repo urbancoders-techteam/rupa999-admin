@@ -1,10 +1,11 @@
 /* eslint-disable no-nested-ternary */
+import { IconButton, MenuItem, TableCell, TableRow, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import { useState } from 'react';
-import { TableRow, MenuItem, TableCell, IconButton, Typography } from '@mui/material';
-import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
+import Label from '../../../components/label';
 import MenuPopover from '../../../components/menu-popover';
+import { fDateTime } from '../../../utils/formatTime';
 
 // ----------------------------------------------------------------------
 
@@ -40,13 +41,13 @@ export default function GeneralMarketRecordTableRow({ index, row, onEditRow }) {
 
   return (
     <>
-      <TableRow hover sx={{ '&:last-child td, &:last-child th': { border: 0.5 } }}>
+      <TableRow hover>
         <TableCell align="right">
           <IconButton color={openPopover ? 'inherit' : 'default'} onClick={handleOpenPopover}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
         </TableCell>
-        <TableCell align="center">{id}</TableCell>
+        <TableCell align="center">{index}</TableCell>
 
         <TableCell align="left">
           <Typography variant="subtitle2" noWrap>
@@ -71,14 +72,24 @@ export default function GeneralMarketRecordTableRow({ index, row, onEditRow }) {
         <TableCell align="left">
           <Label
             variant="soft"
-            color={status === 'FAILED' ? 'error' : status === 'SUCCESS' ? 'success' : 'warning'}
+            color={
+              status === 'WON'
+                ? 'success'
+                : status === 'LOST'
+                  ? 'error'
+                  : 'warning'
+            }
             sx={{ textTransform: 'uppercase', fontWeight: 'bold' }}
           >
-            {status}
+            {status === 'WON' ? "SUCCESS" : status === 'LOST' ? "FAILED" : status}
           </Label>
         </TableCell>
 
-        <TableCell align="left">{createdAt}</TableCell>
+        <TableCell align="left">
+          <Typography variant="body2">
+            {createdAt ? fDateTime(createdAt) : '—'}
+          </Typography>
+        </TableCell>
       </TableRow>
 
       <MenuPopover

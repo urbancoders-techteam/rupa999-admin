@@ -160,3 +160,21 @@ export const getAllBidsAsync = createAsyncThunk(
     })
 );
 
+// Get General Market Records (Admin only)
+export const getGeneralMarketRecordsAsync = createAsyncThunk(
+  'user/getGeneralMarketRecords',
+  async (params = {}, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: '/admin/general-market-records',
+      method: 'get',
+      params: {
+        page: params.page || 1,
+        limit: params.limit || 10,
+        marketId: params.marketId || '',
+        search: params.search || '',
+        status: params.status || '',
+      },
+    })
+);
+
