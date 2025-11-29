@@ -1,32 +1,33 @@
-import { Helmet } from 'react-helmet-async';
 import { paramCase } from 'change-case';
-import { useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 // @mui
-import { Card, Table, Button, TableBody, Container, TableContainer, Box } from '@mui/material';
+import { Box, Button, Card, Container, Table, TableBody, TableCell, TableContainer, TableRow } from '@mui/material';
 import useResponsive from '../../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
-// _mock_
-import {marketRecordData}  from '../../_mock/arrays/_market';
 // components
-import Scrollbar from '../../components/scrollbar';
 import ConfirmDialog from '../../components/confirm-dialog';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
+import Scrollbar from '../../components/scrollbar';
 import { useSettingsContext } from '../../components/settings';
 import {
-  useTable,
-  getComparator,
   emptyRows,
-  TableNoData,
+  getComparator,
   TableEmptyRows,
   TableHeadCustom,
+  TableNoData,
   TablePaginationCustom,
+  useTable,
 } from '../../components/table';
 // sections
-import WithdrawDetailsToolbar from '../../sections/_withdraw_details/components/WithdrawDetailsToolbar';
-import WithdrawMobileViewCardLayout from '../../sections/_withdraw_details/components/WithdrawDetailsMobileViewCardLayout';
 import WinHistoryTableRow from '../../sections/_win_history/list/WinHistoryTableRow';
+import WithdrawMobileViewCardLayout from '../../sections/_withdraw_details/components/WithdrawDetailsMobileViewCardLayout';
+import WithdrawDetailsToolbar from '../../sections/_withdraw_details/components/WithdrawDetailsToolbar';
+// redux
+import { getAllWinningBidsAsync } from '../../redux/services/bid_services';
 
 // ----------------------------------------------------------------------
 
@@ -66,8 +67,9 @@ export default function WinHistoryListPage() {
   const { themeStretch } = useSettingsContext();
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const [tableData, setTableData] = useState(marketRecordData);
+  const { winningBidsList, loading, pagination } = useSelector((state) => state.bid);
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
@@ -76,6 +78,32 @@ export default function WinHistoryListPage() {
   const [filterRole, setFilterRole] = useState('all');
 
   const [filterStatus, setFilterStatus] = useState('all');
+
+  // Fetch winning bids on mount and when page changes
+  useEffect(() => {
+    dispatch(
+      getAllWinningBidsAsync({
+        page: page + 1, // API uses 1-based pagination
+        limit: rowsPerPage,
+      })
+    );
+  }, [dispatch, page, rowsPerPage]);
+
+  // Transform API data to table format
+  const tableData = useMemo(
+    () =>
+      winningBidsList.map((bid) => ({
+        id: bid._id,
+        marketName: bid.marketId?.name || 'N/A',
+        userName: bid.userId?.name || 'N/A',
+        session: bid.type || 'N/A',
+        number: bid.bidTable?.digit || 'N/A',
+        amount: bid.totalPoints || 0,
+        winAmount: bid.winAmount || 0,
+        createdAt: bid.createdAt ? new Date(bid.createdAt).toLocaleString() : 'N/A',
+      })),
+    [winningBidsList]
+  );
 
   // Memoized filtered data
   const dataFiltered = useMemo(
@@ -118,42 +146,18 @@ export default function WinHistoryListPage() {
   };
 
   const handleDeleteRow = (id) => {
-    const deleteRow = tableData.filter((row) => row.id !== id);
-    setSelected([]);
-    setTableData(deleteRow);
-
-    if (page > 0) {
-      if (dataInPage.length < 2) {
-        setPage(page - 1);
-      }
-    }
+    // Note: Delete functionality should be implemented via API if needed
+    // For now, this is just a placeholder
+    console.log('Delete row:', id);
   };
 
   const handleDeleteRows = (selectedRows) => {
-    const deleteRows = tableData.filter((row) => !selectedRows.includes(row.id));
+    // Note: Delete functionality should be implemented via API if needed
+    // For now, this is just a placeholder
+    console.log('Delete rows:', selectedRows);
     setSelected([]);
-    setTableData(deleteRows);
-
-    if (page > 0) {
-      if (selectedRows.length === dataInPage.length) {
-        setPage(page - 1);
-      } else if (selectedRows.length === dataFiltered.length) {
-        setPage(0);
-      } else if (selectedRows.length > dataInPage.length) {
-        <TablePaginationCustom
-          count={dataFiltered.length}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={onChangePage}
-          onRowsPerPageChange={onChangeRowsPerPage}
-          //
-          dense={dense}
-          onChangeDense={onChangeDense}
-        />;
-        const newPage = Math.ceil((tableData.length - selectedRows.length) / rowsPerPage) - 1;
-        setPage(newPage);
-      }
-    }
+    // Since we're using API data, we can't delete locally
+    // This would need to be implemented via API endpoint
   };
 
   const handleEditRow = (id) => {
@@ -233,32 +237,42 @@ export default function WinHistoryListPage() {
                   />
 
                   <TableBody>
-                    {dataFiltered
-                      ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((row, index) => (
-                        <WinHistoryTableRow
-                          index={index + 1}
-                          key={row.id}
-                          row={row}
-                          selected={selected.includes(row.id)}
-                          onSelectRow={() => onSelectRow(row.id)}
-                          onDeleteRow={() => handleDeleteRow(row.id)}
-                          onEditRow={() => handleEditRow(row.name)}
+                    {loading ? (
+                      <TableRow>
+                        <TableCell colSpan={TABLE_HEAD.length} align="center">
+                          Loading...
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      <>
+                        {dataFiltered
+                          ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                          .map((row, index) => (
+                            <WinHistoryTableRow
+                              index={index}
+                              key={row.id}
+                              row={row}
+                              selected={selected.includes(row.id)}
+                              onSelectRow={() => onSelectRow(row.id)}
+                              onDeleteRow={() => handleDeleteRow(row.id)}
+                              onEditRow={() => handleEditRow(row.name)}
+                            />
+                          ))}
+
+                        <TableEmptyRows
+                          height={denseHeight}
+                          emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
                         />
-                      ))}
 
-                    <TableEmptyRows
-                      height={denseHeight}
-                      emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
-                    />
-
-                    <TableNoData isNotFound={isNotFound} />
+                        <TableNoData isNotFound={isNotFound} />
+                      </>
+                    )}
                   </TableBody>
                 </Table>
               </Scrollbar>
             </TableContainer>
             <TablePaginationCustom
-              count={dataFiltered.length}
+              count={pagination.total || 0}
               page={page}
               rowsPerPage={rowsPerPage}
               onPageChange={onChangePage}

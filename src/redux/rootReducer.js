@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 import storage from 'redux-persist/lib/storage';
 // slices
 import authReducer from './slices/auth_slices';
+import bidReducer from './slices/bid_slices';
 import marketResultReducer from './slices/market_result_slices';
 import marketReducer from './slices/market_slices';
 import permissionReducer from './slices/permission_slices';
@@ -20,6 +21,7 @@ export const rootPersistConfig = {
 
 const rootReducer = combineReducers({
   auth: authReducer,
+  bid: bidReducer,
   staff: staffReducer,
   role: roleReducer,
   permission: permissionReducer,

@@ -1,8 +1,7 @@
 /* eslint-disable no-nested-ternary */
+import { IconButton, MenuItem, TableCell, TableRow, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import { useState } from 'react';
-import { TableRow, MenuItem, TableCell, IconButton, Typography } from '@mui/material';
-import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
 import MenuPopover from '../../../components/menu-popover';
 
@@ -44,7 +43,7 @@ export default function WinHistoryTableRow({ index, row, onEditRow }) {
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
         </TableCell>
-        <TableCell align="left">{id}</TableCell>
+        <TableCell align="left">{index + 1}</TableCell>
 
         <TableCell align="left">
           <Typography variant="subtitle2" noWrap>
@@ -58,11 +57,11 @@ export default function WinHistoryTableRow({ index, row, onEditRow }) {
           {session}
         </TableCell>
 
-        <TableCell align="left">{amount}</TableCell>
+        <TableCell align="left">₹{amount?.toLocaleString('en-IN') || 0}</TableCell>
 
         <TableCell align="left">{number}</TableCell>
 
-        <TableCell align="left">{winAmount}</TableCell>
+        <TableCell align="left">₹{winAmount?.toLocaleString('en-IN') || 0}</TableCell>
 
         <TableCell align="left">{createdAt}</TableCell>
       </TableRow>
