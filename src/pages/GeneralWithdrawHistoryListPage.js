@@ -93,7 +93,8 @@ export default function GeneralWithdrawHistoryListPage() {
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
-  const [filterName, setFilterName] = useState('');
+  const [filterName, setFilterName] = useState(''); // Input field value
+  const [searchQuery, setSearchQuery] = useState(''); // Actual search value for filtering
 
   const [filterRole, setFilterRole] = useState('all');
 
@@ -176,10 +177,10 @@ export default function GeneralWithdrawHistoryListPage() {
     let filtered = [...tableData];
 
     // Filter by name (search in marketName which is userId.name)
-    if (filterName) {
+    if (searchQuery) {
       filtered = filtered.filter((item) => {
         const userName = item?.marketName || '';
-        return userName.toLowerCase().includes(filterName.toLowerCase());
+        return userName.toLowerCase().includes(searchQuery.toLowerCase());
       });
     }
 
@@ -197,7 +198,7 @@ export default function GeneralWithdrawHistoryListPage() {
     });
 
     return stabilized.map((el) => el[0]);
-  }, [tableData, order, orderBy, filterName, filterStatus]);
+  }, [tableData, order, orderBy, searchQuery, filterStatus]);
 
   // Memoized paginated data
   const dataInPage = useMemo(
@@ -209,7 +210,7 @@ export default function GeneralWithdrawHistoryListPage() {
 
   const isMobile = useResponsive('down', 'sm');
 
-  const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
+  const isFiltered = searchQuery !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
   const isNotFound = !loading && tableData.length === 0 && !isFiltered;
 
@@ -219,8 +220,12 @@ export default function GeneralWithdrawHistoryListPage() {
   };
 
   const handleFilterName = (event) => {
-    setPage(0);
     setFilterName(event.target.value);
+  };
+
+  const handleSearch = () => {
+    setPage(0);
+    setSearchQuery(filterName);
   };
 
   const handleDeleteRow = (id) => {
@@ -258,8 +263,10 @@ export default function GeneralWithdrawHistoryListPage() {
 
   const handleResetFilter = () => {
     setFilterName('');
+    setSearchQuery('');
     setFilterRole('all');
     setFilterStatus('all');
+    setPage(0);
   };
 
   const handleAccept = async (id) => {
@@ -329,6 +336,7 @@ export default function GeneralWithdrawHistoryListPage() {
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
+              onSearch={handleSearch}
               onResetFilter={handleResetFilter}
               sx={{ mt: 1 }}
             />

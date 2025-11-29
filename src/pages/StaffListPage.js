@@ -88,7 +88,8 @@ export default function StaffListPage() {
 
   const [openConfirm, setOpenConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
-  const [filterName, setFilterName] = useState('');
+  const [filterName, setFilterName] = useState(''); // Input field value
+  const [searchQuery, setSearchQuery] = useState(''); // Actual search value for filtering
   const [filterRole, setFilterRole] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [changePasswordLoading, setChangePasswordLoading] = useState(false);
@@ -116,7 +117,7 @@ export default function StaffListPage() {
 
   const dataFiltered = applyFilter({
     inputData: tableData,
-    filterName,
+    filterName: searchQuery,
     filterRole,
     filterStatus,
   });
@@ -127,10 +128,10 @@ export default function StaffListPage() {
 
   const isMobile = useResponsive('down', 'sm');
 
-  const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
+  const isFiltered = searchQuery !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
   const isNotFound =
-    (!dataFiltered.length && !!filterName) ||
+    (!dataFiltered.length && !!searchQuery) ||
     (!dataFiltered.length && !!filterRole && filterRole !== 'all') ||
     (!dataFiltered.length && !!filterStatus && filterStatus !== 'all');
 
@@ -144,8 +145,12 @@ export default function StaffListPage() {
   };
 
   const handleFilterName = (event) => {
-    setPage(0);
     setFilterName(event.target.value);
+  };
+
+  const handleSearch = () => {
+    setPage(0);
+    setSearchQuery(filterName);
   };
 
   const handleDeleteRow = async (id) => {
@@ -200,6 +205,7 @@ export default function StaffListPage() {
 
   const handleResetFilter = () => {
     setFilterName('');
+    setSearchQuery('');
     setFilterRole('all');
     setFilterStatus('all');
     setPage(0);
@@ -386,6 +392,7 @@ export default function StaffListPage() {
                 isFiltered={isFiltered}
                 filterName={filterName}
                 onFilterName={handleFilterName}
+                onSearch={handleSearch}
                 onResetFilter={handleResetFilter}
               />
             </Box>

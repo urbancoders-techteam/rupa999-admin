@@ -14,6 +14,7 @@ UserBidHistoryTableToolbar.propTypes = {
   selectedGameType: PropTypes.object,
   selectedStatus: PropTypes.object,
   onFilterName: PropTypes.func,
+  onSearch: PropTypes.func,
   onGameTypeChange: PropTypes.func,
   onStatusChange: PropTypes.func,
   onResetFilter: PropTypes.func,
@@ -25,6 +26,7 @@ export default function UserBidHistoryTableToolbar({
   selectedGameType,
   selectedStatus,
   onFilterName,
+  onSearch,
   onGameTypeChange,
   onStatusChange,
   onResetFilter,
@@ -87,6 +89,21 @@ export default function UserBidHistoryTableToolbar({
             }}
           />
         </Grid>
+
+        {/* Search Button */}
+        {onSearch && (
+          <Grid item xs={12} sm={6} md={2}>
+            <Button
+              variant="contained"
+              onClick={onSearch}
+              startIcon={<Iconify icon="eva:search-fill" />}
+              fullWidth
+              sx={{ height: '40px' }}
+            >
+              Search
+            </Button>
+          </Grid>
+        )}
 
         {/* Game Type Autocomplete */}
         <Grid item xs={12} sm={6} md={3}>

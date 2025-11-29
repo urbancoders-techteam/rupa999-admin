@@ -90,7 +90,8 @@ export default function StarLineMarketsRecordListPage() {
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
-  const [filterName, setFilterName] = useState('');
+  const [filterName, setFilterName] = useState(''); // Input field value
+  const [searchQuery, setSearchQuery] = useState(''); // Actual search value for filtering
 
   const [selectedDropDown, setSelectedDropDown] = useState('');
 
@@ -108,11 +109,11 @@ export default function StarLineMarketsRecordListPage() {
       applyFilter({
         inputData: tableData,
         comparator: getComparator(order, orderBy),
-        filterName,
+        filterName: searchQuery,
         selectedDropDown,
         filterStatus,
       }),
-    [tableData, order, orderBy, filterName, selectedDropDown, filterStatus]
+    [tableData, order, orderBy, searchQuery, selectedDropDown, filterStatus]
   );
 
   // Memoized paginated data
@@ -125,10 +126,10 @@ export default function StarLineMarketsRecordListPage() {
 
   const isMobile = useResponsive('down', 'sm');
 
-  const isFiltered = filterName !== '' || selectedDropDown !== 'all' || filterStatus !== 'all';
+  const isFiltered = searchQuery !== '' || selectedDropDown !== 'all' || filterStatus !== 'all';
 
   const isNotFound =
-    (!dataFiltered.length && !!filterName) ||
+    (!dataFiltered.length && !!searchQuery) ||
     (!dataFiltered.length && !!selectedDropDown) ||
     (!dataFiltered.length && !!filterStatus);
 
@@ -137,8 +138,12 @@ export default function StarLineMarketsRecordListPage() {
   };
 
   const handleFilterName = (event) => {
-    setPage(0);
     setFilterName(event.target.value);
+  };
+
+  const handleSearch = () => {
+    setPage(0);
+    setSearchQuery(filterName);
   };
 
   const handleSelectedDropDown = (items) => {
@@ -190,8 +195,10 @@ export default function StarLineMarketsRecordListPage() {
 
   const handleResetFilter = () => {
     setFilterName('');
+    setSearchQuery('');
     setSelectedDropDown('');
     setFilterStatus('all');
+    setPage(0);
   };
 
   return (
@@ -219,6 +226,7 @@ export default function StarLineMarketsRecordListPage() {
               onselectedDropDown={handleSelectedDropDown}
               onDateFilter = {handleDateFilter}
               onFilterName={handleFilterName}
+              onSearch={handleSearch}
               onResetFilter={handleResetFilter}
               sx={{ mt: 1 }}
             />
@@ -239,6 +247,7 @@ export default function StarLineMarketsRecordListPage() {
               selectedDropDown={selectedDropDown}
               onselectedDropDown={handleSelectedDropDown}
               onFilterName={handleFilterName}
+              onSearch={handleSearch}
               onResetFilter={handleResetFilter}
               sx={{ mt: 1 }}
             />

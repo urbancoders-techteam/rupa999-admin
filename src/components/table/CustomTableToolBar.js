@@ -44,12 +44,12 @@ export default function CustomTableToolbar({
   return (
     <Grid
       container
-      spacing={2}
+      spacing={{ xs: 1.5, sm: 2 }}
       alignItems="center"
       justifyContent="flex-start"
       sx={{
-        px: { xs: 1.5, md: 2.5 },
-        py: { xs: 1.5, md: 2.5 },
+        px: { xs: 0, sm: 1.5, md: 2.5 },
+        py: { xs: 1, sm: 1.5, md: 2.5 },
       }}
     >
       {/* Search Field */}
@@ -63,9 +63,14 @@ export default function CustomTableToolbar({
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
+                <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', fontSize: { xs: 18, sm: 20 } }} />
               </InputAdornment>
             ),
+          }}
+          sx={{
+            '& .MuiInputBase-root': {
+              fontSize: { xs: '0.875rem', sm: '1rem' },
+            },
           }}
         />
       </Grid>
@@ -87,8 +92,18 @@ export default function CustomTableToolbar({
             SelectProps={{
               MenuProps: {
                 PaperProps: {
-                  sx: { maxHeight: 260 },
+                  sx: { 
+                    maxHeight: { xs: 200, sm: 260 },
+                    '& .MuiMenuItem-root': {
+                      fontSize: { xs: '0.875rem', sm: '1rem' },
+                    },
+                  },
                 },
+              },
+            }}
+            sx={{
+              '& .MuiInputBase-root': {
+                fontSize: { xs: '0.875rem', sm: '1rem' },
               },
             }}
           >
@@ -108,6 +123,7 @@ export default function CustomTableToolbar({
                     borderRadius: 0.75,
                     typography: 'body2',
                     textTransform: 'capitalize',
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
                   }}
                 >
                   {label}
@@ -123,12 +139,21 @@ export default function CustomTableToolbar({
         <Grid item xs={12} sm={6} md={3}>
           <DatePicker
             label="Select Date"
-            format="DD/MM/YYYY"
+            inputFormat="dd/MM/yyyy"
             value={selectedDate}
             onChange={onDateFilter}
-            slotProps={{
-              textField: { size: 'small', fullWidth: true },
-            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                size="small"
+                fullWidth
+                sx={{
+                  '& .MuiInputBase-root': {
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
+                  },
+                }}
+              />
+            )}
           />
         </Grid>
       )}
@@ -139,8 +164,12 @@ export default function CustomTableToolbar({
           <Button
             variant="contained"
             onClick={handleSearchClick}
-            startIcon={<Iconify icon="eva:search-fill" />}
-            sx={{ height: '40px' }}
+            startIcon={<Iconify icon="eva:search-fill" sx={{ fontSize: { xs: 18, sm: 20 } }} />}
+            fullWidth
+            sx={{ 
+              height: { xs: '36px', sm: '40px' },
+              fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+            }}
           >
             Search
           </Button>
@@ -154,8 +183,11 @@ export default function CustomTableToolbar({
             fullWidth
             color="error"
             onClick={onResetFilter}
-            startIcon={<Iconify icon="eva:trash-2-outline" />}
-            sx={{ height: '40px' }}
+            startIcon={<Iconify icon="eva:trash-2-outline" sx={{ fontSize: { xs: 18, sm: 20 } }} />}
+            sx={{ 
+              height: { xs: '36px', sm: '40px' },
+              fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+            }}
           >
             Clear
           </Button>

@@ -66,7 +66,8 @@ export default function StarLineMarketsListPage() {
 
   const [tableData, setTableData] = useState(_marketjson);
 
-  const [filterName, setFilterName] = useState('');
+  const [filterName, setFilterName] = useState(''); // Input field value
+  const [searchQuery, setSearchQuery] = useState(''); // Actual search value for filtering
 
   const [filterRole, setFilterRole] = useState('all');
 
@@ -78,11 +79,11 @@ export default function StarLineMarketsListPage() {
       applyFilter({
         inputData: tableData,
         comparator: getComparator(order, orderBy),
-        filterName,
+        filterName: searchQuery,
         filterRole,
         filterStatus,
       }),
-    [tableData, order, orderBy, filterName, filterRole, filterStatus]
+    [tableData, order, orderBy, searchQuery, filterRole, filterStatus]
   );
 
   // Memoized paginated data
@@ -95,17 +96,21 @@ export default function StarLineMarketsListPage() {
 
   const isMobile = useResponsive('down', 'sm');
 
-  const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
+  const isFiltered = searchQuery !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
   const isNotFound =
-    (!dataFiltered.length && !!filterName) ||
+    (!dataFiltered.length && !!searchQuery) ||
     (!dataFiltered.length && !!filterRole) ||
     (!dataFiltered.length && !!filterStatus);
 
 
   const handleFilterName = (event) => {
-    setPage(0);
     setFilterName(event.target.value);
+  };
+
+  const handleSearch = () => {
+    setPage(0);
+    setSearchQuery(filterName);
   };
 
   const handleDeleteRow = (id) => {
@@ -126,8 +131,10 @@ export default function StarLineMarketsListPage() {
 
   const handleResetFilter = () => {
     setFilterName('');
+    setSearchQuery('');
     setFilterRole('all');
     setFilterStatus('all');
+    setPage(0);
   };
 
   return (
@@ -161,6 +168,7 @@ export default function StarLineMarketsListPage() {
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
+              onSearch={handleSearch}
               onResetFilter={handleResetFilter}
               sx={{ mt: 1 }}
             />
@@ -189,6 +197,7 @@ export default function StarLineMarketsListPage() {
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
+              onSearch={handleSearch}
               onResetFilter={handleResetFilter}
               sx={{ mt: 1 }}
             />

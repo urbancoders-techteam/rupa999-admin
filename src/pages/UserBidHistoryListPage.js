@@ -70,7 +70,8 @@ export default function UserBidHistoryListPage() {
     (state) => state.user
   );
 
-  const [filterName, setFilterName] = useState('');
+  const [filterName, setFilterName] = useState(''); // Input field value
+  const [searchQuery, setSearchQuery] = useState(''); // Actual search value sent to API
   const [filterGameType, setFilterGameType] = useState(null);
   const [filterStatus, setFilterStatus] = useState(null);
 
@@ -84,13 +85,13 @@ export default function UserBidHistoryListPage() {
           userId,
           page: page + 1, // API uses 1-based pagination
           limit: rowsPerPage,
-          search: filterName,
+          search: searchQuery,
           gameType: filterGameType?.value || '',
           status: filterStatus?.value || '',
         })
       );
     }
-  }, [dispatch, userId, page, rowsPerPage, filterName, filterGameType, filterStatus]);
+  }, [dispatch, userId, page, rowsPerPage, searchQuery, filterGameType, filterStatus]);
 
   // Transform API data to table format
   const tableData = useMemo(
@@ -119,13 +120,17 @@ export default function UserBidHistoryListPage() {
 
   const isMobile = useResponsive('down', 'sm');
 
-  const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== null || filterGameType !== null;
+  const isFiltered = searchQuery !== '' || filterRole !== 'all' || filterStatus !== null || filterGameType !== null;
 
   const isNotFound = !bidHistoryLoading && !tableData.length;
 
   const handleFilterName = (event) => {
-    setPage(0);
     setFilterName(event.target.value);
+  };
+
+  const handleSearch = () => {
+    setPage(0);
+    setSearchQuery(filterName);
   };
 
   const handleGameTypeChange = (gameType) => {
@@ -140,8 +145,10 @@ export default function UserBidHistoryListPage() {
 
   const handleResetFilter = () => {
     setFilterName('');
+    setSearchQuery('');
     setFilterGameType(null);
     setFilterStatus(null);
+    setPage(0);
   };
 
   return (
@@ -195,6 +202,7 @@ export default function UserBidHistoryListPage() {
               selectedGameType={filterGameType}
               selectedStatus={filterStatus}
               onFilterName={handleFilterName}
+              onSearch={handleSearch}
               onGameTypeChange={handleGameTypeChange}
               onStatusChange={handleStatusChange}
               onResetFilter={handleResetFilter}
@@ -221,6 +229,7 @@ export default function UserBidHistoryListPage() {
               selectedGameType={filterGameType}
               selectedStatus={filterStatus}
               onFilterName={handleFilterName}
+              onSearch={handleSearch}
               onGameTypeChange={handleGameTypeChange}
               onStatusChange={handleStatusChange}
               onResetFilter={handleResetFilter}

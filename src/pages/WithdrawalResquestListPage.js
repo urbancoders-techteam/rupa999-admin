@@ -92,7 +92,8 @@ export default function WithdrawalResquestListPage() {
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
-  const [filterName, setFilterName] = useState('');
+  const [filterName, setFilterName] = useState(''); // Input field value
+  const [searchQuery, setSearchQuery] = useState(''); // Actual search value for filtering
 
   const [filterRole, setFilterRole] = useState('all');
 
@@ -160,10 +161,10 @@ export default function WithdrawalResquestListPage() {
     let filtered = [...tableData];
 
     // Filter by name
-    if (filterName) {
+    if (searchQuery) {
       filtered = filtered.filter((item) => {
         const userName = item?.userId?.name || '';
-        return userName.toLowerCase().includes(filterName.toLowerCase());
+        return userName.toLowerCase().includes(searchQuery.toLowerCase());
       });
     }
 
@@ -181,7 +182,7 @@ export default function WithdrawalResquestListPage() {
     });
 
     return stabilized.map((el) => el[0]);
-  }, [tableData, order, orderBy, filterName, filterStatus]);
+  }, [tableData, order, orderBy, searchQuery, filterStatus]);
 
   const dataInPage = useMemo(
     () => dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
@@ -192,7 +193,7 @@ export default function WithdrawalResquestListPage() {
 
   const isMobile = useResponsive('down', 'sm');
 
-  const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
+  const isFiltered = searchQuery !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
   const isNotFound = !loading && tableData.length === 0 && !isFiltered;
 
@@ -210,8 +211,12 @@ export default function WithdrawalResquestListPage() {
   };
 
   const handleFilterName = (event) => {
-    setPage(0);
     setFilterName(event.target.value);
+  };
+
+  const handleSearch = () => {
+    setPage(0);
+    setSearchQuery(filterName);
   };
 
   const handleDeleteRow = (id) => {
@@ -232,7 +237,9 @@ export default function WithdrawalResquestListPage() {
 
   const handleResetFilter = () => {
     setFilterName('');
+    setSearchQuery('');
     setFilterStatus('all');
+    setPage(0);
   };
 
   const handleAccept = async (id) => {
@@ -331,6 +338,7 @@ export default function WithdrawalResquestListPage() {
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
+              onSearch={handleSearch}
               onResetFilter={handleResetFilter}
             />
             <WithdrawalRequestMobileViewLayout
@@ -345,6 +353,7 @@ export default function WithdrawalResquestListPage() {
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
+              onSearch={handleSearch}
               onResetFilter={handleResetFilter}
             />
 

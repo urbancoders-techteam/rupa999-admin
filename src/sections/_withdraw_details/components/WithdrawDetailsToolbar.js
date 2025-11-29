@@ -12,6 +12,7 @@ WithdrawDetailsToolbar.propTypes = {
   filterUserId: PropTypes.string,
   onFilterName: PropTypes.func,
   onFilterUserId: PropTypes.func,
+  onSearch: PropTypes.func,
   onResetFilter: PropTypes.func,
 };
 
@@ -21,6 +22,7 @@ export default function WithdrawDetailsToolbar({
   filterUserId,
   onFilterName,
   onFilterUserId,
+  onSearch,
   onResetFilter,
 }) {
   return (
@@ -61,6 +63,17 @@ export default function WithdrawDetailsToolbar({
             ),
           }}
         />
+      )}
+
+      {onSearch && (
+        <Button
+          variant="contained"
+          onClick={onSearch}
+          startIcon={<Iconify icon="eva:search-fill" />}
+          sx={{ flexShrink: 0 }}
+        >
+          Search
+        </Button>
       )}
 
       {isFiltered && (

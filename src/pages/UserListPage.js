@@ -90,7 +90,8 @@ export default function UserListPage() {
 
   const [openConfirm, setOpenConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
-  const [filterName, setFilterName] = useState('');
+  const [filterName, setFilterName] = useState(''); // Input field value
+  const [searchQuery, setSearchQuery] = useState(''); // Actual search value sent to API
   const [filterRole] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [changePasswordLoading, setChangePasswordLoading] = useState(false);
@@ -110,11 +111,11 @@ export default function UserListPage() {
       getAllUsersAsync({
         page: page + 1, // API uses 1-based pagination
         limit: rowsPerPage,
-        search: filterName,
+        search: searchQuery,
         status: filterStatus !== 'all' ? getStatusForAPI(filterStatus) : '',
       })
     );
-  }, [dispatch, page, rowsPerPage, filterName, filterStatus]);
+  }, [dispatch, page, rowsPerPage, searchQuery, filterStatus]);
 
   // Transform API data to table format
   // Note: API already handles pagination and filtering, so we use the data directly
@@ -154,9 +155,9 @@ export default function UserListPage() {
 
   const isMobile = useResponsive('down', 'sm');
 
-  const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
+  const isFiltered = searchQuery !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
-  const isNotFound = !tableData.length && (!!filterName || filterStatus !== 'all');
+  const isNotFound = !tableData.length && (!!searchQuery || filterStatus !== 'all');
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
@@ -168,8 +169,19 @@ export default function UserListPage() {
   };
 
   const handleFilterName = (event) => {
-    setPage(0);
     setFilterName(event.target.value);
+  };
+
+  const handleSearch = () => {
+    setPage(0);
+    setSearchQuery(filterName);
+  };
+
+  const handleResetFilter = () => {
+    setFilterName('');
+    setSearchQuery('');
+    setFilterStatus('all');
+    setPage(0);
   };
 
   const handleDeleteRow = async (id) => {
@@ -182,7 +194,7 @@ export default function UserListPage() {
         getAllUsersAsync({
           page: page + 1,
           limit: rowsPerPage,
-          search: filterName,
+          search: searchQuery,
           status: filterStatus !== 'all' ? getStatusForAPI(filterStatus) : '',
         })
       );
@@ -218,7 +230,7 @@ export default function UserListPage() {
         getAllUsersAsync({
           page: page + 1,
           limit: rowsPerPage,
-          search: filterName,
+          search: searchQuery,
           status: filterStatus !== 'all' ? getStatusForAPI(filterStatus) : '',
         })
       );
@@ -267,8 +279,8 @@ export default function UserListPage() {
         getAllUsersAsync({
           page: page + 1,
           limit: rowsPerPage,
-          search: filterName,
-          status: filterStatus !== 'all' ? filterStatus : '',
+          search: searchQuery,
+          status: filterStatus !== 'all' ? getStatusForAPI(filterStatus) : '',
         })
       );
       return true;
@@ -334,7 +346,7 @@ export default function UserListPage() {
         <Box
           sx={(theme) => ({
             [theme.breakpoints.down('sm')]: {
-              height: 80, // equal to breadcrumb bar height
+              height: 110, // equal to breadcrumb bar height
             },
           })}
         />
@@ -345,6 +357,8 @@ export default function UserListPage() {
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
+              onSearch={handleSearch}
+              onResetFilter={handleResetFilter}
             />
             <UserMobileViewCardLayout
               data={tableData}
@@ -381,6 +395,8 @@ export default function UserListPage() {
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
+              onSearch={handleSearch}
+              onResetFilter={handleResetFilter}
             />
 
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>

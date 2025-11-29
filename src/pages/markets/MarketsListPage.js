@@ -69,7 +69,8 @@ export default function MarketDetailsPage() {
   // Redux state
   const { marketList, pagination } = useSelector((state) => state.market);
 
-  const [filterName, setFilterName] = useState('');
+  const [filterName, setFilterName] = useState(''); // Input field value
+  const [searchQuery, setSearchQuery] = useState(''); // Actual search value sent to API
   const [filterRole, setFilterRole] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
 
@@ -79,10 +80,10 @@ export default function MarketDetailsPage() {
       getAllMarketsAsync({
         page: page + 1, // API uses 1-based pagination
         limit: rowsPerPage,
-        search: filterName,
+        search: searchQuery,
       })
     );
-  }, [dispatch, page, rowsPerPage, filterName]);
+  }, [dispatch, page, rowsPerPage, searchQuery]);
 
   // Transform API data to table format
   const tableData = marketList.map((market, index) => ({
@@ -115,14 +116,18 @@ export default function MarketDetailsPage() {
 
   const isMobile = useResponsive('down', 'sm');
 
-  const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
+  const isFiltered = searchQuery !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
-  const isNotFound = !tableData.length && (!!filterName || filterStatus !== 'all');
+  const isNotFound = !tableData.length && (!!searchQuery || filterStatus !== 'all');
 
 
   const handleFilterName = (event) => {
-    setPage(0);
     setFilterName(event.target.value);
+  };
+
+  const handleSearch = () => {
+    setPage(0);
+    setSearchQuery(filterName);
   };
 
   const handleDeleteRow = async (id) => {
@@ -134,7 +139,7 @@ export default function MarketDetailsPage() {
         getAllMarketsAsync({
           page: page + 1,
           limit: rowsPerPage,
-          search: filterName,
+          search: searchQuery,
         })
       );
       setSelected([]);
@@ -159,8 +164,10 @@ export default function MarketDetailsPage() {
 
   const handleResetFilter = () => {
     setFilterName('');
+    setSearchQuery('');
     setFilterRole('all');
     setFilterStatus('all');
+    setPage(0);
   };
 
   return (
@@ -193,6 +200,7 @@ export default function MarketDetailsPage() {
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
+              onSearch={handleSearch}
               onResetFilter={handleResetFilter}
               sx={{ mt: 1 }}
             />
@@ -220,6 +228,7 @@ export default function MarketDetailsPage() {
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
+              onSearch={handleSearch}
               onResetFilter={handleResetFilter}
               sx={{ mt: 1 }}
             />

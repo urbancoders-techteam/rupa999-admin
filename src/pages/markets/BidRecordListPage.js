@@ -233,7 +233,8 @@ export default function BidRecordListPage() {
   const [tableData, setTableData] = useState(bidRecordData);
   const [loading, setLoading] = useState(false);
 
-  const [filterName, setFilterName] = useState('');
+  const [filterName, setFilterName] = useState(''); // Input field value
+  const [searchQuery, setSearchQuery] = useState(''); // Actual search value for filtering
   const [filterUserId, setFilterUserId] = useState('');
 
   const [filterRole, setFilterRole] = useState('all');
@@ -245,12 +246,12 @@ export default function BidRecordListPage() {
     () =>
       applyFilter({
         inputData: tableData,
-        filterName,
+        filterName: searchQuery,
         filterUserId,
         filterRole,
         filterStatus,
       }),
-    [tableData, filterName, filterUserId, filterRole, filterStatus]
+    [tableData, searchQuery, filterUserId, filterRole, filterStatus]
   );
 
   // Memoized paginated data
@@ -263,17 +264,21 @@ export default function BidRecordListPage() {
 
   const isMobile = useResponsive('down', 'sm');
 
-  const isFiltered = filterName !== '' || filterUserId !== '' || filterRole !== 'all' || filterStatus !== 'all';
+  const isFiltered = searchQuery !== '' || filterUserId !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
   const isNotFound =
-    (!dataFiltered.length && !!filterName) ||
+    (!dataFiltered.length && !!searchQuery) ||
     (!dataFiltered.length && !!filterRole) ||
     (!dataFiltered.length && !!filterStatus);
 
 
   const handleFilterName = (event) => {
-    setPage(0);
     setFilterName(event.target.value);
+  };
+
+  const handleSearch = () => {
+    setPage(0);
+    setSearchQuery(filterName);
   };
 
   const handleFilterUserId = (event) => {
@@ -299,9 +304,11 @@ export default function BidRecordListPage() {
 
   const handleResetFilter = () => {
     setFilterName('');
+    setSearchQuery('');
     setFilterUserId('');
     setFilterRole('all');
     setFilterStatus('all');
+    setPage(0);
   };
 
   return (
@@ -328,6 +335,7 @@ export default function BidRecordListPage() {
               filterUserId={filterUserId}
               onFilterName={handleFilterName}
               onFilterUserId={handleFilterUserId}
+              onSearch={handleSearch}
               onResetFilter={handleResetFilter}
               sx={{ mt: 1 }}
             />
@@ -351,6 +359,7 @@ export default function BidRecordListPage() {
               filterUserId={filterUserId}
               onFilterName={handleFilterName}
               onFilterUserId={handleFilterUserId}
+              onSearch={handleSearch}
               onResetFilter={handleResetFilter}
               sx={{ mt: 1 }}
             />

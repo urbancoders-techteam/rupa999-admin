@@ -87,7 +87,8 @@ export default function MarketResultListPage() {
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
-  const [filterName, setFilterName] = useState('');
+  const [filterName, setFilterName] = useState(''); // Input field value
+  const [searchQuery, setSearchQuery] = useState(''); // Actual search value for filtering
 
   const [showWinner, setShowWinner] = useState(false);
 
@@ -96,7 +97,7 @@ export default function MarketResultListPage() {
   const dataFiltered = applyFilter({
     inputData: tableData,
     comparator: getComparator(order, orderBy),
-    filterName,
+    filterName: searchQuery,
   });
 
   console.log('dataFiltered :>> ', dataFiltered);
@@ -106,9 +107,9 @@ export default function MarketResultListPage() {
 
   const denseHeight = dense ? 52 : 72;
 
-  const isFiltered = filterName !== '';
+  const isFiltered = searchQuery !== '';
 
-  const isNotFound = !resultList.length && !!filterName;
+  const isNotFound = !resultList.length && !!searchQuery;
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
@@ -119,9 +120,12 @@ export default function MarketResultListPage() {
   };
 
   const handleFilterName = (event) => {
-    setPage(0);
     setFilterName(event.target.value);
-    console.log('event.target.value :>> ', event.target.value);
+  };
+
+  const handleSearch = () => {
+    setPage(0);
+    setSearchQuery(filterName);
   };
 
   const handleDeleteRow = (id) => {
@@ -159,6 +163,8 @@ export default function MarketResultListPage() {
 
   const handleResetFilter = () => {
     setFilterName('');
+    setSearchQuery('');
+    setPage(0);
   };
 
   const onHandleShowWinner = () => {
@@ -205,6 +211,7 @@ export default function MarketResultListPage() {
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
+              onSearch={handleSearch}
               onResetFilter={handleResetFilter}
             />
 

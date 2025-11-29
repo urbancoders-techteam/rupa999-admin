@@ -304,7 +304,7 @@ function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange
 
           {/* Pagination Controls */}
           <Stack direction="row" justifyContent="center" alignItems="center" sx={{ mt: 2, mb: 1 }}>
-            {totalPages > 1 && (
+            {/* {totalPages > 1 && ( */}
               <Pagination
                 count={totalPages}
                 page={page}
@@ -314,7 +314,7 @@ function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange
                 size="small"
                 shape="rounded"
               />
-            )}
+            {/* // )} */}
           </Stack>
         </>
       )}

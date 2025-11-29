@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 // redux
 import { useDispatch, useSelector } from 'react-redux';
 // @mui
-import { Box, Button, Card, Container, Table, TableBody, TableContainer } from '@mui/material';
+import { Box, Button, Card, Container, Table, TableBody, TableContainer, CircularProgress, Typography } from '@mui/material';
 import useResponsive from '../../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
@@ -207,15 +207,34 @@ export default function GeneralMarketRecordListPage() {
         <title> General Market Record : List | Rupa999 </title>
       </Helmet>
 
-      <Container maxWidth={themeStretch ? false : 'xl'}>
+      <Container 
+        maxWidth={themeStretch ? false : 'xl'}
+        sx={{
+          px: { xs: 1, sm: 2, md: 3 },
+          pb: { xs: 2, sm: 3 },
+          pt: { xs: 1, sm: 2 },
+        }}
+      >
         {isMobile ? (
-          <Box sx={{ position: 'sticky', top: 0, zIndex: 10, bgcolor: 'background.paper' }}>
+          <Box 
+            sx={{ 
+              position: 'sticky', 
+              top: 0, 
+              zIndex: 10, 
+              bgcolor: 'background.paper',
+              pb: { xs: 1, sm: 1.5 },
+              mb: { xs: 1, sm: 1.5 },
+              pt: { xs: 1, sm: 1.5 },
+              boxShadow: { xs: '0 2px 4px rgba(0,0,0,0.05)', sm: 'none' },
+            }}
+          >
             <CustomBreadcrumbs
               heading="General Market Record"
               links={[
                 { name: 'Dashboard', href: PATH_DASHBOARD.root },
                 { name: 'General Market Record', href: PATH_DASHBOARD.markets.marketrecords.root },
               ]}
+              sx={{ mb: { xs: 1, sm: 2 } }}
             />
             <CustomTableToolbar
               isFiltered={isFiltered}
@@ -228,7 +247,6 @@ export default function GeneralMarketRecordListPage() {
               onFilterName={handleFilterName}
               onSearch={handleSearch}
               onResetFilter={handleResetFilter}
-              sx={{ mt: 1 }}
             />
           </Box>
         ) : (
@@ -256,24 +274,48 @@ export default function GeneralMarketRecordListPage() {
 
         {/* Render mobile card layout for small screens, otherwise render the table */}
         {isMobile ? (
-          <Box sx={{ mt: 2 }}>
-            <GeneralMarketRecordMVCLayout
-              data={dataFiltered}
-              loading={generalMarketRecordsLoading}
-              onEditRow={(id) => handleEditRow(id)}
-              onDeleteRow={(id) => handleDeleteRow(id)}
-              onSelectRow={(id) => onSelectRow(id)}
-              selected={selected}
-            />
-            <TablePaginationCustom
-              count={generalMarketRecordsPagination?.total || tableData.length}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              onPageChange={onChangePage}
-              onRowsPerPageChange={onChangeRowsPerPage}
-              dense={dense}
-              onChangeDense={onChangeDense}
-            />
+          <Box 
+            sx={{ 
+              mt: { xs: 1, sm: 2 }, 
+              width: '100%', 
+              overflow: 'hidden',
+              minHeight: { xs: 'calc(100vh - 320px)', sm: '400px' },
+            }}
+          >
+            {generalMarketRecordsLoading ? (
+              <Box 
+                sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  alignItems: 'center',
+                  minHeight: { xs: '200px', sm: '300px' },
+                  py: 4,
+                }}
+              >
+                <Box sx={{ textAlign: 'center' }}>
+                  <CircularProgress size={40} />
+                  <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>
+                    Loading records...
+                  </Typography>
+                </Box>
+              </Box>
+            ) : (
+              <>
+                <GeneralMarketRecordMVCLayout
+                  data={dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)}
+                  loading={generalMarketRecordsLoading}
+                  onEditRow={(id) => handleEditRow(id)}
+                  onDeleteRow={(id) => handleDeleteRow(id)}
+                  onSelectRow={(id) => onSelectRow(id)}
+                  selected={selected}
+                  page={page}
+                  rowsPerPage={rowsPerPage}
+                  total={generalMarketRecordsPagination?.total || tableData.length}
+                  onPageChange={onChangePage}
+                  onRowsPerPageChange={onChangeRowsPerPage}
+                />
+              </>
+            )}
           </Box>
         ) : (
           <Card>

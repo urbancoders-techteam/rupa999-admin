@@ -82,7 +82,8 @@ export default function DesignationListPage() {
 
   const [openConfirm, setOpenConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
-  const [filterName, setFilterName] = useState('');
+  const [filterName, setFilterName] = useState(''); // Input field value
+  const [searchQuery, setSearchQuery] = useState(''); // Actual search value sent to API
   const [filterStatus, setFilterStatus] = useState('all');
 
   // Fetch roles on component mount and when filters change
@@ -91,10 +92,10 @@ export default function DesignationListPage() {
       getAllRolesAsync({
         page: page + 1, // API uses 1-based pagination
         limit: rowsPerPage,
-        search: filterName,
+        search: searchQuery,
       })
     );
-  }, [dispatch, page, rowsPerPage, filterName]);
+  }, [dispatch, page, rowsPerPage, searchQuery]);
 
   // Transform API data to table format
   const tableData = useMemo(
@@ -114,8 +115,8 @@ export default function DesignationListPage() {
 
   const dataFiltered = applyFilter({
     inputData: tableData,
-    filterName,
-    filterStatus,
+    filterName: '', // Don't filter by name client-side, API handles it
+    filterStatus: 'all', // Don't filter by status client-side, API handles it
   });
 
   const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
@@ -124,11 +125,9 @@ export default function DesignationListPage() {
 
   const isMobile = useResponsive('down', 'sm');
 
-  const isFiltered = filterName !== '' || filterStatus !== 'all';
+  const isFiltered = searchQuery !== '' || filterStatus !== 'all';
 
-  const isNotFound =
-    (!dataFiltered.length && !!filterName) ||
-    (!dataFiltered.length && !!filterStatus);
+  const isNotFound = !tableData.length && (!!searchQuery || filterStatus !== 'all');
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
@@ -144,8 +143,12 @@ export default function DesignationListPage() {
   };
 
   const handleFilterName = (event) => {
-    setPage(0);
     setFilterName(event.target.value);
+  };
+
+  const handleSearch = () => {
+    setPage(0);
+    setSearchQuery(filterName);
   };
 
   const handleDeleteRow = async (id) => {
@@ -157,7 +160,7 @@ export default function DesignationListPage() {
         getAllRolesAsync({
           page: page + 1,
           limit: rowsPerPage,
-          search: filterName,
+          search: searchQuery,
         })
       );
       setSelected([]);
@@ -199,7 +202,7 @@ export default function DesignationListPage() {
         getAllRolesAsync({
           page: page + 1,
           limit: rowsPerPage,
-          search: filterName,
+          search: searchQuery,
         })
       );
     } catch (error) {
@@ -210,7 +213,9 @@ export default function DesignationListPage() {
 
   const handleResetFilter = () => {
     setFilterName('');
+    setSearchQuery('');
     setFilterStatus('all');
+    setPage(0);
   };
 
   return (
@@ -294,6 +299,7 @@ export default function DesignationListPage() {
             isFiltered={isFiltered}
             filterName={filterName}
             onFilterName={handleFilterName}
+            onSearch={handleSearch}
             onResetFilter={handleResetFilter}
           />
 

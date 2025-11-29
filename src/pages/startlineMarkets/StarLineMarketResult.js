@@ -88,21 +88,22 @@ export default function StarLineMarketResultListPage() {
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
-  const [filterName, setFilterName] = useState('');
+  const [filterName, setFilterName] = useState(''); // Input field value
+  const [searchQuery, setSearchQuery] = useState(''); // Actual search value for filtering
 
   const dataFiltered = applyFilter({
     inputData: tableData,
     comparator: getComparator(order, orderBy),
-    filterName,
+    filterName: searchQuery,
   });
 
   const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   const denseHeight = dense ? 52 : 72;
 
-  const isFiltered = filterName !== '';
+  const isFiltered = searchQuery !== '';
 
-  const isNotFound = !dataFiltered.length && !!filterName;
+  const isNotFound = !dataFiltered.length && !!searchQuery;
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
@@ -113,9 +114,12 @@ export default function StarLineMarketResultListPage() {
   };
 
   const handleFilterName = (event) => {
-    setPage(0);
     setFilterName(event.target.value);
-    console.log('event.target.value :>> ', event.target.value);
+  };
+
+  const handleSearch = () => {
+    setPage(0);
+    setSearchQuery(filterName);
   };
 
   const handleDeleteRow = (id) => {
@@ -153,6 +157,8 @@ export default function StarLineMarketResultListPage() {
 
   const handleResetFilter = () => {
     setFilterName('');
+    setSearchQuery('');
+    setPage(0);
   };
 
   return (
@@ -185,6 +191,7 @@ export default function StarLineMarketResultListPage() {
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
+              onSearch={handleSearch}
               onResetFilter={handleResetFilter}
             />
 

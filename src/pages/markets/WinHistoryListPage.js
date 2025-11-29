@@ -69,7 +69,8 @@ export default function WinHistoryListPage() {
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
-  const [filterName, setFilterName] = useState('');
+  const [filterName, setFilterName] = useState(''); // Input field value
+  const [searchQuery, setSearchQuery] = useState(''); // Actual search value for filtering
 
   const [filterRole, setFilterRole] = useState('all');
 
@@ -107,11 +108,11 @@ export default function WinHistoryListPage() {
     () =>
       applyFilter({
         inputData: tableData,
-        filterName,
+        filterName: searchQuery,
         filterRole,
         filterStatus,
       }),
-    [tableData, filterName, filterRole, filterStatus]
+    [tableData, searchQuery, filterRole, filterStatus]
   );
 
   // Memoized paginated data
@@ -124,10 +125,10 @@ export default function WinHistoryListPage() {
 
   const isMobile = useResponsive('down', 'sm');
 
-  const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
+  const isFiltered = searchQuery !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
   const isNotFound =
-    (!dataFiltered.length && !!filterName) ||
+    (!dataFiltered.length && !!searchQuery) ||
     (!dataFiltered.length && !!filterRole) ||
     (!dataFiltered.length && !!filterStatus);
 
@@ -137,8 +138,12 @@ export default function WinHistoryListPage() {
   };
 
   const handleFilterName = (event) => {
-    setPage(0);
     setFilterName(event.target.value);
+  };
+
+  const handleSearch = () => {
+    setPage(0);
+    setSearchQuery(filterName);
   };
 
   const handleDeleteRow = (id) => {
@@ -162,8 +167,10 @@ export default function WinHistoryListPage() {
 
   const handleResetFilter = () => {
     setFilterName('');
+    setSearchQuery('');
     setFilterRole('all');
     setFilterStatus('all');
+    setPage(0);
   };
 
   return (
@@ -186,6 +193,7 @@ export default function WinHistoryListPage() {
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
+              onSearch={handleSearch}
               onResetFilter={handleResetFilter}
               sx={{ mt: 1 }}
             />
@@ -203,6 +211,7 @@ export default function WinHistoryListPage() {
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
+              onSearch={handleSearch}
               onResetFilter={handleResetFilter}
               sx={{ mt: 1 }}
             />
