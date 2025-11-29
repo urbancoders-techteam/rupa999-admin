@@ -152,7 +152,7 @@ export default function GeneralMarketRecordListPage() {
 
   const denseHeight = dense ? 52 : 72;
 
-  const isMobile = useResponsive('down', 'sm');
+  const isMobile = useResponsive('down', 'md');
 
   const isFiltered = searchQuery !== '' || selectedDropDown !== '' || filterStatus !== 'all';
 
@@ -256,7 +256,7 @@ export default function GeneralMarketRecordListPage() {
 
         {/* Render mobile card layout for small screens, otherwise render the table */}
         {isMobile ? (
-          <>
+          <Box sx={{ mt: 2 }}>
             <GeneralMarketRecordMVCLayout
               data={dataFiltered}
               loading={generalMarketRecordsLoading}
@@ -274,12 +274,12 @@ export default function GeneralMarketRecordListPage() {
               dense={dense}
               onChangeDense={onChangeDense}
             />
-          </>
+          </Box>
         ) : (
           <Card>
-            <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
+            <TableContainer sx={{ position: 'relative', overflow: 'auto' }}>
               <Scrollbar>
-                <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
+                <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: { xs: 600, md: 800 } }}>
                   <TableHeadCustom
                     order={order}
                     orderBy={orderBy}

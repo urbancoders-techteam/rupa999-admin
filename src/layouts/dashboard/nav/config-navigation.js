@@ -115,7 +115,7 @@ const navConfig = [
         path: PATH_DASHBOARD.staff.root,
         icon: ICONS.user,
       },
-    
+
       {
         title: 'settings',
         path: PATH_DASHBOARD.settings.root,
@@ -132,7 +132,19 @@ const navConfig = [
           { title: 'slider images', path: PATH_DASHBOARD.sliderimage.root },
           {
             title: 'Help and Support',
-            //  path: PATH_DASHBOARD.helpsupport.list
+            path: PATH_DASHBOARD.helpsupport.form,
+          },
+          {
+            title: 'Gateway Settings',
+            path: PATH_DASHBOARD.gateway.form,
+          },
+          {
+            title: 'Static Data',
+            path: PATH_DASHBOARD.staticdata.form,
+          },
+          {
+            title: 'Common Setting',
+            path: PATH_DASHBOARD.commonsetting.form,
           },
         ],
       },

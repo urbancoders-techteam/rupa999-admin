@@ -55,6 +55,10 @@ import {
   MainBidHistoryListPage,
   NotificationListPage,
   NotificationFormHandlePage,
+  GatewaySettingFormPage,
+  StaticDataFormPage,
+  CommonSettingFormPage,
+  HelpAndSupportFormPage,
   //
 } from './elements';
 
@@ -185,11 +189,8 @@ export default function Router() {
             {
               path: 'helpsupport',
               children: [
-                { element: <Navigate to="/dashboard/settings/helpsupport" replace />, index: true },
-                // { path: 'list', element: <PanaChartsListPage /> },
-                // { path: 'new', element: <MarketFormHandlePage /> },
-                // { path: ':id/edit', element: <MarketFormHandlePage /> },
-                // { path: ':id/view', element: <MarketFormHandlePage /> },
+                { element: <Navigate to="/dashboard/settings/helpsupport/form" replace />, index: true },
+                { path: 'form', element: <HelpAndSupportFormPage /> },
               ],
             },
             {
@@ -224,6 +225,27 @@ export default function Router() {
                 { path: 'new', element: <NotificationFormHandlePage /> },
                 { path: ':id/edit', element: <NotificationFormHandlePage /> },
                 { path: ':id/view', element: <NotificationFormHandlePage /> },
+              ],
+            },
+            {
+              path: 'gateway',
+              children: [
+                { element: <Navigate to="/dashboard/settings/gateway" replace />, index: true },
+                { path: 'form', element: <GatewaySettingFormPage /> },
+              ],
+            },
+            {
+              path: 'staticdata',
+              children: [
+                { element: <Navigate to="/dashboard/settings/staticdata/form" replace />, index: true },
+                { path: 'form', element: <StaticDataFormPage /> },
+              ],
+            },
+            {
+              path: 'commonsetting',
+              children: [
+                { element: <Navigate to="/dashboard/settings/commonsetting/form" replace />, index: true },
+                { path: 'form', element: <CommonSettingFormPage /> },
               ],
             },
           ],

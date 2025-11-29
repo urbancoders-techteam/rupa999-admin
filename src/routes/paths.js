@@ -93,6 +93,26 @@ export const PATH_DASHBOARD = {
     form: path(ROOTS_DASHBOARD, '/settings/sliderimage/form'),
   },
 
+  gateway: {
+    root: path(ROOTS_DASHBOARD, '/settings/gateway'),
+    form: path(ROOTS_DASHBOARD, '/settings/gateway/form'),
+  },
+
+  helpsupport: {
+    root: path(ROOTS_DASHBOARD, '/settings/helpsupport'),
+    form: path(ROOTS_DASHBOARD, '/settings/helpsupport/form'),
+  },
+
+  staticdata: {
+    root: path(ROOTS_DASHBOARD, '/settings/staticdata'),
+    form: path(ROOTS_DASHBOARD, '/settings/staticdata/form'),
+  },
+
+  commonsetting: {
+    root: path(ROOTS_DASHBOARD, '/settings/commonsetting'),
+    form: path(ROOTS_DASHBOARD, '/settings/commonsetting/form'),
+  },
+
   gift: {
     root: path(ROOTS_DASHBOARD, '/gift'),
     list: path(ROOTS_DASHBOARD, '/gift/list'),

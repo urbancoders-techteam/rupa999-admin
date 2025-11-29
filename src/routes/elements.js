@@ -99,7 +99,7 @@ export const DipositHistoryListPage = Loadable(lazy(() => import('../pages/Dipos
 export const GameTypeFormPage = Loadable(lazy(() => import('../pages/GameTypeFormPage')));
 
 // DASHBOARD: Notifications
-export const NotificationListPage = Loadable(lazy(() => import('../pages/NotificationListPage')));
+export const NotificationListPage = Loadable(lazy(() => import('../pages/settings/NotificationListPage')));
 export const NotificationFormHandlePage = Loadable(lazy(() => import('../sections/_notification/pages/NotificationFormHandle')));
 
 // DASHBOARD: Main Transaction
@@ -107,6 +107,18 @@ export const MainTransactionListPage = Loadable(lazy(() => import('../pages/Main
 
 // DASHBOARD: Main Bid History
 export const MainBidHistoryListPage = Loadable(lazy(() => import('../pages/MainBidHistoryListPage')));
+
+// DASHBOARD: Gateway Settings
+export const GatewaySettingFormPage = Loadable(lazy(() => import('../pages/settings/GatwaySettingFormPage')));
+
+// DASHBOARD: Static Data
+export const StaticDataFormPage = Loadable(lazy(() => import('../pages/settings/StaticDataForm')));
+
+// DASHBOARD: Common Setting
+export const CommonSettingFormPage = Loadable(lazy(() => import('../pages/settings/CommanSettingFormPage')));
+
+// DASHBOARD: Help and Support
+export const HelpAndSupportFormPage = Loadable(lazy(() => import('../pages/settings/HelpAndSupportFormPage')));
 
 // BASIC PAGES
 export const Page500 = Loadable(lazy(() => import('../pages/errorHandlingPage/Page500')));

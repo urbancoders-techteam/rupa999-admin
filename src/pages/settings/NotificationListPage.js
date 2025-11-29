@@ -16,14 +16,14 @@ import {
 } from '@mui/material';
 // routes
 import { useDispatch, useSelector } from 'react-redux';
-import { PATH_DASHBOARD } from '../routes/paths';
+import { PATH_DASHBOARD } from '../../routes/paths';
 // components
-import ConfirmDialog from '../components/confirm-dialog';
-import CustomBreadcrumbs from '../components/custom-breadcrumbs';
-import Iconify from '../components/iconify';
-import Scrollbar from '../components/scrollbar';
-import { useSettingsContext } from '../components/settings';
-import { useSnackbar } from '../components/snackbar';
+import ConfirmDialog from '../../components/confirm-dialog';
+import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
+import Iconify from '../../components/iconify';
+import Scrollbar from '../../components/scrollbar';
+import { useSettingsContext } from '../../components/settings';
+import { useSnackbar } from '../../components/snackbar';
 import {
   emptyRows,
   TableEmptyRows,
@@ -32,9 +32,9 @@ import {
   TablePaginationCustom,
   TableSelectedAction,
   useTable,
-} from '../components/table';
-import { deleteNotificationAsync, getAllNotificationsAsync } from '../redux/services/notification_services';
-import NotificationTableRow from '../sections/_notification/components/NotificationTableRow';
+} from '../../components/table';
+import { deleteNotificationAsync, getAllNotificationsAsync } from '../../redux/services/notification_services';
+import NotificationTableRow from '../../sections/_notification/components/NotificationTableRow';
 
 const TABLE_HEAD = [
   { id: 'sno', label: 'S.no', align: 'left' },

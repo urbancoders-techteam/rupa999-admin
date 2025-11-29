@@ -6,6 +6,7 @@ import Iconify from '../../../components/iconify';
 import Label from '../../../components/label';
 import MenuPopover from '../../../components/menu-popover';
 import { fDateTime } from '../../../utils/formatTime';
+import { fNumber } from '../../../utils/formatNumber';
 
 // ----------------------------------------------------------------------
 
@@ -65,9 +66,9 @@ export default function GeneralMarketRecordTableRow({ index, row, onEditRow }) {
 
         <TableCell align="left">{number}</TableCell>
 
-        <TableCell align="left">{amount}</TableCell>
+        <TableCell align="left">₹{fNumber(amount || 0)}</TableCell>
 
-        <TableCell align="left">{winAmount}</TableCell>
+        <TableCell align="left">₹{fNumber(winAmount || 0)}</TableCell>
 
         <TableCell align="left">
           <Label

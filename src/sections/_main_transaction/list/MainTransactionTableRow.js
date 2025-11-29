@@ -280,7 +280,7 @@ export default function MainTransactionTableRow({ row, index }) {
               {marketName || '—'}
             </Typography>
           )}
-          {debit && (
+          {(debit && gameName) ? (
             <Typography
               variant="subtitle2"
               color="text.secondary"
@@ -300,9 +300,9 @@ export default function MainTransactionTableRow({ row, index }) {
                 },
               })}
             >
-              {debit ? `${gameName} - ${fCurrency(debit)}` : '—'}
+              {debit ? `${gameName} - ${fCurrency(debit)}` : ''}
             </Typography>
-          )}
+          ) : ''}
         </Stack>
       </TableCell>
 
@@ -380,7 +380,7 @@ export default function MainTransactionTableRow({ row, index }) {
             },
           })}
         >
-          {fCurrency(credit > 0 ? credit : '0')}
+          {fCurrency(credit > 0 ? credit : '')}
         </Typography>
       </TableCell>
 
@@ -420,7 +420,7 @@ export default function MainTransactionTableRow({ row, index }) {
             },
           })}
         >
-          {fCurrency(balance)}
+          {balance ? fCurrency(balance) : '-'}
         </Typography>
       </TableCell>
 
