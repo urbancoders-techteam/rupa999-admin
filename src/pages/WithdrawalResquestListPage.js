@@ -1,20 +1,24 @@
 import { paramCase } from 'change-case';
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 // @mui
 import {
   Card,
   Container,
-  Table, TableBody,
-  TableContainer
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
 } from '@mui/material';
 import { Box } from '@mui/system';
 import useResponsive from '../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
 // _mock_
-import { _userDataList } from '../_mock/arrays';
 // components
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 import Scrollbar from '../components/scrollbar';
@@ -28,26 +32,31 @@ import {
   TablePaginationCustom,
   useTable,
 } from '../components/table';
+// services
+import {
+  approveWithdrawalRequestAsync,
+  getAllWithdrawalRequestsAsync,
+  rejectWithdrawalRequestAsync,
+} from '../redux/services/withdrawal_services';
+
 // sections
 import CustomTableToolbar from '../components/table/CustomTableToolBar';
 import WithdrawalRequestMobileViewLayout from '../sections/_users/withdrawal-request/list/WithdrawalRequestMobileViewLayout';
+import WithdrawDetailsTableRow from '../sections/_withdraw_details/components/WithdrawDetailsTableRow';
 
 // ----------------------------------------------------------------------
 
 const STATUS_OPTIONS = ['Creadit', 'Debit'];
 
 const TABLE_HEAD = [
-  { id: 'Action', label: 'Action', align: 'left' },
-  { id: 'id', label: 'ID', align: 'left' },
+  { id: 'index', label: 'ID', align: 'center' },
   { id: 'name', label: 'Name', align: 'left' },
-  { id: 'name', label: 'Phone', align: 'left' },
-  { id: 'digit', label: 'Amount', align: 'left' },
-  { id: 'point', label: 'Request Type', align: 'left' },
-  { id: 'point', label: 'Date', align: 'left' },
-  { id: 'point', label: 'Status', align: 'left' },
-  { id: 'date', label: 'Created At', align: 'left' },
-
-];;
+  { id: 'amount', label: 'Amount', align: 'left' },
+  { id: 'method', label: 'Method', align: 'left' },
+  { id: 'status', label: 'Status', align: 'left' },
+  { id: 'createdAt', label: 'Created At', align: 'left' },
+  { id: 'actions', label: 'Actions', align: 'left' },
+];
 
 // ----------------------------------------------------------------------
 
@@ -72,9 +81,14 @@ export default function WithdrawalResquestListPage() {
   const { themeStretch } = useSettingsContext();
 
   const navigate = useNavigate();
-  // const theme = useTheme();
+  const dispatch = useDispatch();
+  const { id: userId } = useParams();
 
-  const [tableData, setTableData] = useState(_userDataList);
+  const [tableData, setTableData] = useState([]);
+  const [totalItems, setTotalItems] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [acceptLoading, setAcceptLoading] = useState({});
+  const [rejectLoading, setRejectLoading] = useState({});
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
@@ -84,15 +98,95 @@ export default function WithdrawalResquestListPage() {
 
   const [filterStatus, setFilterStatus] = useState('all');
 
-  const dataFiltered = applyFilter({
-    inputData: tableData,
-    comparator: getComparator(order, orderBy),
-    filterName,
-    filterRole,
-    filterStatus,
-  });
+  // Fetch withdrawal requests by userId
+  const fetchWithdrawalRequests = useCallback(async () => {
+    if (!userId) return;
 
-  const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    setLoading(true);
+    try {
+      const params = {
+        page: page + 1, // API uses 1-based pagination
+        limit: rowsPerPage,
+        userId, // Filter by userId
+      };
+
+      const result = await dispatch(getAllWithdrawalRequestsAsync(params)).unwrap();
+      if (result?.data) {
+        // Transform API data to match table structure
+        const transformedData = result.data.map((item) => ({
+          id: item._id || item.id,
+          _id: item._id || item.id,
+          userId: item.userId || {}, // Keep userId object for WithdrawDetailsTableRow
+          amount: item.amount || 0,
+          method: item.method || 'N/A',
+          status: item.status || 'pending',
+          remarks: item.remarks || '-',
+          createdAt: item.createdAt,
+          processedAt: item.processedAt ? new Date(item.processedAt).toLocaleString('en-IN') : null,
+          processedBy: item.processedBy || null,
+          bankDetails: item.bankDetails || null,
+          upiDetails: item.upiDetails || null,
+          ...item,
+        }));
+        setTableData(transformedData);
+        // Store total items from pagination
+        if (result?.pagination?.total) {
+          setTotalItems(result.pagination.total);
+        } else if (result?.pagination?.totalItems) {
+          setTotalItems(result.pagination.totalItems);
+        } else if (result?.totalItems !== undefined) {
+          setTotalItems(result.totalItems);
+        } else if (result?.data?.length !== undefined) {
+          setTotalItems(result.data.length);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch withdrawal requests:', error);
+      toast.error(error?.message || 'Failed to fetch withdrawal requests');
+      setTableData([]);
+      setTotalItems(0);
+    } finally {
+      setLoading(false);
+    }
+  }, [dispatch, userId, page, rowsPerPage]);
+
+  // Fetch withdrawal requests on component mount and when dependencies change
+  useEffect(() => {
+    fetchWithdrawalRequests();
+  }, [fetchWithdrawalRequests]);
+
+  // Memoized filtered data
+  const dataFiltered = useMemo(() => {
+    let filtered = [...tableData];
+
+    // Filter by name
+    if (filterName) {
+      filtered = filtered.filter((item) => {
+        const userName = item?.userId?.name || '';
+        return userName.toLowerCase().includes(filterName.toLowerCase());
+      });
+    }
+
+    // Filter by status
+    if (filterStatus !== 'all') {
+      filtered = filtered.filter((item) => item.status === filterStatus);
+    }
+
+    // Sort data
+    const stabilized = filtered.map((el, index) => [el, index]);
+    stabilized.sort((a, b) => {
+      const orderResult = getComparator(order, orderBy)(a[0], b[0]);
+      if (orderResult !== 0) return orderResult;
+      return a[1] - b[1];
+    });
+
+    return stabilized.map((el) => el[0]);
+  }, [tableData, order, orderBy, filterName, filterStatus]);
+
+  const dataInPage = useMemo(
+    () => dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+    [dataFiltered, page, rowsPerPage]
+  );
 
   const denseHeight = dense ? 52 : 72;
 
@@ -100,10 +194,7 @@ export default function WithdrawalResquestListPage() {
 
   const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
-  const isNotFound = true
-  // (!dataFiltered.length && !!filterName) ||
-  // (!dataFiltered.length && !!filterRole) ||
-  // (!dataFiltered.length && !!filterStatus);
+  const isNotFound = !loading && tableData.length === 0 && !isFiltered;
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
@@ -141,6 +232,37 @@ export default function WithdrawalResquestListPage() {
 
   const handleResetFilter = () => {
     setFilterName('');
+    setFilterStatus('all');
+  };
+
+  const handleAccept = async (id) => {
+    setAcceptLoading((prev) => ({ ...prev, [id]: true }));
+    try {
+      await dispatch(approveWithdrawalRequestAsync({ id, remarks: '' })).unwrap();
+      toast.success('Withdrawal request approved successfully');
+      // Refresh the list
+      fetchWithdrawalRequests();
+    } catch (error) {
+      console.error('Failed to approve withdrawal request:', error);
+      toast.error(error?.message || 'Failed to approve withdrawal request');
+    } finally {
+      setAcceptLoading((prev) => ({ ...prev, [id]: false }));
+    }
+  };
+
+  const handleReject = async (id) => {
+    setRejectLoading((prev) => ({ ...prev, [id]: true }));
+    try {
+      await dispatch(rejectWithdrawalRequestAsync({ id, remarks: '' })).unwrap();
+      toast.success('Withdrawal request rejected successfully');
+      // Refresh the list
+      fetchWithdrawalRequests();
+    } catch (error) {
+      console.error('Failed to reject withdrawal request:', error);
+      toast.error(error?.message || 'Failed to reject withdrawal request');
+    } finally {
+      setRejectLoading((prev) => ({ ...prev, [id]: false }));
+    }
   };
 
   return (
@@ -209,13 +331,12 @@ export default function WithdrawalResquestListPage() {
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
+              onResetFilter={handleResetFilter}
             />
             <WithdrawalRequestMobileViewLayout
               data={dataFiltered}
               onEditRow={handleEditRow}
               onDeleteRow={(id) => handleDeleteRow(id)}
-            // onSelectRow={(id) => onSelectRow(id)}
-            // selected={selected}
             />
           </>
         ) : (
@@ -224,57 +345,48 @@ export default function WithdrawalResquestListPage() {
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
+              onResetFilter={handleResetFilter}
             />
 
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
-              {/* <TableSelectedAction
-                dense={dense}
-                numSelected={selected.length}
-                rowCount={tableData.length}
-                onSelectAllRows={(checked) =>
-                  onSelectAllRows(
-                    checked,
-                    tableData.map((row) => row.id)
-                  )
-                }
-                action={
-                  <Tooltip title="Delete">
-                    <IconButton color="primary" onClick={handleOpenConfirm}>
-                      <Iconify icon="eva:trash-2-outline" />
-                    </IconButton>
-                  </Tooltip>
-                }
-              /> */}
-
               <Scrollbar>
                 <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
                   <TableHeadCustom
                     order={order}
                     orderBy={orderBy}
                     headLabel={TABLE_HEAD}
-                    rowCount={tableData.length}
+                    rowCount={tableData.length || 0}
                     numSelected={selected.length}
                     onSort={onSort}
                   />
 
                   <TableBody>
-                    {/* {dataFiltered
-                      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((row) => (
-                        <UserTableRow
-                          key={row.id}
+                    {loading ? (
+                      <TableRow>
+                        <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
+                          Loading...
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      dataInPage.map((row, index) => (
+                        <WithdrawDetailsTableRow
+                          key={row._id || row.id}
+                          index={(page * rowsPerPage) + index + 1}
                           row={row}
-                          // selected={selected.includes(row.id)}
-                          // onSelectRow={() => onSelectRow(row.id)}
-                          onDeleteRow={() => handleDeleteRow(row.id)}
-                          onEditRow={() => handleEditRow(row.name)}
+                          onAccept={() => handleAccept(row._id || row.id)}
+                          onReject={() => handleReject(row._id || row.id)}
+                          acceptLoading={acceptLoading[row._id || row.id] || false}
+                          rejectLoading={rejectLoading[row._id || row.id] || false}
                         />
-                      ))} */}
+                      ))
+                    )}
 
-                    <TableEmptyRows
-                      height={denseHeight}
-                      emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
-                    />
+                    {!loading && (
+                      <TableEmptyRows
+                        height={denseHeight}
+                        emptyRows={emptyRows(page, rowsPerPage, totalItems || tableData.length)}
+                      />
+                    )}
 
                     <TableNoData isNotFound={isNotFound} />
                   </TableBody>
@@ -283,7 +395,7 @@ export default function WithdrawalResquestListPage() {
             </TableContainer>
 
             <TablePaginationCustom
-              count={dataFiltered.length}
+              count={totalItems || tableData.length}
               page={page}
               rowsPerPage={rowsPerPage}
               onPageChange={onChangePage}
@@ -300,31 +412,3 @@ export default function WithdrawalResquestListPage() {
 }
 
 // ----------------------------------------------------------------------
-
-function applyFilter({ inputData, comparator, filterName, filterStatus, filterRole }) {
-  const stabilizedThis = inputData.map((el, index) => [el, index]);
-
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-
-  inputData = stabilizedThis.map((el) => el[0]);
-
-  if (filterName) {
-    inputData = inputData.filter(
-      (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
-    );
-  }
-
-  if (filterStatus !== 'all') {
-    inputData = inputData.filter((user) => user.status === filterStatus);
-  }
-
-  if (filterRole !== 'all') {
-    inputData = inputData.filter((user) => user.role === filterRole);
-  }
-
-  return inputData;
-}

@@ -76,7 +76,7 @@ function WithdrawDetailsMobileViewCardLayout({
                   Name:
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 500 }}>
-                  {row.name || row.Name || row.marketName || '—'}
+                  {row.userId?.name || row.name || row.Name || row.marketName || '—'}
                 </Typography>
               </Box>
 
@@ -86,7 +86,27 @@ function WithdrawDetailsMobileViewCardLayout({
                   Phone No:
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 500 }}>
-                  {row.phone || row.Phone || row.userPhone || row.phoneNumber || '—'}
+                  {row.userId?.number || row.phone || row.Phone || row.userPhone || row.phoneNumber || '—'}
+                </Typography>
+              </Box>
+
+              {/* Method */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                  Method:
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 500, textTransform: 'capitalize' }}>
+                  {row.method || '—'}
+                </Typography>
+              </Box>
+
+              {/* Status */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                  Status:
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 500, textTransform: 'capitalize' }}>
+                  {row.status || 'pending'}
                 </Typography>
               </Box>
 
@@ -121,29 +141,40 @@ function WithdrawDetailsMobileViewCardLayout({
                 </Typography>
               </Box>
 
-              {/* Accept / Reject Buttons */}
-              <Stack direction="row" spacing={1} sx={{ mt: 2, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-                <LoadingButton
-                  fullWidth
-                  variant="contained"
-                  color="success"
-                  onClick={() => onAccept && onAccept(row.id || row.ID || row._id, row)}
-                  loading={acceptLoading}
-                  sx={{ flex: 1 }}
-                >
-                  Accept
-                </LoadingButton>
-                <LoadingButton
-                  fullWidth
-                  variant="contained"
-                  color="error"
-                  onClick={() => onReject && onReject(row.id || row.ID || row._id, row)}
-                  loading={rejectLoading}
-                  sx={{ flex: 1 }}
-                >
-                  Reject
-                </LoadingButton>
-              </Stack>
+              {/* Accept / Reject Buttons - Only show for pending requests */}
+              {row.status === 'pending' && (
+                <Stack direction="row" spacing={1} sx={{ mt: 2, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+                  <LoadingButton
+                    fullWidth
+                    variant="contained"
+                    color="success"
+                    onClick={() => onAccept && onAccept(row._id || row.id || row.ID, row)}
+                    loading={acceptLoading && (acceptLoading[row._id || row.id || row.ID] || false)}
+                    disabled={rejectLoading && (rejectLoading[row._id || row.id || row.ID] || false)}
+                    sx={{ flex: 1 }}
+                  >
+                    Accept
+                  </LoadingButton>
+                  <LoadingButton
+                    fullWidth
+                    variant="contained"
+                    color="error"
+                    onClick={() => onReject && onReject(row._id || row.id || row.ID, row)}
+                    loading={rejectLoading && (rejectLoading[row._id || row.id || row.ID] || false)}
+                    disabled={acceptLoading && (acceptLoading[row._id || row.id || row.ID] || false)}
+                    sx={{ flex: 1 }}
+                  >
+                    Reject
+                  </LoadingButton>
+                </Stack>
+              )}
+              {row.status !== 'pending' && (
+                <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid', borderColor: 'divider', textAlign: 'center' }}>
+                  <Typography variant="body2" sx={{ color: row.status === 'approved' ? 'success.main' : 'error.main', fontWeight: 600 }}>
+                    {row.status === 'approved' ? '✓ Approved' : '✗ Rejected'}
+                  </Typography>
+                </Box>
+              )}
             </Stack>
           </Card>
         ))}

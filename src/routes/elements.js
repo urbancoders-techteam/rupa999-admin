@@ -5,11 +5,11 @@ import LoadingScreen from '../components/loading-screen';
 // ----------------------------------------------------------------------
 
 const Loadable = (Component) => (props) =>
-  (
-    <Suspense fallback={<LoadingScreen />}>
-      <Component {...props} />
-    </Suspense>
-  );
+(
+  <Suspense fallback={<LoadingScreen />}>
+    <Component {...props} />
+  </Suspense>
+);
 
 // ----------------------------------------------------------------------
 
@@ -37,9 +37,6 @@ export const UserFormHandle = Loadable(lazy(() => import('../sections/_users/for
 export const UserBidHistoryListPage = Loadable(lazy(() => import('../pages/UserBidHistoryListPage')));
 export const UserTransactionListPage = Loadable(lazy(() => import('../pages/UserTransactionListPage')));
 export const WithdrawalResquestListPage = Loadable(lazy(() => import('../pages/WithdrawalResquestListPage')));
-
-// DASHBOARD: Withdraw Details
-export const WithdrawDetailsPage = Loadable(lazy(() => import('../pages/WithdrawDetailsPage')));
 
 // DASHBOARD: Profit
 export const ProfitPage = Loadable(lazy(() => import('../pages/ProfitPage')));
