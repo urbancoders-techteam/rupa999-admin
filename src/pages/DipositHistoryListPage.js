@@ -1,56 +1,47 @@
+import { useEffect, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { paramCase } from 'change-case';
-import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 // @mui
-
-import { Card, Table, TableBody, Container, TableContainer, Box } from '@mui/material';
-import useResponsive from '../hooks/useResponsive';
+import {
+  Card,
+  Container,
+  Table,
+  TableBody,
+  TableContainer,
+  TableRow,
+  TableCell,
+} from '@mui/material';
+// redux
+import { useDispatch, useSelector } from 'react-redux';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
-
-// _mock_
-import {generalWithdrawHistoryData}  from '../_mock/arrays';
-
 // components
-import Scrollbar from '../components/scrollbar';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
+import Scrollbar from '../components/scrollbar';
 import { useSettingsContext } from '../components/settings';
-
-// table
 import {
-  useTable,
-  getComparator,
   emptyRows,
-  TableNoData,
   TableEmptyRows,
   TableHeadCustom,
+  TableNoData,
   TablePaginationCustom,
+  useTable,
 } from '../components/table';
-import CustomTableToolbar from '../components/table/CustomTableToolBar';
-
 // sections
-import WithdrawMobileViewCardLayout from '../sections/_withdraw_details/components/WithdrawDetailsMobileViewCardLayout';
-import GeneralWithdrawHistoryTableRow from '../sections/_general_withdraw_history/components/GeneralWithdrawHistoryTableRow';
+import CustomTableToolbar from '../components/table/CustomTableToolBar';
+import { getAllDepositHistoryAsync } from '../redux/services/user_services';
+import MainTransactionTableRow from '../sections/_main_transaction/list/MainTransactionTableRow';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'actions', label: 'Actions', align: 'left' },
-  { id: 'id', label: 'ID', align: 'left' },
-  { id: 'marketName', label: 'Name', align: 'left' },
+  { id: 'sNo', label: 'S.No.', align: 'center' },
+  { id: 'date', label: 'Date', align: 'left' },
+  { id: 'userName', label: 'User Name', align: 'left' },
   { id: 'userPhone', label: 'Phone', align: 'left' },
-  { id: 'amount', label: 'Amount', align: 'left' },
-  { id: 'payableAmount', label: 'Payable Amount', align: 'left' },
-  { id: 'requestType', label: 'Request Type', align: 'left' },
-  { id: 'withdrawMode', label: 'Withdraw Mode', align: 'left' },
-  { id: 'upiName', label: 'UPI Name', align: 'left' },
-  { id: 'upiID', label: 'UPI ID', align: 'left' },
-  { id: 'bankName', label: 'Bank Name', align: 'left' },
-  { id: 'ifsc', label: 'Bank IFSC', align: 'left' },
-  { id: 'status', label: 'Status', align: 'left' },
-  { id: 'reason', label: 'Faild Reason', align: 'left' },
-  { id: 'createdAt', label: 'Created At', align: 'left' },
+  { id: 'credit', label: 'Credit Amount', align: 'left' },
+  { id: 'balance', label: 'Balance', align: 'left' },
+  { id: 'createdBy', label: 'Created By', align: 'left' },
+  { id: 'remarks', label: 'Remarks', align: 'left' },
 ];
 
 // ----------------------------------------------------------------------
@@ -59,77 +50,57 @@ export default function DipositHistoryListPage() {
   const {
     dense,
     page,
-    order,
-    orderBy,
     rowsPerPage,
     setPage,
-    //
-    selected,
-    setSelected,
-    onSelectRow,
-    //
-    onSort,
     onChangeDense,
     onChangePage,
     onChangeRowsPerPage,
   } = useTable();
 
   const { themeStretch } = useSettingsContext();
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const [filterName, setFilterName] = useState('');
-  const [tableData, setTableData] = useState(generalWithdrawHistoryData);
-
-
-  // Memoized filtered data
-  const dataFiltered = useMemo(
-    () =>
-      applyFilter({
-        inputData: tableData,
-        comparator: getComparator(order, orderBy),
-        filterName,
-      }),
-    [tableData, order, orderBy, filterName]
+  // Redux state
+  const { allDepositHistoryList, allDepositHistoryLoading, allDepositHistoryPagination } = useSelector(
+    (state) => state.user
   );
 
-  // Memoized paginated data
-  const dataInPage = useMemo(
-    () => dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [dataFiltered, page, rowsPerPage]
+  // Fetch deposit history on component mount and when pagination changes
+  useEffect(() => {
+    dispatch(
+      getAllDepositHistoryAsync({
+        page: page + 1, // API uses 1-based pagination
+        limit: rowsPerPage,
+      })
+    );
+  }, [dispatch, page, rowsPerPage]);
+
+  // Transform API data to table format
+  const tableData = useMemo(
+    () =>
+      allDepositHistoryList.map((transaction, index) => ({
+        id: transaction._id || index + 1,
+        _id: transaction._id,
+        sno: (page * rowsPerPage) + index + 1, // Calculate S.No. based on pagination
+        date: transaction.date,
+        particulars: transaction.particulars || 'Deposit',
+        debit: 0,
+        credit: transaction.credit || 0,
+        balance: transaction.balance || 0,
+        user: transaction.user,
+        admin: transaction.admin,
+        remarks: transaction.remarks || '-',
+        userName: transaction.user?.name || 'N/A',
+        userPhone: transaction.user?.number || transaction.user?.whatsappNumber || 'N/A',
+        createdBy: transaction.admin?.name || 'System',
+        ...transaction,
+      })),
+    [allDepositHistoryList, page, rowsPerPage]
   );
 
   const denseHeight = dense ? 52 : 72;
 
-  const isMobile = useResponsive('down', 'sm');
-
-  const isFiltered = filterName !== '';
-
-  const isNotFound = !dataFiltered.length && !!filterName || !dataFiltered.length
-
-  const handleFilterName = (event) => {
-    setPage(0);
-    setFilterName(event.target.value);
-  };
-
-  const handleDeleteRow = (id) => {
-    const deleteRow = tableData.filter((row) => row.id !== id);
-    setSelected([]);
-    setTableData(deleteRow);
-
-    if (page > 0) {
-      if (dataInPage.length < 2) {
-        setPage(page - 1);
-      }
-    }
-  };
-
-  const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
-  };
-
-  const handleResetFilter = () => {
-    setFilterName('');
-  };
+  const isNotFound = !allDepositHistoryLoading && !tableData.length;
 
   return (
     <>
@@ -138,133 +109,70 @@ export default function DipositHistoryListPage() {
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
-        {!isMobile ? (
-          <Box sx={{ position: 'sticky', top: 0, zIndex: 10, bgcolor: 'background.paper' }}>
-            <CustomBreadcrumbs
-              heading="Deposit History List"
-              links={[
-                { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                { name: 'Deposit History List', href: PATH_DASHBOARD.diposithistory.root },
-              ]}
-            />
-            <CustomTableToolbar
-              isFiltered={isFiltered}
-              filterName={filterName}
-              onFilterName={handleFilterName}
-              onResetFilter={handleResetFilter}
-              sx={{ mt: 1 }}
-            />
-          </Box>
-        ) : (
-          <>
-            <CustomBreadcrumbs
-              heading="Deposit History List"
-              links={[
-                { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                { name: 'Deposit History List', href: PATH_DASHBOARD.marketrecords.root },
-              ]}
-            />
-            <CustomTableToolbar
-              isFiltered={isFiltered}
-              filterName={filterName}
-              onFilterName={handleFilterName}
-              onResetFilter={handleResetFilter}
-              sx={{ mt: 1 }}
-            />
-          </>
-        )}
+        <CustomBreadcrumbs
+          heading="Deposit History List"
+          links={[
+            { name: 'Dashboard', href: PATH_DASHBOARD.root },
+            { name: 'Deposit History List', href: PATH_DASHBOARD.diposithistory.root },
+          ]}
+        />
 
-        {/* Render mobile card layout for small screens, otherwise render the table */}
-        {isMobile ? (
-          <WithdrawMobileViewCardLayout
-            data={dataFiltered}
-            onEditRow={(id) => handleEditRow(id)}
-            onDeleteRow={(id) => handleDeleteRow(id)}
-            onSelectRow={(id) => onSelectRow(id)}
-            selected={selected}
+        <Card>
+          <CustomTableToolbar />
+
+          <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
+            <Scrollbar>
+              <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: { xs: 500, sm: 800 } }}>
+                <TableHeadCustom
+                  headLabel={TABLE_HEAD}
+                  rowCount={tableData.length}
+                />
+
+                <TableBody>
+                  {allDepositHistoryLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={TABLE_HEAD.length} align="center">
+                        Loading...
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    <>
+                      {tableData.length > 0 ? (
+                        tableData.map((row, index) => (
+                          <MainTransactionTableRow key={row.id || index} row={row} index={row.sno} />
+                        ))
+                      ) : (
+                        <TableNoData isNotFound={isNotFound} />
+                      )}
+
+                      <TableEmptyRows
+                        height={denseHeight}
+                        emptyRows={emptyRows(
+                          page,
+                          rowsPerPage,
+                          allDepositHistoryPagination?.total || tableData.length
+                        )}
+                      />
+                    </>
+                  )}
+                </TableBody>
+              </Table>
+            </Scrollbar>
+          </TableContainer>
+
+          <TablePaginationCustom
+            count={allDepositHistoryPagination?.total || 0}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onPageChange={onChangePage}
+            onRowsPerPageChange={onChangeRowsPerPage}
+            dense={dense}
+            onChangeDense={onChangeDense}
           />
-        ) : (
-          <Card>
-            <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
-              <Scrollbar>
-                <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
-                  <TableHeadCustom
-                    order={order}
-                    orderBy={orderBy}
-                    headLabel={TABLE_HEAD}
-                    rowCount={tableData.length}
-                    numSelected={selected.length}
-                    onSort={onSort}
-                  />
-
-                  <TableBody>
-                    {dataFiltered
-                      ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((row, index) => (
-                        <GeneralWithdrawHistoryTableRow
-                          index={(page * rowsPerPage) + index + 1}
-                          key={row.id}
-                          row={row}
-                          selected={selected.includes(row.id)}
-                          onSelectRow={() => onSelectRow(row.id)}
-                          onDeleteRow={() => handleDeleteRow(row.id)}
-                          onEditRow={() => handleEditRow(row.name)}
-                        />
-                      ))}
-
-                    <TableEmptyRows
-                      height={denseHeight}
-                      emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
-                    />
-
-                    <TableNoData isNotFound={isNotFound} />
-                  </TableBody>
-                </Table>
-              </Scrollbar>
-            </TableContainer>
-            <TablePaginationCustom
-              count={dataFiltered.length}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              onPageChange={onChangePage}
-              onRowsPerPageChange={onChangeRowsPerPage}
-              //
-              dense={dense}
-              onChangeDense={onChangeDense}
-            />
-          </Card>
-        )}
+        </Card>
       </Container>
     </>
   );
 }
 
 // ----------------------------------------------------------------------
-
-function applyFilter({ inputData, comparator, filterName, filterStatus, filterRole }) {
-  const stabilizedThis = inputData.map((el, index) => [el, index]);
-
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-
-  inputData = stabilizedThis.map((el) => el[0]);
-
-  if (filterName) {
-    inputData = inputData.filter(
-      (user) => user.marketName.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
-    );
-  }
-
-  if (filterStatus !== 'all') {
-    inputData = inputData.filter((user) => user.status === filterStatus);
-  }
-
-  if (filterRole !== 'all') {
-    inputData = inputData.filter((user) => user.role === filterRole);
-  }
-
-  return inputData;
-}

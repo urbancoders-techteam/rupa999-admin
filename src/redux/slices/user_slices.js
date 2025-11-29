@@ -8,6 +8,7 @@ import {
   addDeductBalanceAsync,
   getUserBidsAsync,
   getAllLedgersAsync,
+  getAllDepositHistoryAsync,
   getAllBidsAsync,
   getGeneralMarketRecordsAsync,
 } from '../services/user_services';
@@ -64,6 +65,15 @@ const initialState = {
   generalMarketRecordsLoading: false,
   generalMarketRecordsError: null,
   generalMarketRecordsPagination: {
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+  },
+  allDepositHistoryList: [],
+  allDepositHistoryLoading: false,
+  allDepositHistoryError: null,
+  allDepositHistoryPagination: {
     page: 1,
     limit: 10,
     total: 0,
@@ -336,6 +346,31 @@ const userSlice = createSlice({
     builder.addMatcher(isAnyOf(getGeneralMarketRecordsAsync.rejected), (state, { payload }) => {
       state.generalMarketRecordsLoading = false;
       state.generalMarketRecordsError = payload?.message || 'Failed to fetch general market records';
+    });
+    // -------------
+
+    // Get all deposit history ----------
+    builder.addMatcher(isAnyOf(getAllDepositHistoryAsync.pending), (state) => {
+      state.allDepositHistoryLoading = true;
+      state.allDepositHistoryError = null;
+    });
+
+    builder.addMatcher(isAnyOf(getAllDepositHistoryAsync.fulfilled), (state, { payload }) => {
+      state.allDepositHistoryLoading = false;
+      state.allDepositHistoryList = payload?.data || [];
+      if (payload?.pagination) {
+        state.allDepositHistoryPagination = {
+          page: payload.pagination.page || 1,
+          limit: payload.pagination.limit || 10,
+          total: payload.pagination.total || 0,
+          totalPages: payload.pagination.totalPages || 0,
+        };
+      }
+    });
+
+    builder.addMatcher(isAnyOf(getAllDepositHistoryAsync.rejected), (state, { payload }) => {
+      state.allDepositHistoryLoading = false;
+      state.allDepositHistoryError = payload?.message || 'Failed to fetch deposit history';
     });
     // -------------
   },

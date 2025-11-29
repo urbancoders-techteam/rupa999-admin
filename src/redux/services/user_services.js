@@ -142,6 +142,22 @@ export const getAllLedgersAsync = createAsyncThunk(
     })
 );
 
+// Get all deposit history (Admin only)
+export const getAllDepositHistoryAsync = createAsyncThunk(
+  'user/getAllDepositHistory',
+  async (params = {}, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: '/admin/deposits/history',
+      method: 'get',
+      params: {
+        page: params.page || 1,
+        limit: params.limit || 10,
+        userId: params.userId || '',
+      },
+    })
+);
+
 // Get all bids (Admin only)
 export const getAllBidsAsync = createAsyncThunk(
   'user/getAllBids',
