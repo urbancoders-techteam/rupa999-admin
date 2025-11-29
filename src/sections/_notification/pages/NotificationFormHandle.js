@@ -1,18 +1,23 @@
 import { Container } from '@mui/material';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useLocation, useParams, useNavigate } from 'react-router';
-import { useSettingsContext } from '../../../components/settings';
-import { PATH_DASHBOARD } from '../../../routes/paths';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLocation, useNavigate, useParams } from 'react-router';
 import CustomBreadcrumbs from '../../../components/custom-breadcrumbs';
+import { useSettingsContext } from '../../../components/settings';
+import { useSnackbar } from '../../../components/snackbar';
+import { createNotificationAsync, getNotificationByIdAsync, updateNotificationAsync } from '../../../redux/services/notification_services';
+import { PATH_DASHBOARD } from '../../../routes/paths';
 import NotificationForm from '../components/NotificationForm';
-import { addNotification, updateNotification } from '../../../utils/notificationService';
 
 export default function NotificationFormHandle() {
   const { themeStretch } = useSettingsContext();
   const { id } = useParams();
   const { pathname = '', state } = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { enqueueSnackbar } = useSnackbar();
+  const { currentNotification, loading } = useSelector((state) => state.notification);
 
   const editView = useMemo(() => {
     if (id && /edit/i?.test(pathname)) {
@@ -39,13 +44,34 @@ export default function NotificationFormHandle() {
     };
   }, [pathname, id]);
 
-  const handleSubmit = (values) => {
-    if (editView.isEdit && id) {
-      updateNotification(id, values);
-    } else {
-      addNotification(values);
+  // Fetch notification data if editing/viewing
+  useEffect(() => {
+    if ((editView.isEdit || editView.isView) && id && !state) {
+      dispatch(getNotificationByIdAsync(id));
     }
-    navigate(PATH_DASHBOARD.notifications.list);
+  }, [id, editView.isEdit, editView.isView, dispatch, state]);
+
+  // Use state data if available, otherwise use currentNotification from Redux
+  const initialData = useMemo(() => {
+    if (state) return state;
+    if (currentNotification) return currentNotification;
+    return {};
+  }, [state, currentNotification]);
+
+  const handleSubmit = async (values) => {
+    try {
+      if (editView.isEdit && id) {
+        await dispatch(updateNotificationAsync({ id, data: values })).unwrap();
+        enqueueSnackbar('Notification updated successfully', { variant: 'success' });
+      } else {
+        await dispatch(createNotificationAsync(values)).unwrap();
+        enqueueSnackbar('Notification created successfully', { variant: 'success' });
+      }
+      navigate(PATH_DASHBOARD.notifications.list);
+    } catch (error) {
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to save notification';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    }
   };
 
   return (
@@ -57,7 +83,12 @@ export default function NotificationFormHandle() {
       <Container maxWidth={themeStretch ? false : 'lg'}>
         <CustomBreadcrumbs heading={editView.heading} links={[{ name: 'Dashboard', href: PATH_DASHBOARD.root }, { name: 'Notifications', href: PATH_DASHBOARD.notifications.list }, { name: editView.heading }]} />
 
-        <NotificationForm isEdit={editView.isEdit} isView={editView.isView} initialData={state ?? {}} onSubmit={handleSubmit} />
+        <NotificationForm
+          isEdit={editView.isEdit}
+          isView={editView.isView}
+          initialData={initialData}
+          onSubmit={handleSubmit}
+        />
       </Container>
     </>
   );

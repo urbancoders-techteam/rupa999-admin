@@ -1,36 +1,40 @@
-import { Helmet } from 'react-helmet-async';
 import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
 import {
-  Card,
-  Table,
   Button,
-  Tooltip,
-  TableBody,
+  Card,
   Container,
   IconButton,
+  Table,
+  TableBody,
+  TableCell,
   TableContainer,
+  TableRow,
+  Tooltip,
 } from '@mui/material';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
 // components
-import Iconify from '../components/iconify';
-import Scrollbar from '../components/scrollbar';
+import { useDispatch, useSelector } from 'react-redux';
 import ConfirmDialog from '../components/confirm-dialog';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
+import Iconify from '../components/iconify';
+import Scrollbar from '../components/scrollbar';
 import { useSettingsContext } from '../components/settings';
+import { useSnackbar } from '../components/snackbar';
 import {
-  useTable,
   emptyRows,
-  TableNoData,
   TableEmptyRows,
   TableHeadCustom,
-  TableSelectedAction,
+  TableNoData,
   TablePaginationCustom,
+  TableSelectedAction,
+  useTable,
 } from '../components/table';
+import { deleteNotificationAsync, getAllNotificationsAsync } from '../redux/services/notification_services';
 import NotificationTableRow from '../sections/_notification/components/NotificationTableRow';
-import { getNotifications, removeNotification } from '../utils/notificationService';
 
 const TABLE_HEAD = [
   { id: 'sno', label: 'S.no', align: 'left' },
@@ -45,30 +49,68 @@ export default function NotificationListPage() {
 
   const { themeStretch } = useSettingsContext();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { enqueueSnackbar } = useSnackbar();
 
-  const [tableData, setTableData] = useState([]);
+  const { notificationList, loading, pagination } = useSelector((state) => state.notification);
+
   const [openConfirm, setOpenConfirm] = useState(false);
 
   useEffect(() => {
-    setTableData(getNotifications());
-  }, []);
+    dispatch(
+      getAllNotificationsAsync({
+        page: page + 1, // API uses 1-based pagination
+        limit: rowsPerPage,
+      })
+    );
+  }, [dispatch, page, rowsPerPage]);
 
-  const dataInPage = tableData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  // Transform API data to table format
+  const tableData = (notificationList || []).map((notification, index) => ({
+    id: notification._id,
+    _id: notification._id,
+    sno: (page * rowsPerPage) + index + 1,
+    title: notification.title || 'N/A',
+    description: notification.description || 'N/A',
+    createdBy: notification.createdBy?.name || 'N/A',
+    createdAt: notification.createdAt,
+    isActive: notification.isActive,
+  }));
 
-  const handleDeleteRow = (id) => {
-    const next = removeNotification(id);
-    setSelected([]);
-    setTableData(next);
-    if (page > 0 && dataInPage.length < 2) setPage(page - 1);
+  const dataInPage = tableData;
+
+  const handleDeleteRow = async (id) => {
+    try {
+      await dispatch(deleteNotificationAsync(id)).unwrap();
+      enqueueSnackbar('Notification deleted successfully', { variant: 'success' });
+      setSelected([]);
+      // Refresh list
+      dispatch(
+        getAllNotificationsAsync({
+          page: page + 1,
+          limit: rowsPerPage,
+        })
+      );
+    } catch (error) {
+      enqueueSnackbar(error?.message || 'Failed to delete notification', { variant: 'error' });
+    }
   };
 
-  const handleDeleteRows = (selectedRows) => {
-    let next = tableData;
-    selectedRows.forEach((id) => {
-      next = next.filter((r) => r.id !== id);
-    });
-    setSelected([]);
-    setTableData(next);
+  const handleDeleteRows = async (selectedRows) => {
+    try {
+      await Promise.all(selectedRows.map((id) => dispatch(deleteNotificationAsync(id)).unwrap()));
+      enqueueSnackbar(`${selectedRows.length} notification(s) deleted successfully`, { variant: 'success' });
+      setSelected([]);
+      // Refresh list
+      dispatch(
+        getAllNotificationsAsync({
+          page: page + 1,
+          limit: rowsPerPage,
+        })
+      );
+    } catch (error) {
+      enqueueSnackbar(error?.message || 'Failed to delete notifications', { variant: 'error' });
+    }
   };
 
   const handleEditRow = (row) => {
@@ -89,7 +131,7 @@ export default function NotificationListPage() {
           heading="Notifications"
           links={[{ name: 'Dashboard', href: PATH_DASHBOARD.root }, { name: 'Notifications', href: PATH_DASHBOARD.notifications.list }]}
           action={
-            <Button component={RouterLink} to={PATH_DASHBOARD.notifications.new} variant="contained" startIcon={<Iconify icon="eva:plus-fill" /> }>
+            <Button component={RouterLink} to={PATH_DASHBOARD.notifications.new} variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
               New Notification
             </Button>
           }
@@ -116,19 +158,45 @@ export default function NotificationListPage() {
                 <TableHeadCustom order={order} orderBy={orderBy} headLabel={TABLE_HEAD} rowCount={tableData.length} numSelected={selected.length} onSort={onSort} />
 
                 <TableBody>
-                  {tableData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => (
-                    <NotificationTableRow key={row.id} row={row} index={page * rowsPerPage + index + 1} selected={selected.includes(row.id)} onSelectRow={() => onSelectRow(row.id)} onDeleteRow={() => handleDeleteRow(row.id)} onEditRow={() => handleEditRow(row)} />
-                  ))}
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={5} align="center">
+                        Loading...
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    <>
+                      {dataInPage.map((row) => (
+                        <NotificationTableRow
+                          key={row.id}
+                          row={row}
+                          index={row.sno}
+                          selected={selected.includes(row.id)}
+                          onSelectRow={() => onSelectRow(row.id)}
+                          onDeleteRow={() => handleDeleteRow(row.id)}
+                          onEditRow={() => handleEditRow(row)}
+                        />
+                      ))}
 
-                  <TableEmptyRows emptyRows={emptyRows(page, rowsPerPage, tableData.length)} />
+                      <TableEmptyRows emptyRows={emptyRows(page, rowsPerPage, pagination.total || 0)} />
 
-                  <TableNoData isNotFound={!tableData.length} />
+                      <TableNoData isNotFound={!tableData.length && !loading} />
+                    </>
+                  )}
                 </TableBody>
               </Table>
             </Scrollbar>
           </TableContainer>
 
-          <TablePaginationCustom count={tableData.length} page={page} rowsPerPage={rowsPerPage} onPageChange={onChangePage} onRowsPerPageChange={onChangeRowsPerPage} dense={dense} onChangeDense={onChangeDense} />
+          <TablePaginationCustom
+            count={pagination.total || 0}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onPageChange={onChangePage}
+            onRowsPerPageChange={onChangeRowsPerPage}
+            dense={dense}
+            onChangeDense={onChangeDense}
+          />
         </Card>
       </Container>
 
