@@ -17,7 +17,7 @@ export default function NotificationFormHandle() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
-  const { currentNotification, loading } = useSelector((state) => state.notification);
+  const { currentNotification } = useSelector((body) => body.notification);
 
   const editView = useMemo(() => {
     if (id && /edit/i?.test(pathname)) {
