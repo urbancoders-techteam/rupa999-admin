@@ -61,11 +61,8 @@ export default function MainTransactionListPage() {
   const {
     dense,
     page,
-    order,
-    orderBy,
     rowsPerPage,
     setPage,
-    onSort,
     onChangeDense,
     onChangePage,
     onChangeRowsPerPage,
@@ -98,6 +95,7 @@ export default function MainTransactionListPage() {
       allLedgersList.map((transaction, index) => ({
         id: transaction._id || index + 1,
         _id: transaction._id,
+        sno: (page * rowsPerPage) + index + 1, // Calculate S.No. based on pagination
         date: transaction.date,
         particulars: transaction.particulars,
         debit: transaction.debit || 0,
@@ -110,7 +108,7 @@ export default function MainTransactionListPage() {
         wonAmount: transaction.wonAmount || transaction.won || null,
         ...transaction,
       })),
-    [allLedgersList]
+    [allLedgersList, page, rowsPerPage]
   );
 
   const denseHeight = dense ? 52 : 72;
@@ -167,11 +165,8 @@ export default function MainTransactionListPage() {
               <Scrollbar>
                 <Table size={dense ? 'small' : 'medium'} sx={{ minWidth:{xs: 500, sm: 800 }}}>
                   <TableHeadCustom
-                    order={order}
-                    orderBy={orderBy}
                     headLabel={TABLE_HEAD}
                     rowCount={tableData.length}
-                    onSort={onSort}
                   />
 
                   <TableBody>
@@ -185,7 +180,7 @@ export default function MainTransactionListPage() {
                       <>
                         {tableData.length > 0 ? (
                           tableData.map((row, index) => (
-                            <MainTransactionTableRow key={row.id || index} row={row} index={index} />
+                            <MainTransactionTableRow key={row.id || index} row={row} index={row.sno} />
                           ))
                         ) : (
                           <TableNoData isNotFound={isNotFound} />

@@ -16,7 +16,6 @@ import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
 import {
   useTable,
-  getComparator,
   emptyRows,
   TableNoData,
   TableEmptyRows,
@@ -24,7 +23,6 @@ import {
   TablePaginationCustom,
 } from '../../components/table';
 // sections
-import WithdrawDetailsToolbar from '../../sections/_withdraw_details/components/WithdrawDetailsToolbar';
 import GeneralMarketRecordTableRow from '../../sections/_general_market_records/components/GeneralMarketRecordsTableRow';
 import GeneralMarketRecordMVCLayout from '../../sections/_general_market_records/components/GeneralMarketRecordMVCLayout';
 import CustomTableToolbar from '../../components/table/CustomTableToolBar';
@@ -51,7 +49,7 @@ const optionsData = [
 
 const TABLE_HEAD = [
   { id: 'actions', label: 'Actions', align: 'center' },
-  { id: 'id', label: 'ID', align: 'left' },
+  { id: 'sno', label: 'S.No.', align: 'left' },
   { id: 'marketName', label: 'Market Name', align: 'left' },
   { id: 'userName', label: 'User Name', align: 'left' },
   { id: 'userPhone', label: 'User Phone', align: 'left' },
@@ -69,8 +67,6 @@ export default function GeneralMarketRecordListPage() {
   const {
     dense,
     page,
-    order,
-    orderBy,
     rowsPerPage,
     setPage,
     //
@@ -78,7 +74,6 @@ export default function GeneralMarketRecordListPage() {
     setSelected,
     onSelectRow,
     //
-    onSort,
     onChangeDense,
     onChangePage,
     onChangeRowsPerPage,
@@ -109,12 +104,11 @@ export default function GeneralMarketRecordListPage() {
     () =>
       applyFilter({
         inputData: tableData,
-        comparator: getComparator(order, orderBy),
         filterName,
         selectedDropDown,
         filterStatus,
       }),
-    [tableData, order, orderBy, filterName, selectedDropDown, filterStatus]
+    [tableData, filterName, selectedDropDown, filterStatus]
   );
 
   // Memoized paginated data
@@ -262,12 +256,9 @@ export default function GeneralMarketRecordListPage() {
               <Scrollbar>
                 <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
                   <TableHeadCustom
-                    order={order}
-                    orderBy={orderBy}
                     headLabel={TABLE_HEAD}
                     rowCount={tableData.length}
                     numSelected={selected.length}
-                    onSort={onSort}
                   />
 
                   <TableBody>
@@ -275,7 +266,7 @@ export default function GeneralMarketRecordListPage() {
                       ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                       .map((row, index) => (
                         <GeneralMarketRecordTableRow
-                          index={index + 1}
+                          index={(page * rowsPerPage) + index + 1}
                           key={row.id}
                           row={row}
                           selected={selected.includes(row.id)}
@@ -337,30 +328,22 @@ export default function GeneralMarketRecordListPage() {
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, comparator, filterName, filterStatus, selectedDropDown }) {
-  const stabilizedThis = inputData.map((el, index) => [el, index]);
-
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-
-  inputData = stabilizedThis.map((el) => el[0]);
+function applyFilter({ inputData, filterName, filterStatus, selectedDropDown }) {
+  let filteredData = inputData;
 
   if (filterName) {
-    inputData = inputData.filter(
+    filteredData = filteredData.filter(
       (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
     );
   }
 
   if (filterStatus !== 'all') {
-    inputData = inputData.filter((user) => user.status === filterStatus);
+    filteredData = filteredData.filter((user) => user.status === filterStatus);
   }
 
   if (selectedDropDown !== 'all') {
-    inputData = inputData.filter((user) => user.role === selectedDropDown);
+    filteredData = filteredData.filter((user) => user.role === selectedDropDown);
   }
 
-  return inputData;
+  return filteredData;
 }

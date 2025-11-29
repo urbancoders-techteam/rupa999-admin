@@ -15,7 +15,6 @@ import Scrollbar from '../../components/scrollbar';
 import { useSettingsContext } from '../../components/settings';
 import {
   emptyRows,
-  getComparator,
   TableEmptyRows,
   TableHeadCustom,
   TableNoData,
@@ -49,8 +48,6 @@ export default function WinHistoryListPage() {
   const {
     dense,
     page,
-    order,
-    orderBy,
     rowsPerPage,
     setPage,
     //
@@ -58,7 +55,6 @@ export default function WinHistoryListPage() {
     setSelected,
     onSelectRow,
     //
-    onSort,
     onChangeDense,
     onChangePage,
     onChangeRowsPerPage,
@@ -92,8 +88,9 @@ export default function WinHistoryListPage() {
   // Transform API data to table format
   const tableData = useMemo(
     () =>
-      winningBidsList.map((bid) => ({
+      winningBidsList.map((bid, index) => ({
         id: bid._id,
+        sno: (page * rowsPerPage) + index + 1, // Calculate S.No. based on pagination
         marketName: bid.marketId?.name || 'N/A',
         userName: bid.userId?.name || 'N/A',
         session: bid.type || 'N/A',
@@ -102,7 +99,7 @@ export default function WinHistoryListPage() {
         winAmount: bid.winAmount || 0,
         createdAt: bid.createdAt ? new Date(bid.createdAt).toLocaleString() : 'N/A',
       })),
-    [winningBidsList]
+    [winningBidsList, page, rowsPerPage]
   );
 
   // Memoized filtered data
@@ -110,12 +107,11 @@ export default function WinHistoryListPage() {
     () =>
       applyFilter({
         inputData: tableData,
-        comparator: getComparator(order, orderBy),
         filterName,
         filterRole,
         filterStatus,
       }),
-    [tableData, order, orderBy, filterName, filterRole, filterStatus]
+    [tableData, filterName, filterRole, filterStatus]
   );
 
   // Memoized paginated data
@@ -228,12 +224,9 @@ export default function WinHistoryListPage() {
               <Scrollbar>
                 <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
                   <TableHeadCustom
-                    order={order}
-                    orderBy={orderBy}
                     headLabel={TABLE_HEAD}
                     rowCount={tableData.length}
                     numSelected={selected.length}
-                    onSort={onSort}
                   />
 
                   <TableBody>
@@ -249,7 +242,7 @@ export default function WinHistoryListPage() {
                           ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                           .map((row, index) => (
                             <WinHistoryTableRow
-                              index={index}
+                              index={row.sno}
                               key={row.id}
                               row={row}
                               selected={selected.includes(row.id)}
@@ -313,30 +306,22 @@ export default function WinHistoryListPage() {
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, comparator, filterName, filterStatus, filterRole }) {
-  const stabilizedThis = inputData.map((el, index) => [el, index]);
-
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-
-  inputData = stabilizedThis.map((el) => el[0]);
+function applyFilter({ inputData, filterName, filterStatus, filterRole }) {
+  let filteredData = inputData;
 
   if (filterName) {
-    inputData = inputData.filter(
+    filteredData = filteredData.filter(
       (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
     );
   }
 
   if (filterStatus !== 'all') {
-    inputData = inputData.filter((user) => user.status === filterStatus);
+    filteredData = filteredData.filter((user) => user.status === filterStatus);
   }
 
   if (filterRole !== 'all') {
-    inputData = inputData.filter((user) => user.role === filterRole);
+    filteredData = filteredData.filter((user) => user.role === filterRole);
   }
 
-  return inputData;
+  return filteredData;
 }

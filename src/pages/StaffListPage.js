@@ -31,7 +31,6 @@ import Scrollbar from '../components/scrollbar';
 import { useSettingsContext } from '../components/settings';
 import {
   emptyRows,
-  getComparator,
   TableEmptyRows,
   TableHeadCustom,
   TableNoData,
@@ -67,8 +66,6 @@ export default function StaffListPage() {
   const {
     dense,
     page,
-    order,
-    orderBy,
     rowsPerPage,
     setPage,
     //
@@ -76,7 +73,6 @@ export default function StaffListPage() {
     setSelected,
     onSelectAllRows,
     //
-    onSort,
     onChangeDense,
     onChangePage,
     onChangeRowsPerPage,
@@ -106,6 +102,7 @@ export default function StaffListPage() {
   const tableData = staffList.map((staff, index) => ({
     id: staff._id || staff.id || index + 1,
     _id: staff._id,
+    sno: (page * rowsPerPage) + index + 1, // Calculate S.No. based on pagination
     name: staff.name,
     email: staff.email,
     mobileNumber: staff.mobile,
@@ -119,7 +116,6 @@ export default function StaffListPage() {
 
   const dataFiltered = applyFilter({
     inputData: tableData,
-    comparator: getComparator(order, orderBy),
     filterName,
     filterRole,
     filterStatus,
@@ -449,12 +445,9 @@ export default function StaffListPage() {
               <Scrollbar>
                 <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
                   <TableHeadCustom
-                    order={order}
-                    orderBy={orderBy}
                     headLabel={TABLE_HEAD}
                     rowCount={tableData.length}
                     numSelected={selected.length}
-                    onSort={onSort}
                   />
 
                   <TableBody>
@@ -464,7 +457,7 @@ export default function StaffListPage() {
                         <StaffTableRow
                           key={row._id}
                           row={row}
-                          index={index}
+                          index={row.sno}
                           // selected={selected.includes(row.id)}
                           onTransationRow={() => handleTransactionRow(row.id)}
                           onWithdrawalRequestRow={() => handleWithdrawalRequestRow(row._id)}
@@ -519,30 +512,22 @@ export default function StaffListPage() {
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, comparator, filterName, filterStatus, filterRole }) {
-  const stabilizedThis = inputData.map((el, index) => [el, index]);
-
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-
-  inputData = stabilizedThis.map((el) => el[0]);
+function applyFilter({ inputData, filterName, filterStatus, filterRole }) {
+  let filteredData = inputData;
 
   if (filterName) {
-    inputData = inputData.filter(
+    filteredData = filteredData.filter(
       (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
     );
   }
 
   if (filterStatus !== 'all') {
-    inputData = inputData.filter((user) => user.status === filterStatus);
+    filteredData = filteredData.filter((user) => user.status === filterStatus);
   }
 
   if (filterRole !== 'all') {
-    inputData = inputData.filter((user) => user.role === filterRole);
+    filteredData = filteredData.filter((user) => user.role === filterRole);
   }
 
-  return inputData;
+  return filteredData;
 }

@@ -270,7 +270,7 @@ export default function WithdrawDetailsPage() {
                       ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                       .map((row, index) => (
                         <WithdrawDetailsTableRow
-                          index={index + 1}
+                          index={(page * rowsPerPage) + index + 1}
                           key={row.id}
                           row={row}
                           selected={selected.includes(row.id)}

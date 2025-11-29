@@ -58,7 +58,7 @@ export default function MarketTableRow({ index, row, selected, onEditRow, onDele
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
         </TableCell>
-        <TableCell align="center">{index}</TableCell>
+        <TableCell align="center">{index || ''}</TableCell>
 
         <TableCell align="left">
           <Typography variant="subtitle2" noWrap>

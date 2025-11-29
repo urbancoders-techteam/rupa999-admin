@@ -273,7 +273,7 @@ export default function StarLineMarketsRecordListPage() {
                       ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                       .map((row, index) => (
                         <GeneralMarketRecordTableRow
-                          index={index + 1}
+                          index={(page * rowsPerPage) + index + 1}
                           key={row.id}
                           row={row}
                           selected={selected.includes(row.id)}

@@ -9,7 +9,12 @@ export const getAllMarketsAsync = createAsyncThunk(
       toolkit,
       url: '/markets/admin',
       method: 'get',
-      params,
+      params: {
+        page: params.page || 1,
+        limit: params.limit || 10,
+        search: params.search || '',
+        status: params.status || '',
+      },
     })
 );
 

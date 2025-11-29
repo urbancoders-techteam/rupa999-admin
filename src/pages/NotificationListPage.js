@@ -45,7 +45,7 @@ const TABLE_HEAD = [
 ];
 
 export default function NotificationListPage() {
-  const { dense, page, order, orderBy, rowsPerPage, setPage, selected, setSelected, onSelectRow, onSelectAllRows, onSort, onChangeDense, onChangePage, onChangeRowsPerPage, } = useTable();
+  const { dense, page, rowsPerPage, setPage, selected, setSelected, onSelectRow, onSelectAllRows, onChangeDense, onChangePage, onChangeRowsPerPage, } = useTable();
 
   const { themeStretch } = useSettingsContext();
   const navigate = useNavigate();
@@ -155,7 +155,7 @@ export default function NotificationListPage() {
 
             <Scrollbar>
               <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: 600 }}>
-                <TableHeadCustom order={order} orderBy={orderBy} headLabel={TABLE_HEAD} rowCount={tableData.length} numSelected={selected.length} onSort={onSort} />
+                <TableHeadCustom headLabel={TABLE_HEAD} rowCount={tableData.length} numSelected={selected.length} />
 
                 <TableBody>
                   {loading ? (

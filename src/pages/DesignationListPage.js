@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
@@ -29,7 +29,6 @@ import Scrollbar from '../components/scrollbar';
 import { useSettingsContext } from '../components/settings';
 import {
   emptyRows,
-  getComparator,
   TableEmptyRows,
   TableHeadCustom,
   TableNoData,
@@ -61,8 +60,6 @@ export default function DesignationListPage() {
   const {
     dense,
     page,
-    order,
-    orderBy,
     rowsPerPage,
     setPage,
     //
@@ -70,7 +67,6 @@ export default function DesignationListPage() {
     setSelected,
     onSelectAllRows,
     //
-    onSort,
     onChangeDense,
     onChangePage,
     onChangeRowsPerPage,
@@ -101,19 +97,23 @@ export default function DesignationListPage() {
   }, [dispatch, page, rowsPerPage, filterName]);
 
   // Transform API data to table format
-  const tableData = roleList.map((role, index) => ({
-    id: role._id || role.id || index + 1,
-    _id: role._id,
-    designationName: role.roleName,
-    status: role.status, // Keep boolean status for StatusToggleCell
-    statusLabel: role.status ? 'Active' : 'InActive', // String label for filtering
-    createdAt: role.createdAt ? new Date(role.createdAt).toLocaleDateString() : '-',
-    ...role,
-  }));
+  const tableData = useMemo(
+    () =>
+      roleList.map((role, index) => ({
+        id: role._id || role.id || index + 1,
+        _id: role._id,
+        sno: (page * rowsPerPage) + index + 1, // Calculate S.No. based on pagination
+        designationName: role.roleName,
+        status: role.status, // Keep boolean status for StatusToggleCell
+        statusLabel: role.status ? 'Active' : 'InActive', // String label for filtering
+        createdAt: role.createdAt ? new Date(role.createdAt).toLocaleDateString() : '-',
+        ...role,
+      })),
+    [roleList, page, rowsPerPage]
+  );
 
   const dataFiltered = applyFilter({
     inputData: tableData,
-    comparator: getComparator(order, orderBy),
     filterName,
     filterStatus,
   });
@@ -320,12 +320,9 @@ export default function DesignationListPage() {
             <Scrollbar>
               <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
                 <TableHeadCustom
-                  order={order}
-                  orderBy={orderBy}
                   headLabel={TABLE_HEAD}
                   rowCount={tableData.length}
                   numSelected={selected.length}
-                  onSort={onSort}
                 />
 
                 <TableBody>
@@ -334,7 +331,7 @@ export default function DesignationListPage() {
                     .map((row, index) => (
                       <DesignationTableRow
                         key={row.id}
-                        index={index}
+                        index={row.sno}
                         row={row}
                         onEditRow={() => handleEditRow(row._id || row.id, row)}
                         onViewRow={() => handleViewRow(row._id || row.id, row)}
@@ -387,28 +384,20 @@ export default function DesignationListPage() {
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, comparator, filterName, filterStatus }) {
-  const stabilizedThis = inputData.map((el, index) => [el, index]);
-
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-
-  inputData = stabilizedThis.map((el) => el[0]);
+function applyFilter({ inputData, filterName, filterStatus }) {
+  let filteredData = inputData;
 
   if (filterName) {
-    inputData = inputData.filter(
+    filteredData = filteredData.filter(
       (designation) =>
         designation.designationName?.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
     );
   }
 
   if (filterStatus !== 'all') {
-    inputData = inputData.filter((designation) => designation.statusLabel === filterStatus);
+    filteredData = filteredData.filter((designation) => designation.statusLabel === filterStatus);
   }
 
-  return inputData;
+  return filteredData;
 }
 

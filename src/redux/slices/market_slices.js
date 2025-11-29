@@ -16,6 +16,7 @@ const initialState = {
     page: 1,
     limit: 10,
     total: 0,
+    totalPages: 0,
   },
 };
 
@@ -37,16 +38,21 @@ const marketSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(getAllMarketsAsync.fulfilled, (state, action) => {
+      .addCase(getAllMarketsAsync.fulfilled, (state, { payload }) => {
         state.loading = false;
-        state.marketList = action.payload?.data || [];
-        if (action.payload?.pagination) {
-          state.pagination = action.payload.pagination;
+        state.marketList = payload?.data || [];
+        if (payload) {
+          state.pagination = {
+            page: payload.pagination.page || 1,
+            limit: payload.pagination.limit || 10,
+            total: payload.pagination.total || 0,
+            totalPages: payload.pagination.totalPages || 0,
+          };
         }
       })
-      .addCase(getAllMarketsAsync.rejected, (state, action) => {
+      .addCase(getAllMarketsAsync.rejected, (state, {payload} ) => {
         state.loading = false;
-        state.error = action.payload?.message || 'Failed to fetch markets';
+        state.error = payload?.message || 'Failed to fetch markets';
       });
 
     // Get market by ID
@@ -128,4 +134,3 @@ const marketSlice = createSlice({
 
 export const { clearMarketError, clearCurrentMarket } = marketSlice.actions;
 export default marketSlice.reducer;
-

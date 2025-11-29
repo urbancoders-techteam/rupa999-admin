@@ -30,7 +30,6 @@ import Scrollbar from '../components/scrollbar';
 import { useSettingsContext } from '../components/settings';
 import {
   emptyRows,
-  getComparator,
   TableEmptyRows,
   TableHeadCustom,
   TableNoData,
@@ -51,7 +50,7 @@ const STATUS_OPTIONS = ['all', 'Active', 'InActive'];
 
 const TABLE_HEAD = [
   { id: 'Action', label: 'Action', align: 'left' },
-  { id: 'id', label: 'ID', align: 'left' },
+  { id: 'sno', label: 'S.No.', align: 'left' },
   { id: 'name', label: 'Name', align: 'left' },
   { id: 'company', label: 'Phone', align: 'left' },
   { id: 'role', label: 'Balance', align: 'left' },
@@ -69,8 +68,6 @@ export default function UserListPage() {
   const {
     dense,
     page,
-    order,
-    orderBy,
     rowsPerPage,
     setPage,
     //
@@ -78,7 +75,6 @@ export default function UserListPage() {
     setSelected,
     onSelectAllRows,
     //
-    onSort,
     onChangeDense,
     onChangePage,
     onChangeRowsPerPage,
@@ -125,6 +121,7 @@ export default function UserListPage() {
   const tableData = userList.map((user, index) => ({
     id: user._id || user.id || index + 1,
     _id: user._id,
+    sno: (page * rowsPerPage) + index + 1, // Calculate S.No. based on pagination
     name: user.name,
     phone: user.number || user.whatsappNumber,
     balance: user.balance || 0,
@@ -145,10 +142,9 @@ export default function UserListPage() {
     ...user,
   }));
 
-  // Apply only client-side sorting since API handles pagination and filtering
+  // Use tableData directly as API handles pagination and filtering
   const dataFiltered = applyFilter({
     inputData: tableData,
-    comparator: getComparator(order, orderBy),
     filterName: '', // Don't filter by name client-side, API handles it
     filterRole,
     filterStatus: 'all', // Don't filter by status client-side, API handles it
@@ -410,19 +406,16 @@ export default function UserListPage() {
               <Scrollbar>
                 <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
                   <TableHeadCustom
-                    order={order}
-                    orderBy={orderBy}
                     headLabel={TABLE_HEAD}
                     rowCount={tableData.length}
                     numSelected={selected.length}
-                    onSort={onSort}
                   />
 
                   <TableBody>
                     {dataFiltered.map((row, index) => (
                         <UserTableRow
                           key={row._id || row.id}
-                          index={index}
+                          index={row.sno}
                           row={row}
                           onTransationRow={() => handleTransactionRow(row._id || row.id)}
                           onWithdrawalRequestRow={() => handleWithdrawalRequestRow(row._id || row.id)}
@@ -487,30 +480,22 @@ export default function UserListPage() {
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, comparator, filterName, filterStatus, filterRole }) {
-  const stabilizedThis = inputData.map((el, index) => [el, index]);
-
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-
-  inputData = stabilizedThis.map((el) => el[0]);
+function applyFilter({ inputData, filterName, filterStatus, filterRole }) {
+  let filteredData = inputData;
 
   if (filterName) {
-    inputData = inputData.filter(
+    filteredData = filteredData.filter(
       (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
     );
   }
 
   if (filterStatus !== 'all') {
-    inputData = inputData.filter((user) => user.statusLabel === filterStatus);
+    filteredData = filteredData.filter((user) => user.statusLabel === filterStatus);
   }
 
   if (filterRole !== 'all') {
-    inputData = inputData.filter((user) => user.role === filterRole);
+    filteredData = filteredData.filter((user) => user.role === filterRole);
   }
 
-  return inputData;
+  return filteredData;
 }

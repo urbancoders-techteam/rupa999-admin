@@ -20,7 +20,6 @@ import Scrollbar from '../components/scrollbar';
 import { useSettingsContext } from '../components/settings';
 import {
   emptyRows,
-  getComparator,
   TableEmptyRows,
   TableHeadCustom,
   TableNoData,
@@ -53,14 +52,11 @@ export default function MainBidHistoryListPage() {
   const {
     dense,
     page,
-    order,
-    orderBy,
     rowsPerPage,
     setPage,
     //
     selected,
     //
-    onSort,
     onChangeDense,
     onChangePage,
     onChangeRowsPerPage,
@@ -99,6 +95,7 @@ export default function MainBidHistoryListPage() {
       allBidsList.map((bid, index) => ({
         id: bid._id || index + 1,
         _id: bid._id,
+        sno: (page * rowsPerPage) + index + 1, // Calculate S.No. based on pagination
         marketName: bid.marketName || bid.market?.name || '-',
         name: bid.gameName || bid.gameType || bid.name || '-',
         digit: bid.digit || bid.number || '-',
@@ -108,12 +105,11 @@ export default function MainBidHistoryListPage() {
         status: bid.status,
         ...bid,
       })),
-    [allBidsList]
+    [allBidsList, page, rowsPerPage]
   );
 
   const dataFiltered = applyFilter({
     inputData: tableData,
-    comparator: getComparator(order, orderBy),
   });
 
   const denseHeight = dense ? 52 : 72;
@@ -234,12 +230,9 @@ export default function MainBidHistoryListPage() {
               <Scrollbar>
                 <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
                   <TableHeadCustom
-                    order={order}
-                    orderBy={orderBy}
                     headLabel={TABLE_HEAD}
                     rowCount={tableData.length}
                     numSelected={selected.length}
-                    onSort={onSort}
                   />
 
                   <TableBody>
@@ -251,7 +244,7 @@ export default function MainBidHistoryListPage() {
                           tableData.map((row, index) => (
                             <MainBidHistoryTableRow
                               key={row._id || row.id || index}
-                              index={index}
+                              index={row.sno}
                               row={row}
                               selected={selected.includes(row.id)}
                             />
@@ -294,14 +287,6 @@ export default function MainBidHistoryListPage() {
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, comparator }) {
-  const stabilizedThis = inputData.map((el, index) => [el, index]);
-
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-
-  return stabilizedThis.map((el) => el[0]);
+function applyFilter({ inputData }) {
+  return inputData;
 }

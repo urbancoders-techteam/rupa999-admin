@@ -1,5 +1,4 @@
 import { Helmet } from 'react-helmet-async';
-import { paramCase } from 'change-case';
 import { useState, useMemo, useEffect } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
@@ -15,7 +14,6 @@ import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
 import {
   useTable,
-  getComparator,
   emptyRows,
   TableNoData,
   TableEmptyRows,
@@ -23,7 +21,6 @@ import {
   TablePaginationCustom,
 } from '../../components/table';
 import CustomTableToolbar from '../../components/table/CustomTableToolBar';
-import ConfirmDialog from '../../components/confirm-dialog';
 // sections
 import Iconify from '../../components/iconify';
 import MarketTableRow from '../../sections/_markets/components/MarketTableRow';
@@ -36,7 +33,7 @@ import { formatTimeTo12Hour } from '../../utils/formatTime';
 
 const TABLE_HEAD = [
   { id: 'action', label: 'Action', align: 'center' },
-  { id: 'id', label: 'ID', align: 'left' },
+  { id: 'sno', label: 'S.No.', align: 'left' },
   { id: 'name', label: 'Name', align: 'left' },
   { id: 'openTime', label: 'Open Time', align: 'left' },
   { id: 'closeTime', label: 'Close Time', align: 'left' },
@@ -52,8 +49,6 @@ export default function MarketDetailsPage() {
   const {
     dense,
     page,
-    order,
-    orderBy,
     rowsPerPage,
     setPage,
     //
@@ -61,7 +56,6 @@ export default function MarketDetailsPage() {
     setSelected,
     onSelectRow,
     //
-    onSort,
     onChangeDense,
     onChangePage,
     onChangeRowsPerPage,
@@ -73,23 +67,28 @@ export default function MarketDetailsPage() {
   const { enqueueSnackbar } = useSnackbar();
 
   // Redux state
-  const { marketList, loading } = useSelector((state) => state.market);
+  const { marketList, pagination } = useSelector((state) => state.market);
 
-  const [openConfirm, setOpenConfirm] = useState(false);
-  const [deleteId, setDeleteId] = useState(null);
   const [filterName, setFilterName] = useState('');
   const [filterRole, setFilterRole] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
 
-  // Fetch markets on component mount
+  // Fetch markets on component mount and when filters change
   useEffect(() => {
-    dispatch(getAllMarketsAsync());
-  }, [dispatch]);
+    dispatch(
+      getAllMarketsAsync({
+        page: page + 1, // API uses 1-based pagination
+        limit: rowsPerPage,
+        search: filterName,
+      })
+    );
+  }, [dispatch, page, rowsPerPage, filterName]);
 
   // Transform API data to table format
   const tableData = marketList.map((market, index) => ({
-    id: market._id || market.id || index + 1,
+    id: market._id || market.id,
     _id: market._id,
+    sno: (page * rowsPerPage) + index + 1, // Calculate S.No. based on pagination
     name: market.name,
     openTime: market.openTime,
     closeTime: formatTimeTo12Hour(market.closeTime),
@@ -100,23 +99,16 @@ export default function MarketDetailsPage() {
     ...market,
   }));
 
-  // Memoized filtered data
+  // Use tableData directly as API handles pagination and filtering
   const dataFiltered = useMemo(
     () =>
       applyFilter({
         inputData: tableData,
-        comparator: getComparator(order, orderBy),
-        filterName,
+        filterName: '', // Don't filter by name client-side, API handles it
         filterRole,
         filterStatus,
       }),
-    [tableData, order, orderBy, filterName, filterRole, filterStatus]
-  );
-
-  // Memoized paginated data
-  const dataInPage = useMemo(
-    () => dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [dataFiltered, page, rowsPerPage]
+    [tableData, filterRole, filterStatus]
   );
 
   const denseHeight = dense ? 52 : 72;
@@ -125,10 +117,7 @@ export default function MarketDetailsPage() {
 
   const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
-  const isNotFound =
-    (!dataFiltered.length && !!filterName) ||
-    (!dataFiltered.length && !!filterRole) ||
-    (!dataFiltered.length && !!filterStatus);
+  const isNotFound = !tableData.length && (!!filterName || filterStatus !== 'all');
 
 
   const handleFilterName = (event) => {
@@ -141,9 +130,16 @@ export default function MarketDetailsPage() {
       await dispatch(deleteMarketAsync(id)).unwrap();
       enqueueSnackbar('Market deleted successfully!', { variant: 'success' });
       // Refresh the list
-      dispatch(getAllMarketsAsync());
+      dispatch(
+        getAllMarketsAsync({
+          page: page + 1,
+          limit: rowsPerPage,
+          search: filterName,
+        })
+      );
       setSelected([]);
-      if (page > 0 && dataInPage.length < 2) {
+      // Check if we need to go back a page after deletion
+      if (page > 0 && tableData.length === 0) {
         setPage(page - 1);
       }
     } catch (error) {
@@ -151,18 +147,6 @@ export default function MarketDetailsPage() {
     }
   };
 
-  const handleOpenDeleteConfirm = (id) => {
-    setDeleteId(id);
-    setOpenConfirm(true);
-  };
-
-  const handleConfirmDelete = () => {
-    if (deleteId) {
-      handleDeleteRow(deleteId);
-      setDeleteId(null);
-    }
-    setOpenConfirm(false);
-  };
 
   const handleEditRow = (name) => {
     const market = tableData.find((m) => m.name === name);
@@ -245,7 +229,7 @@ export default function MarketDetailsPage() {
         {/* Render mobile card layout for small screens, otherwise render the table */}
         {isMobile ? (
           <MarketMobileViewCardLayout
-            data={dataFiltered}
+            data={tableData}
             onEditRow={handleEditRow}
             onDeleteRow={(id) => handleDeleteRow(id)}
             onSelectRow={(id) => onSelectRow(id)}
@@ -257,32 +241,27 @@ export default function MarketDetailsPage() {
               <Scrollbar>
                 <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
                   <TableHeadCustom
-                    order={order}
-                    orderBy={orderBy}
                     headLabel={TABLE_HEAD}
                     rowCount={tableData.length}
                     numSelected={selected.length}
-                    onSort={onSort}
                   />
 
                   <TableBody>
-                    {dataFiltered
-                      ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((row, index) => (
+                    {dataFiltered.map((row, index) => (
                         <MarketTableRow
-                          index={index + 1}
+                          index={row.sno}
                           key={row.id || row._id}
                           row={row}
                           selected={selected.includes(row.id)}
                           onSelectRow={() => onSelectRow(row.id)}
-                          onDeleteRow={() => handleOpenDeleteConfirm(row._id || row.id)}
+                          onDeleteRow={() => handleDeleteRow(row._id || row.id)}
                           onEditRow={() => handleEditRow(row.name)}
                         />
                       ))}
 
                     <TableEmptyRows
                       height={denseHeight}
-                      emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
+                      emptyRows={emptyRows(0, rowsPerPage, tableData.length)}
                     />
 
                     <TableNoData isNotFound={isNotFound} />
@@ -291,7 +270,7 @@ export default function MarketDetailsPage() {
               </Scrollbar>
             </TableContainer>
             <TablePaginationCustom
-              count={dataFiltered.length}
+              count={pagination?.total || tableData.length || 0}
               page={page}
               rowsPerPage={rowsPerPage}
               onPageChange={onChangePage}
@@ -302,22 +281,6 @@ export default function MarketDetailsPage() {
             />
           </Card>
         )}
-
-        <ConfirmDialog
-          open={openConfirm}
-          onClose={() => setOpenConfirm(false)}
-          title="Delete"
-          content="Are you sure want to delete?"
-          action={
-            <Button
-              variant="contained"
-              color="error"
-              onClick={handleConfirmDelete}
-            >
-              Delete
-            </Button>
-          }
-        />
       </Container>
     </>
   );
@@ -325,30 +288,22 @@ export default function MarketDetailsPage() {
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, comparator, filterName, filterStatus, filterRole }) {
-  const stabilizedThis = inputData.map((el, index) => [el, index]);
-
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-
-  inputData = stabilizedThis.map((el) => el[0]);
+function applyFilter({ inputData, filterName, filterStatus, filterRole }) {
+  let filteredData = inputData;
 
   if (filterName) {
-    inputData = inputData.filter(
+    filteredData = filteredData.filter(
       (marketlist) => marketlist.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
     );
   }
 
   if (filterStatus !== 'all') {
-    inputData = inputData.filter((marketlist) => marketlist.status === filterStatus);
+    filteredData = filteredData.filter((marketlist) => marketlist.status === filterStatus);
   }
 
   if (filterRole !== 'all') {
-    inputData = inputData.filter((marketlist) => marketlist.role === filterRole);
+    filteredData = filteredData.filter((marketlist) => marketlist.role === filterRole);
   }
 
-  return inputData;
+  return filteredData;
 }

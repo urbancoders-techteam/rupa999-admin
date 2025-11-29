@@ -250,7 +250,7 @@ export default function GeneralWithdrawHistoryListPage() {
                       ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                       .map((row, index) => (
                         <GeneralWithdrawHistoryTableRow
-                          index={index + 1}
+                          index={(page * rowsPerPage) + index + 1}
                           key={row.id}
                           row={row}
                           selected={selected.includes(row.id)}

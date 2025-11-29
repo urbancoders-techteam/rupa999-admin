@@ -61,11 +61,8 @@ export default function UserTransactionListPage() {
   const {
     dense,
     page,
-    order,
-    orderBy,
     rowsPerPage,
     setPage,
-    onSort,
     onChangeDense,
     onChangePage,
     onChangeRowsPerPage,
@@ -102,6 +99,7 @@ export default function UserTransactionListPage() {
       transactionsList.map((transaction, index) => ({
         id: transaction._id || index + 1,
         _id: transaction._id,
+        sno: (page * rowsPerPage) + index + 1, // Calculate S.No. based on pagination
         date: transaction.date,
         particulars: transaction.particulars,
         debit: transaction.debit || 0,
@@ -114,7 +112,7 @@ export default function UserTransactionListPage() {
         wonAmount: transaction.wonAmount || transaction.won || null,
         ...transaction,
       })),
-    [transactionsList]
+    [transactionsList, page, rowsPerPage]
   );
 
   const denseHeight = dense ? 52 : 72;
@@ -172,11 +170,8 @@ export default function UserTransactionListPage() {
             <Scrollbar>
               <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: { xs: 500, sm: 800 } }}>
                 <TableHeadCustom
-                  order={order}
-                  orderBy={orderBy}
                   headLabel={TABLE_HEAD}
                   rowCount={tableData.length}
-                  onSort={onSort}
                 />
 
                 <TableBody>
@@ -190,7 +185,7 @@ export default function UserTransactionListPage() {
                     <>
                       {tableData.length > 0 ? (
                         tableData.map((row, index) => (
-                          <TransactionTableRow key={row.id} row={row} index={index} />
+                          <TransactionTableRow key={row.id} row={row} index={row.sno} />
                         ))
                       ) : (
                         <TableNoData isNotFound={isNotFound} />
