@@ -66,9 +66,10 @@ const calculateDigit = (pana) => {
 GeneralCreateResultForm.propTypes = {
   showWinner: PropTypes.bool,
   onHandleShowWinner: PropTypes.func,
+  selectedMarketId: PropTypes.func, // Callback to pass selected marketId
 };
 
-export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner }) {
+export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner, selectedMarketId }) {
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
   const { marketList, loading: marketLoading } = useSelector((state) => state.market);
@@ -116,6 +117,7 @@ export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner
   const { handleSubmit, setValue, control, reset, formState: { isSubmitting } } = methods;
   const usePercentage = useWatch({ control, name: 'usePercentage' });
   const panaValue = useWatch({ control, name: 'pana' });
+  const selectedMarket = useWatch({ control, name: 'market' });
 
   useEffect(() => {
     dispatch(getAllMarketsAsync());
@@ -127,6 +129,19 @@ export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner
       setValue('digit', digit, { shouldValidate: true });
     }
   }, [panaValue, setValue]);
+
+  // Pass selected marketId to parent component
+  useEffect(() => {
+    if (selectedMarketId) {
+      if (selectedMarket) {
+        const marketId = getMarketId(selectedMarket);
+        selectedMarketId(marketId || null);
+      } else {
+        // When market is cleared, pass null to show all data
+        selectedMarketId(null);
+      }
+    }
+  }, [selectedMarket, selectedMarketId]);
 
   const handlePercentageToggle = useCallback(
     (value) => () => setValue('usePercentage', value, { shouldValidate: true }),

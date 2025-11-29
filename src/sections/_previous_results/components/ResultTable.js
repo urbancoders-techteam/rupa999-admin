@@ -1,56 +1,87 @@
-import React, { useState } from 'react';
 import {
   Box,
   Card,
+  CircularProgress,
   Grid,
-  Typography,
+  Pagination,
+  Paper,
+  Stack,
   Table,
-  TableHead,
   TableBody,
-  TableRow,
   TableCell,
   TableContainer,
-  Paper,
-  IconButton,
+  TableHead,
+  TableRow,
+  Typography,
   useMediaQuery,
-  Stack,
-  Pagination,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
+import PropTypes from 'prop-types';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllWinningBidsAsync } from '../../../redux/services/bid_services';
 
-// Dummy table data (10 items for testing scroll + pagination)
-const tableData = Array.from({ length: 10 }).map((_, i) => ({
-  id: i + 1,
-  userName: `User ${i + 1}`,
-  marketName: `Market ${String.fromCharCode(65 + i)}`,
-  number: Math.floor(Math.random() * 90 + 10).toString(),
-  amount: Math.floor(Math.random() * 2000 + 500),
-  winningAmount: i % 2 === 0 ? Math.floor(Math.random() * 3000) : 0,
-  createdAt: '06-11-2025',
-}));
+ResultTable.propTypes = {
+  marketId: PropTypes.string,
+};
 
-export default function ResultTable() {
+export default function ResultTable({ marketId }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const dispatch = useDispatch();
+
+  const { winningBidsList, loading, pagination } = useSelector((state) => state.bid);
 
   // ===== Pagination states =====
   const [page, setPage] = useState(1);
-  const rowsPerPage = 5;
-  const pageCount = Math.ceil(tableData.length / rowsPerPage);
+  const rowsPerPage = 10;
+
+  // Reset page when marketId changes
+  useEffect(() => {
+    setPage(1);
+  }, [marketId]);
+
+  // Fetch winning bids on mount and when page or marketId changes
+  useEffect(() => {
+    const params = {
+      page,
+      limit: rowsPerPage,
+    };
+
+    // Only include marketId if it's provided (not null/undefined/empty)
+    if (marketId) {
+      params.marketId = marketId;
+    }
+
+    dispatch(getAllWinningBidsAsync(params));
+  }, [dispatch, page, marketId]);
 
   const handleChangePage = (_, value) => {
     setPage(value);
   };
 
-  const paginatedData = tableData.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  // Transform API data to table format
+  const tableData = (winningBidsList || []).map((bid) => ({
+    id: bid._id,
+    userName: bid.userId?.name || 'N/A',
+    marketName: bid.marketId?.name || 'N/A',
+    number: bid.bidTable?.digit || 'N/A',
+    amount: bid.totalPoints || 0,
+    winningAmount: bid.winAmount || 0,
+    createdAt: bid.createdAt ? new Date(bid.createdAt).toLocaleDateString('en-GB') : 'N/A',
+  }));
+
+  // Calculate totals (for current page only, or fetch all for accurate totals)
+  const totalBiddingAmount = tableData.reduce((sum, item) => sum + (item.amount || 0), 0);
+  const totalWinningAmount = tableData.reduce((sum, item) => sum + (item.winningAmount || 0), 0);
+
+  const pageCount = pagination?.totalPages || 1;
 
   return (
     <Card sx={{ p: 3, borderRadius: 2, mb: 2 }}>
       {/* ====== Top Summary Cards ====== */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={4}>
           <Box
             sx={{
               bgcolor: 'grey.100',
@@ -59,11 +90,16 @@ export default function ResultTable() {
               textAlign: 'center',
             }}
           >
-            <Typography variant="subtitle2">Total Bidding Amount 0</Typography>
+            <Typography variant="subtitle2">
+              Total Bidding Amount
+            </Typography>
+            <Typography variant="subtitle2">
+              ₹{totalBiddingAmount.toLocaleString('en-IN')}
+            </Typography>
           </Box>
         </Grid>
 
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={4}>
           <Box
             sx={{
               bgcolor: 'grey.100',
@@ -72,13 +108,24 @@ export default function ResultTable() {
               textAlign: 'center',
             }}
           >
-            <Typography variant="subtitle2">Total Winning Amount 0</Typography>
+            <Typography variant="subtitle2">
+              Total Winning Amount
+            </Typography>
+            <Typography variant="subtitle2">
+              ₹{totalWinningAmount.toLocaleString('en-IN')}
+            </Typography>
           </Box>
         </Grid>
       </Grid>
 
+      {loading && (
+        <Box display="flex" justifyContent="center" alignItems="center" py={4}>
+          <CircularProgress />
+        </Box>
+      )}
+
       {/* ====== Desktop Table View ====== */}
-      {!isMobile && (
+      {!loading && !isMobile && (
         <>
           <TableContainer
             component={Paper}
@@ -104,13 +151,12 @@ export default function ResultTable() {
                   <TableCell>Number</TableCell>
                   <TableCell>Amount</TableCell>
                   <TableCell>Winning Amount</TableCell>
-                  <TableCell>Action</TableCell>
                   <TableCell>Created At</TableCell>
                 </TableRow>
               </TableHead>
 
               <TableBody>
-                {paginatedData.map((row) => (
+                {tableData.map((row) => (
                   <TableRow
                     key={row.id}
                     hover
@@ -122,17 +168,17 @@ export default function ResultTable() {
                     <TableCell>{row.userName}</TableCell>
                     <TableCell>{row.marketName}</TableCell>
                     <TableCell>{row.number}</TableCell>
-                    <TableCell>{row.amount}</TableCell>
-                    <TableCell>{row.winningAmount}</TableCell>
+                    <TableCell>₹{row.amount.toLocaleString('en-IN')}</TableCell>
                     <TableCell>
-                      <Box sx={{ display: 'flex', gap: 1 }}>
-                        <IconButton color="primary" size="small">
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                        <IconButton color="error" size="small">
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Box>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: row.winningAmount > 0 ? 'success.main' : 'text.secondary',
+                          fontWeight: 600,
+                        }}
+                      >
+                        ₹{row.winningAmount.toLocaleString('en-IN')}
+                      </Typography>
                     </TableCell>
                     <TableCell>{row.createdAt}</TableCell>
                   </TableRow>
@@ -140,7 +186,7 @@ export default function ResultTable() {
 
                 {tableData.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={7} align="center">
+                    <TableCell colSpan={6} align="center">
                       No records found.
                     </TableCell>
                   </TableRow>
@@ -163,10 +209,10 @@ export default function ResultTable() {
       )}
 
       {/* ====== Mobile Card View ====== */}
-      {isMobile && (
+      {!loading && isMobile && (
         <>
           <Stack spacing={2} sx={{ maxHeight: 480, overflowY: 'auto' }}>
-            {paginatedData.map((row) => (
+            {tableData.map((row) => (
               <Box
                 key={row.id}
                 sx={{
@@ -190,7 +236,7 @@ export default function ResultTable() {
                   Number: <strong>{row.number}</strong>
                 </Typography>
                 <Typography variant="body2">
-                  Amount: <strong>{row.amount}</strong>
+                  Amount: <strong>₹{row.amount.toLocaleString('en-IN')}</strong>
                 </Typography>
                 <Typography variant="body2">
                   Winning Amount:{' '}
@@ -199,7 +245,7 @@ export default function ResultTable() {
                       color: row.winningAmount > 0 ? 'green' : 'red',
                     }}
                   >
-                    {row.winningAmount}
+                    ₹{row.winningAmount.toLocaleString('en-IN')}
                   </strong>
                 </Typography>
 
@@ -210,16 +256,6 @@ export default function ResultTable() {
                 >
                   Created: {row.createdAt}
                 </Typography>
-
-                {/* Action buttons */}
-                <Stack direction="row" spacing={1} mt={1}>
-                  <IconButton color="primary" size="small">
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton color="error" size="small">
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
-                </Stack>
               </Box>
             ))}
 

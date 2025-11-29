@@ -91,6 +91,8 @@ export default function MarketResultListPage() {
 
   const [showWinner, setShowWinner] = useState(false);
 
+  const [selectedMarketId, setSelectedMarketId] = useState(null);
+
   const dataFiltered = applyFilter({
     inputData: tableData,
     comparator: getComparator(order, orderBy),
@@ -183,9 +185,13 @@ export default function MarketResultListPage() {
           ]}
         />
 
-        <GeneralCreateResultForm showWinner={showWinner} onHandleShowWinner={onHandleShowWinner} />
+        <GeneralCreateResultForm 
+          showWinner={showWinner} 
+          onHandleShowWinner={onHandleShowWinner}
+          selectedMarketId={setSelectedMarketId}
+        />
 
-        {showWinner === true && <ResultTable />}
+        {showWinner === true && <ResultTable marketId={selectedMarketId} />}
 
         {isMobile ? (
           <PreviousResultMobileViewCardLayout
