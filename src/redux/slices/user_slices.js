@@ -9,6 +9,7 @@ import {
   getUserBidsAsync,
   getAllLedgersAsync,
   getAllBidsAsync,
+  getGeneralMarketRecordsAsync,
 } from '../services/user_services';
 
 const initialState = {
@@ -54,6 +55,15 @@ const initialState = {
   allBidsLoading: false,
   allBidsError: null,
   allBidsPagination: {
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+  },
+  generalMarketRecordsList: [],
+  generalMarketRecordsLoading: false,
+  generalMarketRecordsError: null,
+  generalMarketRecordsPagination: {
     page: 1,
     limit: 10,
     total: 0,
@@ -293,6 +303,39 @@ const userSlice = createSlice({
     builder.addMatcher(isAnyOf(getAllBidsAsync.rejected), (state, { payload }) => {
       state.allBidsLoading = false;
       state.allBidsError = payload?.message || 'Failed to fetch bids';
+    });
+    // -------------
+
+    // Get General Market Records ----------
+    builder.addMatcher(isAnyOf(getGeneralMarketRecordsAsync.pending), (state) => {
+      state.generalMarketRecordsLoading = true;
+      state.generalMarketRecordsError = null;
+    });
+
+    builder.addMatcher(isAnyOf(getGeneralMarketRecordsAsync.fulfilled), (state, { payload }) => {
+      state.generalMarketRecordsLoading = false;
+      state.generalMarketRecordsList = payload?.data || [];
+      if (payload?.pagination) {
+        state.generalMarketRecordsPagination = {
+          page: payload.pagination.page || 1,
+          limit: payload.pagination.limit || 10,
+          total: payload.pagination.total || 0,
+          totalPages: payload.pagination.totalPages || 0,
+        };
+      } else if (payload) {
+        // Fallback for different response structure
+        state.generalMarketRecordsPagination = {
+          page: payload.pagination?.page || 1,
+          limit: payload.pagination?.limit || 10,
+          total: payload.pagination?.total || 0,
+          totalPages: payload.pagination?.totalPages || 0,
+        };
+      }
+    });
+
+    builder.addMatcher(isAnyOf(getGeneralMarketRecordsAsync.rejected), (state, { payload }) => {
+      state.generalMarketRecordsLoading = false;
+      state.generalMarketRecordsError = payload?.message || 'Failed to fetch general market records';
     });
     // -------------
   },

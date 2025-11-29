@@ -1,55 +1,43 @@
-import { Helmet } from 'react-helmet-async';
 import { paramCase } from 'change-case';
-import { useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
+// redux
+import { useDispatch, useSelector } from 'react-redux';
 // @mui
-import { Card, Table, Button, TableBody, Container, TableContainer, Box } from '@mui/material';
+import { Box, Button, Card, Container, Table, TableBody, TableContainer } from '@mui/material';
 import useResponsive from '../../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
-// _mock_
-import { marketRecordData } from '../../_mock/arrays/_market';
 // components
-import Scrollbar from '../../components/scrollbar';
 import ConfirmDialog from '../../components/confirm-dialog';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
+import Scrollbar from '../../components/scrollbar';
 import { useSettingsContext } from '../../components/settings';
 import {
-  useTable,
   emptyRows,
-  TableNoData,
+  getComparator,
   TableEmptyRows,
   TableHeadCustom,
+  TableNoData,
   TablePaginationCustom,
+  TableSkeleton,
+  useTable,
 } from '../../components/table';
 // sections
-import GeneralMarketRecordTableRow from '../../sections/_general_market_records/components/GeneralMarketRecordsTableRow';
-import GeneralMarketRecordMVCLayout from '../../sections/_general_market_records/components/GeneralMarketRecordMVCLayout';
 import CustomTableToolbar from '../../components/table/CustomTableToolBar';
+import GeneralMarketRecordMVCLayout from '../../sections/_general_market_records/components/GeneralMarketRecordMVCLayout';
+import GeneralMarketRecordTableRow from '../../sections/_general_market_records/components/GeneralMarketRecordsTableRow';
+// redux services
+import { getAllMarketsAsync } from '../../redux/services/market_services';
+import { getGeneralMarketRecordsAsync } from '../../redux/services/user_services';
 
 // ----------------------------------------------------------------------
 
-const optionsData = [
-  'SRIDEVI DAY',
-  'TIME BAZAR',
-  'MADHUR DAY',
-  'MILAN DAY',
-  'RAJDHANI DAY',
-  'SUPREME DAY',
-  'KALIYAN',
-  'SRIDEVI NIGHT',
-  'MADHUR NIGHT',
-  'MILAN NIGHT',
-  'KALIYAN NIGHT',
-  'MAIN BAZAR',
-  'RAJDHANI NIGHT',
-  'KARNATAKA DAY',
-  'KARNATAKA NIGHT',
-];
 
 const TABLE_HEAD = [
   { id: 'actions', label: 'Actions', align: 'center' },
-  { id: 'sno', label: 'S.No.', align: 'left' },
+  { id: 'id', label: 'ID', align: 'left' },
   { id: 'marketName', label: 'Market Name', align: 'left' },
   { id: 'userName', label: 'User Name', align: 'left' },
   { id: 'userPhone', label: 'User Phone', align: 'left' },
@@ -67,6 +55,8 @@ export default function GeneralMarketRecordListPage() {
   const {
     dense,
     page,
+    order,
+    orderBy,
     rowsPerPage,
     setPage,
     //
@@ -74,20 +64,30 @@ export default function GeneralMarketRecordListPage() {
     setSelected,
     onSelectRow,
     //
+    onSort,
     onChangeDense,
     onChangePage,
     onChangeRowsPerPage,
   } = useTable();
 
   const { themeStretch } = useSettingsContext();
+  const dispatch = useDispatch();
+
+  // Redux state
+  const {
+    generalMarketRecordsList,
+    generalMarketRecordsLoading,
+    generalMarketRecordsPagination,
+  } = useSelector((state) => state.user);
+
+  const { marketList } = useSelector((state) => state.market);
 
   const navigate = useNavigate();
-
-  const [tableData, setTableData] = useState(marketRecordData);
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
   const [filterName, setFilterName] = useState('');
+  const [searchQuery, setSearchQuery] = useState(''); // Actual search value sent to API
 
   const [selectedDropDown, setSelectedDropDown] = useState('');
 
@@ -95,89 +95,98 @@ export default function GeneralMarketRecordListPage() {
 
   const [selectedDate, setSelectedDate] = useState(new Date());
 
+  // Fetch markets on component mount
+  useEffect(() => {
+    dispatch(getAllMarketsAsync({ page: 1, limit: 100 }));
+  }, [dispatch]);
+
   const handleDateFilter = (newValue) => {
     setSelectedDate(newValue);
   };
 
-  // Memoized filtered data
-  const dataFiltered = useMemo(
+  // Fetch data on component mount and when filters change (but not on filterName change)
+  useEffect(() => {
+    dispatch(
+      getGeneralMarketRecordsAsync({
+        page: page + 1, // API uses 1-based pagination
+        limit: rowsPerPage,
+        search: searchQuery,
+        marketId: selectedDropDown || '',
+        status: filterStatus !== 'all' ? filterStatus : '',
+      })
+    );
+  }, [dispatch, page, rowsPerPage, searchQuery, selectedDropDown, filterStatus]);
+
+  // Transform API data to table format
+  const tableData = useMemo(
     () =>
-      applyFilter({
-        inputData: tableData,
-        filterName,
-        selectedDropDown,
-        filterStatus,
-      }),
-    [tableData, filterName, selectedDropDown, filterStatus]
+      generalMarketRecordsList.map((record, index) => ({
+        id: record.id || index + 1,
+        marketName: record.marketName || '-',
+        userName: record.userName || '-',
+        userPhone: record.userPhone || '-',
+        session: record.session || '-',
+        number: record.number || '-',
+        amount: record.amount || 0,
+        winAmount: record.winAmount || 0,
+        status: record.status || 'PENDING',
+        createdAt: record.createdAt || '-',
+        ...record,
+      })),
+    [generalMarketRecordsList]
   );
 
-  // Memoized paginated data
-  const dataInPage = useMemo(
-    () => dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [dataFiltered, page, rowsPerPage]
+  // Apply client-side sorting
+  const dataFiltered = useMemo(
+    () => {
+      const stabilizedThis = tableData.map((el, index) => [el, index]);
+      stabilizedThis.sort((a, b) => {
+        const sortOrder = getComparator(order, orderBy)(a[0], b[0]);
+        if (sortOrder !== 0) return sortOrder;
+        return a[1] - b[1];
+      });
+      return stabilizedThis.map((el) => el[0]);
+    },
+    [tableData, order, orderBy]
   );
 
   const denseHeight = dense ? 52 : 72;
 
   const isMobile = useResponsive('down', 'sm');
 
-  const isFiltered = filterName !== '' || selectedDropDown !== 'all' || filterStatus !== 'all';
+  const isFiltered = searchQuery !== '' || selectedDropDown !== '' || filterStatus !== 'all';
 
-  const isNotFound =
-    (!dataFiltered.length && !!filterName) ||
-    (!dataFiltered.length && !!selectedDropDown) ||
-    (!dataFiltered.length && !!filterStatus);
+  const isNotFound = !generalMarketRecordsLoading && !tableData.length;
 
   const handleCloseConfirm = () => {
     setOpenConfirm(false);
   };
 
   const handleFilterName = (event) => {
-    setPage(0);
     setFilterName(event.target.value);
   };
 
-  const handleSelectedDropDown = (items) => {
-    setSelectedDropDown(items);
+  const handleSearch = () => {
+    setPage(0);
+    setSearchQuery(filterName);
+  };
+
+  const handleSelectedDropDown = (event) => {
+    setPage(0);
+    setSelectedDropDown(event.target.value);
   };
 
   const handleDeleteRow = (id) => {
-    const deleteRow = tableData.filter((row) => row.id !== id);
-    setSelected([]);
-    setTableData(deleteRow);
-
-    if (page > 0) {
-      if (dataInPage.length < 2) {
-        setPage(page - 1);
-      }
-    }
+    // Note: Delete functionality would need to be implemented in the API
+    // For now, this is a placeholder
+    console.log('Delete row:', id);
   };
 
   const handleDeleteRows = (selectedRows) => {
-    const deleteRows = tableData.filter((row) => !selectedRows.includes(row.id));
+    // Note: Delete functionality would need to be implemented in the API
+    // For now, this is a placeholder
+    console.log('Delete rows:', selectedRows);
     setSelected([]);
-    setTableData(deleteRows);
-
-    if (page > 0) {
-      if (selectedRows.length === dataInPage.length) {
-        setPage(page - 1);
-      } else if (selectedRows.length === dataFiltered.length) {
-        setPage(0);
-      } else if (selectedRows.length > dataInPage.length) {
-        <TablePaginationCustom
-          count={dataFiltered.length}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={onChangePage}
-          onRowsPerPageChange={onChangeRowsPerPage}
-          //
-          dense={dense}
-          onChangeDense={onChangeDense}
-        />;
-        const newPage = Math.ceil((tableData.length - selectedRows.length) / rowsPerPage) - 1;
-        setPage(newPage);
-      }
-    }
   };
 
   const handleEditRow = (id) => {
@@ -186,8 +195,10 @@ export default function GeneralMarketRecordListPage() {
 
   const handleResetFilter = () => {
     setFilterName('');
+    setSearchQuery('');
     setSelectedDropDown('');
     setFilterStatus('all');
+    setPage(0);
   };
 
   return (
@@ -210,11 +221,12 @@ export default function GeneralMarketRecordListPage() {
               isFiltered={isFiltered}
               filterName={filterName}
               selectedDate={selectedDate}
-              fileterOptions={optionsData}
+              marketOptions={marketList}
               selectedDropDown={selectedDropDown}
               onselectedDropDown={handleSelectedDropDown}
-              onDateFilter = {handleDateFilter}
+              onDateFilter={handleDateFilter}
               onFilterName={handleFilterName}
+              onSearch={handleSearch}
               onResetFilter={handleResetFilter}
               sx={{ mt: 1 }}
             />
@@ -231,10 +243,11 @@ export default function GeneralMarketRecordListPage() {
             <CustomTableToolbar
               isFiltered={isFiltered}
               filterName={filterName}
-              fileterOptions={optionsData}
+              marketOptions={marketList}
               selectedDropDown={selectedDropDown}
               onselectedDropDown={handleSelectedDropDown}
               onFilterName={handleFilterName}
+              onSearch={handleSearch}
               onResetFilter={handleResetFilter}
               sx={{ mt: 1 }}
             />
@@ -243,51 +256,76 @@ export default function GeneralMarketRecordListPage() {
 
         {/* Render mobile card layout for small screens, otherwise render the table */}
         {isMobile ? (
-          <GeneralMarketRecordMVCLayout
-            data={dataFiltered}
-            onEditRow={(id) => handleEditRow(id)}
-            onDeleteRow={(id) => handleDeleteRow(id)}
-            onSelectRow={(id) => onSelectRow(id)}
-            selected={selected}
-          />
+          <>
+            <GeneralMarketRecordMVCLayout
+              data={dataFiltered}
+              loading={generalMarketRecordsLoading}
+              onEditRow={(id) => handleEditRow(id)}
+              onDeleteRow={(id) => handleDeleteRow(id)}
+              onSelectRow={(id) => onSelectRow(id)}
+              selected={selected}
+            />
+            <TablePaginationCustom
+              count={generalMarketRecordsPagination?.total || tableData.length}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={onChangePage}
+              onRowsPerPageChange={onChangeRowsPerPage}
+              dense={dense}
+              onChangeDense={onChangeDense}
+            />
+          </>
         ) : (
           <Card>
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
               <Scrollbar>
                 <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
                   <TableHeadCustom
+                    order={order}
+                    orderBy={orderBy}
                     headLabel={TABLE_HEAD}
                     rowCount={tableData.length}
                     numSelected={selected.length}
+                    onSort={onSort}
                   />
 
                   <TableBody>
-                    {dataFiltered
-                      ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((row, index) => (
-                        <GeneralMarketRecordTableRow
-                          index={(page * rowsPerPage) + index + 1}
-                          key={row.id}
-                          row={row}
-                          selected={selected.includes(row.id)}
-                          onSelectRow={() => onSelectRow(row.id)}
-                          onDeleteRow={() => handleDeleteRow(row.id)}
-                          onEditRow={() => handleEditRow(row.name)}
+                    {generalMarketRecordsLoading ? (
+                      <TableSkeleton />
+                    ) : (
+                      <>
+                        {tableData.length > 0 ? (
+                          dataFiltered.map((row, index) => (
+                            <GeneralMarketRecordTableRow
+                              index={(page * rowsPerPage) + index + 1}
+                              key={row.id}
+                              row={row}
+                              selected={selected.includes(row.id)}
+                              onSelectRow={() => onSelectRow(row.id)}
+                              onDeleteRow={() => handleDeleteRow(row.id)}
+                              onEditRow={() => handleEditRow(row.id)}
+                            />
+                          ))
+                        ) : (
+                          <TableNoData isNotFound={isNotFound} />
+                        )}
+
+                        <TableEmptyRows
+                          height={denseHeight}
+                          emptyRows={emptyRows(
+                            page,
+                            rowsPerPage,
+                            generalMarketRecordsPagination?.total || tableData.length
+                          )}
                         />
-                      ))}
-
-                    <TableEmptyRows
-                      height={denseHeight}
-                      emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
-                    />
-
-                    <TableNoData isNotFound={isNotFound} />
+                      </>
+                    )}
                   </TableBody>
                 </Table>
               </Scrollbar>
             </TableContainer>
             <TablePaginationCustom
-              count={dataFiltered.length}
+              count={generalMarketRecordsPagination?.total || tableData.length}
               page={page}
               rowsPerPage={rowsPerPage}
               onPageChange={onChangePage}
@@ -327,23 +365,3 @@ export default function GeneralMarketRecordListPage() {
 }
 
 // ----------------------------------------------------------------------
-
-function applyFilter({ inputData, filterName, filterStatus, selectedDropDown }) {
-  let filteredData = inputData;
-
-  if (filterName) {
-    filteredData = filteredData.filter(
-      (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
-    );
-  }
-
-  if (filterStatus !== 'all') {
-    filteredData = filteredData.filter((user) => user.status === filterStatus);
-  }
-
-  if (selectedDropDown !== 'all') {
-    filteredData = filteredData.filter((user) => user.role === selectedDropDown);
-  }
-
-  return filteredData;
-}
