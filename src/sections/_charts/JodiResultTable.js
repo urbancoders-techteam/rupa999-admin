@@ -29,16 +29,23 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 const StyledHeaderCell = styled(StyledTableCell)(({ theme }) => ({
-  fontWeight: 600,
-  fontSize: '1rem',
-  minWidth:'30px',
-//   color: '#fff',
-  backgroundColor: '#1b3153ff !important', // consistent header color
+  fontWeight: 700,
+  fontSize: '0.9375rem',
+  minWidth: '30px',
+  color: '#fff !important',
+  background: 'linear-gradient(135deg, #1b3153 0%, #2d4a7c 100%) !important',
   position: 'sticky',
   top: 0,
   zIndex: 2,
+  textTransform: 'uppercase',
+  letterSpacing: '0.5px',
+  borderRight: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.2)'}`,
+  '&:last-of-type': {
+    borderRight: 'none',
+  },
   [theme.breakpoints.down('sm')]: {
-    fontSize: '0.8rem',
+    fontSize: '0.8125rem',
+    padding: '8px 4px',
   },
 }));
 
@@ -49,24 +56,29 @@ const StyledTableRow = styled(TableRow)(() => ({
   },
 }));
 
-const ScrollContainer = styled(TableContainer)(() => ({
-  maxHeight: 500,
+const ScrollContainer = styled(TableContainer)(({ theme }) => ({
+  maxHeight: 600,
   overflowX: 'auto',
   overflowY: 'auto',
   scrollBehavior: 'smooth',
   '&::-webkit-scrollbar': {
-    height: 6,
-    width: 6,
+    height: 8,
+    width: 8,
+  },
+  '&::-webkit-scrollbar-track': {
+    backgroundColor: 'rgba(0, 0, 0, 0.02)',
+    borderRadius: 4,
   },
   '&::-webkit-scrollbar-thumb': {
-    backgroundColor: 'transparent',
-    borderRadius: 6,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    borderRadius: 4,
+    transition: 'background-color 0.2s ease',
   },
   '&:hover::-webkit-scrollbar-thumb': {
-    backgroundColor: '#bdbdbd',
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
   },
   '&::-webkit-scrollbar-thumb:hover': {
-    backgroundColor: '#999',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
   },
 }));
 
@@ -105,20 +117,27 @@ export default function JodiResultTable() {
         justifyContent: 'center',
         width: '100%',
         overflowX: 'auto',
-        px: { xs: 1, sm: 3 },
-        backgroundColor: '#f9fafb',
-        py: 2,
+        px: { xs: 0.5, sm: 2, md: 3 },
+        backgroundColor: 'transparent',
+        py: { xs: 1, sm: 2 },
       }}
     >
       <Paper
         elevation={0}
         sx={{
-          border: '1px solid #e0e0e0',
+          border: '1px solid',
+          borderColor: 'divider',
           margin: 'auto',
           width: '100%',
-          maxWidth: 900,
-          transition: 'box-shadow 0.3s ease',
-          '&:hover': { boxShadow: '0px 6px 16px rgba(0,0,0,0.05)' },
+          maxWidth: 1000,
+          borderRadius: 2,
+          overflow: 'hidden',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+          '&:hover': {
+            boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+            transform: 'translateY(-2px)',
+          },
         }}
       >
         <Typography
@@ -126,11 +145,14 @@ export default function JodiResultTable() {
           fontWeight={700}
           textAlign="center"
           sx={{
-            py: { xs: 0.75, sm: 1 },
-            backgroundColor: '#1b3153ff',
+            py: { xs: 1, sm: 1.25 },
+            px: { xs: 1.5, sm: 2 },
+            background: 'linear-gradient(135deg, #1b3153 0%, #2d4a7c 100%)',
             color: '#fff',
-            fontSize: { xs: '0.95rem', sm: '1.25rem' },
-            borderRadius: '4px 4px 0 0',
+            fontSize: { xs: '1rem', sm: '1.25rem', md: '1.375rem' },
+            letterSpacing: '0.5px',
+            textTransform: 'uppercase',
+            boxShadow: '0 2px 8px rgba(27, 49, 83, 0.2)',
           }}
         >
           Jodi Chart
@@ -148,7 +170,14 @@ export default function JodiResultTable() {
 
             <TableBody>
               {data.map((row, i) => (
-                <StyledTableRow key={i}>
+                <StyledTableRow
+                  key={i}
+                  sx={{
+                    '&:nth-of-type(even)': {
+                      backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                    },
+                  }}
+                >
                   {Object.entries(row).map(([key, value]) => {
                     const isSpecial = [11, 22, 33, 55, 66, 77, 88, 99].includes(Number(value));
                     return (
@@ -157,12 +186,26 @@ export default function JodiResultTable() {
                         sx={{
                           color:
                             value === '**'
-                              ? '#111827'
+                              ? 'text.secondary'
                               : isSpecial
-                              ? '#dc2626' // red tone like previous table
-                              : '#111827',
-                          fontWeight: isSpecial ? 700 : 400,
-                          fontSize: { xs: '0.7rem', sm: '0.9rem' },
+                              ? '#dc2626'
+                              : 'text.primary',
+                          fontWeight: isSpecial ? 700 : 500,
+                          fontSize: { xs: '0.75rem', sm: '0.875rem', md: '0.9375rem' },
+                          position: 'relative',
+                          '&::after': isSpecial
+                            ? {
+                                content: '""',
+                                position: 'absolute',
+                                bottom: 0,
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                width: '60%',
+                                height: '2px',
+                                backgroundColor: '#dc2626',
+                                opacity: 0.3,
+                              }
+                            : {},
                         }}
                       >
                         {value}

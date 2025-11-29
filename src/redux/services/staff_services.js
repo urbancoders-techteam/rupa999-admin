@@ -82,3 +82,14 @@ export const updateStaffStatusAsync = createAsyncThunk(
     })
 );
 
+// Get dashboard statistics
+export const getDashboardStatsAsync = createAsyncThunk(
+  'staff/getDashboardStats',
+  async (_, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: '/admin/dashboard/stats',
+      method: 'get',
+    })
+);
+

@@ -1,11 +1,12 @@
-import { createSlice, isAnyOf } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import {
-  getAllStaffAsync,
-  getStaffByIdAsync,
   createStaffAsync,
-  updateStaffAsync,
   deleteStaffAsync,
+  getAllStaffAsync,
+  getDashboardStatsAsync,
+  getStaffByIdAsync,
   getStaffProfileAsync,
+  updateStaffAsync,
 } from '../services/staff_services';
 
 const initialState = {
@@ -18,6 +19,9 @@ const initialState = {
     limit: 10,
     total: 0,
   },
+  dashboardStats: null,
+  dashboardLoading: false,
+  dashboardError: null,
 };
 
 const staffSlice = createSlice({
@@ -138,6 +142,21 @@ const staffSlice = createSlice({
       .addCase(getStaffProfileAsync.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || 'Failed to fetch profile';
+      });
+
+    // Get dashboard stats
+    builder
+      .addCase(getDashboardStatsAsync.pending, (state) => {
+        state.dashboardLoading = true;
+        state.dashboardError = null;
+      })
+      .addCase(getDashboardStatsAsync.fulfilled, (state, action) => {
+        state.dashboardLoading = false;
+        state.dashboardStats = action.payload?.data || null;
+      })
+      .addCase(getDashboardStatsAsync.rejected, (state, action) => {
+        state.dashboardLoading = false;
+        state.dashboardError = action.payload?.message || 'Failed to fetch dashboard stats';
       });
   },
 });

@@ -116,8 +116,7 @@ const SinglePanaChartTable = () => {
     <Box 
       sx={{ 
         p: { xs: 0.5, sm: 1, md: 2 }, 
-        backgroundColor: '#f9fafb', 
-        minHeight: '100vh',
+        backgroundColor: 'transparent', 
         width: '100%',
         overflow: 'hidden',
       }}
@@ -126,15 +125,18 @@ const SinglePanaChartTable = () => {
         variant="h5"
         gutterBottom
         sx={{
-          py: { xs: 0.5, sm: 0.75, md: 1 },
-          px: { xs: 1, sm: 2 },
-          fontWeight: 'bold',
+          py: { xs: 1, sm: 1.25, md: 1.5 },
+          px: { xs: 1.5, sm: 2, md: 2.5 },
+          fontWeight: 700,
           textAlign: 'center',
           color: '#fff',
-          backgroundColor: '#1b3153ff',
-          fontSize: { xs: '0.875rem', sm: '1.1rem', md: '1.25rem' },
-          borderRadius: { xs: 1, sm: 2 },
-          mb: { xs: 1, sm: 2 },
+          background: 'linear-gradient(135deg, #1b3153 0%, #2d4a7c 100%)',
+          fontSize: { xs: '1rem', sm: '1.25rem', md: '1.375rem' },
+          borderRadius: { xs: 1.5, sm: 2 },
+          mb: { xs: 1.5, sm: 2 },
+          letterSpacing: '0.5px',
+          textTransform: 'uppercase',
+          boxShadow: '0 2px 8px rgba(27, 49, 83, 0.2)',
         }}
       >
         Single Pana Chart
@@ -142,23 +144,33 @@ const SinglePanaChartTable = () => {
 
       <TableContainer 
         component={Paper} 
+        elevation={0}
         sx={{ 
-          boxShadow: 3, 
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 2,
           overflowX: 'auto',
           overflowY: 'auto',
           maxWidth: '100%',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          '&:hover': {
+            boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+          },
           '&::-webkit-scrollbar': {
-            height: { xs: '4px', sm: '6px' },
-            width: { xs: '4px', sm: '6px' },
+            height: { xs: '6px', sm: '8px' },
+            width: { xs: '6px', sm: '8px' },
           },
           '&::-webkit-scrollbar-track': {
-            backgroundColor: '#f1f1f1',
+            backgroundColor: 'rgba(0, 0, 0, 0.02)',
+            borderRadius: 4,
           },
           '&::-webkit-scrollbar-thumb': {
-            backgroundColor: '#888',
-            borderRadius: '3px',
+            backgroundColor: 'rgba(0, 0, 0, 0.1)',
+            borderRadius: '4px',
+            transition: 'background-color 0.2s ease',
             '&:hover': {
-              backgroundColor: '#555',
+              backgroundColor: 'rgba(0, 0, 0, 0.2)',
             },
           },
         }}
@@ -171,21 +183,25 @@ const SinglePanaChartTable = () => {
             width: '100%',
           }}
         >
-          <TableHead sx={{ backgroundColor: '#f3f4f6', position: 'sticky', top: 0, zIndex: 10 }}>
+          <TableHead sx={{ background: 'linear-gradient(135deg, #1b3153 0%, #2d4a7c 100%)', position: 'sticky', top: 0, zIndex: 10 }}>
             <TableRow>
               <TableCell
                 sx={{
                   ...cellBaseSx,
                   width: { xs: '100px', sm: '120px', md: '140px' },
                   minWidth: { xs: '100px', sm: '120px', md: '140px' },
-                  fontWeight: 'medium',
-                  fontSize: { xs: '0.6rem', sm: '0.75rem', md: '0.875rem' },
+                  fontWeight: 700,
+                  fontSize: { xs: '0.6875rem', sm: '0.8125rem', md: '0.875rem' },
                   whiteSpace: 'nowrap',
-                  backgroundColor: '#f3f4f6',
+                  color: '#fff !important',
+                  background: 'linear-gradient(135deg, #1b3153 0%, #2d4a7c 100%) !important',
                   position: 'sticky',
                   left: 0,
                   zIndex: 11,
-                  boxShadow: '2px 0 4px rgba(0,0,0,0.1)',
+                  boxShadow: '2px 0 4px rgba(0,0,0,0.15)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  borderRight: '1px solid rgba(255,255,255,0.2)',
                 }}
               >
                 Date Range
@@ -197,10 +213,17 @@ const SinglePanaChartTable = () => {
                     ...cellBaseSx,
                     minWidth: { xs: '80px', sm: '100px', md: '110px' },
                     width: { xs: '80px', sm: '100px', md: '110px' },
-                    fontWeight: 'medium',
-                    fontSize: { xs: '0.6rem', sm: '0.7rem', md: '0.875rem' },
+                    fontWeight: 700,
+                    fontSize: { xs: '0.6875rem', sm: '0.75rem', md: '0.875rem' },
                     whiteSpace: 'nowrap',
-                    backgroundColor: '#f3f4f6',
+                    color: '#fff !important',
+                    background: 'linear-gradient(135deg, #1b3153 0%, #2d4a7c 100%) !important',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    borderRight: '1px solid rgba(255,255,255,0.2)',
+                    '&:last-of-type': {
+                      borderRight: 'none',
+                    },
                   }}
                 >
                   {day}
@@ -210,20 +233,32 @@ const SinglePanaChartTable = () => {
           </TableHead>
 
           <TableBody>
-            {data.map((item) => (
-              <TableRow key={item.id} sx={{ '&:hover': { backgroundColor: '#f9fafb' } }}>
+            {data.map((item, index) => (
+              <TableRow
+                key={item.id}
+                sx={{
+                  '&:hover': {
+                    backgroundColor: 'rgba(27, 49, 83, 0.03)',
+                    transition: 'background-color 0.2s ease',
+                  },
+                  '&:nth-of-type(even)': {
+                    backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                  },
+                }}
+              >
                 <TableCell
                   sx={{
                     ...cellBaseSx,
                     verticalAlign: 'center',
-                    fontSize: { xs: '0.6rem', sm: '0.7rem', md: '0.75rem' },
-                    backgroundColor: '#f9fafb',
+                    fontSize: { xs: '0.625rem', sm: '0.6875rem', md: '0.75rem' },
+                    backgroundColor: 'rgba(0, 0, 0, 0.02)',
                     position: 'sticky',
                     left: 0,
                     zIndex: 5,
-                    boxShadow: '2px 0 4px rgba(0,0,0,0.1)',
+                    boxShadow: '2px 0 4px rgba(0,0,0,0.08)',
                     minWidth: { xs: '100px', sm: '120px', md: '140px' },
                     width: { xs: '100px', sm: '120px', md: '140px' },
+                    fontWeight: 500,
                   }}
                 >
                   <Box
@@ -339,18 +374,20 @@ const SinglePanaChartTable = () => {
                             flex: '1 1 auto',
                             minWidth: 0,
                             maxWidth: '100%',
+                            position: 'relative',
                           }}
                         >
                           <Typography
                             sx={{
-                              fontSize: { xs: '1rem', sm: '1.4rem', md: '1.8rem' },
-                              fontWeight: '900',
+                              fontSize: { xs: '1.125rem', sm: '1.5rem', md: '1.875rem' },
+                              fontWeight: 900,
                               color: dayData.isRed ? '#dc2626' : '#111827',
                               lineHeight: 1,
                               whiteSpace: 'nowrap',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
                               maxWidth: '100%',
+                              textShadow: dayData.isRed ? '0 1px 2px rgba(220, 38, 38, 0.2)' : 'none',
                             }}
                           >
                             {dayData.middle}

@@ -1,35 +1,39 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 // @mui
-import {
-  Container,
-  Box,
-  Stack,
-  Paper,
-  IconButton,
-  Drawer,
-  useMediaQuery,
-  Typography,
-} from '@mui/material';
+import FilterListIcon from '@mui/icons-material/FilterList';
 import MenuIcon from '@mui/icons-material/Menu';
+import {
+  Box,
+  Card,
+  Container,
+  Drawer,
+  IconButton,
+  Paper,
+  Stack,
+  Typography,
+  alpha,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
-// _mock_
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
 // sections
-import PanaChartToolBar from '../../sections/_panaChart/components/PanaChartToolBar';
 import JodiResultTable from '../../sections/_charts/JodiResultTable';
 import SinglePanaChartTable from '../../sections/_charts/SinglePanaChartTable';
+import PanaChartToolBar from '../../sections/_panaChart/components/PanaChartToolBar';
 
 // ----------------------------------------------------------------------
 
 export default function PanaChartsListPage() {
   const { themeStretch } = useSettingsContext();
-  const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [selectedGame, setSelectedGame] = useState('Jodi')
+  const [selectedGame, setSelectedGame] = useState('Jodi');
 
   const handleDrawerOpen = () => setDrawerOpen(true);
   const handleDrawerClose = () => setDrawerOpen(false);
@@ -41,16 +45,22 @@ export default function PanaChartsListPage() {
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
+        {/* Sticky Header */}
         <Paper
+          elevation={0}
           sx={{
             position: 'sticky',
             top: 60,
             zIndex: 10,
-            py: 0.2,
-            px: 1.5,
+            py: { xs: 1.5, sm: 2 },
+            px: { xs: 2, sm: 3 },
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            backgroundColor: alpha(theme.palette.background.paper, 0.95),
+            backdropFilter: 'blur(8px)',
+            borderBottom: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+            mb: { xs: 2, sm: 3 },
           }}
         >
           <CustomBreadcrumbs
@@ -61,36 +71,89 @@ export default function PanaChartsListPage() {
             ]}
           />
           {isMobile && (
-            <>
-              <IconButton color="primary" onClick={handleDrawerOpen} sx={{ ml: 1 }}>
-                <MenuIcon />
-              </IconButton>
-              <Drawer anchor="right" open={drawerOpen} onClose={handleDrawerClose}>
-                <Typography variant="h6" sx={{ p: 2 }}>
-                  Tool Bar
-                </Typography>
-                <Box sx={{ width: 280, p: 2 }}>
-                  <PanaChartToolBar 
-                    handleDrawerClose={handleDrawerClose}
-                    selectedGame={selectedGame} 
-                    onGameChange={setSelectedGame}
-                  />
-                </Box>
-              </Drawer>
-            </>
-          // ) : (
-            
+            <IconButton
+              color="primary"
+              onClick={handleDrawerOpen}
+              sx={{
+                ml: 1,
+                bgcolor: alpha(theme.palette.primary.main, 0.08),
+                '&:hover': {
+                  bgcolor: alpha(theme.palette.primary.main, 0.16),
+                },
+              }}
+            >
+              <FilterListIcon />
+            </IconButton>
           )}
         </Paper>
-        <Box sx={{ my: 2, width: '100%' }}>
-          {!isMobile && (
-            <PanaChartToolBar 
-              selectedGame={selectedGame} 
+
+        {/* Filter Toolbar - Desktop */}
+        {!isMobile && (
+          <Card
+            elevation={0}
+            sx={{
+              mb: { xs: 2, sm: 3 },
+              p: { xs: 2, sm: 2.5 },
+              backgroundColor: alpha(theme.palette.background.paper, 0.6),
+              border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+              borderRadius: 2,
+            }}
+          >
+            <PanaChartToolBar
+              selectedGame={selectedGame}
               onGameChange={setSelectedGame}
             />
-          )}
-        </Box>
-        <Stack spacing={3} mb={3}>
+          </Card>
+        )}
+
+        {/* Mobile Drawer */}
+        <Drawer
+          anchor="right"
+          open={drawerOpen}
+          onClose={handleDrawerClose}
+          PaperProps={{
+            sx: {
+              width: { xs: '85%', sm: 360 },
+              p: 2.5,
+            },
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              mb: 3,
+              pb: 2,
+              borderBottom: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+            }}
+          >
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              Filter Options
+            </Typography>
+            <IconButton
+              size="small"
+              onClick={handleDrawerClose}
+              sx={{
+                color: 'text.secondary',
+                '&:hover': {
+                  bgcolor: alpha(theme.palette.error.main, 0.08),
+                  color: 'error.main',
+                },
+              }}
+            >
+              <MenuIcon />
+            </IconButton>
+          </Box>
+          <PanaChartToolBar
+            handleDrawerClose={handleDrawerClose}
+            selectedGame={selectedGame}
+            onGameChange={setSelectedGame}
+          />
+        </Drawer>
+
+        {/* Chart Tables */}
+        <Stack spacing={{ xs: 2, sm: 3 }} sx={{ mb: 3 }}>
           {selectedGame === 'Jodi' && <JodiResultTable />}
           {selectedGame === 'Single Pana' && <SinglePanaChartTable />}
         </Stack>
