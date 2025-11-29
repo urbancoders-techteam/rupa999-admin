@@ -9,57 +9,53 @@ import DashboardLayout from '../layouts/dashboard';
 import { PATH_AFTER_LOGIN } from '../config-global';
 //
 import {
+  BidRecordListPage,
+  DesignationListPage,
+  DipositHistoryListPage,
+  GameTypeFormPage,
+  GeneralDashboardPage,
+  GeneralMarketRecordListPage,
+  GeneralPredictionFormPage,
+  GeneralWithdrawHistoryListPage,
+  GiftFormHandlePage,
+  GiftPage,
   // Auth
   LoginPage,
-  GeneralDashboardPage,
-
-  // Error Handling Pages
-  Page500,
+  MainBidHistoryListPage,
+  MainTransactionListPage,
+  MarketDataListPage,
+  MarketFormHandlePage,
+  MarketResultListPage,
+  MarketsListPage,
+  NotificationFormHandlePage,
+  NotificationListPage,
   Page403,
   Page404,
-
-  // Dashboard: Components
-  SliderImagePage,
-  UserListPage,
-  ProfitPage,
-  WithdrawDetailsPage,
-  GiftPage,
-  GiftFormHandlePage,
-  MarketsListPage,
-  MarketFormHandlePage,
+  // Error Handling Pages
+  Page500,
   PanaChartsListPage,
-  GeneralMarketRecordListPage,
+  ProfitPage,
   ResetPasswordPage,
-  GeneralPredictionFormPage,
-  WinHistoryListPage,
-  GeneralWithdrawHistoryListPage,
-  DipositHistoryListPage,
-  UserFormHandle,
-  UserBidHistoryListPage,
-  UserTransactionListPage,
-  WithdrawalResquestListPage,
-  GameTypeFormPage,
-  StarLineMarketsListPage,
-  StarlineMarketFormHandle,
-  StarLineMarketsRecordListPage,
-  MarketResultListPage,
-  StarLineMarketResultListPage,
-  StarLineWinHistoryListPage,
-  StaffListPage,
-  StaffFormHandle,
   RolePermissionFormHandle,
-  DesignationListPage,
-  MarketDataListPage,
-  BidRecordListPage,
-  MainTransactionListPage,
-  MainBidHistoryListPage,
-  NotificationListPage,
-  NotificationFormHandlePage,
+  SliderImagePage,
+  StaffFormHandle,
   GatewaySettingFormPage,
   StaticDataFormPage,
   CommonSettingFormPage,
   HelpAndSupportFormPage,
   //
+  StaffListPage,
+  StarlineMarketFormHandle,
+  StarLineMarketResultListPage,
+  StarLineMarketsListPage,
+  StarLineMarketsRecordListPage,
+  StarLineWinHistoryListPage,
+  UserBidHistoryListPage,
+  UserFormHandle,
+  UserListPage,
+  UserTransactionListPage,
+  WinHistoryListPage,
+  WithdrawalResquestListPage,
 } from './elements';
 
 // ----------------------------------------------------------------------
@@ -82,7 +78,7 @@ export default function Router() {
             </GuestGuard>
           ),
         },
-      
+
       ],
     },
 
@@ -130,17 +126,7 @@ export default function Router() {
             { path: ':id/withdrawalrequest', element: <WithdrawalResquestListPage /> },
           ],
         },
-        {
-          path: 'withdrawdetails',
-          children: [
-            {
-              element: <Navigate to="/dashboard/withdrawdetails/list" replace />,
-              index: true,
-            },
-            { path: 'list', element: <WithdrawDetailsPage /> },
-          ],
-        },
-        
+
         { path: 'profit', element: <ProfitPage />, index: true },
 
         {

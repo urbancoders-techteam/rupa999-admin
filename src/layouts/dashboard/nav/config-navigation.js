@@ -85,12 +85,6 @@ const navConfig = [
         icon: ICONS.banking,
       },
 
-      {
-        title: 'withdraw details',
-        path: PATH_DASHBOARD.withdrawdetails.root,
-        icon: ICONS.banking,
-      },
-
       { title: 'profits', path: PATH_DASHBOARD.profit.root, icon: ICONS.analytics },
 
       // { title: 'gift', path: PATH_DASHBOARD.gift.root, icon: ICONS.booking },
