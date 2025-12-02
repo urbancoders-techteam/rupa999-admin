@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 // @mui
 import {
+  Box,
   Button,
   Card,
   Container,
@@ -33,6 +34,7 @@ import {
 } from '../../components/table';
 // sections
 import CustomTableToolbar from '../../components/table/CustomTableToolBar';
+import BulkUploadMarketResults from '../../sections/_previous_results/components/BulkUploadMarketResults';
 import GeneralCreateResultForm from '../../sections/_previous_results/components/GeneralCreateResultForm';
 import MarketResultTableRow from '../../sections/_previous_results/components/MarketResultTableRow';
 import PreviousResultMobileViewCardLayout from '../../sections/_previous_results/components/PreviousResultMobileViewCardLayout';
@@ -191,8 +193,8 @@ export default function MarketResultListPage() {
           ]}
         />
 
-        <GeneralCreateResultForm 
-          showWinner={showWinner} 
+        <GeneralCreateResultForm
+          showWinner={showWinner}
           onHandleShowWinner={onHandleShowWinner}
           selectedMarketId={setSelectedMarketId}
         />
@@ -283,6 +285,18 @@ export default function MarketResultListPage() {
             />
           </Card>
         )}
+
+        {/* Bulk Upload Component - Fixed at bottom */}
+        <Box
+          sx={{
+            position: 'fixed',
+            bottom: 24,
+            right: 24,
+            zIndex: 1000,
+          }}
+        >
+          <BulkUploadMarketResults selectedMarketId={selectedMarketId} />
+        </Box>
       </Container>
 
       <ConfirmDialog
