@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
@@ -16,23 +16,23 @@ import {
   FormHelperText,
 } from '@mui/material';
 import * as Yup from 'yup';
-import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
 import { useSnackbar } from '../../components/snackbar';
 import FormProvider, { RHFTextField } from '../../components/hook-form';
 import { useSettingsContext } from '../../components/settings';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { PATH_DASHBOARD } from '../../routes/paths';
+import { getHelpSupportAsync, updateHelpSupportAsync } from '../../redux/services/help_support_services';
 
 // ----------------------------------------------------------------------
 
-HelpAndSupportFormPage.propTypes = {
-  currentSettings: PropTypes.object,
-};
-
-export default function HelpAndSupportFormPage({ currentSettings }) {
+export default function HelpAndSupportFormPage() {
   const { enqueueSnackbar } = useSnackbar();
   const { themeStretch } = useSettingsContext();
+  const dispatch = useDispatch();
+  const [currentSettings, setCurrentSettings] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   // Validation Schema
   const HelpAndSupportSchema = Yup.object().shape({
@@ -73,19 +73,47 @@ export default function HelpAndSupportFormPage({ currentSettings }) {
 
   const values = watch();
 
+  // Fetch Help and Support data on component mount
+  const fetchHelpSupport = useCallback(async () => {
+    try {
+      setLoading(true);
+      const result = await dispatch(getHelpSupportAsync()).unwrap();
+      if (result?.data) {
+        setCurrentSettings(result.data);
+      }
+    } catch (error) {
+      console.error('Error fetching help and support data:', error);
+      enqueueSnackbar(error?.message || 'Failed to load help and support settings', { variant: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  }, [dispatch, enqueueSnackbar]);
+
+  useEffect(() => {
+    fetchHelpSupport();
+  }, [fetchHelpSupport]);
+
   useEffect(() => {
     if (currentSettings) {
-      reset(defaultValues);
+      reset({
+        supportNumber: currentSettings?.supportNumber || '+91 9827690565',
+        telegramLink: currentSettings?.telegramLink || 'https://t.me/Ridhigame',
+        whatsappEnable: currentSettings?.whatsappEnable || 'Enable',
+        maintainanceModeEnable: currentSettings?.maintainanceModeEnable || 'Disable',
+        supportTime: currentSettings?.supportTime || '10:00 AM - 10:00 PM',
+        whatsappNumber: currentSettings?.whatsappNumber || '9827690565',
+        telegramEnable: currentSettings?.telegramEnable || 'Enable',
+      });
     }
-  }, [currentSettings, reset, defaultValues]);
+  }, [currentSettings, reset]);
 
   const onSubmit = async (data) => {
     try {
-      console.log('Form Data:', data);
-      // TODO: Replace with actual API call
-      // await dispatch(updateHelpAndSupportSettingsAsync(data)).unwrap();
-
-      enqueueSnackbar('Help and Support settings saved successfully!', { variant: 'success' });
+      const result = await dispatch(updateHelpSupportAsync(data)).unwrap();
+      if (result?.data) {
+        setCurrentSettings(result.data);
+        enqueueSnackbar('Help and Support settings saved successfully!', { variant: 'success' });
+      }
     } catch (error) {
       enqueueSnackbar(error?.message || 'Failed to save help and support settings', { variant: 'error' });
     }
