@@ -1,7 +1,9 @@
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import {
   Card,
   Stack,
@@ -9,16 +11,22 @@ import {
   useMediaQuery,
   useTheme,
   Paper,
+  Alert,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import FormProvider, { RHFTextField } from '../../components/hook-form';
+import { changePasswordAsync } from '../../redux/services/auth_services';
+import { PATH_DASHBOARD } from '../../routes/paths';
 
 // ----------------------------------------------------------------------
 
 export default function AdminChangePasswordForm() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const { changePasswordLoading, changePasswordError } = useSelector((state) => state.auth);
 
   const ChangePasswordSchema = Yup.object().shape({
     password: Yup.string()
@@ -39,17 +47,53 @@ export default function AdminChangePasswordForm() {
 
   const {
     handleSubmit,
-    formState: { isSubmitting },
+    setError,
+    formState: { isSubmitting, errors },
   } = methods;
 
   const onSubmit = async (data) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log('Password changed successfully:', data);
-      // You can trigger an API call here
-      navigate('/dashboard'); // redirect after success
+      // Get adminId from localStorage
+      const adminData = localStorage.getItem('admin');
+      if (!adminData) {
+        toast.error('Admin data not found. Please login again.');
+        navigate('/login');
+        return;
+      }
+
+      const admin = JSON.parse(adminData);
+      const adminId = admin._id || admin.id;
+
+      if (!adminId) {
+        toast.error('Admin ID not found. Please login again.');
+        navigate('/login');
+        return;
+      }
+
+      // Prepare API payload
+      const payload = {
+        adminId,
+        newPassword: data.password,
+        cpassword: data.confirmPassword,
+      };
+
+      const res = await dispatch(changePasswordAsync(payload));
+
+      if (res.type === 'auth/changePassword/fulfilled') {
+        if (res.payload?.success) {
+          toast.success(res.payload?.message || 'Password changed successfully');
+          navigate(PATH_DASHBOARD.home.root);
+        } else {
+          throw new Error(res.payload?.message || 'Failed to change password');
+        }
+      } else if (res.type === 'auth/changePassword/rejected') {
+        throw new Error(res.payload?.message || res.payload || 'Failed to change password');
+      }
     } catch (error) {
-      console.error(error);
+      setError('afterSubmit', {
+        message: error.message || 'Failed to change password',
+      });
+      toast.error(error.message || 'Failed to change password');
     }
   };
 
@@ -83,16 +127,23 @@ export default function AdminChangePasswordForm() {
 
         <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
           <Stack spacing={isMobile ? 2 : 3}>
+            {!!errors.afterSubmit && (
+              <Alert severity="error">{errors.afterSubmit.message}</Alert>
+            )}
+            {changePasswordError && !errors.afterSubmit && (
+              <Alert severity="error">{changePasswordError}</Alert>
+            )}
+
             <RHFTextField
               name="password"
-              label="Password"
+              label="New Password"
               type="password"
               size={isMobile ? 'small' : 'medium'}
             />
 
             <RHFTextField
               name="confirmPassword"
-              label="Confirm Password"
+              label="Confirm New Password"
               type="password"
               size={isMobile ? 'small' : 'medium'}
             />
@@ -101,7 +152,7 @@ export default function AdminChangePasswordForm() {
               type="submit"
               variant="contained"
               fullWidth={isMobile}
-              loading={isSubmitting}
+              loading={isSubmitting || changePasswordLoading}
               sx={{
                 alignSelf: isMobile ? 'stretch' : 'flex-start',
                 px: 4,
@@ -112,7 +163,7 @@ export default function AdminChangePasswordForm() {
                 mt: 1,
               }}
             >
-              Change
+              Change Password
             </LoadingButton>
           </Stack>
         </FormProvider>

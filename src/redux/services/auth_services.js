@@ -8,3 +8,15 @@ export const staffLoginAsync = createAsyncThunk('api/account', async (data, tool
         data,
     })
 );
+
+// Change admin password
+export const changePasswordAsync = createAsyncThunk(
+  'auth/changePassword',
+  async (data, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: '/admin/change-password',
+      method: 'post',
+      data,
+    })
+);
