@@ -1,13 +1,15 @@
 import SearchIcon from '@mui/icons-material/Search';
 import { alpha, Autocomplete, Button, Grid, TextField, useTheme } from '@mui/material';
 import PropTypes from 'prop-types';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllMarketsAsync } from '../../../redux/services/market_services';
 
 PanaChartToolBar.propTypes = {
   handleDrawerClose: PropTypes.func,
+  selectedMarketType: PropTypes.string,
+  onMarketTypeChange: PropTypes.func,
   selectedGame: PropTypes.string,
   onGameChange: PropTypes.func,
   selectedMarket: PropTypes.object,
@@ -16,7 +18,9 @@ PanaChartToolBar.propTypes = {
 
 export default function PanaChartToolBar({
   handleDrawerClose,
-  selectedGame = 'Jodi',
+  selectedMarketType = 'Main Market',
+  onMarketTypeChange,
+  selectedGame = 'Single Pana',
   onGameChange,
   selectedMarket = null,
   onMarketChange,
@@ -28,13 +32,16 @@ export default function PanaChartToolBar({
   const methods = useForm({
     defaultValues: {
       game: selectedGame,
-      marketType: '',
+      marketType: selectedMarketType || 'Main Market',
       market: selectedMarket,
       date: null,
     },
   });
 
-  const { handleSubmit, control, setValue } = methods;
+  const { handleSubmit, control, setValue, watch } = methods;
+  
+  // Watch market type to filter markets
+  const watchedMarketType = watch('marketType');
 
   // Fetch markets on mount
   useEffect(() => {
@@ -49,8 +56,34 @@ export default function PanaChartToolBar({
     setValue('market', selectedMarket);
   }, [selectedMarket, setValue]);
 
+  useEffect(() => {
+    setValue('marketType', selectedMarketType);
+  }, [selectedMarketType, setValue]);
+
+  // Filter markets based on market type
+  // Note: Since markets don't have an explicit type field, we'll show all markets for now
+  // You may need to add a filter based on your business logic (e.g., naming convention or separate API)
+  const filteredMarkets = useMemo(() => marketList || [], [marketList]);
+
+  // Auto-select first market when markets are loaded and market type is selected
+  useEffect(() => {
+    if (
+      watchedMarketType &&
+      filteredMarkets.length > 0 &&
+      !selectedMarket &&
+      onMarketChange
+    ) {
+      const firstMarket = filteredMarkets[0];
+      setValue('market', firstMarket);
+      onMarketChange(firstMarket);
+    }
+  }, [filteredMarkets, watchedMarketType, selectedMarket, setValue, onMarketChange]);
+
   const onSubmit = (data) => {
     console.log('PanaChartToolBar Data:', data);
+    if (onMarketTypeChange && data.marketType) {
+      onMarketTypeChange(data.marketType);
+    }
     if (onMarketChange && data.market) {
       onMarketChange(data.market);
     }
@@ -71,12 +104,31 @@ export default function PanaChartToolBar({
                   fullWidth
                   options={['Main Market', 'Starline Market']}
                   value={field.value || ''}
-                  onChange={(_, newValue) => field.onChange(newValue)}
+                  onChange={(_, newValue) => {
+                    field.onChange(newValue);
+                    if (onMarketTypeChange) {
+                      onMarketTypeChange(newValue || '');
+                    }
+                    // Reset market when market type changes, then auto-select first market
+                    setValue('market', null);
+                    if (onMarketChange) {
+                      onMarketChange(null);
+                    }
+                    // Auto-select first market after a short delay to ensure markets are available
+                    setTimeout(() => {
+                      if (newValue && filteredMarkets.length > 0 && onMarketChange) {
+                        const firstMarket = filteredMarkets[0];
+                        setValue('market', firstMarket);
+                        onMarketChange(firstMarket);
+                      }
+                    }, 100);
+                  }}
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Market Types"
+                      label="Market Types *"
                       fullWidth
+                      required
                       sx={{
                         '& .MuiOutlinedInput-root': {
                           backgroundColor: alpha(theme.palette.background.paper, 0.8),
@@ -100,7 +152,8 @@ export default function PanaChartToolBar({
                 <Autocomplete
                   size="small"
                   fullWidth
-                  options={marketList || []}
+                  disabled={!watchedMarketType}
+                  options={filteredMarkets}
                   getOptionLabel={(option) => (typeof option === 'string' ? option : option?.name || '')}
                   isOptionEqualToValue={(option, value) => {
                     if (!option || !value) return false;
@@ -118,7 +171,7 @@ export default function PanaChartToolBar({
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Choose Markets"
+                      label={watchedMarketType ? "Choose Markets" : "Select Market Type First"}
                       fullWidth
                       sx={{
                         '& .MuiOutlinedInput-root': {
@@ -144,9 +197,9 @@ export default function PanaChartToolBar({
                   size="small"
                   fullWidth
                   options={['Jodi', 'Single Pana']}
-                  value={field.value || selectedGame || 'Jodi'}
+                  value={field.value || selectedGame || 'Single Pana'}
                   onChange={(_, newValue) => {
-                    const gameValue = newValue || 'Jodi';
+                    const gameValue = newValue || 'Single Pana';
                     field.onChange(gameValue);
                     if (onGameChange) onGameChange(gameValue);
                   }}

@@ -142,9 +142,21 @@ const transformJodiDataToTableFormat = (apiData) => {
         const openDigit = dayData.openDigit;
         const closeDigit = dayData.closeDigit;
 
-        // For Jodi, we use the closeDigit if available, otherwise openDigit
-        const jodiValue = closeDigit !== null && closeDigit !== undefined ? closeDigit : openDigit;
-        weekRow[dayName] = jodiValue !== null && jodiValue !== undefined ? jodiValue : '**';
+        const middleOne = openDigit !== null && openDigit !== undefined ? Number(openDigit) : '**';
+
+        const middleTwo = closeDigit !== null && closeDigit !== undefined ? Number(closeDigit) : '**';
+
+        let jodiValue;
+        if (middleOne === '**' && middleTwo === '**') {
+          jodiValue = '**';
+        } else if (middleOne === '**') {
+          jodiValue = middleTwo;
+        } else if (middleTwo === '**') {
+          jodiValue = middleOne;
+        } else {
+          jodiValue = `${middleOne}${middleTwo}`;
+        }
+        weekRow[dayName] = typeof jodiValue === 'string' ? jodiValue : Number(jodiValue);
       } else {
         // Missing day - show '**'
         weekRow[dayName] = '**';
@@ -160,28 +172,6 @@ const transformJodiDataToTableFormat = (apiData) => {
   return weeks;
 };
 
-// Dummy data constant
-const DUMMY_DATA = [
-  { Mon: 62, Tue: 40, Wed: 66, Thu: 81, Fri: 41, Sat: '**', Sun: '**' },
-  { Mon: 89, Tue: 77, Wed: 51, Thu: 52, Fri: 84, Sat: 20, Sun: 92 },
-  { Mon: 69, Tue: 92, Wed: 64, Thu: 86, Fri: 16, Sat: 85, Sun: 22 },
-  { Mon: 33, Tue: 31, Wed: 15, Thu: 40, Fri: 87, Sat: 91, Sun: 67 },
-  { Mon: 76, Tue: 54, Wed: 89, Thu: 15, Fri: 96, Sat: 32, Sun: 8 },
-  { Mon: 48, Tue: 33, Wed: 78, Thu: 93, Fri: 70, Sat: 89, Sun: 99 },
-  { Mon: 53, Tue: 65, Wed: 4, Thu: 51, Fri: 54, Sat: 17, Sun: 67 },
-  { Mon: 53, Tue: 71, Wed: 32, Thu: 89, Fri: 42, Sat: 22, Sun: 60 },
-  { Mon: 42, Tue: 23, Wed: 32, Thu: 24, Fri: 83, Sat: 49, Sun: 51 },
-  { Mon: 65, Tue: 6, Wed: 54, Thu: 19, Fri: 55, Sat: 34, Sun: 92 },
-  { Mon: 37, Tue: 4, Wed: 11, Thu: 25, Fri: 54, Sat: 88, Sun: 34 },
-  { Mon: 68, Tue: 1, Wed: 86, Thu: 97, Fri: '**', Sat: 48, Sun: 4 },
-  { Mon: 57, Tue: 40, Wed: 63, Thu: 48, Fri: 91, Sat: 51, Sun: 98 },
-  { Mon: 73, Tue: 17, Wed: 69, Thu: 93, Fri: 79, Sat: 69, Sun: 96 },
-  { Mon: 48, Tue: 92, Wed: 81, Thu: 71, Fri: 12, Sat: 41, Sun: 23 },
-  { Mon: 53, Tue: 47, Wed: 68, Thu: 19, Fri: 79, Sat: 26, Sun: 45 },
-  { Mon: 25, Tue: 78, Wed: 1, Thu: 13, Fri: 71, Sat: 13, Sun: 2 },
-  { Mon: 21, Tue: 71, Wed: 24, Thu: 19, Fri: 30, Sat: 58, Sun: 54 },
-];
-
 // ===== Component =====
 export default function JodiResultTable({ selectedMarket }) {
   const dispatch = useDispatch();
@@ -191,8 +181,7 @@ export default function JodiResultTable({ selectedMarket }) {
 
   useEffect(() => {
     if (!selectedMarket || !selectedMarket._id) {
-      // If no market selected, use dummy data
-      setData(DUMMY_DATA);
+      setData([]);
       return;
     }
 
@@ -209,14 +198,14 @@ export default function JodiResultTable({ selectedMarket }) {
 
         if (result?.data) {
           const transformedData = transformJodiDataToTableFormat(result.data);
-          setData(transformedData.length > 0 ? transformedData : DUMMY_DATA);
+          setData(transformedData.length > 0 ? transformedData : []);
         } else {
-          setData(DUMMY_DATA);
+          setData([]);
         }
       } catch (err) {
         console.error('Error fetching market results:', err);
         setError(err?.message || 'Failed to fetch market results');
-        setData(DUMMY_DATA);
+        setData([]);
       } finally {
         setLoading(false);
       }
@@ -308,7 +297,7 @@ export default function JodiResultTable({ selectedMarket }) {
                   }}
                 >
                   {Object.entries(row).map(([key, value]) => {
-                    const isSpecial = [11, 22, 33, 55, 66, 77, 88, 99].includes(Number(value));
+                    const isSpecial = ['00', '11', '22', '33', '55', '66', '77', '88', '99'].includes(value);
                     return (
                       <StyledTableCell
                         key={key}

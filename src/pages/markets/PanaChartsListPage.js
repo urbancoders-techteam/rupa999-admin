@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet-async';
 // @mui
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -32,12 +33,35 @@ export default function PanaChartsListPage() {
   const { themeStretch } = useSettingsContext();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { marketList } = useSelector((state) => state.market);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [selectedGame, setSelectedGame] = useState('Jodi');
+  const [selectedMarketType, setSelectedMarketType] = useState('Main Market');
+  const [selectedGame, setSelectedGame] = useState('Single Pana');
   const [selectedMarket, setSelectedMarket] = useState(null);
 
   const handleDrawerOpen = () => setDrawerOpen(true);
   const handleDrawerClose = () => setDrawerOpen(false);
+
+  // Reset market when market type changes and auto-select first market
+  const handleMarketTypeChange = (marketType) => {
+    setSelectedMarketType(marketType);
+    setSelectedMarket(null); // Reset market selection when market type changes
+    // Auto-select first market after reset
+    if (marketType && marketList && marketList.length > 0) {
+      setTimeout(() => {
+        const firstMarket = marketList[0];
+        setSelectedMarket(firstMarket);
+      }, 100);
+    }
+  };
+
+  // Auto-select first market when markets are loaded and no market is selected
+  useEffect(() => {
+    if (selectedMarketType && marketList && marketList.length > 0 && !selectedMarket) {
+      const firstMarket = marketList[0];
+      setSelectedMarket(firstMarket);
+    }
+  }, [marketList, selectedMarketType, selectedMarket]);
 
   return (
     <>
@@ -101,6 +125,8 @@ export default function PanaChartsListPage() {
             }}
           >
             <PanaChartToolBar
+              selectedMarketType={selectedMarketType}
+              onMarketTypeChange={handleMarketTypeChange}
               selectedGame={selectedGame}
               onGameChange={setSelectedGame}
               selectedMarket={selectedMarket}
@@ -150,6 +176,8 @@ export default function PanaChartsListPage() {
           </Box>
           <PanaChartToolBar
             handleDrawerClose={handleDrawerClose}
+            selectedMarketType={selectedMarketType}
+            onMarketTypeChange={handleMarketTypeChange}
             selectedGame={selectedGame}
             onGameChange={setSelectedGame}
             selectedMarket={selectedMarket}
@@ -157,11 +185,13 @@ export default function PanaChartsListPage() {
           />
         </Drawer>
 
-        {/* Chart Tables */}
-        <Stack spacing={{ xs: 2, sm: 3 }} sx={{ mb: 3 }}>
-          {selectedGame === 'Jodi' && <JodiResultTable selectedMarket={selectedMarket} />}
-          {selectedGame === 'Single Pana' && <SinglePanaChartTable selectedMarket={selectedMarket} />}
-        </Stack>
+        {/* Chart Tables - Only show when market type is selected */}
+        {selectedMarketType && (
+          <Stack spacing={{ xs: 2, sm: 3 }} sx={{ mb: 3 }}>
+            {selectedGame === 'Jodi' && <JodiResultTable selectedMarket={selectedMarket} />}
+            {selectedGame === 'Single Pana' && <SinglePanaChartTable selectedMarket={selectedMarket} />}
+          </Stack>
+        )}
       </Container>
     </>
   );
