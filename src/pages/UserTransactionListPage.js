@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 // @mui
 import {
   Card,
@@ -71,10 +71,16 @@ export default function UserTransactionListPage() {
   const { themeStretch } = useSettingsContext();
   const dispatch = useDispatch();
   const { id: userId } = useParams();
+  const location = useLocation();
+  
+  // Get userName from navigation state
+  const userName = location.state?.userName || '';
+  
+
 
   // Redux state
-  const { transactionsList, transactionsLoading, transactionsPagination, selectedUserName } = useSelector(
-    (state) => state.user
+  const { transactionsList, transactionsLoading, transactionsPagination } = useSelector(
+    (value) => value.user
   );
 
   const [filterParticulars, setFilterParticulars] = useState('All');
@@ -138,11 +144,11 @@ export default function UserTransactionListPage() {
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <CustomBreadcrumbs
-          heading={selectedUserName ? `Transaction List - ${selectedUserName}` : 'Transaction List'}
+          heading={userName ? `Transaction List - ${userName}` : 'Transaction List'}
           links={[
             { name: 'Dashboard', href: PATH_DASHBOARD.root },
             { name: 'User List', href: PATH_DASHBOARD.user.list },
-            { name: 'Transaction List' },
+            { name: userName ? `${userName}'s Transactions` : 'Transaction List' },
           ]}
         />
 
@@ -164,7 +170,7 @@ export default function UserTransactionListPage() {
             </TextField>
           </Stack>
 
-          <CustomTableToolbar isFiltered={isFiltered} onResetFilter={handleResetFilter} />
+          <CustomTableToolbar isFiltered={isFiltered} onResetFilter={handleResetFilter} userName={userName} />
 
           <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
             <Scrollbar>

@@ -18,12 +18,15 @@ export default function UserFormHandle() {
 
   // const { bannerById, isLoading } = useSelector((sliceState) => sliceState.banner);
 
+  // Get userName from navigation state (prefer userName, fallback to name for backward compatibility)
+  const userName = state?.userName || state?.name || '';
+
   const editView = useMemo(() => {
     if (id && /edit/i?.test(pathname)) {
       return {
         title: 'User: Edit | Rupa999',
-        heading: 'Edit User',
-        user: state?.name ?? '',
+        heading: userName ? `Edit User - ${userName}` : 'Edit User',
+        user: userName || '',
         isEdit: true,
         isView: false,
       };
@@ -31,8 +34,8 @@ export default function UserFormHandle() {
     if (id && /view/i?.test(pathname)) {
       return {
         title: 'User: View | Rupa999',
-        heading: 'View User',
-        user: state?.name ?? '',
+        heading: userName ? `View User - ${userName}` : 'View User',
+        user: userName || '',
         isEdit: false,
         isView: true,
       };
@@ -44,7 +47,7 @@ export default function UserFormHandle() {
       isEdit: false,
       isView: false,
     };
-  }, [pathname, id, state]);
+  }, [pathname, id, userName]);
 
   //   useEffect(() => {
   //     if (id) dispatch(getBannerByIdAsync(id));
@@ -69,7 +72,7 @@ export default function UserFormHandle() {
               href: PATH_DASHBOARD.user.list,
             },
             {
-              name: editView?.heading,
+              name: userName || editView?.heading,
               href: PATH_DASHBOARD.user.list,
             },
           ]}

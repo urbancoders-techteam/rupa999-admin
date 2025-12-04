@@ -267,17 +267,17 @@ function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange
 
                     <Box flex={1} sx={{ display: 'flex', alignItems: 'center', gap: 1, my: 1.5}}>
                       {onTransactionRow && (
-                        <Button variant="contained" onClick={() => onTransactionRow(row._id || row.id)}>
+                        <Button variant="contained" onClick={() => onTransactionRow(row._id || row.id, row)}>
                           <Typography variant="body2"> Transaction</Typography>
                         </Button>
                       )}
                       {onWithdrawalRequestsRow && (
-                        <Button variant="contained" onClick={() => onWithdrawalRequestsRow(row._id || row.id)}>
+                        <Button variant="contained" onClick={() => onWithdrawalRequestsRow(row._id || row.id, row)}>
                           <Typography variant="body2">Withdrawal</Typography>
                         </Button>
                       )}
                       {onBidHistoryRow && (
-                        <Button variant="contained" onClick={() => onBidHistoryRow(row._id || row.id)}>
+                        <Button variant="contained" onClick={() => onBidHistoryRow(row._id || row.id, row)}>
                           <Typography variant="body2" textWrap='noWrap'>Bid</Typography>
                         </Button>
                       )}

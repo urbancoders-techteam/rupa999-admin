@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 // @mui
 import {
   Card,
@@ -64,6 +64,10 @@ export default function UserBidHistoryListPage() {
   const { themeStretch } = useSettingsContext();
   const dispatch = useDispatch();
   const { id: userId } = useParams();
+  const location = useLocation();
+  
+  // Get userName from navigation state
+  const userName = location.state?.userName || '';
 
   // Redux state
   const { bidHistoryList, bidHistoryLoading, bidHistoryPagination } = useSelector(
@@ -176,11 +180,11 @@ export default function UserBidHistoryListPage() {
           })}
         >
           <CustomBreadcrumbs
-            heading="User Bid History"
+            heading={userName ? `User Bid History - ${userName}` : 'User Bid History'}
             links={[
               { name: 'Dashboard', href: PATH_DASHBOARD.root },
               { name: 'User List', href: PATH_DASHBOARD.user.list },
-              { name: 'User Bid History' },
+              { name: userName ? `${userName}'s Bid History` : 'User Bid History' },
             ]}
           />
         </Box>

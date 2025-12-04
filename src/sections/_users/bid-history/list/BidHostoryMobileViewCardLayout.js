@@ -23,6 +23,14 @@ function BidHostoryMobileViewCardLayout({
     return 'N/A';
   };
 
+  const formatText = (text) => {
+    if (!text || text === '-') return '—';
+    return text
+      .split('_')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
   if (loading) {
     return (
       <Box
@@ -73,7 +81,7 @@ function BidHostoryMobileViewCardLayout({
             {/* Header */}
             <Box mb={1.5}>
               <Typography variant="subtitle1" fontWeight={600} noWrap>
-                {row.marketId.name || 'N/A'}
+                {row.marketId?.name || row.marketName || 'N/A'}
               </Typography>
             </Box>
 
@@ -83,10 +91,28 @@ function BidHostoryMobileViewCardLayout({
             <Stack spacing={1}>
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2" color="text.secondary">
+                  User Name:
+                </Typography>
+                <Typography variant="body2" fontWeight={500}>
+                  {row.userId?.name || '—'}
+                </Typography>
+              </Stack>
+
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="body2" color="text.secondary">
+                  Phone:
+                </Typography>
+                <Typography variant="body2" fontWeight={500}>
+                  {row.userId?.number || '—'}
+                </Typography>
+              </Stack>
+
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="body2" color="text.secondary">
                   Game Name:
                 </Typography>
                 <Typography variant="body2" fontWeight={500}>
-                  {row.name || '—'}
+                  {formatText(row.name) || formatText(row.gameType) || '—'}
                 </Typography>
               </Stack>
 
@@ -95,7 +121,7 @@ function BidHostoryMobileViewCardLayout({
                   Digit:
                 </Typography>
                 <Typography variant="body2" fontWeight={500}>
-                  {row.bidTable.digit || '—'}
+                  {row.bidTable?.digit || '—'}
                 </Typography>
               </Stack>
 

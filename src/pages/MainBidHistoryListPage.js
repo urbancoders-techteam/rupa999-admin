@@ -97,10 +97,10 @@ export default function MainBidHistoryListPage() {
         id: bid._id || index + 1,
         _id: bid._id,
         sno: (page * rowsPerPage) + index + 1, // Calculate S.No. based on pagination
-        marketName: bid.marketName || bid.market?.name || '-',
+        marketName: bid.marketName || bid.market?.name || bid.marketId?.name || '-',
         name: bid.gameName || bid.gameType || bid.name || '-',
-        digit: bid.digit || bid.number || '-',
-        point: bid.point || bid.amount || 0,
+        digit: bid.digit || bid.bidTable?.digit || bid.number || '-',
+        point: bid.point || bid.bidTable?.bid || bid.amount || bid.totalPoints || 0,
         date: bid.date || bid.createdAt || '-',
         gameType: bid.gameType,
         status: bid.status,

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
@@ -105,8 +105,8 @@ export default function UserListPage() {
     return '';
   };
 
-  // Fetch users on component mount and when filters change
-  useEffect(() => {
+  // Reusable function to fetch users
+  const fetchUsers = useCallback(() => {
     dispatch(
       getAllUsersAsync({
         page: page + 1, // API uses 1-based pagination
@@ -116,6 +116,11 @@ export default function UserListPage() {
       })
     );
   }, [dispatch, page, rowsPerPage, searchQuery, filterStatus]);
+
+  // Fetch users on component mount and when filters change
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   // Transform API data to table format
   // Note: API already handles pagination and filtering, so we use the data directly
@@ -190,14 +195,7 @@ export default function UserListPage() {
       await dispatch(deleteUserAsync(id)).unwrap();
       enqueueSnackbar('User deleted successfully!', { variant: 'success' });
       // Refresh the list
-      dispatch(
-        getAllUsersAsync({
-          page: page + 1,
-          limit: rowsPerPage,
-          search: searchQuery,
-          status: filterStatus !== 'all' ? getStatusForAPI(filterStatus) : '',
-        })
-      );
+      fetchUsers();
       setSelected([]);
       setOpenConfirm(false);
       setDeleteId(null);
@@ -226,34 +224,27 @@ export default function UserListPage() {
       await dispatch(updateUserStatusAsync({ id, status: statusValue })).unwrap();
       enqueueSnackbar(`User ${status ? 'activated' : 'blocked'} successfully!`, { variant: 'success' });
       // Refresh the list
-      dispatch(
-        getAllUsersAsync({
-          page: page + 1,
-          limit: rowsPerPage,
-          search: searchQuery,
-          status: filterStatus !== 'all' ? getStatusForAPI(filterStatus) : '',
-        })
-      );
+      fetchUsers();
     } catch (error) {
       enqueueSnackbar(error?.message || 'Failed to update user status', { variant: 'error' });
       throw error; // Re-throw to let StatusToggleCell revert the UI
     }
   };
 
-  const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.user.edit(id));
+  const handleEditRow = (id, userName) => {
+    navigate(PATH_DASHBOARD.user.edit(id), { state: { userName } });
   };
 
-  const handleTransactionRow = (id) => {
-    navigate(PATH_DASHBOARD.user.transactions(id));
+  const handleTransactionRow = (id, userName) => {
+    navigate(PATH_DASHBOARD.user.transactions(id), { state: { userName } });
   };
 
-  const handleWithdrawalRequestRow = (id) => {
-    navigate(PATH_DASHBOARD.user.withdrawalrequest(id));
+  const handleWithdrawalRequestRow = (id, userName) => {
+    navigate(PATH_DASHBOARD.user.withdrawalrequest(id), { state: { userName } });
   };
 
-  const handleBidHistoryRow = (userId) => {
-    navigate(PATH_DASHBOARD.user.bidhistory(userId));
+  const handleBidHistoryRow = (userId, userName) => {
+    navigate(PATH_DASHBOARD.user.bidhistory(userId), { state: { userName } });
   };
 
   const handleChangePassword = async (userId, password, cpassword) => {
@@ -275,14 +266,7 @@ export default function UserListPage() {
       await dispatch(addDeductBalanceAsync({ id: userId, amount, action })).unwrap();
       enqueueSnackbar(`Balance ${action === 'add' ? 'added' : 'deducted'} successfully`, { variant: 'success' });
       // Refresh user list to get updated balance
-      dispatch(
-        getAllUsersAsync({
-          page: page + 1,
-          limit: rowsPerPage,
-          search: searchQuery,
-          status: filterStatus !== 'all' ? getStatusForAPI(filterStatus) : '',
-        })
-      );
+      fetchUsers();
       return true;
     } catch (error) {
       enqueueSnackbar(error?.message || `Failed to ${action === 'add' ? 'add' : 'deduct'} balance`, { variant: 'error' });
@@ -362,12 +346,12 @@ export default function UserListPage() {
             />
             <UserMobileViewCardLayout
               data={tableData}
-              onEditRow={handleEditRow}
+              onEditRow={(id, row) => handleEditRow(id, row?.name)}
               onDeleteRow={(id) => handleDeleteRow(id)}
               onStatusChange={handleStatusChange}
-              onTransactionRow={handleTransactionRow}
-              onBidHistoryRow={handleBidHistoryRow}
-              onWithdrawalRequestsRow={handleWithdrawalRequestRow}
+              onTransactionRow={(id, row) => handleTransactionRow(id, row?.name)}
+              onBidHistoryRow={(id, row) => handleBidHistoryRow(id, row?.name)}
+              onWithdrawalRequestsRow={(id, row) => handleWithdrawalRequestRow(id, row?.name)}
               onChangePassword={(id, password, cpassword) => handleChangePassword(id, password, cpassword)}
               changePasswordLoading={changePasswordLoading}
               onAddDeductBalance={(id, amount, action) => handleAddDeductBalance(id, amount, action)}
@@ -433,11 +417,11 @@ export default function UserListPage() {
                           key={row._id || row.id}
                           index={row.sno}
                           row={row}
-                          onTransationRow={() => handleTransactionRow(row._id || row.id)}
-                          onWithdrawalRequestRow={() => handleWithdrawalRequestRow(row._id || row.id)}
-                          onBidHistoryRow={() => handleBidHistoryRow(row._id || row.id)}
+                          onTransationRow={() => handleTransactionRow(row._id || row.id, row.name)}
+                          onWithdrawalRequestRow={() => handleWithdrawalRequestRow(row._id || row.id, row.name)}
+                          onBidHistoryRow={() => handleBidHistoryRow(row._id || row.id, row.name)}
                           onDeleteRow={async () => handleDeleteRow(row._id || row.id)}
-                          onEditRow={() => handleEditRow(row._id || row.id)}
+                          onEditRow={() => handleEditRow(row._id || row.id, row.name)}
                           onStatusChange={(_id, status) => handleStatusChange(_id, status)}
                           onChangePassword={(id, password, cpassword) => handleChangePassword(id, password, cpassword)}
                           changePasswordLoading={changePasswordLoading}
@@ -509,9 +493,9 @@ function applyFilter({ inputData, filterName, filterStatus, filterRole }) {
     filteredData = filteredData.filter((user) => user.statusLabel === filterStatus);
   }
 
-  if (filterRole !== 'all') {
-    filteredData = filteredData.filter((user) => user.role === filterRole);
-  }
+  // if (filterRole !== 'all') {
+  //   filteredData = filteredData.filter((user) => user.role === filterRole);
+  // }
 
   return filteredData;
 }

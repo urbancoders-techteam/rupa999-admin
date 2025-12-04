@@ -52,19 +52,19 @@ export default function MainBidHistoryTableRow({ index, row, selected }) {
 
       <TableCell align="left">
         <Typography variant="subtitle2" noWrap>
-          {userId.name || '—'}
+          {userId?.name || '—'}
         </Typography>
       </TableCell>
      
       <TableCell align="left">
         <Typography variant="body2" noWrap>
-          {userId.number || '—'}
+          {userId?.number || '—'}
         </Typography>
       </TableCell>
 
       <TableCell align="left">
         <Typography variant="subtitle2" noWrap>
-          {marketId.name || '—'}
+          {marketId?.name || '—'}
         </Typography>
       </TableCell>
 
@@ -76,7 +76,7 @@ export default function MainBidHistoryTableRow({ index, row, selected }) {
 
       <TableCell align="left">
         <Typography variant="body2">
-          {fBidDigit(bidTable.digit) || '—'}
+          {bidTable?.digit ? fBidDigit(bidTable.digit) : '—'}
         </Typography>
       </TableCell>
 

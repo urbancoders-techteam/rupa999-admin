@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 // @mui
 import {
   Card,
@@ -45,9 +45,6 @@ import WithdrawalRequestMobileViewLayout from '../sections/_users/withdrawal-req
 import WithdrawDetailsTableRow from '../sections/_withdraw_details/components/WithdrawDetailsTableRow';
 
 // ----------------------------------------------------------------------
-
-const STATUS_OPTIONS = ['Creadit', 'Debit'];
-
 const TABLE_HEAD = [
   { id: 'index', label: 'ID', align: 'center' },
   { id: 'name', label: 'Name', align: 'left' },
@@ -71,7 +68,6 @@ export default function WithdrawalResquestListPage() {
     //
     selected,
     setSelected,
-    onSelectAllRows,
     onSort,
     onChangeDense,
     onChangePage,
@@ -83,6 +79,10 @@ export default function WithdrawalResquestListPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { id: userId } = useParams();
+  const location = useLocation();
+  
+  // Get userName from navigation state
+  const userName = location.state?.userName || '';
 
   const [tableData, setTableData] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
@@ -90,12 +90,9 @@ export default function WithdrawalResquestListPage() {
   const [acceptLoading, setAcceptLoading] = useState({});
   const [rejectLoading, setRejectLoading] = useState({});
 
-  const [openConfirm, setOpenConfirm] = useState(false);
-
   const [filterName, setFilterName] = useState(''); // Input field value
   const [searchQuery, setSearchQuery] = useState(''); // Actual search value for filtering
 
-  const [filterRole, setFilterRole] = useState('all');
 
   const [filterStatus, setFilterStatus] = useState('all');
 
@@ -163,8 +160,8 @@ export default function WithdrawalResquestListPage() {
     // Filter by name
     if (searchQuery) {
       filtered = filtered.filter((item) => {
-        const userName = item?.userId?.name || '';
-        return userName.toLowerCase().includes(searchQuery.toLowerCase());
+        const itemUserName = item?.userId?.name || '';
+        return itemUserName.toLowerCase().includes(searchQuery.toLowerCase());
       });
     }
 
@@ -193,22 +190,9 @@ export default function WithdrawalResquestListPage() {
 
   const isMobile = useResponsive('down', 'sm');
 
-  const isFiltered = searchQuery !== '' || filterRole !== 'all' || filterStatus !== 'all';
+  const isFiltered = searchQuery !== '' || filterStatus !== 'all';
 
   const isNotFound = !loading && tableData.length === 0 && !isFiltered;
-
-  const handleOpenConfirm = () => {
-    setOpenConfirm(true);
-  };
-
-  const handleCloseConfirm = () => {
-    setOpenConfirm(false);
-  };
-
-  const handleFilterStatus = (event, newValue) => {
-    setPage(0);
-    setFilterStatus(newValue);
-  };
 
   const handleFilterName = (event) => {
     setFilterName(event.target.value);
@@ -297,29 +281,13 @@ export default function WithdrawalResquestListPage() {
           })}
         >
           <CustomBreadcrumbs
-            heading="Withdrawal Requests"
+            heading={userName ? `Withdrawal Requests - ${userName}` : 'Withdrawal Requests'}
             links={[
               { name: 'Dashboard', href: PATH_DASHBOARD.root },
               { name: 'User List', href: PATH_DASHBOARD.user.list },
-              { name: 'Withdrawal Requests' },
+              { name: userName ? `${userName}'s Withdrawal Requests` : 'Withdrawal Requests' },
             ]}
-          // action={
-          //   <Button
-          //     component={RouterLink}
-          //     variant="contained"
-          //     startIcon={<Iconify icon="eva:plus-fill" />}
-          //     // to={PATH_DASHBOARD.user.new}
-          //     sx={{
-          //       [(theme) => theme.breakpoints.down('sm')]: {
-          //         fontSize: '0.75rem',
-          //         py: 0.5,
-          //         px: 1.5,
-          //       },
-          //     }}
-          //   >
-          //     Add / Deduct 
-          //   </Button>
-          // }
+
           />
         </Box>
 
@@ -340,6 +308,7 @@ export default function WithdrawalResquestListPage() {
               onFilterName={handleFilterName}
               onSearch={handleSearch}
               onResetFilter={handleResetFilter}
+              userName={userName}
             />
             <WithdrawalRequestMobileViewLayout
               data={dataFiltered}
@@ -355,6 +324,7 @@ export default function WithdrawalResquestListPage() {
               onFilterName={handleFilterName}
               onSearch={handleSearch}
               onResetFilter={handleResetFilter}
+              userName={userName}
             />
 
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
