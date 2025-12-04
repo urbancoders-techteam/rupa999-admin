@@ -1,126 +1,226 @@
-import React from 'react';
 import {
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Paper,
+  Alert,
   Box,
+  CircularProgress,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Typography,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-
-const data = [
-  {
-    id: 1,
-    dateStart: '03/11/2025',
-    dateEnd: '09/11/2025',
-    days: [
-      { top: 150, middle: 62, bottom: 570, isRed: false },
-      { top: 356, middle: 40, bottom: 370, isRed: false },
-      { top: 169, middle: 66, bottom: 259, isRed: true },
-      { top: 350, middle: 81, bottom: 236, isRed: false },
-      { top: 338, middle: 41, bottom: 290, isRed: false },
-      { top: 589, middle: '2 *', bottom: '***', isRed: false },
-      { top: '***', middle: '**', bottom: 360, isRed: false },
-    ],
-  },
-  {
-    id: 2,
-    dateStart: '27/10/2025',
-    dateEnd: '02/11/2025',
-    days: [
-      { top: 189, middle: 89, bottom: 450, isRed: false },
-      { top: 160, middle: 77, bottom: 890, isRed: true },
-      { top: 267, middle: 51, bottom: 344, isRed: false },
-      { top: 168, middle: 52, bottom: 138, isRed: false },
-      { top: 125, middle: 84, bottom: 167, isRed: false },
-      { top: 345, middle: 20, bottom: 145, isRed: false },
-      { top: 360, middle: 92, bottom: 129, isRed: false },
-    ],
-  },
-  {
-    id: 3,
-    dateStart: '13/10/2025',
-    dateEnd: '19/10/2025',
-    days: [
-      { top: 448, middle: 69, bottom: 469, isRed: false },
-      { top: 126, middle: 92, bottom: 679, isRed: false },
-      { top: 178, middle: 64, bottom: 158, isRed: false },
-      { top: 350, middle: 86, bottom: 123, isRed: false },
-      { top: 146, middle: 16, bottom: 790, isRed: false },
-      { top: 260, middle: 85, bottom: 258, isRed: false },
-      { top: 570, middle: 22, bottom: 147, isRed: true },
-    ],
-  },
-  {
-    id: 4,
-    dateStart: '06/10/2025',
-    dateEnd: '12/10/2025',
-    days: [
-      { top: 670, middle: 33, bottom: 139, isRed: true },
-      { top: 256, middle: 31, bottom: 489, isRed: false },
-      { top: 236, middle: 15, bottom: 249, isRed: false },
-      { top: 338, middle: 40, bottom: 668, isRed: false },
-      { top: 468, middle: 87, bottom: 250, isRed: false },
-      { top: 126, middle: 91, bottom: 227, isRed: false },
-      { top: 178, middle: 67, bottom: 368, isRed: false },
-    ],
-  },
-  {
-    id: 5,
-    dateStart: '29/09/2025',
-    dateEnd: '05/10/2025',
-    days: [
-      { top: 566, middle: 76, bottom: 169, isRed: false },
-      { top: 780, middle: 54, bottom: 699, isRed: false },
-      { top: 567, middle: 89, bottom: 559, isRed: false },
-      { top: 380, middle: 15, bottom: 348, isRed: false },
-      { top: 469, middle: 96, bottom: 259, isRed: false },
-      { top: 157, middle: 32, bottom: 237, isRed: false },
-      { top: 235, middle: 8, bottom: 364, isRed: false },
-    ],
-  },
-  {
-    id: 5,
-    dateStart: '29/09/2025',
-    dateEnd: '05/10/2025',
-    days: [
-      { top: 566, middle: 76, bottom: 169, isRed: false },
-      { top: 780, middle: 54, bottom: 699, isRed: false },
-      { top: 567, middle: 89, bottom: 559, isRed: false },
-      { top: 380, middle: 15, bottom: 348, isRed: false },
-      { top: 469, middle: 96, bottom: 259, isRed: false },
-      { top: 157, middle: 32, bottom: 237, isRed: false },
-      { top: 235, middle: 8, bottom: 364, isRed: false },
-    ],
-  },
-];
+import PropTypes from 'prop-types';
+import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { getMarketResultsByMarketAndGameTypeAsync } from '../../redux/services/market_result_services';
 
 const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-const SinglePanaChartTable = () => {
+// Helper function to get day of week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+// We convert to Monday=0, Tuesday=1, ..., Sunday=6
+const getDayOfWeek = (dateString) => {
+  const date = new Date(dateString);
+  const day = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  return day === 0 ? 6 : day - 1; // Convert to Monday=0, Tuesday=1, ..., Sunday=6
+};
+
+// Helper function to transform day data
+const transformDayData = (dayData) => {
+  if (!dayData) {
+    // Missing day - return placeholder
+    return { top: '***', middle: '**', bottom: '***', isRed: false };
+  }
+
+  const openPana = dayData.openPana;
+  const closePana = dayData.closePana;
+  const openDigit = dayData.openDigit;
+  const closeDigit = dayData.closeDigit;
+
+  // Top: openPana (3-digit number, or '***' if null/undefined)
+  const top = openPana !== null && openPana !== undefined ? Number(openPana) : '***';
+
+  // Middle: openDigit (main number, or '**' if null/undefined)
+  const middleOne = openDigit !== null && openDigit !== undefined ? Number(openDigit) : '**';
+
+  const middleTwo = closeDigit !== null && closeDigit !== undefined ? Number(closeDigit) : '**';
+
+  // Combine middleOne and middleTwo to form the middle value
+  let middle;
+  if (middleOne === '**' && middleTwo === '**') {
+    middle = '**';
+  } else if (middleOne === '**') {
+    middle = middleTwo;
+  } else if (middleTwo === '**') {
+    middle = middleOne;
+  } else {
+    middle = `${middleOne}${middleTwo}`;
+  }
+
+  const bottom = closePana !== null && closePana !== undefined ? Number(closePana) : '***';
+
+  const middleNum = typeof middle === 'string' ? middle : middle;
+  const specialNumbers = ['00', '11', '22', '33', '55', '66', '77', '88', '99'];
+  const isRed = typeof middleNum === 'string' && specialNumbers.includes(middleNum);
+
+  return {
+    top,
+    middle,
+    bottom,
+    isRed,
+  };
+};
+
+// Helper function to transform API data to table format
+const transformDataToTableFormat = (apiData) => {
+  if (!apiData || apiData.length === 0) return [];
+
+  // API already returns data sorted by date ascending, but ensure it's sorted correctly
+  const sortedData = [...apiData].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  // Create a map of date to data
+  const dateToDataMap = new Map();
+  sortedData.forEach((item) => {
+    dateToDataMap.set(item.date, item);
+  });
+
+  // Find the date range
+  const firstDate = new Date(sortedData[0].date);
+  const lastDate = new Date(sortedData[sortedData.length - 1].date);
+
+  // Get the Monday of the first week
+  const getMonday = (date) => {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
+    return new Date(d.setDate(diff));
+  };
+
+  const startMonday = getMonday(firstDate);
+  const endMonday = getMonday(lastDate);
+
+  // Group data into weeks
+  const weeks = [];
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  // Iterate through each week
+  for (let weekStart = new Date(startMonday); weekStart <= endMonday; weekStart.setDate(weekStart.getDate() + 7)) {
+    const weekDays = [];
+    let weekHasData = false;
+
+    // For each day of the week (Monday to Sunday)
+    for (let i = 0; i < 7; i += 1) {
+      const currentDate = new Date(weekStart);
+      currentDate.setDate(weekStart.getDate() + i);
+      const dateString = currentDate.toISOString().split('T')[0];
+
+      const dayData = dateToDataMap.get(dateString);
+
+      if (dayData) {
+        weekHasData = true;
+      }
+
+      weekDays.push(transformDayData(dayData));
+    }
+
+    // Only add week if it has at least one day with data
+    if (weekHasData) {
+      // End date is always Sunday (6 days after Monday = 7 days total)
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+      weeks.push({
+        id: weeks.length + 1,
+        dateStart: formatDate(weekStart), // Always start from Monday
+        dateEnd: formatDate(weekEnd), // Always end on Sunday (7 days from Monday)
+        days: weekDays,
+      });
+    }
+  }
+
+  return weeks;
+};
+
+const SinglePanaChartTable = ({ selectedMarket }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  
+  const dispatch = useDispatch();
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!selectedMarket || !selectedMarket._id) {
+      // If no market selected, show empty data
+      setData([]);
+      return;
+    }
+
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await dispatch(
+          getMarketResultsByMarketAndGameTypeAsync({
+            marketsId: selectedMarket._id,
+            gameType: 'pana',
+          })
+        ).unwrap();
+
+        if (result?.data) {
+          const transformedData = transformDataToTableFormat(result.data);
+          setData(transformedData);
+        } else {
+          setData([]);
+        }
+      } catch (err) {
+        console.error('Error fetching market results:', err);
+        setError(err?.message || 'Failed to fetch market results');
+        setData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [dispatch, selectedMarket]);
+
   const cellBaseSx = {
     border: '1px solid #e0e0e0',
     padding: { xs: '2px 4px', sm: '4px 6px', md: '6px 8px' },
     textAlign: 'center',
   };
 
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
-    <Box 
-      sx={{ 
-        p: { xs: 0.5, sm: 1, md: 2 }, 
-        backgroundColor: 'transparent', 
+    <Box
+      sx={{
+        p: { xs: 0.5, sm: 1, md: 2 },
+        backgroundColor: 'transparent',
         width: '100%',
         overflow: 'hidden',
       }}
     >
+      {error && (
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
       <Typography
         variant="h5"
         gutterBottom
@@ -142,10 +242,10 @@ const SinglePanaChartTable = () => {
         Single Pana Chart
       </Typography>
 
-      <TableContainer 
-        component={Paper} 
+      <TableContainer
+        component={Paper}
         elevation={0}
-        sx={{ 
+        sx={{
           border: '1px solid',
           borderColor: 'divider',
           borderRadius: 2,
@@ -175,8 +275,8 @@ const SinglePanaChartTable = () => {
           },
         }}
       >
-        <Table 
-          aria-label="responsive table" 
+        <Table
+          aria-label="responsive table"
           size={isMobile ? 'small' : 'medium'}
           sx={{
             minWidth: { xs: '600px', sm: '800px' },
@@ -270,21 +370,21 @@ const SinglePanaChartTable = () => {
                       gap: { xs: 0.1, sm: 0.2 },
                     }}
                   >
-                    <Typography sx={{ 
+                    <Typography sx={{
                       fontSize: { xs: '0.55rem', sm: '0.65rem', md: '0.75rem' },
                       lineHeight: 1.2,
                     }}>
                       {item.dateStart}
                     </Typography>
-                    <Typography sx={{ 
-                      fontWeight: 'bold', 
-                      my: '1px', 
+                    <Typography sx={{
+                      fontWeight: 'bold',
+                      my: '1px',
                       fontSize: { xs: '0.5rem', sm: '0.6rem', md: '0.7rem' },
                       lineHeight: 1,
                     }}>
                       -
                     </Typography>
-                    <Typography sx={{ 
+                    <Typography sx={{
                       fontSize: { xs: '0.55rem', sm: '0.65rem', md: '0.75rem' },
                       lineHeight: 1.2,
                     }}>
@@ -299,11 +399,11 @@ const SinglePanaChartTable = () => {
                   const bottomStr = String(dayData.bottom);
                   const topDigits = topStr.split('').slice(0, 3);
                   const bottomDigits = bottomStr.split('').slice(0, 3);
-                  
+
                   // Pad arrays to ensure 3 items for consistent layout
                   while (topDigits.length < 3) topDigits.push('');
                   while (bottomDigits.length < 3) bottomDigits.push('');
-                  
+
                   return (
                     <TableCell
                       key={i}
@@ -438,6 +538,10 @@ const SinglePanaChartTable = () => {
       </TableContainer>
     </Box>
   );
+};
+
+SinglePanaChartTable.propTypes = {
+  selectedMarket: PropTypes.object,
 };
 
 export default SinglePanaChartTable;

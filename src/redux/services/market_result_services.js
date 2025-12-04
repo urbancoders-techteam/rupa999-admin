@@ -70,3 +70,18 @@ export const revertMarketResultAsync = createAsyncThunk(
     })
 );
 
+// Get market results by market and game type
+export const getMarketResultsByMarketAndGameTypeAsync = createAsyncThunk(
+  'marketResult/getByMarketAndGameType',
+  async ({ marketsId, gameType }, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: '/market-results/byMarketAndGameType',
+      method: 'get',
+      params: {
+        marketsId,
+        gameType,
+      },
+    })
+);
+

@@ -1,34 +1,59 @@
-import React, { useEffect } from 'react';
-import { Grid, Button, TextField, Autocomplete, Box, useTheme, alpha } from '@mui/material';
-import PropTypes from 'prop-types';
-import { useForm, Controller, FormProvider } from 'react-hook-form';
 import SearchIcon from '@mui/icons-material/Search';
+import { alpha, Autocomplete, Button, Grid, TextField, useTheme } from '@mui/material';
+import PropTypes from 'prop-types';
+import { useEffect } from 'react';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllMarketsAsync } from '../../../redux/services/market_services';
 
 PanaChartToolBar.propTypes = {
   handleDrawerClose: PropTypes.func,
   selectedGame: PropTypes.string,
   onGameChange: PropTypes.func,
+  selectedMarket: PropTypes.object,
+  onMarketChange: PropTypes.func,
 };
 
-export default function PanaChartToolBar({ handleDrawerClose, selectedGame = 'Jodi', onGameChange }) {
+export default function PanaChartToolBar({
+  handleDrawerClose,
+  selectedGame = 'Jodi',
+  onGameChange,
+  selectedMarket = null,
+  onMarketChange,
+}) {
   const theme = useTheme();
+  const dispatch = useDispatch();
+  const { marketList } = useSelector((state) => state.market);
+
   const methods = useForm({
     defaultValues: {
       game: selectedGame,
       marketType: '',
-      market: '',
+      market: selectedMarket,
       date: null,
     },
   });
 
   const { handleSubmit, control, setValue } = methods;
 
+  // Fetch markets on mount
+  useEffect(() => {
+    dispatch(getAllMarketsAsync({ page: 1, limit: 1000 }));
+  }, [dispatch]);
+
   useEffect(() => {
     setValue('game', selectedGame);
   }, [selectedGame, setValue]);
 
+  useEffect(() => {
+    setValue('market', selectedMarket);
+  }, [selectedMarket, setValue]);
+
   const onSubmit = (data) => {
     console.log('PanaChartToolBar Data:', data);
+    if (onMarketChange && data.market) {
+      onMarketChange(data.market);
+    }
     if (handleDrawerClose) handleDrawerClose();
   };
 
@@ -44,7 +69,7 @@ export default function PanaChartToolBar({ handleDrawerClose, selectedGame = 'Jo
                 <Autocomplete
                   size="small"
                   fullWidth
-                  options={['Market', 'Starline']}
+                  options={['Main Market', 'Starline Market']}
                   value={field.value || ''}
                   onChange={(_, newValue) => field.onChange(newValue)}
                   renderInput={(params) => (
@@ -75,9 +100,21 @@ export default function PanaChartToolBar({ handleDrawerClose, selectedGame = 'Jo
                 <Autocomplete
                   size="small"
                   fullWidth
-                  options={optionsData}
-                  value={field.value || ''}
-                  onChange={(_, newValue) => field.onChange(newValue)}
+                  options={marketList || []}
+                  getOptionLabel={(option) => (typeof option === 'string' ? option : option?.name || '')}
+                  isOptionEqualToValue={(option, value) => {
+                    if (!option || !value) return false;
+                    const optionId = typeof option === 'string' ? option : option._id || option.id;
+                    const valueId = typeof value === 'string' ? value : value._id || value.id;
+                    return optionId === valueId;
+                  }}
+                  value={field.value || null}
+                  onChange={(_, newValue) => {
+                    field.onChange(newValue);
+                    if (onMarketChange && newValue) {
+                      onMarketChange(newValue);
+                    }
+                  }}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -160,20 +197,3 @@ export default function PanaChartToolBar({ handleDrawerClose, selectedGame = 'Jo
   );
 }
 
-const optionsData = [
-  'SRIDEVI DAY',
-  'TIME BAZAR',
-  'MADHUR DAY',
-  'MILAN DAY',
-  'RAJDHANI DAY',
-  'SUPREME DAY',
-  'KALIYAN',
-  'SRIDEVI NIGHT',
-  'MADHUR NIGHT',
-  'MILAN NIGHT',
-  'KALIYAN NIGHT',
-  'MAIN BAZAR',
-  'RAJDHANI NIGHT',
-  'KARNATAKA DAY',
-  'KARNATAKA NIGHT',
-];

@@ -1,17 +1,26 @@
 /* eslint-disable no-nested-ternary */
-import React, { useEffect, useState } from 'react';
 import {
+  Alert,
+  Box,
+  CircularProgress,
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
-  Box,
-  Typography,
+  Typography
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import PropTypes from 'prop-types';
+import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { getMarketResultsByMarketAndGameTypeAsync } from '../../redux/services/market_result_services';
+
+JodiResultTable.propTypes = {
+  selectedMarket: PropTypes.object,
+};
 
 // ===== Styled Components =====
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -82,38 +91,153 @@ const ScrollContainer = styled(TableContainer)(({ theme }) => ({
   },
 }));
 
+// Helper function to get Monday of a week
+const getMonday = (date) => {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
+  return new Date(d.setDate(diff));
+};
+
+// Helper function to transform API data to table format for Jodi
+const transformJodiDataToTableFormat = (apiData) => {
+  if (!apiData || apiData.length === 0) return [];
+
+  // API already returns data sorted by date ascending, but ensure it's sorted correctly
+  const sortedData = [...apiData].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  // Create a map of date to data
+  const dateToDataMap = new Map();
+  sortedData.forEach((item) => {
+    dateToDataMap.set(item.date, item);
+  });
+
+  // Find the date range
+  const firstDate = new Date(sortedData[0].date);
+  const lastDate = new Date(sortedData[sortedData.length - 1].date);
+
+  const startMonday = getMonday(firstDate);
+  const endMonday = getMonday(lastDate);
+
+  // Group data into weeks
+  const weeks = [];
+  const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  // Iterate through each week
+  for (let weekStart = new Date(startMonday); weekStart <= endMonday; weekStart.setDate(weekStart.getDate() + 7)) {
+    const weekRow = {};
+    let weekHasData = false;
+
+    // For each day of the week (Monday to Sunday)
+    for (let i = 0; i < 7; i += 1) {
+      const currentDate = new Date(weekStart);
+      currentDate.setDate(weekStart.getDate() + i);
+      const dateString = currentDate.toISOString().split('T')[0];
+
+      const dayData = dateToDataMap.get(dateString);
+      const dayName = dayNames[i];
+
+      if (dayData) {
+        weekHasData = true;
+        const openDigit = dayData.openDigit;
+        const closeDigit = dayData.closeDigit;
+
+        // For Jodi, we use the closeDigit if available, otherwise openDigit
+        const jodiValue = closeDigit !== null && closeDigit !== undefined ? closeDigit : openDigit;
+        weekRow[dayName] = jodiValue !== null && jodiValue !== undefined ? jodiValue : '**';
+      } else {
+        // Missing day - show '**'
+        weekRow[dayName] = '**';
+      }
+    }
+
+    // Only add week if it has at least one day with data
+    if (weekHasData) {
+      weeks.push(weekRow);
+    }
+  }
+
+  return weeks;
+};
+
+// Dummy data constant
+const DUMMY_DATA = [
+  { Mon: 62, Tue: 40, Wed: 66, Thu: 81, Fri: 41, Sat: '**', Sun: '**' },
+  { Mon: 89, Tue: 77, Wed: 51, Thu: 52, Fri: 84, Sat: 20, Sun: 92 },
+  { Mon: 69, Tue: 92, Wed: 64, Thu: 86, Fri: 16, Sat: 85, Sun: 22 },
+  { Mon: 33, Tue: 31, Wed: 15, Thu: 40, Fri: 87, Sat: 91, Sun: 67 },
+  { Mon: 76, Tue: 54, Wed: 89, Thu: 15, Fri: 96, Sat: 32, Sun: 8 },
+  { Mon: 48, Tue: 33, Wed: 78, Thu: 93, Fri: 70, Sat: 89, Sun: 99 },
+  { Mon: 53, Tue: 65, Wed: 4, Thu: 51, Fri: 54, Sat: 17, Sun: 67 },
+  { Mon: 53, Tue: 71, Wed: 32, Thu: 89, Fri: 42, Sat: 22, Sun: 60 },
+  { Mon: 42, Tue: 23, Wed: 32, Thu: 24, Fri: 83, Sat: 49, Sun: 51 },
+  { Mon: 65, Tue: 6, Wed: 54, Thu: 19, Fri: 55, Sat: 34, Sun: 92 },
+  { Mon: 37, Tue: 4, Wed: 11, Thu: 25, Fri: 54, Sat: 88, Sun: 34 },
+  { Mon: 68, Tue: 1, Wed: 86, Thu: 97, Fri: '**', Sat: 48, Sun: 4 },
+  { Mon: 57, Tue: 40, Wed: 63, Thu: 48, Fri: 91, Sat: 51, Sun: 98 },
+  { Mon: 73, Tue: 17, Wed: 69, Thu: 93, Fri: 79, Sat: 69, Sun: 96 },
+  { Mon: 48, Tue: 92, Wed: 81, Thu: 71, Fri: 12, Sat: 41, Sun: 23 },
+  { Mon: 53, Tue: 47, Wed: 68, Thu: 19, Fri: 79, Sat: 26, Sun: 45 },
+  { Mon: 25, Tue: 78, Wed: 1, Thu: 13, Fri: 71, Sat: 13, Sun: 2 },
+  { Mon: 21, Tue: 71, Wed: 24, Thu: 19, Fri: 30, Sat: 58, Sun: 54 },
+];
+
 // ===== Component =====
-export default function JodiResultTable() {
+export default function JodiResultTable({ selectedMarket }) {
+  const dispatch = useDispatch();
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const dummyData = [
-      { Mon: 62, Tue: 40, Wed: 66, Thu: 81, Fri: 41, Sat: '**', Sun: '**' },
-      { Mon: 89, Tue: 77, Wed: 51, Thu: 52, Fri: 84, Sat: 20, Sun: 92 },
-      { Mon: 69, Tue: 92, Wed: 64, Thu: 86, Fri: 16, Sat: 85, Sun: 22 },
-      { Mon: 33, Tue: 31, Wed: 15, Thu: 40, Fri: 87, Sat: 91, Sun: 67 },
-      { Mon: 76, Tue: 54, Wed: 89, Thu: 15, Fri: 96, Sat: 32, Sun: 8 },
-      { Mon: 48, Tue: 33, Wed: 78, Thu: 93, Fri: 70, Sat: 89, Sun: 99 },
-      { Mon: 53, Tue: 65, Wed: 4, Thu: 51, Fri: 54, Sat: 17, Sun: 67 },
-      { Mon: 53, Tue: 71, Wed: 32, Thu: 89, Fri: 42, Sat: 22, Sun: 60 },
-      { Mon: 42, Tue: 23, Wed: 32, Thu: 24, Fri: 83, Sat: 49, Sun: 51 },
-      { Mon: 65, Tue: 6, Wed: 54, Thu: 19, Fri: 55, Sat: 34, Sun: 92 },
-      { Mon: 37, Tue: 4, Wed: 11, Thu: 25, Fri: 54, Sat: 88, Sun: 34 },
-      { Mon: 68, Tue: 1, Wed: 86, Thu: 97, Fri: '**', Sat: 48, Sun: 4 },
-      { Mon: 57, Tue: 40, Wed: 63, Thu: 48, Fri: 91, Sat: 51, Sun: 98 },
-      { Mon: 73, Tue: 17, Wed: 69, Thu: 93, Fri: 79, Sat: 69, Sun: 96 },
-      { Mon: 48, Tue: 92, Wed: 81, Thu: 71, Fri: 12, Sat: 41, Sun: 23 },
-      { Mon: 53, Tue: 47, Wed: 68, Thu: 19, Fri: 79, Sat: 26, Sun: 45 },
-      { Mon: 25, Tue: 78, Wed: 1, Thu: 13, Fri: 71, Sat: 13, Sun: 2 },
-      { Mon: 21, Tue: 71, Wed: 24, Thu: 19, Fri: 30, Sat: 58, Sun: 54 },
-    ];
-    setData(dummyData);
-  }, []);
+    if (!selectedMarket || !selectedMarket._id) {
+      // If no market selected, use dummy data
+      setData(DUMMY_DATA);
+      return;
+    }
+
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await dispatch(
+          getMarketResultsByMarketAndGameTypeAsync({
+            marketsId: selectedMarket._id,
+            gameType: 'jodi',
+          })
+        ).unwrap();
+
+        if (result?.data) {
+          const transformedData = transformJodiDataToTableFormat(result.data);
+          setData(transformedData.length > 0 ? transformedData : DUMMY_DATA);
+        } else {
+          setData(DUMMY_DATA);
+        }
+      } catch (err) {
+        console.error('Error fetching market results:', err);
+        setError(err?.message || 'Failed to fetch market results');
+        setData(DUMMY_DATA);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [dispatch, selectedMarket]);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box
       sx={{
         display: 'flex',
+        flexDirection: 'column',
         justifyContent: 'center',
         width: '100%',
         overflowX: 'auto',
@@ -122,6 +246,11 @@ export default function JodiResultTable() {
         py: { xs: 1, sm: 2 },
       }}
     >
+      {error && (
+        <Alert severity="warning" sx={{ mb: 2, width: '100%' }}>
+          {error}
+        </Alert>
+      )}
       <Paper
         elevation={0}
         sx={{
@@ -188,23 +317,23 @@ export default function JodiResultTable() {
                             value === '**'
                               ? 'text.secondary'
                               : isSpecial
-                              ? '#dc2626'
-                              : 'text.primary',
+                                ? '#dc2626'
+                                : 'text.primary',
                           fontWeight: isSpecial ? 700 : 500,
                           fontSize: { xs: '0.75rem', sm: '0.875rem', md: '0.9375rem' },
                           position: 'relative',
                           '&::after': isSpecial
                             ? {
-                                content: '""',
-                                position: 'absolute',
-                                bottom: 0,
-                                left: '50%',
-                                transform: 'translateX(-50%)',
-                                width: '60%',
-                                height: '2px',
-                                backgroundColor: '#dc2626',
-                                opacity: 0.3,
-                              }
+                              content: '""',
+                              position: 'absolute',
+                              bottom: 0,
+                              left: '50%',
+                              transform: 'translateX(-50%)',
+                              width: '60%',
+                              height: '2px',
+                              backgroundColor: '#dc2626',
+                              opacity: 0.3,
+                            }
                             : {},
                         }}
                       >

@@ -34,6 +34,7 @@ export default function PanaChartsListPage() {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedGame, setSelectedGame] = useState('Jodi');
+  const [selectedMarket, setSelectedMarket] = useState(null);
 
   const handleDrawerOpen = () => setDrawerOpen(true);
   const handleDrawerClose = () => setDrawerOpen(false);
@@ -102,6 +103,8 @@ export default function PanaChartsListPage() {
             <PanaChartToolBar
               selectedGame={selectedGame}
               onGameChange={setSelectedGame}
+              selectedMarket={selectedMarket}
+              onMarketChange={setSelectedMarket}
             />
           </Card>
         )}
@@ -149,13 +152,15 @@ export default function PanaChartsListPage() {
             handleDrawerClose={handleDrawerClose}
             selectedGame={selectedGame}
             onGameChange={setSelectedGame}
+            selectedMarket={selectedMarket}
+            onMarketChange={setSelectedMarket}
           />
         </Drawer>
 
         {/* Chart Tables */}
         <Stack spacing={{ xs: 2, sm: 3 }} sx={{ mb: 3 }}>
-          {selectedGame === 'Jodi' && <JodiResultTable />}
-          {selectedGame === 'Single Pana' && <SinglePanaChartTable />}
+          {selectedGame === 'Jodi' && <JodiResultTable selectedMarket={selectedMarket} />}
+          {selectedGame === 'Single Pana' && <SinglePanaChartTable selectedMarket={selectedMarket} />}
         </Stack>
       </Container>
     </>
