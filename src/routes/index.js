@@ -43,6 +43,7 @@ import {
   StaticDataFormPage,
   CommonSettingFormPage,
   HelpAndSupportFormPage,
+  MarqueMessageFormPage,
   //
   StaffListPage,
   StarlineMarketFormHandle,
@@ -232,6 +233,13 @@ export default function Router() {
               children: [
                 { element: <Navigate to="/dashboard/settings/commonsetting/form" replace />, index: true },
                 { path: 'form', element: <CommonSettingFormPage /> },
+              ],
+            },
+            {
+              path: 'marquemessage',
+              children: [
+                { element: <Navigate to="/dashboard/settings/marquemessage/form" replace />, index: true },
+                { path: 'form', element: <MarqueMessageFormPage /> },
               ],
             },
           ],

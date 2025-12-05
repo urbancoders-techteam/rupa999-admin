@@ -81,7 +81,7 @@ export default function StaffTableRow({ index, row, selected, onEditRow, onTrans
           </IconButton>
         </TableCell>
 
-        <TableCell align="left">{index + 1}</TableCell>
+        <TableCell align="left">{index}</TableCell>
 
         <TableCell align="left">
           <Stack direction="row" alignItems="center" spacing={2}>

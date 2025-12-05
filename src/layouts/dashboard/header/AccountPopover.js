@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // @mui
 import { alpha } from '@mui/material/styles';
-import { Box, Divider, Typography, Stack, MenuItem } from '@mui/material';
+import { MenuItem } from '@mui/material';
 // routes
 import { PATH_DASHBOARD, PATH_AUTH } from '../../../routes/paths';
 // auth
@@ -12,6 +12,7 @@ import { CustomAvatar } from '../../../components/custom-avatar';
 import { useSnackbar } from '../../../components/snackbar';
 import MenuPopover from '../../../components/menu-popover';
 import { IconButtonAnimate } from '../../../components/animate';
+import Iconify from '../../../components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -62,6 +63,11 @@ export default function AccountPopover() {
     }
   };
 
+  const handleChangePassword = () => {
+    navigate(PATH_DASHBOARD.changepassword.form);
+    handleClosePopover();
+  };
+
 
   return (
     <>
@@ -87,8 +93,13 @@ export default function AccountPopover() {
 
       <MenuPopover open={openPopover} onClose={handleClosePopover} sx={{ width: 200, p: 0 }}>
 
-        <MenuItem onClick={handleLogout} sx={{ m: 1 }}>
+        <MenuItem onClick={handleLogout} sx={{ m: 1 , display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%'}}>
           Logout
+          <Iconify icon="mdi:logout" />
+        </MenuItem>
+        <MenuItem onClick={handleChangePassword} sx={{ m: 1 , display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%'}}>
+          Change Password
+          <Iconify icon="mdi:lock-reset" />
         </MenuItem>
       </MenuPopover>
     </>

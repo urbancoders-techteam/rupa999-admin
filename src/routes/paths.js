@@ -113,6 +113,11 @@ export const PATH_DASHBOARD = {
     form: path(ROOTS_DASHBOARD, '/settings/commonsetting/form'),
   },
 
+  marquemessage: {
+    root: path(ROOTS_DASHBOARD, '/settings/marquemessage'),
+    form: path(ROOTS_DASHBOARD, '/settings/marquemessage/form'),
+  },
+
   gift: {
     root: path(ROOTS_DASHBOARD, '/gift'),
     list: path(ROOTS_DASHBOARD, '/gift/list'),

@@ -25,7 +25,7 @@ export default function ResetPasswordPage() {
           links={[
             { name: 'Dashboard', href: PATH_DASHBOARD.root },
             { name: 'Change Password', href: PATH_DASHBOARD.changepassword.form },
-            { name: 'Form' },
+            // { name: 'Form' },
           ]}
         />
 
