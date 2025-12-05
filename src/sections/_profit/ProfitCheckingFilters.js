@@ -115,7 +115,7 @@ const ProfitCheckingFilters = () => {
               chart={{
                 series: [
                   { label: 'Total Amount', value: 44 },
-                  { label: 'Total Profit', value: 75 },
+                  { label: 'Total Win Amount', value: 75 },
                   { label: 'Profit', value: 75 },
                 ],
               }}

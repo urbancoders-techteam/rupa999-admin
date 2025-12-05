@@ -53,14 +53,14 @@ const marketTimeOptions = ['Open', 'Close'];
 
 const TABLE_HEAD = [
   { id: 'srNo', label: 'Sr No.', align: 'center' },
-  { id: 'jodiDigit', label: 'Jodi Digit', align: 'left' },
-  { id: 'halfSangamA', label: 'Half Sangam A', align: 'left' },
-  { id: 'halfSangamB', label: 'Half Sangam B', align: 'left' },
-  { id: 'fullSangam', label: 'Full Sangam', align: 'left' },
   { id: 'singleDigit', label: 'Single Digit', align: 'left' },
+  { id: 'jodiDigit', label: 'Jodi Digit', align: 'left' },
   { id: 'singlePana', label: 'Single Pana', align: 'left' },
   { id: 'doublePana', label: 'Double Pana', align: 'left' },
   { id: 'triplePana', label: 'Triple Pana', align: 'left' },
+  { id: 'halfSangamA', label: 'Half Sangam A', align: 'left' },
+  { id: 'halfSangamB', label: 'Half Sangam B', align: 'left' },
+  { id: 'fullSangam', label: 'Full Sangam', align: 'left' },
 ];
 
 // Mock data for demonstration

@@ -68,7 +68,7 @@ function ProgressItem({ progress }) {
         value={progress.value}
         color={
           (progress.label === 'Total Amount' && 'info') ||
-          (progress.label === 'Total Profit' && 'warning') ||
+          (progress.label === 'Total Win Amount' && 'warning') ||
           (progress.label === 'Profit' && 'success') ||
           'primary'
         }
