@@ -69,10 +69,6 @@ export default function StarLineMarketsListPage() {
   const [filterName, setFilterName] = useState(''); // Input field value
   const [searchQuery, setSearchQuery] = useState(''); // Actual search value for filtering
 
-  const [filterRole, setFilterRole] = useState('all');
-
-  const [filterStatus, setFilterStatus] = useState('all');
-
   // Memoized filtered data
   const dataFiltered = useMemo(
     () =>
@@ -80,10 +76,8 @@ export default function StarLineMarketsListPage() {
         inputData: tableData,
         comparator: getComparator(order, orderBy),
         filterName: searchQuery,
-        filterRole,
-        filterStatus,
       }),
-    [tableData, order, orderBy, searchQuery, filterRole, filterStatus]
+    [tableData, order, orderBy, searchQuery]
   );
 
   // Memoized paginated data
@@ -96,12 +90,9 @@ export default function StarLineMarketsListPage() {
 
   const isMobile = useResponsive('down', 'sm');
 
-  const isFiltered = searchQuery !== '' || filterRole !== 'all' || filterStatus !== 'all';
+  const isFiltered = searchQuery !== '';
 
-  const isNotFound =
-    (!dataFiltered.length && !!searchQuery) ||
-    (!dataFiltered.length && !!filterRole) ||
-    (!dataFiltered.length && !!filterStatus);
+  const isNotFound = !dataFiltered.length && !!searchQuery;
 
 
   const handleFilterName = (event) => {
@@ -132,8 +123,6 @@ export default function StarLineMarketsListPage() {
   const handleResetFilter = () => {
     setFilterName('');
     setSearchQuery('');
-    setFilterRole('all');
-    setFilterStatus('all');
     setPage(0);
   };
 
@@ -282,7 +271,7 @@ export default function StarLineMarketsListPage() {
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, comparator, filterName, filterStatus, filterRole }) {
+function applyFilter({ inputData, comparator, filterName }) {
   const stabilizedThis = inputData.map((el, index) => [el, index]);
 
   stabilizedThis.sort((a, b) => {
@@ -297,14 +286,6 @@ function applyFilter({ inputData, comparator, filterName, filterStatus, filterRo
     inputData = inputData.filter(
       (market) => market.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
     );
-  }
-
-  if (filterStatus !== 'all') {
-    inputData = inputData.filter((market) => market.status === filterStatus);
-  }
-
-  if (filterRole !== 'all') {
-    inputData = inputData.filter((market) => market.role === filterRole);
   }
 
   return inputData;

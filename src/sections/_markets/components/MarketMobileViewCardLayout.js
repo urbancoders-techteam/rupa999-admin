@@ -60,7 +60,7 @@ function MarketMobileViewCardLayout({
             <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ px: 2, py: 1 }}>
               <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="body1" sx={{ fontWeight: 700, borderRight: '1px solid', pr: 1, mr: 1 }}>
-                  {index + 1 || '—'}
+                  {row.sno || index + 1 || '—'}
                 </Typography>
                 <Typography variant="body1" sx={{flex:1 , flexWrap:'nowrap', fontWeight: 700, borderRight: '1px solid', pr: 1, mr: 1 }}>
                   {row.name || '—'}

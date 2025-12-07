@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
 import { Card, Table, Button, TableBody, Container, TableContainer, Box } from '@mui/material';
@@ -71,8 +71,6 @@ export default function MarketDetailsPage() {
 
   const [filterName, setFilterName] = useState(''); // Input field value
   const [searchQuery, setSearchQuery] = useState(''); // Actual search value sent to API
-  const [filterRole, setFilterRole] = useState('all');
-  const [filterStatus, setFilterStatus] = useState('all');
 
   // Fetch markets on component mount and when filters change
   useEffect(() => {
@@ -86,39 +84,34 @@ export default function MarketDetailsPage() {
   }, [dispatch, page, rowsPerPage, searchQuery]);
 
   // Transform API data to table format
-  const tableData = marketList.map((market, index) => ({
-    id: market._id || market.id,
-    _id: market._id,
-    sno: (page * rowsPerPage) + index + 1, // Calculate S.No. based on pagination
-    name: market.name,
-    openTime: market.openTime,
-    closeTime: formatTimeTo12Hour(market.closeTime),
-    activeDays: market.activeDays?.join(", ") || "N/A",
-    disableGame: market.disableGame || "no",
-    hideOpen: market.hideOpen || "disable",
-    createdAt: market.createdAt ? new Date(market.createdAt).toLocaleDateString() : "-",
-    ...market,
-  }));
+  const tableData = useMemo(
+    () =>
+      marketList.map((market, index) => ({
+        id: market._id || market.id,
+        _id: market._id,
+        sno: (page * rowsPerPage) + index + 1, // Calculate S.No. based on pagination
+        name: market.name,
+        openTime: market.openTime,
+        closeTime: formatTimeTo12Hour(market.closeTime),
+        activeDays: market.activeDays?.join(", ") || "N/A",
+        disableGame: market.disableGame || "no",
+        hideOpen: market.hideOpen || "disable",
+        createdAt: market.createdAt ? new Date(market.createdAt).toLocaleDateString() : "-",
+        ...market,
+      })),
+    [marketList, page, rowsPerPage]
+  );
 
   // Use tableData directly as API handles pagination and filtering
-  const dataFiltered = useMemo(
-    () =>
-      applyFilter({
-        inputData: tableData,
-        filterName: '', // Don't filter by name client-side, API handles it
-        filterRole,
-        filterStatus,
-      }),
-    [tableData, filterRole, filterStatus]
-  );
+  const dataFiltered = tableData;
 
   const denseHeight = dense ? 52 : 72;
 
   const isMobile = useResponsive('down', 'sm');
 
-  const isFiltered = searchQuery !== '' || filterRole !== 'all' || filterStatus !== 'all';
+  const isFiltered = searchQuery !== '';
 
-  const isNotFound = !tableData.length && (!!searchQuery || filterStatus !== 'all');
+  const isNotFound = !tableData.length && !!searchQuery;
 
 
   const handleFilterName = (event) => {
@@ -165,8 +158,6 @@ export default function MarketDetailsPage() {
   const handleResetFilter = () => {
     setFilterName('');
     setSearchQuery('');
-    setFilterRole('all');
-    setFilterStatus('all');
     setPage(0);
   };
 
@@ -308,22 +299,3 @@ export default function MarketDetailsPage() {
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, filterName, filterStatus, filterRole }) {
-  let filteredData = inputData;
-
-  if (filterName) {
-    filteredData = filteredData.filter(
-      (marketlist) => marketlist.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
-    );
-  }
-
-  if (filterStatus !== 'all') {
-    filteredData = filteredData.filter((marketlist) => marketlist.status === filterStatus);
-  }
-
-  if (filterRole !== 'all') {
-    filteredData = filteredData.filter((marketlist) => marketlist.role === filterRole);
-  }
-
-  return filteredData;
-}
