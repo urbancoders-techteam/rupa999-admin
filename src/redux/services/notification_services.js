@@ -12,7 +12,6 @@ export const getAllNotificationsAsync = createAsyncThunk(
       params: {
         page: params.page || 1,
         limit: params.limit || 10,
-        isActive: params.isActive || '',
       },
     })
 );
