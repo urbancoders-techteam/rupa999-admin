@@ -206,13 +206,24 @@ export default function StarLineMarketsListPage() {
 
         {/* Render mobile card layout for small screens, otherwise render the table */}
         {isMobile ? (
-          <MarketMobileViewCardLayout
-            data={dataFiltered}
-            onEditRow={handleEditRow}
-            onDeleteRow={(id) => handleDeleteRow(id)}
-            onSelectRow={(id) => onSelectRow(id)}
-            selected={selected}
-          />
+          <>
+            <MarketMobileViewCardLayout
+              data={dataInPage}
+              onEditRow={handleEditRow}
+              onDeleteRow={(id) => handleDeleteRow(id)}
+              onSelectRow={(id) => onSelectRow(id)}
+              selected={selected}
+            />
+            <TablePaginationCustom
+              count={dataFiltered.length}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={onChangePage}
+              onRowsPerPageChange={onChangeRowsPerPage}
+              dense={dense}
+              onChangeDense={onChangeDense}
+            />
+          </>
         ) : (
           <Card>
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>

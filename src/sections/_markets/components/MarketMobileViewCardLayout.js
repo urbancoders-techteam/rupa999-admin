@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import {
   Accordion,
@@ -13,7 +13,6 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import CircularProgress from '@mui/material/CircularProgress';
 import dayjs from 'dayjs';
 import Label from '../../../components/label';
 import { fDateTimeOrdinal } from '../../../utils/formatTime';
@@ -25,44 +24,27 @@ function MarketMobileViewCardLayout({
   onSelectRow,
   selected = [],
 }) {
-  const [visibleData, setVisibleData] = useState(data.slice(0, 10));
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(data.length > 10);
-  const containerRef = useRef(null);
-
-  useEffect(() => {
-    setVisibleData(data.slice(0, 10));
-    setHasMore(data.length > 10);
-  }, [data]);
-
-  const handleScroll = React.useCallback(() => {
-    if (!containerRef.current || loading || !hasMore) return;
-    const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
-    if (scrollHeight - scrollTop - clientHeight < 50) {
-      setLoading(true);
-      setTimeout(() => {
-        const nextLength = visibleData.length + 10;
-        const newData = data.slice(0, nextLength);
-        setVisibleData(newData);
-        setHasMore(newData.length < data.length);
-        setLoading(false);
-      }, 1200);
-    }
-  }, [containerRef, loading, hasMore, visibleData.length, data]);
-
-  useEffect(() => {
-    const ref = containerRef.current;
-    if (!ref) return undefined;
-    ref.addEventListener('scroll', handleScroll);
-    return () => ref.removeEventListener('scroll', handleScroll);
-  }, [handleScroll]);
+  if (!data || data.length === 0) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: 200,
+          p: 2,
+        }}
+      >
+        <Typography variant="body2" color="text.secondary">
+          No markets available
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box
-      ref={containerRef}
       sx={{
-        maxHeight: 600,
-        overflowY: 'auto',
         p: 2,
         borderRadius: 2,
         boxShadow: 1,
@@ -70,7 +52,7 @@ function MarketMobileViewCardLayout({
       }}
     >
       <Stack spacing={0.5}>
-        {visibleData?.map((row, index) => (
+        {data.map((row, index) => (
           <Accordion
             key={row.id}
             sx={{ borderRadius: 2, boxShadow: 'none',  }}
@@ -157,18 +139,6 @@ function MarketMobileViewCardLayout({
             </AccordionDetails>
           </Accordion>
         ))}
-
-        {loading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
-            <CircularProgress size={32} color="primary" />
-          </Box>
-        )}
-
-        {!hasMore && (
-          <Typography align="center" variant="body2" sx={{ color: 'text.secondary', py: 2 }}>
-            No more data
-          </Typography>
-        )}
       </Stack>
     </Box>
   );
