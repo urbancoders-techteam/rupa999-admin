@@ -356,6 +356,18 @@ export default function UserListPage() {
               changePasswordLoading={changePasswordLoading}
               onAddDeductBalance={(id, amount, action) => handleAddDeductBalance(id, amount, action)}
               addDeductBalanceLoading={addDeductBalanceLoading}
+              // Filter props
+              filterStatus={filterStatus}
+              onFilterStatus={handleFilterStatus}
+            />
+            <TablePaginationCustom
+              count={pagination?.total || tableData.length || 0}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={onChangePage}
+              onRowsPerPageChange={onChangeRowsPerPage}
+              dense={dense}
+              onChangeDense={onChangeDense}
             />
           </>
         ) : (

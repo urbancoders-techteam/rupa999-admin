@@ -7,24 +7,38 @@ import {
   AccordionSummary,
   Box,
   Button,
-  Divider, Pagination,
+  Divider,
   Paper,
   Stack,
+  Tab,
+  Tabs,
   Typography
 } from '@mui/material';
 import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import ChangePasswordDialog from '../../../components/change-password-dialog/ChangePasswordDialog';
 import AddDeductBalanceModal from '../form/UserAddDeductForm';
 import StatusToggleCell from './StatusToggledCell';
 
-function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange, onChangePassword, changePasswordLoading, onViewBankDetails, onAddDeductBalance, addDeductBalanceLoading, onTransactionRow, onWithdrawalRequestsRow, onBidHistoryRow }) {
-  const [page, setPage] = useState(1);
-  const rowsPerPage = 10;
+const STATUS_OPTIONS = ['all', 'Active', 'InActive'];
 
-  // Derived values
-  const totalPages = Math.ceil(data.length / rowsPerPage);
-  const [paginatedData, setPaginatedData] = useState([]);
+function UserMobileViewCardLayout({ 
+  data, 
+  onEditRow, 
+  onDeleteRow, 
+  onStatusChange, 
+  onChangePassword, 
+  changePasswordLoading, 
+  onViewBankDetails, 
+  onAddDeductBalance, 
+  addDeductBalanceLoading, 
+  onTransactionRow, 
+  onWithdrawalRequestsRow, 
+  onBidHistoryRow,
+  // Filter props
+  filterStatus = 'all',
+  onFilterStatus,
+}) {
 
   const [openAddDeduct, setOpenAddDeduct] = useState(false);
   const [openChangePassword, setOpenChangePassword] = useState(false);
@@ -76,16 +90,10 @@ function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange
     }
   };
 
-  // Handle pagination update
-  useEffect(() => {
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    setPaginatedData(data.slice(start, end));
-  }, [data, page]);
-
-  const handlePageChange = (event, value) => {
-    setPage(value);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleFilterStatus = (event, newValue) => {
+    if (onFilterStatus) {
+      onFilterStatus(event, newValue);
+    }
   };
 
   return (
@@ -98,6 +106,28 @@ function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange
         bgcolor: 'background.default',
       }}
     >
+      {/* Status Filter Tabs */}
+      <Tabs
+        value={filterStatus}
+        onChange={handleFilterStatus}
+        variant="scrollable"
+        scrollButtons="auto"
+        sx={{
+          mb: 2,
+          bgcolor: 'background.neutral',
+          borderRadius: 1,
+          '& .MuiTab-root': {
+            fontSize: '0.75rem',
+            minHeight: 48,
+            px: 1.5,
+          },
+        }}
+      >
+        {STATUS_OPTIONS.map((tab) => (
+          <Tab key={tab} label={tab} value={tab} />
+        ))}
+      </Tabs>
+
       {data.length === 0 ? (
         <Box
           sx={{
@@ -112,10 +142,9 @@ function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange
           </Typography>
         </Box>
       ) : (
-        <>
-          <Stack spacing={1.5}>
-            {paginatedData.map((row, index) => (
-              <Paper
+        <Stack spacing={1.5}>
+          {data.map((row, index) => (
+            <Paper
                 key={row._id}
                 sx={{
                   borderRadius: 2,
@@ -299,24 +328,8 @@ function UserMobileViewCardLayout({ data, onEditRow, onDeleteRow, onStatusChange
                   </AccordionDetails>
                 </Accordion>
               </Paper>
-            ))}
-          </Stack>
-
-          {/* Pagination Controls */}
-          <Stack direction="row" justifyContent="center" alignItems="center" sx={{ mt: 2, mb: 1 }}>
-            {/* {totalPages > 1 && ( */}
-              <Pagination
-                count={totalPages}
-                page={page}
-                color="primary"
-                onChange={handlePageChange}
-                siblingCount={0}
-                size="small"
-                shape="rounded"
-              />
-            {/* // )} */}
-          </Stack>
-        </>
+          ))}
+        </Stack>
       )}
 
       <AddDeductBalanceModal
@@ -351,6 +364,9 @@ UserMobileViewCardLayout.propTypes = {
   onTransactionRow: PropTypes.func,
   onWithdrawalRequestsRow: PropTypes.func,
   onBidHistoryRow: PropTypes.func,
+  // Filter props
+  filterStatus: PropTypes.string,
+  onFilterStatus: PropTypes.func,
 };
 
 export default UserMobileViewCardLayout;
