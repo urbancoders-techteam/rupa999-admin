@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import AxiosClient from '../../utils/axios';
 
-// Get all notifications
+// Get all notifications (only announcement type for admin)
 export const getAllNotificationsAsync = createAsyncThunk(
   'notification/getAll',
   async (params = {}, toolkit) =>
@@ -12,6 +12,7 @@ export const getAllNotificationsAsync = createAsyncThunk(
       params: {
         page: params.page || 1,
         limit: params.limit || 10,
+        type: 'announcement', // Only show announcement type in admin
       },
     })
 );
@@ -39,17 +40,6 @@ export const createNotificationAsync = createAsyncThunk(
     })
 );
 
-// Update notification
-export const updateNotificationAsync = createAsyncThunk(
-  'notification/update',
-  async ({ id, data }, toolkit) =>
-    AxiosClient({
-      toolkit,
-      url: `/notifications/${id}`,
-      method: 'patch',
-      data,
-    })
-);
 
 // Delete notification
 export const deleteNotificationAsync = createAsyncThunk(

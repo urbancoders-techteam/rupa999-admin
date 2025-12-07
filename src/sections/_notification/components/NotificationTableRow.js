@@ -2,17 +2,13 @@ import PropTypes from 'prop-types';
 import { TableRow, TableCell, IconButton } from '@mui/material';
 import Iconify from '../../../components/iconify';
 
-export default function NotificationTableRow({ row, index, selected, onSelectRow, onDeleteRow, onEditRow }) {
+export default function NotificationTableRow({ row, index, selected, onSelectRow, onDeleteRow }) {
   return (
     <TableRow hover selected={selected}>
       <TableCell>{index}</TableCell>
       <TableCell>{row.title}</TableCell>
       <TableCell>{row.description}</TableCell>
-      <TableCell>{row.createdBy ?? 'Admin'}</TableCell>
       <TableCell align="right">
-        <IconButton color="primary" onClick={onEditRow} size="small">
-          <Iconify icon="eva:edit-fill" />
-        </IconButton>
         <IconButton color="error" onClick={onDeleteRow} size="small">
           <Iconify icon="eva:trash-2-outline" />
         </IconButton>
@@ -27,5 +23,4 @@ NotificationTableRow.propTypes = {
   selected: PropTypes.bool,
   onSelectRow: PropTypes.func,
   onDeleteRow: PropTypes.func.isRequired,
-  onEditRow: PropTypes.func.isRequired,
 };

@@ -40,7 +40,6 @@ const TABLE_HEAD = [
   { id: 'sno', label: 'S.no', align: 'left' },
   { id: 'title', label: 'Title', align: 'left' },
   { id: 'description', label: 'Description', align: 'left' },
-  { id: 'createdBy', label: 'Created By', align: 'left' },
   { id: 'action', label: 'Action', align: 'right' },
 ];
 
@@ -72,7 +71,6 @@ export default function NotificationListPage() {
     sno: (page * rowsPerPage) + index + 1,
     title: notification.title || 'N/A',
     description: notification.description || 'N/A',
-    createdBy: notification.createdBy?.name || 'N/A',
     createdAt: notification.createdAt,
     isActive: notification.isActive,
   }));
@@ -113,9 +111,6 @@ export default function NotificationListPage() {
     }
   };
 
-  const handleEditRow = (row) => {
-    navigate(PATH_DASHBOARD.notifications.edit(row.id), { state: row });
-  };
 
   const handleOpenConfirm = () => setOpenConfirm(true);
   const handleCloseConfirm = () => setOpenConfirm(false);
@@ -160,7 +155,7 @@ export default function NotificationListPage() {
                 <TableBody>
                   {loading ? (
                     <TableRow>
-                      <TableCell colSpan={5} align="center">
+                      <TableCell colSpan={4} align="center">
                         Loading...
                       </TableCell>
                     </TableRow>
@@ -174,7 +169,6 @@ export default function NotificationListPage() {
                           selected={selected.includes(row.id)}
                           onSelectRow={() => onSelectRow(row.id)}
                           onDeleteRow={() => handleDeleteRow(row.id)}
-                          onEditRow={() => handleEditRow(row)}
                         />
                       ))}
 

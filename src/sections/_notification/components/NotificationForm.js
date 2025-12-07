@@ -20,13 +20,12 @@ const NotificationSchema = Yup.object().shape({
 });
 
 NotificationForm.propTypes = {
-  isEdit: PropTypes.bool,
   isView: PropTypes.bool,
   initialData: PropTypes.object,
   onSubmit: PropTypes.func.isRequired,
 };
 
-export default function NotificationForm({ isEdit = false, isView = false, initialData = {}, onSubmit }) {
+export default function NotificationForm({ isView = false, initialData = {}, onSubmit }) {
   const defaultValues = useMemo(
     () => ({
       title: initialData?.title || '',
@@ -48,10 +47,10 @@ export default function NotificationForm({ isEdit = false, isView = false, initi
   } = methods;
 
   useEffect(() => {
-    if ((isEdit || isView) && initialData) {
+    if (isView && initialData) {
       reset(defaultValues);
     }
-  }, [isEdit, isView, initialData, reset, defaultValues]);
+  }, [isView, initialData, reset, defaultValues]);
 
   const handleFormSubmit = async (data) => {
     try {
@@ -92,7 +91,7 @@ export default function NotificationForm({ isEdit = false, isView = false, initi
             <Grid item xs={12}>
               <Stack direction="row" spacing={2}>
                 <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
-                  {isEdit ? 'Update Notification' : 'Create Notification'}
+                  Create Notification
                 </LoadingButton>
               </Stack>
             </Grid>

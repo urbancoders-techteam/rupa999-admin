@@ -3,7 +3,6 @@ import {
   getAllNotificationsAsync,
   getNotificationByIdAsync,
   createNotificationAsync,
-  updateNotificationAsync,
   deleteNotificationAsync,
 } from '../services/notification_services';
 
@@ -83,31 +82,6 @@ const notificationSlice = createSlice({
         state.error = action.payload?.message || 'Failed to create notification';
       });
 
-    // Update notification
-    builder
-      .addCase(updateNotificationAsync.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(updateNotificationAsync.fulfilled, (state, action) => {
-        state.loading = false;
-        const updatedNotification = action.payload?.data;
-        if (updatedNotification) {
-          const index = state.notificationList.findIndex(
-            (n) => n._id === updatedNotification._id
-          );
-          if (index !== -1) {
-            state.notificationList[index] = updatedNotification;
-          }
-          if (state.currentNotification?._id === updatedNotification._id) {
-            state.currentNotification = updatedNotification;
-          }
-        }
-      })
-      .addCase(updateNotificationAsync.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload?.message || 'Failed to update notification';
-      });
 
     // Delete notification
     builder
