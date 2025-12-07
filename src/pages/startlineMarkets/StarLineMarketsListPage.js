@@ -92,7 +92,7 @@ export default function StarLineMarketsListPage() {
 
   const isFiltered = searchQuery !== '';
 
-  const isNotFound = !dataFiltered.length;
+  const isNotFound = !dataFiltered.length && !!searchQuery;
 
 
   const handleFilterName = (event) => {

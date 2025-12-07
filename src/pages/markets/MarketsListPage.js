@@ -111,7 +111,7 @@ export default function MarketDetailsPage() {
 
   const isFiltered = searchQuery !== '';
 
-  const isNotFound = !tableData.length;
+  const isNotFound = !tableData.length && !!searchQuery;
 
 
   const handleFilterName = (event) => {

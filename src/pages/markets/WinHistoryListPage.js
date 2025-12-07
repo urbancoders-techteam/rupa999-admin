@@ -23,7 +23,7 @@ import {
 } from '../../components/table';
 // sections
 import WinHistoryTableRow from '../../sections/_win_history/list/WinHistoryTableRow';
-import WithdrawMobileViewCardLayout from '../../sections/_withdraw_details/components/WithdrawDetailsMobileViewCardLayout';
+import WinHistoryMobileViewCardLayout from '../../sections/_win_history/list/WinHistoryMobileViewCardLayout';
 import WithdrawDetailsToolbar from '../../sections/_withdraw_details/components/WithdrawDetailsToolbar';
 // redux
 import { getAllWinningBidsAsync } from '../../redux/services/bid_services';
@@ -96,6 +96,7 @@ export default function WinHistoryListPage() {
         userName: bid.userId?.name || 'N/A',
         session: bid.type || 'N/A',
         number: bid.bidTable?.digit || 'N/A',
+        contactNumber: bid.userId?.number || 'N/A',
         amount: bid.totalPoints || 0,
         winAmount: bid.winAmount || 0,
         createdAt: bid.createdAt ? new Date(bid.createdAt).toLocaleString() : 'N/A',
@@ -220,13 +221,27 @@ export default function WinHistoryListPage() {
 
         {/* Render mobile card layout for small screens, otherwise render the table */}
         {isMobile ? (
-          <WithdrawMobileViewCardLayout
-            data={dataFiltered}
-            onEditRow={(id) => handleEditRow(id)}
-            onDeleteRow={(id) => handleDeleteRow(id)}
-            onSelectRow={(id) => onSelectRow(id)}
-            selected={selected}
-          />
+          <>
+            <WinHistoryMobileViewCardLayout
+              data={dataInPage}
+              onEditRow={(id) => handleEditRow(id)}
+              onDeleteRow={(id) => handleDeleteRow(id)}
+              onSelectRow={(id) => onSelectRow(id)}
+              selected={selected}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              loading={loading}
+            />
+            <TablePaginationCustom
+              count={pagination.total || 0}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={onChangePage}
+              onRowsPerPageChange={onChangeRowsPerPage}
+              dense={dense}
+              onChangeDense={onChangeDense}
+            />
+          </>
         ) : (
           <Card>
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
@@ -319,17 +334,22 @@ function applyFilter({ inputData, filterName, filterStatus, filterRole }) {
   let filteredData = inputData;
 
   if (filterName) {
+    const searchTerm = filterName.toLowerCase();
     filteredData = filteredData.filter(
-      (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+      (item) =>
+        (item.userName && item.userName.toLowerCase().indexOf(searchTerm) !== -1) ||
+        (item.marketName && item.marketName.toLowerCase().indexOf(searchTerm) !== -1) ||
+        (item.number && item.number.toString().indexOf(searchTerm) !== -1) ||
+        (item.session && item.session.toLowerCase().indexOf(searchTerm) !== -1)
     );
   }
 
   if (filterStatus !== 'all') {
-    filteredData = filteredData.filter((user) => user.status === filterStatus);
+    filteredData = filteredData.filter((item) => item.status === filterStatus);
   }
 
   if (filterRole !== 'all') {
-    filteredData = filteredData.filter((user) => user.role === filterRole);
+    filteredData = filteredData.filter((item) => item.role === filterRole);
   }
 
   return filteredData;

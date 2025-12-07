@@ -64,26 +64,23 @@ function MarketMobileViewCardLayout({
             sx={{ borderRadius: 2, boxShadow: 'none',  }}
           >
             <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ px: 2, py: 1 }}>
-              <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="body1" sx={{ fontWeight: 700, borderRight: '1px solid', pr: 1, mr: 1 }}>
-                  {serialNumber}
-                </Typography>
-                <Typography variant="body1" sx={{flex:1 , flexWrap:'nowrap', fontWeight: 700, borderRight: '1px solid', pr: 1, mr: 1 }}>
-                  {row.name || '—'}
-                </Typography>
-                <Label
-                  variant="soft"
-                  color={
-                    row.currentStatus === 'enable'
-                      ? 'success'
-                      : row.currentStatus === 'disable'
-                      ? 'error'
-                      : 'default'
-                  }
-                  sx={{ textTransform: 'capitalize' }}
-                >
-                  {row.hideOpen}
-                </Label>
+              <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="body1" sx={{ fontWeight: 700, borderRight: '1px solid', pr: 1, mr: 1 }}>
+                    {serialNumber}
+                  </Typography>
+                  <Typography variant="body1" sx={{ flex: 1, flexWrap: 'nowrap', fontWeight: 700 }}>
+                    {row.name || '—'}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', gap: 2, fontSize: '0.875rem' }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    Open: {row.openTime ? dayjs(row.openTime).format("hh:mm A") : '—'}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    Close: {row.closeTime ? dayjs(row.closeTime).format("hh:mm A") : '—'}
+                  </Typography>
+                </Box>
               </Box>
             </AccordionSummary>
 
@@ -91,21 +88,23 @@ function MarketMobileViewCardLayout({
               <Stack spacing={0.5}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    Open Time:
+                   Hide Open:
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'text.primary', textAlign: 'right' }}>
-                    {dayjs(row.openTime).format("hh:mm A") || '—'}
+                    <Label variant="soft" color={row.hideOpen === 'enable' ? 'warning' : 'info'} sx={{ textTransform: 'capitalize', fontSize: '0.75rem' }}>
+                      {row.hideOpen}
+                    </Label>
                   </Typography>
                 </Box>
 
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                     Close Time:
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'text.primary', textAlign: 'right' }}>
                     {dayjs(row.closeTime).format("hh:mm A") || '—'}
                   </Typography>
-                </Box>
+                </Box> */}
 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
