@@ -111,7 +111,7 @@ export default function MarketDetailsPage() {
 
   const isFiltered = searchQuery !== '';
 
-  const isNotFound = !tableData.length && !!searchQuery;
+  const isNotFound = !tableData.length;
 
 
   const handleFilterName = (event) => {
@@ -235,6 +235,8 @@ export default function MarketDetailsPage() {
               onDeleteRow={(id) => handleDeleteRow(id)}
               onSelectRow={(id) => onSelectRow(id)}
               selected={selected}
+              page={page}
+              rowsPerPage={rowsPerPage}
             />
             <TablePaginationCustom
               count={pagination?.total || tableData.length || 0}
@@ -258,24 +260,27 @@ export default function MarketDetailsPage() {
                   />
 
                   <TableBody>
-                    {dataFiltered.map((row, index) => (
-                        <MarketTableRow
-                          index={row.sno}
-                          key={row.id || row._id}
-                          row={row}
-                          selected={selected.includes(row.id)}
-                          onSelectRow={() => onSelectRow(row.id)}
-                          onDeleteRow={() => handleDeleteRow(row._id || row.id)}
-                          onEditRow={() => handleEditRow(row.name)}
+                    {tableData.length > 0 ? (
+                      <>
+                        {dataFiltered.map((row, index) => (
+                          <MarketTableRow
+                            index={row.sno}
+                            key={row.id || row._id}
+                            row={row}
+                            selected={selected.includes(row.id)}
+                            onSelectRow={() => onSelectRow(row.id)}
+                            onDeleteRow={() => handleDeleteRow(row._id || row.id)}
+                            onEditRow={() => handleEditRow(row.name)}
+                          />
+                        ))}
+                        <TableEmptyRows
+                          height={denseHeight}
+                          emptyRows={emptyRows(0, rowsPerPage, tableData.length)}
                         />
-                      ))}
-
-                    <TableEmptyRows
-                      height={denseHeight}
-                      emptyRows={emptyRows(0, rowsPerPage, tableData.length)}
-                    />
-
-                    <TableNoData isNotFound={isNotFound} />
+                      </>
+                    ) : (
+                      <TableNoData isNotFound={isNotFound} />
+                    )}
                   </TableBody>
                 </Table>
               </Scrollbar>

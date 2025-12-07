@@ -1,30 +1,19 @@
 import { paramCase } from 'change-case';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 // @mui
-import {
-  Box,
-  Button,
-  Card,
-  Container,
-  Table,
-  TableBody,
-  TableContainer,
-  useMediaQuery,
-} from '@mui/material';
+import { Box, Card, Container, Table, TableBody, TableCell, TableContainer, TableRow, useMediaQuery } from '@mui/material';
 // routes
 import { useTheme } from '@mui/system';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllMarketResultsAsync } from '../../redux/services/market_result_services';
 import { PATH_DASHBOARD } from '../../routes/paths';
 // components
-import ConfirmDialog from '../../components/confirm-dialog';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import Scrollbar from '../../components/scrollbar';
 import { useSettingsContext } from '../../components/settings';
 import {
-  emptyRows,
   getComparator,
   TableEmptyRows,
   TableHeadCustom,
@@ -50,8 +39,10 @@ const TABLE_HEAD = [
   { id: 'openPana', label: 'Open Pana', align: 'center' },
   { id: 'closePana', label: 'Close Pana', align: 'center' },
   { id: 'createdAt', label: 'Created At', align: 'left' },
-
 ];
+
+// Helper function to get row ID
+const getRowId = (row) => row._id || row.id;
 
 // ----------------------------------------------------------------------
 
@@ -63,11 +54,9 @@ export default function MarketResultListPage() {
     orderBy,
     rowsPerPage,
     setPage,
-    //
     selected,
     setSelected,
     onSelectRow,
-    //
     onSort,
     onChangeDense,
     onChangePage,
@@ -75,108 +64,105 @@ export default function MarketResultListPage() {
   } = useTable();
 
   const { themeStretch } = useSettingsContext();
-
-  const { resultList } = useSelector((state) => state.marketResult);
-  console.log('resultList :>> ', resultList);
-
+  const { resultList, pagination, loading } = useSelector((state) => state.marketResult);
   const theme = useTheme();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const [tableData, setTableData] = useState(resultList);
-
-  const [openConfirm, setOpenConfirm] = useState(false);
-
-  const [filterName, setFilterName] = useState(''); // Input field value
-  const [searchQuery, setSearchQuery] = useState(''); // Actual search value for filtering
-
+  const [filterName, setFilterName] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [showWinner, setShowWinner] = useState(false);
-
   const [selectedMarketId, setSelectedMarketId] = useState(null);
 
-  const dataFiltered = applyFilter({
-    inputData: tableData,
-    comparator: getComparator(order, orderBy),
-    filterName: searchQuery,
-  });
+  // Convert UI page (0-based) to API page (1-based)
+  const apiPage = page + 1;
+  const apiLimit = rowsPerPage;
 
-  console.log('dataFiltered :>> ', dataFiltered);
-  console.log('tableData :>> ', tableData);
+  // Fetch data when page, rowsPerPage, or searchQuery changes
+  useEffect(() => {
+    const params = {
+      page: apiPage,
+      limit: apiLimit,
+    };
 
-  const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    // If backend supports search, add it here
+    // Otherwise, we'll filter client-side
+    if (searchQuery) {
+      params.search = searchQuery;
+    }
 
-  const denseHeight = dense ? 52 : 72;
+    // If backend supports sorting, add it here
+    if (orderBy) {
+      params.sortBy = orderBy;
+      params.sortOrder = order;
+    }
 
-  const isFiltered = searchQuery !== '';
+    dispatch(getAllMarketResultsAsync(params));
+  }, [dispatch, apiPage, apiLimit, searchQuery, orderBy, order]);
 
-  const isNotFound = !resultList.length && !!searchQuery;
+  // Client-side filtering if backend doesn't support search
+  const dataFiltered = useMemo(() => {
+    if (!searchQuery) return resultList;
 
-  const handleOpenConfirm = () => {
-    setOpenConfirm(true);
-  };
+    const searchLower = searchQuery.toLowerCase();
+    return resultList.filter((marketResult) => {
+      const marketName = marketResult?.market?.name?.toLowerCase() || '';
+      const gameName = marketResult?.gameName?.toLowerCase() || '';
+      return marketName.includes(searchLower) || gameName.includes(searchLower);
+    });
+  }, [resultList, searchQuery]);
 
-  const handleCloseConfirm = () => {
-    setOpenConfirm(false);
-  };
+  // Client-side sorting if backend doesn't support sorting
+  const dataSorted = useMemo(
+    () => [...dataFiltered].sort(getComparator(order, orderBy)),
+    [dataFiltered, order, orderBy]
+  );
 
-  const handleFilterName = (event) => {
+  // Handlers
+  const handleFilterName = useCallback((event) => {
     setFilterName(event.target.value);
-  };
+  }, []);
 
-  const handleSearch = () => {
+  const handleSearch = useCallback(() => {
     setPage(0);
     setSearchQuery(filterName);
-  };
+  }, [filterName, setPage]);
 
-  const handleDeleteRow = (id) => {
-    const deleteRow = tableData.filter((row) => row.id !== id);
-    setSelected([]);
-    setTableData(deleteRow);
-
-    if (page > 0) {
-      if (dataInPage.length < 2) {
-        setPage(page - 1);
-      }
-    }
-  };
-
-  const handleDeleteRows = (selectedRows) => {
-    const deleteRows = tableData.filter((row) => !selectedRows.includes(row.id));
-    setSelected([]);
-    setTableData(deleteRows);
-
-    if (page > 0) {
-      if (selectedRows.length === dataInPage.length) {
-        setPage(page - 1);
-      } else if (selectedRows.length === dataFiltered.length) {
-        setPage(0);
-      } else if (selectedRows.length > dataInPage.length) {
-        const newPage = Math.ceil((tableData.length - selectedRows.length) / rowsPerPage) - 1;
-        setPage(newPage);
-      }
-    }
-  };
-
-  const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.gameresults.edit(paramCase(id)));
-  };
-
-  const handleResetFilter = () => {
+  const handleResetFilter = useCallback(() => {
     setFilterName('');
     setSearchQuery('');
     setPage(0);
-  };
+  }, [setPage]);
 
-  const onHandleShowWinner = () => {
-    setShowWinner(!showWinner);
-  }
+  const handleDeleteRow = useCallback(
+    (id) => {
+      // Note: This function seems unused as rows are managed via Redux
+      // If delete functionality is needed, implement Redux action
+      setSelected((prev) => prev.filter((selectedId) => selectedId !== id));
+    },
+    [setSelected]
+  );
 
-  useEffect(() => {
-    dispatch(getAllMarketResultsAsync());
-  }, [dispatch]);
+  const handleEditRow = useCallback(
+    (id) => {
+      navigate(PATH_DASHBOARD.gameresults.edit(paramCase(id)));
+    },
+    [navigate]
+  );
 
+  const toggleShowWinner = useCallback(() => {
+    setShowWinner((prev) => !prev);
+  }, []);
+
+  // Computed values
+  const isFiltered = searchQuery !== '';
+  const isNotFound = !dataSorted.length && !loading && !!searchQuery;
+  const denseHeight = dense ? 52 : 72;
+  
+  // Convert server page (1-based) to UI page (0-based) for pagination component
+  const serverPage = pagination?.page ? pagination.page - 1 : page;
+  const serverTotal = pagination?.total || 0;
 
   return (
     <>
@@ -195,17 +181,17 @@ export default function MarketResultListPage() {
 
         <GeneralCreateResultForm
           showWinner={showWinner}
-          onHandleShowWinner={onHandleShowWinner}
+          onHandleShowWinner={toggleShowWinner}
           selectedMarketId={setSelectedMarketId}
         />
 
-        {showWinner === true && <ResultTable marketId={selectedMarketId} />}
+        {showWinner && <ResultTable marketId={selectedMarketId} />}
 
         {isMobile ? (
           <PreviousResultMobileViewCardLayout
-            data={resultList}
+            data={dataFiltered}
             onEditRow={handleEditRow}
-            onDeleteRow={(id) => handleDeleteRow(id)}
+            onDeleteRow={handleDeleteRow}
           />
         ) : (
           <Card>
@@ -218,68 +204,59 @@ export default function MarketResultListPage() {
             />
 
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
-              {/* <TableSelectedAction
-                dense={dense}
-                numSelected={selected.length}
-                rowCount={tableData.length}
-                onSelectAllRows={(checked) =>
-                  onSelectAllRows(
-                    checked,
-                    tableData.map((row) => row.id)
-                  )
-                }
-                // action={
-                //   <Tooltip title="Delete">
-                //     <IconButton color="primary" onClick={handleOpenConfirm}>
-                //       <Iconify icon="eva:trash-2-outline" />
-                //     </IconButton>
-                //   </Tooltip>
-                // }
-              /> */}
-
               <Scrollbar>
-                <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
+                <Table size={dense ? 'medium' : 'small'} sx={{ minWidth: 800 }}>
                   <TableHeadCustom
                     order={order}
                     orderBy={orderBy}
                     headLabel={TABLE_HEAD}
-                    rowCount={tableData.length}
+                    rowCount={dataFiltered.length}
                     numSelected={selected.length}
                     onSort={onSort}
                   />
 
                   <TableBody>
-                    {resultList
-                      // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((row) => (
-                        <MarketResultTableRow
-                          key={row.id}
-                          row={row}
-                          selected={selected.includes(row.id)}
-                          onSelectRow={() => onSelectRow(row.id)}
-                          onDeleteRow={() => handleDeleteRow(row.id)}
-                          onEditRow={() => handleEditRow(row.name)}
+                    {loading ? (
+                      <TableRow>
+                        <TableCell colSpan={TABLE_HEAD.length} align="center" sx={{ py: 3 }}>
+                          Loading...
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      <>
+                        {dataSorted.map((row) => {
+                          const rowId = getRowId(row);
+                          return (
+                            <MarketResultTableRow
+                              key={rowId}
+                              row={row}
+                              selected={selected.includes(rowId)}
+                              onSelectRow={() => onSelectRow(rowId)}
+                              onDeleteRow={() => handleDeleteRow(rowId)}
+                              onEditRow={() => handleEditRow(rowId)}
+                            />
+                          );
+                        })}
+
+                        <TableEmptyRows
+                          height={denseHeight}
+                          emptyRows={Math.max(0, rowsPerPage - dataSorted.length)}
                         />
-                      ))}
 
-                    <TableEmptyRows
-                      height={denseHeight}
-                      emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
-                    />
-
-                    <TableNoData isNotFound={isNotFound} />
+                        <TableNoData isNotFound={isNotFound} />
+                      </>
+                    )}
                   </TableBody>
                 </Table>
               </Scrollbar>
             </TableContainer>
 
             <TablePaginationCustom
-              page={page}
-              count={dataFiltered.length}
+              page={serverPage}
+              count={serverTotal}
               rowsPerPage={rowsPerPage}
               onPageChange={onChangePage}
               onRowsPerPageChange={onChangeRowsPerPage}
-              //
               dense={dense}
               onChangeDense={onChangeDense}
             />
@@ -298,60 +275,6 @@ export default function MarketResultListPage() {
           <BulkUploadMarketResults selectedMarketId={selectedMarketId} />
         </Box>
       </Container>
-
-      <ConfirmDialog
-        open={openConfirm}
-        onClose={handleCloseConfirm}
-        title="Delete"
-        content={
-          <>
-            Are you sure want to delete <strong> {selected.length} </strong> items?
-          </>
-        }
-        action={
-          <Button
-            variant="contained"
-            color="error"
-            onClick={() => {
-              handleDeleteRows(selected);
-              handleCloseConfirm();
-            }}
-          >
-            Delete
-          </Button>
-        }
-      />
     </>
   );
-}
-
-// ----------------------------------------------------------------------
-
-function applyFilter({ inputData, comparator, filterName, filterStatus, filterRole }) {
-  const stabilizedThis = inputData.map((el, index) => [el, index]);
-
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-
-  inputData = stabilizedThis.map((el) => el[0]);
-
-  if (filterName) {
-    inputData = inputData.filter(
-      (gameresults) =>
-        gameresults.gameName.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
-    );
-  }
-
-  if (filterStatus !== 'all') {
-    inputData = inputData.filter((gameresults) => gameresults.status === filterStatus);
-  }
-
-  if (filterRole !== 'all') {
-    inputData = inputData.filter((gameresults) => gameresults.role === filterRole);
-  }
-
-  return inputData;
 }

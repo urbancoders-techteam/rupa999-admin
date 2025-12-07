@@ -23,6 +23,8 @@ function MarketMobileViewCardLayout({
   onDeleteRow,
   onSelectRow,
   selected = [],
+  page = 0,
+  rowsPerPage = 10,
 }) {
   if (!data || data.length === 0) {
     return (
@@ -36,7 +38,7 @@ function MarketMobileViewCardLayout({
         }}
       >
         <Typography variant="body2" color="text.secondary">
-          No markets available
+          No Data Available
         </Typography>
       </Box>
     );
@@ -52,7 +54,11 @@ function MarketMobileViewCardLayout({
       }}
     >
       <Stack spacing={0.5}>
-        {data.map((row, index) => (
+        {data.map((row, index) => {
+          // Calculate serial number across pagination (same as desktop view)
+          const serialNumber = row.sno || (page * rowsPerPage) + index + 1;
+          
+          return (
           <Accordion
             key={row.id}
             sx={{ borderRadius: 2, boxShadow: 'none',  }}
@@ -60,7 +66,7 @@ function MarketMobileViewCardLayout({
             <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ px: 2, py: 1 }}>
               <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="body1" sx={{ fontWeight: 700, borderRight: '1px solid', pr: 1, mr: 1 }}>
-                  {row.sno || index + 1 || '—'}
+                  {serialNumber}
                 </Typography>
                 <Typography variant="body1" sx={{flex:1 , flexWrap:'nowrap', fontWeight: 700, borderRight: '1px solid', pr: 1, mr: 1 }}>
                   {row.name || '—'}
@@ -138,7 +144,8 @@ function MarketMobileViewCardLayout({
               </Stack>
             </AccordionDetails>
           </Accordion>
-        ))}
+          );
+        })}
       </Stack>
     </Box>
   );
@@ -150,6 +157,8 @@ MarketMobileViewCardLayout.propTypes = {
   onDeleteRow: PropTypes.func,
   onSelectRow: PropTypes.func,
   selected: PropTypes.array,
+  page: PropTypes.number,
+  rowsPerPage: PropTypes.number,
 };
 
 export default MarketMobileViewCardLayout;

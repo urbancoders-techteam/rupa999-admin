@@ -92,7 +92,7 @@ export default function StarLineMarketsListPage() {
 
   const isFiltered = searchQuery !== '';
 
-  const isNotFound = !dataFiltered.length && !!searchQuery;
+  const isNotFound = !dataFiltered.length;
 
 
   const handleFilterName = (event) => {
@@ -202,6 +202,8 @@ export default function StarLineMarketsListPage() {
               onDeleteRow={(id) => handleDeleteRow(id)}
               onSelectRow={(id) => onSelectRow(id)}
               selected={selected}
+              page={page}
+              rowsPerPage={rowsPerPage}
             />
             <TablePaginationCustom
               count={dataFiltered.length}
@@ -228,26 +230,29 @@ export default function StarLineMarketsListPage() {
                   />
 
                   <TableBody>
-                    {dataFiltered
-                      ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((row, index) => (
-                        <StarlineMarketTableRow
-                          index={(page * rowsPerPage) + index + 1}
-                          key={row.id}
-                          row={row}
-                          selected={selected.includes(row.id)}
-                          onSelectRow={() => onSelectRow(row.id)}
-                          onDeleteRow={() => handleDeleteRow(row.id)}
-                          onEditRow={() => handleEditRow(row.name)}
+                    {dataFiltered.length > 0 ? (
+                      <>
+                        {dataFiltered
+                          ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                          .map((row, index) => (
+                            <StarlineMarketTableRow
+                              index={(page * rowsPerPage) + index + 1}
+                              key={row.id}
+                              row={row}
+                              selected={selected.includes(row.id)}
+                              onSelectRow={() => onSelectRow(row.id)}
+                              onDeleteRow={() => handleDeleteRow(row.id)}
+                              onEditRow={() => handleEditRow(row.name)}
+                            />
+                          ))}
+                        <TableEmptyRows
+                          height={denseHeight}
+                          emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
                         />
-                      ))}
-
-                    <TableEmptyRows
-                      height={denseHeight}
-                      emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
-                    />
-
-                    <TableNoData isNotFound={isNotFound} />
+                      </>
+                    ) : (
+                      <TableNoData isNotFound={isNotFound} />
+                    )}
                   </TableBody>
                 </Table>
               </Scrollbar>

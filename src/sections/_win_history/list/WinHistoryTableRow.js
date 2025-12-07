@@ -37,7 +37,7 @@ export default function WinHistoryTableRow({ index, row, onEditRow }) {
 
   return (
     <>
-      <TableRow hover sx={{ '&:last-child td, &:last-child th': { border: 0.5 } }}>
+      <TableRow hover>
         <TableCell align="left">
           <IconButton color={openPopover ? 'inherit' : 'default'} onClick={handleOpenPopover}>
             <Iconify icon="eva:more-vertical-fill" />

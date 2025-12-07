@@ -30,7 +30,7 @@ export default function MarketDataTableRow({ index, row }) {
   };
 
   return (
-    <TableRow hover sx={{ '&:last-child td, &:last-child th': { border: 0.5 } }}>
+    <TableRow hover>
       <TableCell align="center">
         <Typography variant="body2">{index}</Typography>
       </TableCell>

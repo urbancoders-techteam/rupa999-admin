@@ -49,7 +49,7 @@ export default function MarketTableRow({ index, row, selected, onEditRow, onDele
 
   return (
     <>
-      <TableRow hover sx={{ '&:last-child td, &:last-child th': { border: 0.5 } }}>
+      <TableRow hover>
          <TableCell align="left">
           <IconButton
             color={openPopover ? 'inherit' : 'default'}

@@ -276,65 +276,90 @@ export default function JodiResultTable({ selectedMarket }) {
           Jodi Chart
         </Typography>
 
-        <ScrollContainer>
-          <Table stickyHeader size="small">
-            <TableHead>
-              <TableRow>
-                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
-                  <StyledHeaderCell key={day}>{day}</StyledHeaderCell>
-                ))}
-              </TableRow>
-            </TableHead>
+        {data.length === 0 ? (
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: { xs: 200, sm: 250, md: 300 },
+              py: { xs: 4, sm: 5, md: 6 },
+              px: { xs: 2, sm: 3 },
+            }}
+          >
+            <Typography
+              variant="body1"
+              sx={{
+                fontSize: { xs: '0.875rem', sm: '1rem', md: '1.125rem' },
+                fontWeight: 500,
+                color: 'text.secondary',
+                textAlign: 'center',
+              }}
+            >
+              No Data Available
+            </Typography>
+          </Box>
+        ) : (
+          <ScrollContainer>
+            <Table stickyHeader size="small">
+              <TableHead>
+                <TableRow>
+                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
+                    <StyledHeaderCell key={day}>{day}</StyledHeaderCell>
+                  ))}
+                </TableRow>
+              </TableHead>
 
-            <TableBody>
-              {data.map((row, i) => (
-                <StyledTableRow
-                  key={i}
-                  sx={{
-                    '&:nth-of-type(even)': {
-                      backgroundColor: 'rgba(0, 0, 0, 0.02)',
-                    },
-                  }}
-                >
-                  {Object.entries(row).map(([key, value]) => {
-                    const isSpecial = ['00', '11', '22', '33', '55', '66', '77', '88', '99'].includes(value);
-                    return (
-                      <StyledTableCell
-                        key={key}
-                        sx={{
-                          color:
-                            value === '**'
-                              ? 'text.secondary'
-                              : isSpecial
-                                ? '#dc2626'
-                                : 'text.primary',
-                          fontWeight: isSpecial ? 700 : 500,
-                          fontSize: { xs: '0.75rem', sm: '0.875rem', md: '0.9375rem' },
-                          position: 'relative',
-                          '&::after': isSpecial
-                            ? {
-                              content: '""',
-                              position: 'absolute',
-                              bottom: 0,
-                              left: '50%',
-                              transform: 'translateX(-50%)',
-                              width: '60%',
-                              height: '2px',
-                              backgroundColor: '#dc2626',
-                              opacity: 0.3,
-                            }
-                            : {},
-                        }}
-                      >
-                        {value}
-                      </StyledTableCell>
-                    );
-                  })}
-                </StyledTableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </ScrollContainer>
+              <TableBody>
+                {data.map((row, i) => (
+                  <StyledTableRow
+                    key={i}
+                    sx={{
+                      '&:nth-of-type(even)': {
+                        backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                      },
+                    }}
+                  >
+                    {Object.entries(row).map(([key, value]) => {
+                      const isSpecial = ['00', '11', '22', '33', '55', '66', '77', '88', '99'].includes(value);
+                      return (
+                        <StyledTableCell
+                          key={key}
+                          sx={{
+                            color:
+                              value === '**'
+                                ? 'text.secondary'
+                                : isSpecial
+                                  ? '#dc2626'
+                                  : 'text.primary',
+                            fontWeight: isSpecial ? 700 : 500,
+                            fontSize: { xs: '0.75rem', sm: '0.875rem', md: '0.9375rem' },
+                            position: 'relative',
+                            '&::after': isSpecial
+                              ? {
+                                content: '""',
+                                position: 'absolute',
+                                bottom: 0,
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                width: '60%',
+                                height: '2px',
+                                backgroundColor: '#dc2626',
+                                opacity: 0.3,
+                              }
+                              : {},
+                          }}
+                        >
+                          {value}
+                        </StyledTableCell>
+                      );
+                    })}
+                  </StyledTableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </ScrollContainer>
+        )}
       </Paper>
     </Box>
   );
