@@ -28,10 +28,10 @@ import {
   useTable,
 } from '../components/table';
 // sections
-import UserBidHistoryTableToolbar from '../sections/_users/bid-history/list/UserBidHistoryTableToolbar';
-import BidHostoryMobileViewCardLayout from '../sections/_users/bid-history/list/BidHostoryMobileViewCardLayout';
-import MainBidHistoryTableRow from '../sections/_main_bid_history/list/MainBidHistoryTableRow';
 import { getAllBidsAsync } from '../redux/services/user_services';
+import MainBidHistoryTableRow from '../sections/_main_bid_history/list/MainBidHistoryTableRow';
+import BidHostoryMobileViewCardLayout from '../sections/_users/bid-history/list/BidHostoryMobileViewCardLayout';
+import UserBidHistoryTableToolbar from '../sections/_users/bid-history/list/UserBidHistoryTableToolbar';
 
 // ----------------------------------------------------------------------
 
@@ -41,6 +41,7 @@ const TABLE_HEAD = [
   { id: 'phoneNumber', label: 'Phone', align: 'left' },
   { id: 'marketName', label: 'Market Name', align: 'left' },
   { id: 'name', label: 'Game Name', align: 'left' },
+  { id: 'type', label: 'Type', align: 'left' },
   { id: 'digit', label: 'Digit', align: 'left' },
   { id: 'point', label: 'Point', align: 'left' },
   { id: 'date', label: 'Date', align: 'left' },
@@ -232,61 +233,61 @@ export default function MainBidHistoryListPage() {
             />
             <Card>
 
-        
 
-            <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
 
-              <Scrollbar>
-                <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
-                  <TableHeadCustom
-                    headLabel={TABLE_HEAD}
-                    rowCount={tableData.length}
-                    numSelected={selected.length}
-                  />
+              <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
 
-                  <TableBody>
-                    {allBidsLoading ? (
-                      <TableSkeleton />
-                    ) : (
-                      <>
-                        {tableData.length > 0 ? (
-                          tableData.map((row, index) => (
-                            <MainBidHistoryTableRow
-                              key={row._id || row.id || index}
-                              index={row.sno}
-                              row={row}
-                              selected={selected.includes(row.id)}
-                            />
-                          ))
-                        ) : (
-                          <TableNoData isNotFound={isNotFound} />
-                        )}
+                <Scrollbar>
+                  <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
+                    <TableHeadCustom
+                      headLabel={TABLE_HEAD}
+                      rowCount={tableData.length}
+                      numSelected={selected.length}
+                    />
 
-                        <TableEmptyRows
-                          height={denseHeight}
-                          emptyRows={emptyRows(
-                            page,
-                            rowsPerPage,
-                            allBidsPagination?.total || tableData.length
+                    <TableBody>
+                      {allBidsLoading ? (
+                        <TableSkeleton />
+                      ) : (
+                        <>
+                          {tableData.length > 0 ? (
+                            tableData.map((row, index) => (
+                              <MainBidHistoryTableRow
+                                key={row._id || row.id || index}
+                                index={row.sno}
+                                row={row}
+                                selected={selected.includes(row.id)}
+                              />
+                            ))
+                          ) : (
+                            <TableNoData isNotFound={isNotFound} />
                           )}
-                        />
-                      </>
-                    )}
-                  </TableBody>
-                </Table>
-              </Scrollbar>
-            </TableContainer>
 
-            <TablePaginationCustom
-              count={allBidsPagination?.total || tableData.length}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              onPageChange={onChangePage}
-              onRowsPerPageChange={onChangeRowsPerPage}
-              dense={dense}
-              onChangeDense={onChangeDense}
-            />
-          </Card>
+                          <TableEmptyRows
+                            height={denseHeight}
+                            emptyRows={emptyRows(
+                              page,
+                              rowsPerPage,
+                              allBidsPagination?.total || tableData.length
+                            )}
+                          />
+                        </>
+                      )}
+                    </TableBody>
+                  </Table>
+                </Scrollbar>
+              </TableContainer>
+
+              <TablePaginationCustom
+                count={allBidsPagination?.total || tableData.length}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                onPageChange={onChangePage}
+                onRowsPerPageChange={onChangeRowsPerPage}
+                dense={dense}
+                onChangeDense={onChangeDense}
+              />
+            </Card>
           </>
         )}
       </Container>

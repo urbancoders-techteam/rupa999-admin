@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types';
 // @mui
 import {
-  TableRow,
   TableCell,
+  TableRow,
   Typography,
 } from '@mui/material';
 // components
-import { fDateTime } from '../../../utils/formatTime';
 import { fBidDigit } from '../../../utils/formatText';
+import { fDateTime } from '../../../utils/formatTime';
 
 // ----------------------------------------------------------------------
 
@@ -25,6 +25,7 @@ export default function MainBidHistoryTableRow({ index, row, selected }) {
     totalPoints,
     userId,
     date,
+    type,
     createdAt,
   } = row || {};
 
@@ -55,7 +56,7 @@ export default function MainBidHistoryTableRow({ index, row, selected }) {
           {userId?.name || '—'}
         </Typography>
       </TableCell>
-     
+
       <TableCell align="left">
         <Typography variant="body2" noWrap>
           {userId?.number || '—'}
@@ -71,6 +72,12 @@ export default function MainBidHistoryTableRow({ index, row, selected }) {
       <TableCell align="left">
         <Typography variant="body2" noWrap>
           {formatText(name) || '—'}
+        </Typography>
+      </TableCell>
+
+      <TableCell align="left">
+        <Typography variant="body2" noWrap>
+          {type || '—'}
         </Typography>
       </TableCell>
 
