@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 // @mui
+import dayjs from 'dayjs';
 import { Box, Button, Card, Container, Table, TableBody, TableCell, TableContainer, TableRow } from '@mui/material';
 import useResponsive from '../../hooks/useResponsive';
 // routes
@@ -35,6 +36,7 @@ const TABLE_HEAD = [
   { id: 'id', label: 'ID', align: 'left' },
   { id: 'marketName', label: 'Market Name', align: 'left' },
   { id: 'userName', label: 'Winner Name', align: 'left' },
+  { id: 'contactNumber', label: 'Phone', align: 'left' },
   { id: 'session', label: 'Session', align: 'left' },
   { id: 'amount', label: 'Amount', align: 'left' },
   { id: 'number', label: 'Number', align: 'left' },
@@ -99,7 +101,7 @@ export default function WinHistoryListPage() {
         contactNumber: bid.userId?.number || 'N/A',
         amount: bid.totalPoints || 0,
         winAmount: bid.winAmount || 0,
-        createdAt: bid.createdAt ? new Date(bid.createdAt).toLocaleString() : 'N/A',
+        createdAt: bid.createdAt ? dayjs(bid.createdAt).format('DD-MMM, YYYY HH:mm A') : 'N/A',
       })),
     [winningBidsList, page, rowsPerPage]
   );

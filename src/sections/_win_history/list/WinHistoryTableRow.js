@@ -14,16 +14,8 @@ WinHistoryTableRow.propTypes = {
 };
 
 export default function WinHistoryTableRow({ index, row, onEditRow }) {
-  const {
-    id,
-    marketName,
-    userName,
-    session,
-    number,
-    amount,
-    winAmount,
-    createdAt,
-  } = row;
+  const { id, marketName, userName, contactNumber, session, number, amount, winAmount, createdAt } =
+    row;
 
   const [openPopover, setOpenPopover] = useState(null);
 
@@ -52,6 +44,7 @@ export default function WinHistoryTableRow({ index, row, onEditRow }) {
         </TableCell>
 
         <TableCell align="left">{userName}</TableCell>
+        <TableCell align="left">{contactNumber || '—'}</TableCell>
 
         <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
           {session}
@@ -63,7 +56,7 @@ export default function WinHistoryTableRow({ index, row, onEditRow }) {
 
         <TableCell align="left">₹{winAmount?.toLocaleString('en-IN') || 0}</TableCell>
 
-        <TableCell align="left">{createdAt}</TableCell>
+        <TableCell align="left" maxWidth="190px">{createdAt}</TableCell>
       </TableRow>
 
       <MenuPopover

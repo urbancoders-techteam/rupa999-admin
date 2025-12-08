@@ -58,17 +58,17 @@ const GameTypeFormPage = () => {
   return (
     <>
       <Helmet>
-        <title>Game Types : Form | Rupa999</title>
+        <title>Rate Card : Form | Rupa999</title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         {/* ✅ Breadcrumb Section */}
         <Box sx={{ position: 'sticky', top: 0, zIndex: 10, bgcolor: 'background.paper' }}>
           <CustomBreadcrumbs
-            heading="Game Types"
+            heading="Rate Card"
             links={[
               { name: 'Dashboard', href: PATH_DASHBOARD.root },
-              { name: 'Game Types', href: PATH_DASHBOARD.gametypes.root },
+              { name: 'Rate Card', href: PATH_DASHBOARD.gametypes.root },
             ]}
           />
         </Box>

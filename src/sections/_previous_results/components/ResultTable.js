@@ -3,7 +3,6 @@ import {
   Card,
   CircularProgress,
   Grid,
-  Pagination,
   Paper,
   Stack,
   Table,
@@ -14,6 +13,7 @@ import {
   TableRow,
   Typography,
   useMediaQuery,
+  TablePagination,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import PropTypes from 'prop-types';
@@ -34,7 +34,7 @@ export default function ResultTable({ marketId }) {
 
   // ===== Pagination states =====
   const [page, setPage] = useState(1);
-  const rowsPerPage = 10;
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   // Reset page when marketId changes
   useEffect(() => {
@@ -54,10 +54,15 @@ export default function ResultTable({ marketId }) {
     }
 
     dispatch(getAllWinningBidsAsync(params));
-  }, [dispatch, page, marketId]);
+  }, [dispatch, page, rowsPerPage, marketId]);
 
   const handleChangePage = (_, value) => {
     setPage(value);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(1);
   };
 
   // Transform API data to table format
@@ -75,7 +80,8 @@ export default function ResultTable({ marketId }) {
   const totalBiddingAmount = tableData.reduce((sum, item) => sum + (item.amount || 0), 0);
   const totalWinningAmount = tableData.reduce((sum, item) => sum + (item.winningAmount || 0), 0);
 
-  const pageCount = pagination?.totalPages || 1;
+  const totalCount = pagination?.total ?? tableData.length;
+  const pageCount = pagination?.totalPages || Math.max(1, Math.ceil(totalCount / rowsPerPage));
 
   return (
     <Card sx={{ p: 3, borderRadius: 2, mb: 2 }}>
@@ -196,15 +202,21 @@ export default function ResultTable({ marketId }) {
           </TableContainer>
 
           {/* Pagination */}
-          <Box display="flex" justifyContent="center" mt={2}>
-            <Pagination
-              count={pageCount}
-              page={page}
-              onChange={handleChangePage}
-              color="primary"
-              shape="rounded"
+          <Stack direction={{ xs: 'column', sm: 'row' }} alignItems="center" justifyContent="space-between" mt={2} spacing={1}>
+            <Typography variant="body2" color="text.secondary">
+              Showing page {page} of {pageCount}
+            </Typography>
+            <TablePagination
+              component="div"
+              rowsPerPageOptions={[10, 25, 50]}
+              count={totalCount}
+              rowsPerPage={rowsPerPage}
+              page={page - 1}
+              onPageChange={(_, newPage) => handleChangePage(null, newPage + 1)}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              labelRowsPerPage="Rows"
             />
-          </Box>
+          </Stack>
         </>
       )}
 
@@ -235,19 +247,19 @@ export default function ResultTable({ marketId }) {
                 <Typography variant="body2">
                   Number: <strong>{row.number}</strong>
                 </Typography>
-                <Typography variant="body2">
-                  Amount: <strong>₹{row.amount.toLocaleString('en-IN')}</strong>
-                </Typography>
-                <Typography variant="body2">
-                  Winning Amount:{' '}
-                  <strong
-                    style={{
-                      color: row.winningAmount > 0 ? 'green' : 'red',
-                    }}
+                <Stack direction="row" justifyContent="space-between" alignItems="center" mt={0.5}>
+                  <Typography variant="body2">Amount:</Typography>
+                  <Typography variant="subtitle2">₹{row.amount.toLocaleString('en-IN')}</Typography>
+                </Stack>
+                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                  <Typography variant="body2">Winning Amount:</Typography>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ color: row.winningAmount > 0 ? 'success.main' : 'error.main' }}
                   >
                     ₹{row.winningAmount.toLocaleString('en-IN')}
-                  </strong>
-                </Typography>
+                  </Typography>
+                </Stack>
 
                 <Typography
                   variant="caption"
@@ -267,15 +279,21 @@ export default function ResultTable({ marketId }) {
           </Stack>
 
           {/* Pagination for mobile cards */}
-          <Box display="flex" justifyContent="center" mt={2}>
-            <Pagination
-              count={pageCount}
-              page={page}
-              onChange={handleChangePage}
-              color="primary"
-              shape="rounded"
+          <Stack direction={{ xs: 'column', sm: 'row' }} alignItems="center" justifyContent="space-between" mt={2} spacing={1}>
+            <Typography variant="body2" color="text.secondary">
+              Showing page {page} of {pageCount}
+            </Typography>
+            <TablePagination
+              component="div"
+              rowsPerPageOptions={[10, 25, 50]}
+              count={totalCount}
+              rowsPerPage={rowsPerPage}
+              page={page - 1}
+              onPageChange={(_, newPage) => handleChangePage(null, newPage + 1)}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              labelRowsPerPage="Rows"
             />
-          </Box>
+          </Stack>
         </>
       )}
     </Card>

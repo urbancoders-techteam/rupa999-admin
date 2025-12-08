@@ -10,7 +10,10 @@ import * as Yup from 'yup';
 import { RHFAutocomplete, RHFTextField } from '../../../components/hook-form';
 import RHFDatePicker from '../../../components/hook-form/RHFDatePicker';
 import { useSnackbar } from '../../../components/snackbar';
-import { createMarketResultAsync, getAllMarketResultsAsync } from '../../../redux/services/market_result_services';
+import {
+  createMarketResultAsync,
+  getAllMarketResultsAsync,
+} from '../../../redux/services/market_result_services';
 import { getAllMarketsAsync } from '../../../redux/services/market_services';
 
 // ----------------------------------------------------------------------
@@ -35,13 +38,17 @@ const isNonDecreasing = (value) => {
 };
 
 // Market helpers
-const getMarketLabel = (option) => (option?.name || option || '');
-const getMarketId = (option) => (option?._id || option || '');
+const getMarketLabel = (option) => option?.name || option || '';
+const getMarketId = (option) => option?._id || option || '';
 const isMarketEqual = (option, value) => getMarketId(option) === getMarketId(value);
 
 // Pana validation
 const validatePanaInput = (value) => {
-  const digits = value.replace(/[^0-9]/g, '').slice(0, 3).split('').map(Number);
+  const digits = value
+    .replace(/[^0-9]/g, '')
+    .slice(0, 3)
+    .split('')
+    .map(Number);
   if (digits.length === 0) return '';
 
   let valid = digits[0].toString();
@@ -50,7 +57,10 @@ const validatePanaInput = (value) => {
   }
   if (digits.length === 3 && valid.length === 2) {
     const second = Number(valid[1]);
-    if ((second === 0 && digits[2] === 0) || (second !== 0 && (digits[2] >= digits[1] || digits[2] === 0))) {
+    if (
+      (second === 0 && digits[2] === 0) ||
+      (second !== 0 && (digits[2] >= digits[1] || digits[2] === 0))
+    ) {
       valid += digits[2].toString();
     }
   }
@@ -59,7 +69,10 @@ const validatePanaInput = (value) => {
 
 const calculateDigit = (pana) => {
   if (!pana || !/^\d{3}$/.test(pana)) return '';
-  const sum = pana.split('').map(Number).reduce((a, b) => a + b, 0);
+  const sum = pana
+    .split('')
+    .map(Number)
+    .reduce((a, b) => a + b, 0);
   return (sum % 10).toString();
 };
 
@@ -69,10 +82,15 @@ GeneralCreateResultForm.propTypes = {
   selectedMarketId: PropTypes.func, // Callback to pass selected marketId
 };
 
-export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner, selectedMarketId }) {
+export default function GeneralCreateResultForm({
+  showWinner,
+  onHandleShowWinner,
+  selectedMarketId,
+}) {
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
   const { marketList, loading: marketLoading } = useSelector((state) => state.market);
+  console.log('marketList', marketList);
   const { loading: marketResultLoading } = useSelector((state) => state.marketResult);
 
   const validationSchema = useMemo(
@@ -114,14 +132,30 @@ export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner
     mode: 'onSubmit',
   });
 
-  const { handleSubmit, setValue, control, reset, formState: { isSubmitting } } = methods;
+  const {
+    handleSubmit,
+    setValue,
+    control,
+    reset,
+    formState: { isSubmitting },
+  } = methods;
   const usePercentage = useWatch({ control, name: 'usePercentage' });
   const panaValue = useWatch({ control, name: 'pana' });
   const selectedMarket = useWatch({ control, name: 'market' });
 
-  useEffect(() => {
-    dispatch(getAllMarketsAsync());
-  }, [dispatch]);
+  // Some API shapes return `{ market: { _id, name } }` in the list.
+  // Normalize so the autocomplete always receives the actual market object.
+  const marketOptions = useMemo(
+    () => marketList.map((item) => ({
+        _id: item._id,
+        name: item.name,
+      })),
+    [marketList]
+  );
+
+  console.log('marketList', marketList);
+
+
 
   useEffect(() => {
     if (panaValue) {
@@ -161,10 +195,12 @@ export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner
 
   const preparePayload = useCallback((data) => {
     const payload = {
-      date: dayjs.isDayjs(data.date) ? data.date.format('YYYY-MM-DD') : dayjs(data.date).format('YYYY-MM-DD'),
+      date: dayjs.isDayjs(data.date)
+        ? data.date.format('YYYY-MM-DD')
+        : dayjs(data.date).format('YYYY-MM-DD'),
       marketsId: getMarketId(data.market),
       session: data.session?.toLowerCase() || '',
-      percentage: data.usePercentage ? (data.percentage || 'yes') : 'no',
+      percentage: data.usePercentage ? data.percentage || 'yes' : 'no',
     };
 
     if (!data.usePercentage) {
@@ -184,7 +220,8 @@ export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner
         reset(INITIAL_FORM_VALUES);
         dispatch(getAllMarketResultsAsync());
       } catch (error) {
-        const errorMessage = error?.response?.data?.message || error?.message || 'Failed to create market result';
+        const errorMessage =
+          error?.response?.data?.message || error?.message || 'Failed to create market result';
         enqueueSnackbar(errorMessage, { variant: 'error' });
       }
     },
@@ -192,6 +229,10 @@ export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner
   );
 
   const isLoading = marketLoading || marketResultLoading;
+
+  useEffect(() => {
+    dispatch(getAllMarketsAsync({ page: 1, limit: 100 }));
+  }, [dispatch]);
 
   return (
     <Card sx={{ p: 3, borderRadius: 2, mb: 2 }}>
@@ -210,20 +251,13 @@ export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner
             {/* Markets */}
             <Grid item xs={12} md={4}>
               <RHFAutocomplete
+                fullWidth
+                size="small"
                 name="market"
                 label="Markets"
-                size="small"
-                fullWidth
-                disabled={marketLoading}
-                options={marketList || []}
-                loading={marketLoading}
-                getOptionLabel={getMarketLabel}
-                isOptionEqualToValue={isMarketEqual}
-                renderOption={(props, option) => (
-                  <li {...props} key={option._id || option}>
-                    {getMarketLabel(option)}
-                  </li>
-                )}
+                options={marketOptions}
+                getOptionLabel={(opt) => opt?.name || ''}
+                isOptionEqualToValue={(opt, val) => opt?._id === val?._id}
               />
             </Grid>
 
@@ -286,7 +320,13 @@ export default function GeneralCreateResultForm({ showWinner, onHandleShowWinner
             {/* Conditional fields */}
             {usePercentage ? (
               <Grid item xs={12} md={4}>
-                <RHFTextField name="percentage" label="Percentage" placeholder="Enter Percentage" size="small" fullWidth />
+                <RHFTextField
+                  name="percentage"
+                  label="Percentage"
+                  placeholder="Enter Percentage"
+                  size="small"
+                  fullWidth
+                />
               </Grid>
             ) : (
               <>

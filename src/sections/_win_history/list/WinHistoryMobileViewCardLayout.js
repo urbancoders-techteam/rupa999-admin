@@ -78,7 +78,7 @@ function WinHistoryMobileViewCardLayout({
               key={row.id}
               sx={{ borderRadius: 2, boxShadow: 'none',  }}
             >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ px: 2, py: 1.5 }}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ px: 2, py: 1 }}>
                 <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary', paddingRight: 1 }}>
