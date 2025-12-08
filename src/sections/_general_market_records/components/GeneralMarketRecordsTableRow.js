@@ -5,8 +5,8 @@ import { useState } from 'react';
 import Iconify from '../../../components/iconify';
 import Label from '../../../components/label';
 import MenuPopover from '../../../components/menu-popover';
-import { fDateTime } from '../../../utils/formatTime';
 import { fNumber } from '../../../utils/formatNumber';
+import { fDateTime } from '../../../utils/formatTime';
 
 // ----------------------------------------------------------------------
 
@@ -74,15 +74,15 @@ export default function GeneralMarketRecordTableRow({ index, row, onEditRow }) {
           <Label
             variant="soft"
             color={
-              status === 'WON'
+              status.toLowerCase() === 'won'
                 ? 'success'
-                : status === 'LOST'
+                : status.toLowerCase() === 'lost'
                   ? 'error'
                   : 'warning'
             }
             sx={{ textTransform: 'uppercase', fontWeight: 'bold' }}
           >
-            {status === 'WON' ? "SUCCESS" : status === 'LOST' ? "FAILED" : status}
+            {status.toLowerCase() === 'won' ? "SUCCESS" : status.toLowerCase() === 'lost' ? "FAILED" : status}
           </Label>
         </TableCell>
 

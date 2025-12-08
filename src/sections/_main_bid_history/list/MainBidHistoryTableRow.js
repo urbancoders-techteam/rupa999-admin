@@ -6,6 +6,7 @@ import {
   Typography,
 } from '@mui/material';
 // components
+import Label from '../../../components/label/Label';
 import { fBidDigit } from '../../../utils/formatText';
 import { fDateTime } from '../../../utils/formatTime';
 
@@ -26,6 +27,7 @@ export default function MainBidHistoryTableRow({ index, row, selected }) {
     userId,
     date,
     type,
+    status,
     createdAt,
   } = row || {};
 
@@ -41,6 +43,34 @@ export default function MainBidHistoryTableRow({ index, row, selected }) {
       .split('_')
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
+  };
+
+  const getStatusColor = () => {
+    const statusLower = status?.toLowerCase();
+    if (statusLower === 'won') return 'success';
+    if (statusLower === 'lost') return 'error';
+    return 'warning';
+  };
+
+  const getStatusLabel = () => {
+    const statusLower = status?.toLowerCase();
+    if (statusLower === 'won') return 'WON';
+    if (statusLower === 'lost') return 'LOST';
+    return status;
+  };
+
+  const getTypeLabel = () => {
+    const typeLower = type?.toLowerCase();
+    if (typeLower === 'open') return 'OPEN';
+    if (typeLower === 'close') return 'CLOSE';
+    return type;
+  };
+
+  const getTypeColor = () => {
+    const typeLower = type?.toLowerCase();
+    if (typeLower === 'open') return 'info';
+    if (typeLower === 'close') return 'primary';
+    return 'default';
   };
 
   return (
@@ -76,9 +106,13 @@ export default function MainBidHistoryTableRow({ index, row, selected }) {
       </TableCell>
 
       <TableCell align="left">
-        <Typography variant="body2" noWrap>
-          {type || '—'}
-        </Typography>
+        <Label
+          variant="soft"
+          color={getTypeColor()}
+          sx={{ textTransform: 'uppercase', fontWeight: 'bold' }}
+        >
+          {getTypeLabel()}
+        </Label>
       </TableCell>
 
       <TableCell align="left">
@@ -91,6 +125,16 @@ export default function MainBidHistoryTableRow({ index, row, selected }) {
         <Typography variant="body2">
           {totalPoints || '—'}
         </Typography>
+      </TableCell>
+
+      <TableCell align="left">
+        <Label
+          variant="soft"
+          color={getStatusColor()}
+          sx={{ textTransform: 'uppercase', fontWeight: 'bold' }}
+        >
+          {getStatusLabel()}
+        </Label>
       </TableCell>
 
       <TableCell align="left">

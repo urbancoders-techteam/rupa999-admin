@@ -44,6 +44,7 @@ const TABLE_HEAD = [
   { id: 'type', label: 'Type', align: 'left' },
   { id: 'digit', label: 'Digit', align: 'left' },
   { id: 'point', label: 'Point', align: 'left' },
+  { id: 'status', label: 'Status', align: 'left' },
   { id: 'date', label: 'Date', align: 'left' },
 ];
 
