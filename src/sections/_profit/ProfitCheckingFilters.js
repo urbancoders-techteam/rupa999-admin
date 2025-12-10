@@ -1,19 +1,71 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Box, Grid, Button, TextField, Autocomplete } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { getProfitBidsAsync } from '../../redux/services/bid_services';
 import YearlySalesGraph from '../../components/graph/YearlySalesGraph';
+import { getAllMarketsAsync } from '../../redux/services/market_services';
 import DonutChart from '../../components/graph/DonutChart';
 import HorizontalProgressGraph from '../../components/graph/HorizontalProgressGraph';
 import { _ecommerceSalesOverview } from '../../_mock/arrays';
 
 const ProfitCheckingFilters = () => {
+  const dispatch = useDispatch();
   const [startDate, setStartDate] = useState(new Date());
   const [dropdownValue, setDropdownValue] = useState('');
   const [subMenuValue, setSubMenuValue] = useState('');
+  console.log('subMenuValue', subMenuValue);
+  
+  const { profitBidsList } = useSelector((state) => state.bid);
 
   const onChangeStartDate = (newValue) => {
     setStartDate(newValue);
   };
+
+  const { marketList } = useSelector((state) => state.market);
+
+  const marketListData = marketList.map((market) => ({ name: market.name, id: market._id }));
+
+  // Transform profitBidsList data for HorizontalProgressGraph
+  const profitProgressData = React.useMemo(() => {
+    if (!profitBidsList || Object.keys(profitBidsList).length === 0) {
+      return [];
+    }
+
+    const { totalAmount = 0, winAmount = 0, profits = 0 } = profitBidsList;
+    
+    // Calculate the maximum value for percentage calculation
+    const maxValue = Math.max(totalAmount, winAmount, Math.abs(profits));
+    
+    return [
+      {
+        label: 'Total Amount',
+        amount: totalAmount,
+        value: maxValue > 0 ? (totalAmount / maxValue) * 100 : 0,
+      },
+      {
+        label: 'Total Win Amount',
+        amount: winAmount,
+        value: maxValue > 0 ? (winAmount / maxValue) * 100 : 0,
+      },
+      {
+        label: 'Profit',
+        amount: profits,
+        value: maxValue > 0 ? (Math.abs(profits) / maxValue) * 100 : 0,
+      },
+    ];
+  }, [profitBidsList]);
+
+  useEffect(() => {
+    dispatch(
+      getAllMarketsAsync({
+        page: 1, // API uses 1-based pagination
+        limit: 100,
+      })
+    );
+    dispatch(getProfitBidsAsync({ period: 'today' }));
+  }, [dispatch]);
+
 
   return (
     <Box
@@ -40,9 +92,11 @@ const ProfitCheckingFilters = () => {
             <Autocomplete
               size="small"
               fullWidth
-              options={optionsData}
+              options={marketListData}
               value={subMenuValue}
               onChange={(_, newValue) => setSubMenuValue(newValue)}
+              getOptionLabel={(option) => option?.name || ''}
+              isOptionEqualToValue={(option, value) => option?.id === value?.id}
               renderInput={(params) => <TextField {...params} label="Choose Markets" fullWidth />}
             />
           </Grid>
@@ -79,7 +133,10 @@ const ProfitCheckingFilters = () => {
 
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3.5}>
-            <HorizontalProgressGraph title="Profit Progress" data={_ecommerceSalesOverview} />
+            <HorizontalProgressGraph 
+              title="Profit Progress" 
+              data={ profitProgressData.length > 0 ? profitProgressData : _ecommerceSalesOverview} 
+            />
           </Grid>
           <Grid item xs={12} md={6} lg={5}>
             <YearlySalesGraph
@@ -111,12 +168,12 @@ const ProfitCheckingFilters = () => {
           <Grid item xs={12} md={6} lg={3.5}>
             <DonutChart
               title="Profit Chart"
-              total={2324}
+              total={profitBidsList.totalAmount}
               chart={{
                 series: [
-                  { label: 'Total Amount', value: 44 },
-                  { label: 'Total Win Amount', value: 75 },
-                  { label: 'Profit', value: 75 },
+                  { label: 'Total Amount', value:profitBidsList.totalAmount || 0},
+                  { label: 'Total Win Amount', value: profitBidsList.winAmount || 0 },
+                  { label: 'Profit', value: profitBidsList.profits || 0 },
                 ],
               }}
             />
@@ -128,21 +185,3 @@ const ProfitCheckingFilters = () => {
 };
 
 export default ProfitCheckingFilters;
-
-const optionsData = [
-  'SRIDEVI DAY',
-  'TIME BAZAR',
-  'MADHUR DAY',
-  'MILAN DAY',
-  'RAJDHANI DAY',
-  'SUPREME DAY',
-  'KALIYAN',
-  'SRIDEVI NIGHT',
-  'MADHUR NIGHT',
-  'MILAN NIGHT',
-  'KALIYAN NIGHT',
-  'MAIN BAZAR',
-  'RAJDHANI NIGHT',
-  'KARNATAKA DAY',
-  'KARNATAKA NIGHT',
-];

@@ -38,3 +38,34 @@ export const getAllBidsAsync = createAsyncThunk(
     })
 );
 
+// Get bid data result
+export const getBidDataResultAsync = createAsyncThunk(
+  'bid/getDataResult',
+  async (params = {}, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: '/bids/data-result',
+      method: 'get',
+      params: {
+        page: params.page || 1,
+        limit: params.limit || 10,
+        ...params,
+      },
+    })
+);
+
+// Get profit bids
+export const getProfitBidsAsync = createAsyncThunk(
+  'bid/getProfitBids',
+  async (params = {}, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: '/bids/profit-bids',
+      method: 'get',
+      params: {
+        period: params.period || 'today',
+        ...params,
+      },
+    })
+);
+

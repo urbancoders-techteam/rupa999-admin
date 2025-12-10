@@ -69,8 +69,6 @@ export default function MarketDetailsPage() {
   // Redux state
   const { marketList, pagination } = useSelector((state) => state.market);
 
-  console.log('marketList', marketList);
-
   const [filterName, setFilterName] = useState(''); // Input field value
   const [searchQuery, setSearchQuery] = useState(''); // Actual search value sent to API
 

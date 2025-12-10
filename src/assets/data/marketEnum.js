@@ -1,21 +1,3 @@
-// export const optionsData = [
-//   { name: 'SRIDEVI DAY', key: 'sridevi_day' },
-//   { name: 'TIME BAZAR', key: 'time_bazar' },
-//   { name: 'MADHUR DAY', key: 'madhur_day' },
-//   { name: 'MILAN DAY', key: 'milan_day' },
-//   { name: 'RAJDHANI DAY', key: 'rajdhani_day' },
-//   { name: 'SUPREME DAY', key: 'supreme_day' },
-//   { name: 'KALIYAN', key: 'kaliyan' },
-//   { name: 'SRIDEVI NIGHT', key: 'sridevi_night' },
-//   { name: 'MADHUR NIGHT', key: 'madhur_night' },
-//   { name: 'MILAN NIGHT', key: 'milan_night' },
-//   { name: 'KALIYAN NIGHT', key: 'kaliyan_night' },
-//   { name: 'MAIN BAZAR', key: 'main_bazar' },
-//   { name: 'RAJDHANI NIGHT', key: 'rajdhani_night' },
-//   { name: 'KARNATAKA DAY', key: 'karnataka_day' },
-//   { name: 'KARNATAKA NIGHT', key: 'karnataka_night' },
-// ];
-
 
 export const marketEnum = [
   'SRIDEVI DAY',
@@ -34,3 +16,40 @@ export const marketEnum = [
   'KARNATAKA DAY',
   'KARNATAKA NIGHT',
 ];
+
+
+export const marketTypeOptiData = [
+  { name: 'Single Digit', key: 'single_digit' },
+  { name: 'Single Pana', key: 'single_pana' },
+  { name: 'Double Pana', key: 'double_pana' },
+  { name: 'Triple Pana', key: 'triple_pana' },
+  { name: 'SP Motor', key: 'sp_motor' },
+  { name: 'DP Motor', key: 'dp_motor' },
+  { name: 'TP Motor', key: 'tp_motor' },
+  { name: 'Half Sangam', key: 'half_sangam' },
+  { name: 'Full Sangam', key: 'full_sangam' },
+  { name: 'Group Jodi', key: 'group_jodi' },
+  { name: 'Group Pana', key: 'group_pana' },
+  { name: 'Jodi Digit', key: 'jodi_digit' },
+];
+
+
+
+
+export const marketTypeEnum = [
+  'single_digit',
+  'single_pana',
+  'double_pana',
+  'triple_pana',
+  'sp_motor',
+  'dp_motor',
+  'tp_motor',
+  'half_sangam',
+  'full_sangam',
+  'group_jodi',
+  'group_pana',
+  'jodi_digit',
+];
+
+
+

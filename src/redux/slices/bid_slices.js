@@ -2,11 +2,15 @@ import { createSlice } from '@reduxjs/toolkit';
 import {
   getAllWinningBidsAsync,
   getAllBidsAsync,
+  getBidDataResultAsync,
+  getProfitBidsAsync,
 } from '../services/bid_services';
 
 const initialState = {
   winningBidsList: [],
   allBidsList: [],
+  bidDataResult: [],
+  profitBidsList: [],
   loading: false,
   error: null,
   pagination: {
@@ -63,6 +67,42 @@ const bidSlice = createSlice({
       .addCase(getAllBidsAsync.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || 'Failed to fetch bids';
+      });
+
+    // Get bid data result
+    builder
+      .addCase(getBidDataResultAsync.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getBidDataResultAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        state.bidDataResult = action.payload?.data || [];
+        if (action.payload?.pagination) {
+          state.pagination = action.payload.pagination;
+        }
+      })
+      .addCase(getBidDataResultAsync.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Failed to fetch bid data result';
+      });
+
+    // Get profit bids
+    builder
+      .addCase(getProfitBidsAsync.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getProfitBidsAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        state.profitBidsList = action.payload?.data || [];
+        if (action.payload?.pagination) {
+          state.pagination = action.payload.pagination;
+        }
+      })
+      .addCase(getProfitBidsAsync.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Failed to fetch profit bids';
       });
   },
 });

@@ -1,5 +1,7 @@
 import { Helmet } from 'react-helmet-async';
-import { useState, useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
 // @mui
 import {
   Card,
@@ -10,14 +12,15 @@ import {
   TableContainer,
   Box,
   Grid,
-  TextField,
-  MenuItem,
   Typography,
   TableCell,
-  TableHead,
   TableRow,
+  useMediaQuery,
+  Tooltip,
+  IconButton,
 } from '@mui/material';
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { useTheme } from '@mui/material/styles';
+import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import Iconify from '../../components/iconify';
@@ -25,31 +28,45 @@ import Iconify from '../../components/iconify';
 import Scrollbar from '../../components/scrollbar';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
+import FormProvider, { RHFAutocomplete } from '../../components/hook-form';
+import {
+  TableHeadCustom,
+  TableEmptyRows,
+  TableNoData,
+  TablePaginationCustom,
+  useTable,
+} from '../../components/table';
 // sections
 import MarketDataTableRow from '../../sections/_market_data/components/MarketDataTableRow';
+import MarketDataMobileViewCardLayout from '../../sections/_market_data/components/MarketDataMobileViewCardLayout';
 import { PATH_DASHBOARD } from '../../routes/paths';
+import { marketTypeOptiData } from '../../assets/data/marketEnum';
+import { getBidDataResultAsync } from '../../redux/services/bid_services';
+import { getAllMarketsAsync } from '../../redux/services/market_services';
 
 // ----------------------------------------------------------------------
 
-const optionsData = [
-  'SRIDEVI DAY',
-  'TIME BAZAR',
-  'MADHUR DAY',
-  'MILAN DAY',
-  'RAJDHANI DAY',
-  'SUPREME DAY',
-  'KALIYAN',
-  'SRIDEVI NIGHT',
-  'MADHUR NIGHT',
-  'MILAN NIGHT',
-  'KALIYAN NIGHT',
-  'MAIN BAZAR',
-  'RAJDHANI NIGHT',
-  'KARNATAKA DAY',
-  'KARNATAKA NIGHT',
+const marketTimeOptions = [
+  { name: 'Open', key: 'open' },
+  { name: 'Close', key: 'close' },
 ];
 
-const marketTimeOptions = ['Open', 'Close'];
+const sortByOptions = [
+  { name: '--', key: '' },
+  { name: 'Single Digit', key: 'singleDigit' },
+  { name: 'Jodi Digit', key: 'jodiDigit' },
+  { name: 'Single Pana', key: 'singlePana' },
+  { name: 'Double Pana', key: 'doublePana' },
+  { name: 'Triple Pana', key: 'triplePana' },
+  { name: 'Half Sangam A', key: 'halfSangamA' },
+  { name: 'Half Sangam B', key: 'halfSangamB' },
+  { name: 'Full Sangam', key: 'fullSangam' },
+];
+
+const sortOrderOptions = [
+  { name: 'Ascending', key: 'asc' },
+  { name: 'Descending', key: 'desc' },
+];
 
 const TABLE_HEAD = [
   { id: 'srNo', label: 'Sr No.', align: 'center' },
@@ -63,99 +80,159 @@ const TABLE_HEAD = [
   { id: 'fullSangam', label: 'Full Sangam', align: 'left' },
 ];
 
-// Mock data for demonstration
-const mockMarketData = [
-  { id: 1, jodiDigit: '47 = 10', halfSangamA: 0, halfSangamB: 0, fullSangam: 0, singleDigit: 0, singlePana: '680 = 10', doublePana: 0, triplePana: 0 },
-  { id: 2, jodiDigit: '56 = 10', halfSangamA: 0, halfSangamB: 0, fullSangam: 0, singleDigit: 0, singlePana: 0, doublePana: 0, triplePana: 0 },
-  { id: 3, jodiDigit: '74 = 15', halfSangamA: 0, halfSangamB: 0, fullSangam: 0, singleDigit: 0, singlePana: 0, doublePana: 0, triplePana: 0 },
-  { id: 4, jodiDigit: '12 = 5', halfSangamA: 0, halfSangamB: 0, fullSangam: 0, singleDigit: 0, singlePana: 0, doublePana: 0, triplePana: 0 },
-  { id: 5, jodiDigit: '23 = 5', halfSangamA: 0, halfSangamB: 0, fullSangam: 0, singleDigit: 0, singlePana: 0, doublePana: 0, triplePana: 0 },
-  { id: 6, jodiDigit: '34 = 7', halfSangamA: 0, halfSangamB: 0, fullSangam: 0, singleDigit: 0, singlePana: 0, doublePana: 0, triplePana: 0 },
-  { id: 7, jodiDigit: '45 = 9', halfSangamA: 0, halfSangamB: 0, fullSangam: 0, singleDigit: 0, singlePana: 0, doublePana: 0, triplePana: 0 },
-  { id: 8, jodiDigit: '67 = 13', halfSangamA: 0, halfSangamB: 0, fullSangam: 0, singleDigit: 0, singlePana: 0, doublePana: 0, triplePana: 0 },
-];
-
 // ----------------------------------------------------------------------
 
 export default function MarketDataListPage() {
+  const { dense, page, rowsPerPage, setPage, onChangeDense, onChangePage, onChangeRowsPerPage } =
+    useTable();
+
   const { themeStretch } = useSettingsContext();
+  const dispatch = useDispatch();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const [tableData] = useState(mockMarketData);
-  const [selectedDate, setSelectedDate] = useState(dayjs());
-  const [selectedMarket, setSelectedMarket] = useState('RAJDHANI DAY');
-  const [selectedMarketTime, setSelectedMarketTime] = useState('Open');
+  const { bidDataResult, loading, pagination } = useSelector((state) => state.bid);
+  console.log('bidDataResult', bidDataResult);
+  const { marketList, loading: marketLoading } = useSelector((state) => state.market);
 
-  const handleDateChange = (newValue) => {
-    setSelectedDate(newValue);
+  const defaultValues = {
+    date: dayjs(),
+    market: null,
+    marketType: null,
+    marketTime: null,
+    sortBy: null,
+    sortOrder: { name: 'Ascending', key: 'asc' },
   };
 
-  const handleMarketChange = (event) => {
-    setSelectedMarket(event.target.value);
+  const methods = useForm({
+    defaultValues,
+  });
+
+  const { handleSubmit, watch } = methods;
+
+  const selectedDate = watch('date');
+
+  // Fetch markets on component mount
+  useEffect(() => {
+    dispatch(getAllMarketsAsync({ page: 1, limit: 10 }));
+  }, [dispatch]);
+
+  const onSubmit = async (data) => {
+    try {
+      setPage(0); // Reset to first page when filters change
+      const params = {
+        page: 1,
+        limit: rowsPerPage,
+      };
+
+      // Add date filter
+      if (data.date) {
+        params.date = dayjs(data.date).format('YYYY-MM-DD');
+      }
+
+      // Add market filter (using _id from API)
+      if (data.market?._id) {
+        params.market = data.market._id;
+      }
+
+      // Add game type filter (using key from marketTypeOptiData)
+      if (data.marketType?.key) {
+        params.gameType = data.marketType.key;
+      }
+
+      // Add market time filter
+      if (data.marketTime?.key) {
+        params.session = data.marketTime.key;
+      }
+
+      // Add sortBy filter
+      if (data.sortBy?.key) {
+        params.sortBy = data.sortBy.key;
+      }
+
+      // Add sortOrder filter
+      if (data.sortOrder?.key) {
+        params.sortOrder = data.sortOrder.key;
+      }
+
+      await dispatch(getBidDataResultAsync(params)).unwrap();
+    } catch (error) {
+      console.error('Failed to fetch bid data result:', error);
+    }
   };
 
-  const handleMarketTimeChange = (event) => {
-    setSelectedMarketTime(event.target.value);
+  // Fetch data when pagination changes
+  const fetchDataWithFilters = async () => {
+    try {
+      const formValues = methods.getValues();
+      const params = {
+        page: page + 1, // API uses 1-based pagination
+        limit: rowsPerPage,
+      };
+
+      // Add date filter
+      if (formValues.date) {
+        params.date = dayjs(formValues.date).format('YYYY-MM-DD');
+      }
+
+      // Add market filter (using _id from API)
+      if (formValues.market?._id) {
+        params.market = formValues.market._id;
+      }
+
+      // Add game type filter
+      if (formValues.marketType?.key) {
+        params.gameType = formValues.marketType.key;
+      }
+
+      // Add market time filter
+      if (formValues.marketTime?.key) {
+        params.session = formValues.marketTime.key;
+      }
+
+      // Add sortBy filter
+      if (formValues.sortBy?.key) {
+        params.sortBy = formValues.sortBy.key;
+      }
+
+      // Add sortOrder filter
+      if (formValues.sortOrder?.key) {
+        params.sortOrder = formValues.sortOrder.key;
+      }
+
+      await dispatch(getBidDataResultAsync(params)).unwrap();
+    } catch (error) {
+      console.error('Failed to fetch bid data result:', error);
+    }
   };
 
-  const handleGetData = () => {
-    // Handle GET button click - fetch data based on filters
-    console.log('Fetching data for:', {
-      date: selectedDate.format('DD-MM-YYYY'),
-      market: selectedMarket,
-      time: selectedMarketTime,
-    });
-    // Add your API call here
-  };
+  // Fetch data when page or rowsPerPage changes (but not on initial mount if filters are empty)
+  useEffect(() => {
+    const formValues = methods.getValues();
+    const hasFilters =
+      formValues.date ||
+      formValues.market ||
+      formValues.marketType ||
+      formValues.marketTime ||
+      formValues.sortBy ||
+      formValues.sortOrder;
+    if (hasFilters) {
+      fetchDataWithFilters();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, rowsPerPage]);
 
-  const handleCopyToClipboard = () => {
-    // Create table text representation
-    let tableText = 'Market Data\n';
-    tableText += `Date: ${selectedDate.format('DD-MM-YYYY')}\n`;
-    tableText += `Market: ${selectedMarket}\n`;
-    tableText += `Time: ${selectedMarketTime}\n\n`;
-    tableText += 'Sr No.\tJodi Digit\tHalf Sangam A\tHalf Sangam B\tFull Sangam\tSingle Digit\tSingle Pana\tDouble Pana\tTriple Pana\n';
-    
-    tableData.forEach((row, index) => {
-      tableText += `${index + 1}\t${row.jodiDigit || '—'}\t${row.halfSangamA || '0'}\t${row.halfSangamB || '0'}\t${row.fullSangam || '0'}\t${row.singleDigit || '0'}\t${row.singlePana || '0'}\t${row.doublePana || '0'}\t${row.triplePana || '0'}\n`;
-    });
-
-    // Calculate totals
-    const totals = tableData.reduce(
-      (acc, row) => {
-        const jodiValue = row.jodiDigit ? parseInt(row.jodiDigit.split('=')[1]?.trim() || '0', 10) : 0;
-        const singlePanaValue = row.singlePana ? parseInt(row.singlePana.split('=')[1]?.trim() || '0', 10) : 0;
-        return {
-          jodiDigit: acc.jodiDigit + jodiValue,
-          singlePana: acc.singlePana + singlePanaValue,
-        };
-      },
-      { jodiDigit: 0, singlePana: 0 }
+  useEffect(() => {
+    dispatch(
+      getAllMarketsAsync({
+        page: 1, // API uses 1-based pagination
+        limit: 100,
+      })
     );
+  }, [dispatch, page, rowsPerPage]);
 
-    tableText += `Total.\t${totals.jodiDigit}\t0\t0\t0\t0\t${totals.singlePana}\t0\t0\n`;
-
-    navigator.clipboard.writeText(tableText).then(() => {
-      // You can add a toast notification here
-      console.log('Copied to clipboard');
-    });
-  };
-
-  // Calculate totals for display
-  const totals = useMemo(
-    () =>
-      tableData.reduce(
-        (acc, row) => {
-          const jodiValue = row.jodiDigit ? parseInt(row.jodiDigit.split('=')[1]?.trim() || '0', 10) : 0;
-          const singlePanaValue = row.singlePana ? parseInt(row.singlePana.split('=')[1]?.trim() || '0', 10) : 0;
-          return {
-            jodiDigit: acc.jodiDigit + jodiValue,
-            singlePana: acc.singlePana + singlePanaValue,
-          };
-        },
-        { jodiDigit: 0, singlePana: 0 }
-      ),
-    [tableData]
-  );
+  const denseHeight = dense ? 52 : 72;
+  const isNotFound = !marketList.length && !loading;
 
   return (
     <>
@@ -166,7 +243,9 @@ export default function MarketDataListPage() {
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Container maxWidth={themeStretch ? false : 'xl'}>
           <CustomBreadcrumbs
-            heading={`Market Data (${selectedDate.format('DD-MM-YYYY')})`}
+            heading={`Market Data (${
+              selectedDate ? dayjs(selectedDate).format('DD-MM-YYYY') : 'N/A'
+            })`}
             links={[
               { name: 'Dashboard', href: PATH_DASHBOARD.home.list },
               { name: 'Market Data', href: PATH_DASHBOARD.markets.marketdata.list },
@@ -175,158 +254,179 @@ export default function MarketDataListPage() {
           />
 
           {/* Filter Section */}
-          <Card sx={{ p: 3, mb: 3 }}>
-            <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} sm={6} md={3}>
-                <DatePicker
-                  label="Date"
-                  format="DD-MM-YYYY"
-                  value={selectedDate}
-                  onChange={handleDateChange}
-                  renderInput={(params) => (
-                    <TextField {...params} size="small" fullWidth />
-                  )}
-                />
-              </Grid>
+          <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+            <Card sx={{ p: 3, mb: 3 }}>
+              <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+                <Grid container spacing={2} alignItems="center">
+                  {/* <Grid item xs={12} sm={6} md={2.5}>
+                    <RHFDatePicker
+                      name="date"
+                      label="Date"
+                      size="small"
+                      format="DD-MM-YYYY"
+                    />
+                  </Grid> */}
 
-              <Grid item xs={12} sm={6} md={3}>
-                <TextField
-                  select
-                  fullWidth
-                  size="small"
-                  label="Market Name"
-                  value={selectedMarket}
-                  onChange={handleMarketChange}
-                >
-                  {optionsData.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
+                  <Grid item xs={12} sm={6} md={2.5}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <RHFAutocomplete
+                        name="market"
+                        label="Market Name"
+                        size="small"
+                        options={marketList || []}
+                        loading={marketLoading}
+                        getOptionLabel={(option) => option?.name || ''}
+                        isOptionEqualToValue={(option, value) => option?._id === value?._id}
+                        renderOption={(props, option) => <li {...props}>{option.name}</li>}
+                        sx={{ flex: 1 }}
+                      />
+                    </Box>
+                  </Grid>
 
-              <Grid item xs={12} sm={6} md={3}>
-                <TextField
-                  select
-                  fullWidth
-                  size="small"
-                  label="Market Time"
-                  value={selectedMarketTime}
-                  onChange={handleMarketTimeChange}
-                >
-                  {marketTimeOptions.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
+                  <Grid item xs={12} sm={6} md={2.5}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <RHFAutocomplete
+                        name="marketType"
+                        label="Filter by game type"
+                        size="small"
+                        options={marketTypeOptiData}
+                        getOptionLabel={(option) => option?.name || ''}
+                        isOptionEqualToValue={(option, value) => option?.key === value?.key}
+                        renderOption={(props, option) => <li {...props}>{option.name}</li>}
+                        sx={{ flex: 1 }}
+                      />
+                    </Box>
+                  </Grid>
 
-              <Grid item xs={12} sm={6} md={3}>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  onClick={handleGetData}
-                  startIcon={<Iconify icon="eva:search-fill" />}
-                >
-                  GET
-                </Button>
-              </Grid>
-            </Grid>
-          </Card>
+                  <Grid item xs={12} sm={6} md={2.5}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <RHFAutocomplete
+                        name="marketTime"
+                        label="Market Time"
+                        size="small"
+                        options={marketTimeOptions}
+                        getOptionLabel={(option) => option?.name || ''}
+                        isOptionEqualToValue={(option, value) => option?.key === value?.key}
+                        renderOption={(props, option) => <li {...props}>{option.name}</li>}
+                        sx={{ flex: 1 }}
+                      />
+                    </Box>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6} md={2.5}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <RHFAutocomplete
+                        name="sortBy"
+                        label="Field to sort by (default: totalAmount)"
+                        size="small"
+                        options={sortByOptions}
+                        getOptionLabel={(option) => option?.name || ''}
+                        isOptionEqualToValue={(option, value) => option?.key === value?.key}
+                        renderOption={(props, option) => <li {...props}>{option.name}</li>}
+                        sx={{ flex: 1 }}
+                      />
+                    </Box>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6} md={2.5}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <RHFAutocomplete
+                        name="sortOrder"
+                        label="Sort Order"
+                        size="small"
+                        options={sortOrderOptions}
+                        getOptionLabel={(option) => option?.name || ''}
+                        isOptionEqualToValue={(option, value) => option?.key === value?.key}
+                        renderOption={(props, option) => <li {...props}>{option.name}</li>}
+                        sx={{ flex: 1 }}
+                      />
+                    </Box>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6} md={2}>
+                    <Button
+                      fullWidth
+                      type="submit"
+                      variant="contained"
+                      disabled={loading}
+                      startIcon={<Iconify icon="eva:search-fill" />}
+                    >
+                      GET
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Box>
+            </Card>
+          </FormProvider>
 
           {/* Table Section */}
-          <Card>
-            <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
-              <Scrollbar>
-                <Table size="small" sx={{ minWidth: 1000 }}>
-                  <TableHead>
-                    <TableRow>
-                      {TABLE_HEAD.map((headCell) => (
-                        <TableCell
-                          key={headCell.id}
-                          align={headCell.align}
-                          sx={{ fontWeight: 'bold', bgcolor: 'background.neutral' }}
-                        >
-                          {headCell.label}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  </TableHead>
+          {isMobile ? (
+            <>
+              <MarketDataMobileViewCardLayout data={bidDataResult} loading={loading} />
+              <TablePaginationCustom
+                page={pagination?.page ? pagination.page - 1 : page}
+                count={pagination?.total || 0}
+                rowsPerPage={rowsPerPage}
+                onPageChange={onChangePage}
+                onRowsPerPageChange={onChangeRowsPerPage}
+                dense={dense}
+                onChangeDense={onChangeDense}
+              />
+            </>
+          ) : (
+            <Card>
+              <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
+                <Scrollbar>
+                  <Table size={dense ? 'medium' : 'small'} sx={{ minWidth: 1000 }}>
+                    <TableHeadCustom headLabel={TABLE_HEAD} rowCount={marketList.length} />
 
-                  <TableBody>
-                    {tableData.map((row, index) => (
-                      <MarketDataTableRow key={row.id} index={index + 1} row={row} />
-                    ))}
+                    <TableBody>
+                      {loading ? (
+                        <TableRow>
+                          <TableCell colSpan={TABLE_HEAD.length} align="center" sx={{ py: 3 }}>
+                            <Typography>Loading...</Typography>
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        <>
+                          {bidDataResult.map((row, index) => (
+                            <MarketDataTableRow
+                              key={row.id}
+                              index={
+                                pagination?.page
+                                  ? (pagination.page - 1) * rowsPerPage + index + 1
+                                  : index + 1
+                              }
+                              row={row}
+                            />
+                          ))}
 
-                    {/* Total Row */}
-                    <TableRow sx={{ bgcolor: 'background.neutral', fontWeight: 'bold' }}>
-                      <TableCell align="center">
-                        <Typography variant="subtitle2" fontWeight="bold">
-                          Total.
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="left">
-                        <Typography variant="subtitle2" fontWeight="bold">
-                          {totals.jodiDigit}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="left">
-                        <Typography variant="subtitle2" fontWeight="bold">
-                          0
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="left">
-                        <Typography variant="subtitle2" fontWeight="bold">
-                          0
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="left">
-                        <Typography variant="subtitle2" fontWeight="bold">
-                          0
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="left">
-                        <Typography variant="subtitle2" fontWeight="bold">
-                          0
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="left">
-                        <Typography variant="subtitle2" fontWeight="bold">
-                          {totals.singlePana}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="left">
-                        <Typography variant="subtitle2" fontWeight="bold">
-                          0
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="left">
-                        <Typography variant="subtitle2" fontWeight="bold">
-                          0
-                        </Typography>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </Scrollbar>
-            </TableContainer>
+                          <TableEmptyRows
+                            height={denseHeight}
+                            emptyRows={Math.max(0, rowsPerPage - bidDataResult.length)}
+                          />
 
-            {/* Copy to Clipboard Button */}
-            <Box sx={{ p: 2, display: 'flex', justifyContent: 'flex-end' }}>
-              <Button
-                variant="outlined"
-                startIcon={<Iconify icon="eva:copy-fill" />}
-                onClick={handleCopyToClipboard}
-              >
-                Copy to Clipboard
-              </Button>
-            </Box>
-          </Card>
+                          <TableNoData isNotFound={isNotFound} />
+                        </>
+                      )}
+                    </TableBody>
+                  </Table>
+                </Scrollbar>
+              </TableContainer>
+
+                <TablePaginationCustom
+                  page={pagination?.page ? pagination.page - 1 : page}
+                  count={pagination?.total || 0}
+                  rowsPerPage={rowsPerPage}
+                  onPageChange={onChangePage}
+                  onRowsPerPageChange={onChangeRowsPerPage}
+                  dense={dense}
+                  onChangeDense={onChangeDense}
+                />
+            </Card>
+          )}
         </Container>
       </LocalizationProvider>
     </>
   );
 }
-
