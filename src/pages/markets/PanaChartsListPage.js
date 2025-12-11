@@ -92,7 +92,7 @@ export default function PanaChartsListPage() {
             heading="Pana Chart Tables"
             links={[
               { name: 'Dashboard', href: PATH_DASHBOARD.root },
-              { name: 'Pana Chart Tables', href: PATH_DASHBOARD.withdrawdetails.list },
+              { name: 'Pana Chart Tables', href: PATH_DASHBOARD.withdrawaldetails.list },
             ]}
           />
           {isMobile && (

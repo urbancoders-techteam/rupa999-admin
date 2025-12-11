@@ -1,9 +1,8 @@
-import { paramCase } from 'change-case';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 // @mui
 import {
   Card,
@@ -41,7 +40,7 @@ import {
 
 // sections
 import CustomTableToolbar from '../components/table/CustomTableToolBar';
-import WithdrawalRequestMobileViewLayout from '../sections/_users/withdrawal-request/list/WithdrawalRequestMobileViewLayout';
+import WithdrawDetailsMobileViewLayoutPage from '../sections/_withdraw_details/components/WithdrawDetailsMobileViewLayoutPage';
 import WithdrawDetailsTableRow from '../sections/_withdraw_details/components/WithdrawDetailsTableRow';
 
 // ----------------------------------------------------------------------
@@ -57,7 +56,7 @@ const TABLE_HEAD = [
 
 // ----------------------------------------------------------------------
 
-export default function WithdrawalResquestListPage() {
+export default function WithdrawDetailsListPage() {
   const {
     dense,
     page,
@@ -67,7 +66,6 @@ export default function WithdrawalResquestListPage() {
     setPage,
     //
     selected,
-    setSelected,
     onSort,
     onChangeDense,
     onChangePage,
@@ -76,7 +74,6 @@ export default function WithdrawalResquestListPage() {
 
   const { themeStretch } = useSettingsContext();
 
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { id: userId } = useParams();
   const location = useLocation();
@@ -203,22 +200,6 @@ export default function WithdrawalResquestListPage() {
     setSearchQuery(filterName);
   };
 
-  const handleDeleteRow = (id) => {
-    const deleteRow = tableData.filter((row) => row.id !== id);
-    setSelected([]);
-    setTableData(deleteRow);
-
-    if (page > 0) {
-      if (dataInPage.length < 2) {
-        setPage(page - 1);
-      }
-    }
-  };
-
-  const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
-  };
-
   const handleResetFilter = () => {
     setFilterName('');
     setSearchQuery('');
@@ -259,7 +240,7 @@ export default function WithdrawalResquestListPage() {
   return (
     <>
       <Helmet>
-        <title> Transctions : List | Rupa999 </title>
+        <title> Withdrawal Details : List | Rupa999 </title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
@@ -281,11 +262,11 @@ export default function WithdrawalResquestListPage() {
           })}
         >
           <CustomBreadcrumbs
-            heading={userName ? `Withdrawal Requests - ${userName}` : 'Withdrawal Requests'}
+            heading={userName ? `Withdrawal Details - ${userName}` : 'Withdrawal Details'}
             links={[
               { name: 'Dashboard', href: PATH_DASHBOARD.root },
               { name: 'User List', href: PATH_DASHBOARD.user.list },
-              { name: userName ? `${userName}'s Withdrawal Requests` : 'Withdrawal Requests' },
+              { name: userName ? `${userName}'s Withdrawal Details` : 'Withdrawal Details' },
             ]}
 
           />
@@ -295,7 +276,7 @@ export default function WithdrawalResquestListPage() {
         <Box
           sx={(theme) => ({
             [theme.breakpoints.down('sm')]: {
-              height: 90, // equal to breadcrumb bar height
+              height: 65, // equal to breadcrumb bar height
             },
           })}
         />
@@ -308,12 +289,14 @@ export default function WithdrawalResquestListPage() {
               onFilterName={handleFilterName}
               onSearch={handleSearch}
               onResetFilter={handleResetFilter}
-              userName={userName}
             />
-            <WithdrawalRequestMobileViewLayout
+            <WithdrawDetailsMobileViewLayoutPage
               data={dataFiltered}
-              onEditRow={handleEditRow}
-              onDeleteRow={(id) => handleDeleteRow(id)}
+              onAccept={(id) => handleAccept(id)}
+              onReject={(id) => handleReject(id)}
+              acceptLoading={acceptLoading}
+              rejectLoading={rejectLoading}
+              loading={loading}
             />
           </>
         ) : (
@@ -324,7 +307,6 @@ export default function WithdrawalResquestListPage() {
               onFilterName={handleFilterName}
               onSearch={handleSearch}
               onResetFilter={handleResetFilter}
-              userName={userName}
             />
 
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>

@@ -188,7 +188,7 @@ export default function StaffListPage() {
     navigate(PATH_DASHBOARD.staff.transactions(id));
   };
   const handleWithdrawalRequestRow = (id) => {
-    navigate(PATH_DASHBOARD.staff.withdrawalrequest(id));
+    navigate(PATH_DASHBOARD.staff.withdrawaldetails(id));
   };
 
   const handleStatusChange = async (id, status) => {

@@ -36,7 +36,7 @@ export const UserListPage = Loadable(lazy(() => import('../pages/UserListPage'))
 export const UserFormHandle = Loadable(lazy(() => import('../sections/_users/form/UserFormHandle')));
 export const UserBidHistoryListPage = Loadable(lazy(() => import('../pages/UserBidHistoryListPage')));
 export const UserTransactionListPage = Loadable(lazy(() => import('../pages/UserTransactionListPage')));
-export const WithdrawalResquestListPage = Loadable(lazy(() => import('../pages/WithdrawalResquestListPage')));
+export const WithdrawDetailsListPage = Loadable(lazy(() => import('../pages/WithdrawDetailsListPage')));
 
 // DASHBOARD: Profit
 export const ProfitPage = Loadable(lazy(() => import('../pages/ProfitPage')));

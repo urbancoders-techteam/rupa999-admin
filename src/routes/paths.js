@@ -61,12 +61,12 @@ export const PATH_DASHBOARD = {
     view: (id) => path(ROOTS_DASHBOARD, `/user/${id}/view`),
     transactions: (id) => path(ROOTS_DASHBOARD, `/user/${id}/transactions`),
     bidhistory: (id) => path(ROOTS_DASHBOARD, `/user/${id}/bidhistory`),
-    withdrawalrequest: (id) => path(ROOTS_DASHBOARD, `/user/${id}/withdrawalrequest`),
+    withdrawaldetails: (id) => path(ROOTS_DASHBOARD, `/user/${id}/withdrawaldetails`),
   },
 
-  withdrawdetails: {
-    root: path(ROOTS_DASHBOARD, '/withdrawdetails'),
-    list: path(ROOTS_DASHBOARD, '/withdrawdetails/list'),
+  withdrawaldetails: {
+    root: path(ROOTS_DASHBOARD, '/withdrawaldetails'),
+    list: path(ROOTS_DASHBOARD, '/withdrawaldetails/list'),
   },
 
   profit: {

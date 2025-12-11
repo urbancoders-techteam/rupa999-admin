@@ -1,4 +1,4 @@
-import { Button, Grid, InputAdornment, MenuItem, TextField, Typography, Box } from '@mui/material';
+import { Button, Grid, InputAdornment, MenuItem, TextField } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import PropTypes from 'prop-types';
 import Iconify from '../iconify';
@@ -44,29 +44,7 @@ export default function CustomTableToolbar({
   const dropdownOptions = marketOptions || fileterOptions || [];
 
   return (
-    <>
-      {/* User Name Display - Only visible when userName is provided */}
-      {userName && (
-        <Box
-          sx={{
-            px: { xs: 1, sm: 1.5, md: 2.5 },
-            pt: { xs: 1.5, sm: 2, md: 2.5 },
-            pb: { xs: 0.5, sm: 1 },
-          }}
-        >
-          <Typography
-            variant="subtitle1"
-            sx={{
-              fontWeight: 600,
-              color: 'text.primary',
-              fontSize: { xs: '0.9375rem', sm: '1rem', md: '1.0625rem' },
-            }}
-          >
-            User: {userName}
-          </Typography>
-        </Box>
-      )}
-      <Grid
+    <Grid
         container
         spacing={{ xs: 1.5, sm: 2 }}
         alignItems="center"
@@ -218,6 +196,5 @@ export default function CustomTableToolbar({
         </Grid>
       )}
     </Grid>
-    </>
   );
 }

@@ -240,7 +240,7 @@ export default function UserListPage() {
   };
 
   const handleWithdrawalRequestRow = (id, userName) => {
-    navigate(PATH_DASHBOARD.user.withdrawalrequest(id), { state: { userName } });
+    navigate(PATH_DASHBOARD.user.withdrawaldetails(id), { state: { userName } });
   };
 
   const handleBidHistoryRow = (userId, userName) => {

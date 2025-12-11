@@ -56,7 +56,7 @@ import {
   UserListPage,
   UserTransactionListPage,
   WinHistoryListPage,
-  WithdrawalResquestListPage,
+  WithdrawDetailsListPage,
 } from './elements';
 
 // ----------------------------------------------------------------------
@@ -124,7 +124,7 @@ export default function Router() {
             { path: ':id/view', element: <UserFormHandle /> },
             { path: ':id/transactions', element: <UserTransactionListPage /> },
             { path: ':id/bidhistory', element: <UserBidHistoryListPage /> },
-            { path: ':id/withdrawalrequest', element: <WithdrawalResquestListPage /> },
+            { path: ':id/withdrawaldetails', element: <WithdrawDetailsListPage /> },
           ],
         },
 
