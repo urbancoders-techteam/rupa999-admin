@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 // @mui
-import { Box, Switch, TablePagination, FormControlLabel } from '@mui/material';
+import { Box, FormControlLabel, Switch, TablePagination } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
@@ -14,13 +14,19 @@ TablePaginationCustom.propTypes = {
 export default function TablePaginationCustom({
   dense,
   onChangeDense,
-  rowsPerPageOptions = [5, 10, 25],
+  rowsPerPageOptions = [10, 25, 50, 100, 200],
   sx,
   ...other
 }) {
   return (
     <Box sx={{ position: 'relative', ...sx }}>
-      <TablePagination rowsPerPageOptions={rowsPerPageOptions} component="div" {...other} />
+      <TablePagination
+        rowsPerPageOptions={rowsPerPageOptions}
+        component="div"
+        showFirstButton
+        showLastButton
+        {...other}
+      />
 
       {onChangeDense && (
         <FormControlLabel
