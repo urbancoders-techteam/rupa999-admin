@@ -22,10 +22,10 @@ import {
   TablePaginationCustom,
   useTable,
 } from '../../components/table';
+import CustomTableToolbar from '../../components/table/CustomTableToolBar';
 // sections
 import WinHistoryTableRow from '../../sections/_win_history/list/WinHistoryTableRow';
 import WinHistoryMobileViewCardLayout from '../../sections/_win_history/list/WinHistoryMobileViewCardLayout';
-import WithdrawDetailsToolbar from '../../sections/_withdraw_details/components/WithdrawDetailsToolbar';
 // redux
 import { getAllWinningBidsAsync } from '../../redux/services/bid_services';
 
@@ -192,7 +192,7 @@ export default function WinHistoryListPage() {
                 { name: 'Win History List', href: PATH_DASHBOARD.markets.winhistory.root },
               ]}
             />
-            <WithdrawDetailsToolbar
+            <CustomTableToolbar
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
@@ -210,7 +210,7 @@ export default function WinHistoryListPage() {
                 { name: 'Win History List', href: PATH_DASHBOARD.markets.winhistory.list },
               ]}
             />
-            <WithdrawDetailsToolbar
+            <CustomTableToolbar
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}

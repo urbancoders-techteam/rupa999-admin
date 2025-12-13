@@ -89,10 +89,10 @@ export default function PanaChartsListPage() {
           }}
         >
           <CustomBreadcrumbs
-            heading="Pana Chart Tables"
+            heading="Chart Tables"
             links={[
               { name: 'Dashboard', href: PATH_DASHBOARD.root },
-              { name: 'Pana Chart Tables', href: PATH_DASHBOARD.withdrawaldetails.list },
+              { name: 'Chart Tables', href: PATH_DASHBOARD.markets.charts.list },
             ]}
           />
           {isMobile && (

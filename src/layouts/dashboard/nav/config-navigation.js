@@ -53,7 +53,7 @@ const navConfig = [
         icon: ICONS.user,
         children: [
           { title: 'Market list', path: PATH_DASHBOARD.markets.marketlist.list },
-          { title: 'Charts', path: PATH_DASHBOARD.markets.panacharts.list },
+          { title: 'Charts', path: PATH_DASHBOARD.markets.charts.list },
           { title: 'Records', path: PATH_DASHBOARD.markets.marketrecords.list },
           { title: 'market results', path: PATH_DASHBOARD.markets.marketresults.list },
           { title: 'Win History', path: PATH_DASHBOARD.markets.winhistory.list },
@@ -96,7 +96,7 @@ const navConfig = [
 
       {
         title: 'Rate Card',
-        path: PATH_DASHBOARD.gametypes.root,
+        path: PATH_DASHBOARD.ratecard.root,
         icon: ICONS.banking,
       },
       {

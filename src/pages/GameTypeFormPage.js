@@ -68,13 +68,13 @@ const GameTypeFormPage = () => {
             heading="Rate Card"
             links={[
               { name: 'Dashboard', href: PATH_DASHBOARD.root },
-              { name: 'Rate Card', href: PATH_DASHBOARD.gametypes.root },
+              { name: 'Rate Card', href: PATH_DASHBOARD.ratecard.root },
             ]}
           />
         </Box>
 
         {/* ✅ Main Content */}
-        <Card sx={{ p: 3, mt: 2 }}>
+        <Card sx={{ p:{md: 3, xs: 1.5}, pt:{xs: 2.5}, mt:{md: 2, xs: 1} }}>
           {gameTypesList?.map((game, index) => {
             const key = `${game.name}-${game.type}`;
             return (

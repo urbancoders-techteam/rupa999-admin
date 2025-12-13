@@ -138,9 +138,9 @@ export const PATH_DASHBOARD = {
       view: (id) => path(ROOTS_DASHBOARD, `/markets/marketlist/${id}/view`),
     },
 
-    panacharts: {
-      root: path(ROOTS_DASHBOARD, '/markets/panacharts'),
-      list: path(ROOTS_DASHBOARD, '/markets/panacharts/list'),
+    charts: {
+      root: path(ROOTS_DASHBOARD, '/markets/charts'),
+      list: path(ROOTS_DASHBOARD, '/markets/charts/list'),
     },
 
     marketrecords: {
@@ -207,8 +207,8 @@ export const PATH_DASHBOARD = {
     list: path(ROOTS_DASHBOARD, '/diposithistory/list'),
   },
 
-  gametypes: {
-    root: path(ROOTS_DASHBOARD, '/gametypes'),
+  ratecard: {
+    root: path(ROOTS_DASHBOARD, '/ratecard'),
   },
 
   maintransaction: {

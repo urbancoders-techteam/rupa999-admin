@@ -39,7 +39,6 @@ import CustomTableToolbar from '../components/table/CustomTableToolBar';
 // sections
 import GeneralWithdrawHistoryTableRow from '../sections/_general_withdraw_history/components/GeneralWithdrawHistoryTableRow';
 import WithdrawMobileViewCardLayout from '../sections/_withdraw_details/components/WithdrawDetailsMobileViewCardLayout';
-import WithdrawDetailsToolbar from '../sections/_withdraw_details/components/WithdrawDetailsToolbar';
 
 // ----------------------------------------------------------------------
 
@@ -315,10 +314,11 @@ export default function GeneralWithdrawHistoryListPage() {
                 { name: 'Main Withdraw History List', href: PATH_DASHBOARD.generalwithdrawhistory.list },
               ]}
             />
-            <WithdrawDetailsToolbar
+            <CustomTableToolbar
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
+              onSearch={handleSearch}
               onResetFilter={handleResetFilter}
               sx={{ mt: 1 }}
             />
