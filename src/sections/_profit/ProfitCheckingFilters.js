@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Grid, Button, TextField, Autocomplete } from '@mui/material';
+import { Box, Grid, Button, TextField, Autocomplete, MenuItem } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { getProfitBidsAsync } from '../../redux/services/bid_services';
 import YearlySalesGraph from '../../components/graph/YearlySalesGraph';
@@ -14,9 +14,18 @@ const ProfitCheckingFilters = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [dropdownValue, setDropdownValue] = useState('');
   const [subMenuValue, setSubMenuValue] = useState('');
+  const [selectedTimePeriod, setSelectedTimePeriod] = useState('');
   console.log('subMenuValue', subMenuValue);
   
   const { profitBidsList } = useSelector((state) => state.bid);
+
+  // Time period options
+  const timePeriodOptions = [
+    { value: 'today', label: 'today' },
+    { value: 'lastweek', label: 'lastweek' },
+    { value: 'lastmonth', label: 'lastmonth' },
+    { value: 'allyear', label: 'allyear' },
+  ];
 
   const onChangeStartDate = (newValue) => {
     setStartDate(newValue);
@@ -63,8 +72,12 @@ const ProfitCheckingFilters = () => {
         limit: 100,
       })
     );
-    dispatch(getProfitBidsAsync({ period: 'today' }));
-  }, [dispatch]);
+    dispatch(getProfitBidsAsync({ period: selectedTimePeriod || 'today' }));
+  }, [dispatch, selectedTimePeriod]);
+
+  const handleTimePeriodChange = (event) => {
+    setSelectedTimePeriod(event.target.value);
+  };
 
 
   return (
@@ -77,7 +90,7 @@ const ProfitCheckingFilters = () => {
       <Box sx={{ flex: 1 }}>
         {/* FILTER BAR */}
         <Grid container spacing={2} alignItems="center" sx={{ mb: 4 }}>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={2}>
             <Autocomplete
               size="small"
               fullWidth
@@ -88,7 +101,7 @@ const ProfitCheckingFilters = () => {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid item xs={12} sm={6} md={3}>
             <Autocomplete
               size="small"
               fullWidth
@@ -101,7 +114,7 @@ const ProfitCheckingFilters = () => {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={2}>
             <DatePicker
               size="small"
               label="Start date"
@@ -110,6 +123,53 @@ const ProfitCheckingFilters = () => {
               onChange={onChangeStartDate}
               renderInput={(params) => <TextField size="small" {...params} />}
             />
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField
+              select
+              fullWidth
+              size="small"
+              label="Time period filter"
+              value={selectedTimePeriod || ''}
+              onChange={handleTimePeriodChange}
+              SelectProps={{
+                MenuProps: {
+                  PaperProps: {
+                    sx: { 
+                      maxHeight: { xs: 200, sm: 260 },
+                      '& .MuiMenuItem-root': {
+                        fontSize: { xs: '0.875rem', sm: '1rem' },
+                      },
+                    },
+                  },
+                },
+              }}
+              sx={{
+                '& .MuiInputBase-root': {
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                },
+              }}
+            >
+              <MenuItem value="">
+                <em>--</em>
+              </MenuItem>
+              {timePeriodOptions.map((option) => (
+                <MenuItem
+                  key={option.value}
+                  value={option.value}
+                  sx={{
+                    mx: 1,
+                    borderRadius: 0.75,
+                    typography: 'body2',
+                    textTransform: 'capitalize',
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
+                  }}
+                >
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
           </Grid>
 
           <Grid item xs={12} sm={6} md={2}>
