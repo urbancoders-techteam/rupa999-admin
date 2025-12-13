@@ -97,7 +97,7 @@ export default function GeneralDashboardPage() {
                     gifSrc={withdrawGif}
                   />
                   <DashboardSummaryCard
-                    totalLabel="Today Wallet Balance"
+                    totalLabel="Total Wallet Balance"
                     totalValue={fNumber(dashboardStats?.todayWalletBalance || 0)}
                     gifSrc={walletBalanceGif}
                   />
