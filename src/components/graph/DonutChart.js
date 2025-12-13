@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { styled, useTheme } from '@mui/material/styles';
 import { Card, CardHeader } from '@mui/material';
 // utils
-import { fNumber } from '../../utils/formatNumber';
+import { fNumber, fPercent } from '../../utils/formatNumber';
 // components
 import Chart, { useChart } from '../chart';
 
@@ -77,7 +77,10 @@ export default function DonutChart({ title, subheader, total, chart, ...other })
       radialBar: {
         hollow: { size: '50%' },
         dataLabels: {
-          value: { offsetY: 16 },
+          value: {
+            offsetY: 16,
+            formatter: (val) => `${val.toFixed(1)}%`,
+          },
           total: {
             formatter: () => fNumber(total),
           },

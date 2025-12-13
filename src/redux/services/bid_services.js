@@ -69,3 +69,18 @@ export const getProfitBidsAsync = createAsyncThunk(
     })
 );
 
+// Get yearly profit bids
+export const getYearlyProfitBidsAsync = createAsyncThunk(
+  'bid/getYearlyProfitBids',
+  async (params = {}, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: '/bids/yearly-profit-bids',
+      method: 'get',
+      params: {
+        year: params.year || undefined,
+        ...params,
+      },
+    })
+);
+
