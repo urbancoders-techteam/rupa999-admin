@@ -21,6 +21,7 @@ function PreviousResultMobileViewCardLayout({
   onEditRow,
   onDeleteRow,
   onSelectRow,
+  onRevert,
   selected = [],
 }) {
   const theme = useTheme();
@@ -199,8 +200,11 @@ function PreviousResultMobileViewCardLayout({
           <Button
             variant="contained"
             color="error"
-            onClick={() => {
-              onSelectRow?.(selectedRow);
+            onClick={async () => {
+              if (selectedRow && onRevert) {
+                const rowId = selectedRow._id || selectedRow.id;
+                await onRevert(rowId);
+              }
               handleCloseConfirm();
             }}
           >
@@ -217,6 +221,7 @@ PreviousResultMobileViewCardLayout.propTypes = {
   onEditRow: PropTypes.func,
   onDeleteRow: PropTypes.func,
   onSelectRow: PropTypes.func,
+  onRevert: PropTypes.func,
   selected: PropTypes.array,
 };
 

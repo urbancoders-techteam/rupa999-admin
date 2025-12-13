@@ -105,7 +105,7 @@ export default function GeneralDashboardPage() {
               </Grid>
             </Grid>
 
-            <SingleAnkBidsTable />
+            {/* <SingleAnkBidsTable /> */}
           </>
         )}
       </Container>

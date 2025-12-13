@@ -7,7 +7,8 @@ import { Box, Card, Container, Table, TableBody, TableCell, TableContainer, Tabl
 // routes
 import { useTheme } from '@mui/system';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllMarketResultsAsync } from '../../redux/services/market_result_services';
+import { getAllMarketResultsAsync, revertMarketResultAsync } from '../../redux/services/market_result_services';
+import { useSnackbar } from '../../components/snackbar';
 import { PATH_DASHBOARD } from '../../routes/paths';
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
@@ -68,6 +69,7 @@ export default function MarketResultListPage() {
   const theme = useTheme();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { enqueueSnackbar } = useSnackbar();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [filterName, setFilterName] = useState('');
@@ -155,6 +157,25 @@ export default function MarketResultListPage() {
     setShowWinner((prev) => !prev);
   }, []);
 
+  const handleRevert = useCallback(async (id) => {
+    if (!id) return;
+
+    try {
+      await dispatch(revertMarketResultAsync(id)).unwrap();
+      enqueueSnackbar('Market result reverted successfully!', { variant: 'success' });
+      dispatch(getAllMarketResultsAsync({
+        page: apiPage,
+        limit: apiLimit,
+        ...(searchQuery && { search: searchQuery }),
+        ...(orderBy && { sortBy: orderBy, sortOrder: order }),
+      }));
+    } catch (error) {
+      const errorMessage =
+        error?.response?.data?.message || error?.message || 'Failed to revert market result';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    }
+  }, [dispatch, enqueueSnackbar, apiPage, apiLimit, searchQuery, orderBy, order]);
+
   // Computed values
   const isFiltered = searchQuery !== '';
   const isNotFound = !dataSorted.length && !loading && !!searchQuery;
@@ -192,6 +213,7 @@ export default function MarketResultListPage() {
             data={dataFiltered}
             onEditRow={handleEditRow}
             onDeleteRow={handleDeleteRow}
+            onRevert={handleRevert}
           />
         ) : (
           <Card>
@@ -234,6 +256,7 @@ export default function MarketResultListPage() {
                               onSelectRow={() => onSelectRow(rowId)}
                               onDeleteRow={() => handleDeleteRow(rowId)}
                               onEditRow={() => handleEditRow(rowId)}
+                              onRevert={handleRevert}
                             />
                           );
                         })}
