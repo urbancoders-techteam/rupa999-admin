@@ -11,22 +11,19 @@ MarketDataTableRow.propTypes = {
 };
 
 export default function MarketDataTableRow({ index, row }) {
-  const {
-    id,
-    jodiDigit,
-    halfSangamA,
-    halfSangamB,
-    fullSangam,
-    singleDigit,
-    singlePana,
-    doublePana,
-    triplePana,
-  } = row;
+  const { id, bidsNumber, type, totalAmount } = row;
 
   const navigate = useNavigate();
 
   const handleNavigate = () => {
-    navigate(PATH_DASHBOARD.markets.marketdata.bidrecord(id));
+    if (id) {
+      navigate(PATH_DASHBOARD.markets.marketdata.bidrecord(id));
+    }
+  };
+
+  const getTypeLabel = (typeValue) => {
+    if (!typeValue) return '—';
+    return typeValue.charAt(0).toUpperCase() + typeValue.slice(1);
   };
 
   return (
@@ -36,37 +33,21 @@ export default function MarketDataTableRow({ index, row }) {
       </TableCell>
 
       <TableCell align="left">
-        <Typography variant="body2" onClick={handleNavigate} sx={{ cursor: 'pointer' }}>
-          {jodiDigit || '—'}
+        <Typography
+          variant="body2"
+          onClick={handleNavigate}
+          sx={{ cursor: id ? 'pointer' : 'default', color: id ? 'primary.main' : 'text.primary' }}
+        >
+          {bidsNumber || '—'}
         </Typography>
       </TableCell>
 
       <TableCell align="left">
-        <Typography variant="body2">{halfSangamA || '0'}</Typography>
+        <Typography variant="body2">{getTypeLabel(type)}</Typography>
       </TableCell>
 
       <TableCell align="left">
-        <Typography variant="body2">{halfSangamB || '0'}</Typography>
-      </TableCell>
-
-      <TableCell align="left">
-        <Typography variant="body2">{fullSangam || '0'}</Typography>
-      </TableCell>
-
-      <TableCell align="left">
-        <Typography variant="body2">{singleDigit || '0'}</Typography>
-      </TableCell>
-
-      <TableCell align="left">
-        <Typography variant="body2">{singlePana || '0'}</Typography>
-      </TableCell>
-
-      <TableCell align="left">
-        <Typography variant="body2">{doublePana || '0'}</Typography>
-      </TableCell>
-
-      <TableCell align="left">
-        <Typography variant="body2">{triplePana || '0'}</Typography>
+        <Typography variant="body2">{totalAmount ? totalAmount.toLocaleString() : '0'}</Typography>
       </TableCell>
     </TableRow>
   );

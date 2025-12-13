@@ -63,6 +63,44 @@ export default function MarketDataMobileViewCardLayout({ data = [], loading = fa
 
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2" color="text.secondary">
+                  Bidding Number:
+                </Typography>
+                <Typography
+                  variant="body2"
+                  fontWeight="medium"
+                  onClick={() => handleNavigate(row.id)}
+                  sx={{ cursor: 'pointer', color: 'primary.main' }}
+                >
+                  {row.bidsNumber || '—'}
+                </Typography>
+              </Stack>
+
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="body2" color="text.secondary">
+                  Type:
+                </Typography>
+                <Typography variant="body2" fontWeight="medium">
+                  {row.type ? row.type.charAt(0).toUpperCase() + row.type.slice(1) : '—'}
+                </Typography>
+              </Stack>
+
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="body2" color="text.secondary">
+                  Total Amount:
+                </Typography>
+                <Typography variant="body2" fontWeight="medium">
+                  {row.totalAmount ? row.totalAmount.toLocaleString() : '0'}
+                </Typography>
+              </Stack>
+
+              <Box sx={{ pt: 1, borderTop: `1px solid ${theme.palette.divider}` }}>
+                <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
+                  Game Type Breakdown:
+                </Typography>
+              </Box>
+
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="body2" color="text.secondary">
                   Single Digit:
                 </Typography>
                 <Typography variant="body2" fontWeight="medium">

@@ -1,23 +1,21 @@
+import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import React, { useMemo, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 // @mui
 import {
-  Card,
-  Table,
-  Button,
-  TableBody,
-  Container,
-  TableContainer,
   Box,
+  Button,
+  Card,
+  Container,
   Grid,
-  Typography,
+  Table,
+  TableBody,
   TableCell,
+  TableContainer,
   TableRow,
-  useMediaQuery,
-  Tooltip,
-  IconButton,
+  Typography,
+  useMediaQuery
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { LocalizationProvider } from '@mui/x-date-pickers';
@@ -25,24 +23,23 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import Iconify from '../../components/iconify';
 // components
-import Scrollbar from '../../components/scrollbar';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
-import { useSettingsContext } from '../../components/settings';
 import FormProvider, { RHFAutocomplete } from '../../components/hook-form';
+import Scrollbar from '../../components/scrollbar';
+import { useSettingsContext } from '../../components/settings';
 import {
   TableHeadCustom,
-  TableEmptyRows,
   TableNoData,
   TablePaginationCustom,
-  useTable,
+  useTable
 } from '../../components/table';
 // sections
-import MarketDataTableRow from '../../sections/_market_data/components/MarketDataTableRow';
-import MarketDataMobileViewCardLayout from '../../sections/_market_data/components/MarketDataMobileViewCardLayout';
-import { PATH_DASHBOARD } from '../../routes/paths';
 import { marketTypeOptiData } from '../../assets/data/marketEnum';
 import { getBidDataResultAsync } from '../../redux/services/bid_services';
 import { getAllMarketsAsync } from '../../redux/services/market_services';
+import { PATH_DASHBOARD } from '../../routes/paths';
+import MarketDataMobileViewCardLayout from '../../sections/_market_data/components/MarketDataMobileViewCardLayout';
+import MarketDataTableRow from '../../sections/_market_data/components/MarketDataTableRow';
 
 // ----------------------------------------------------------------------
 
@@ -71,6 +68,7 @@ const sortOrderOptions = [
 const TABLE_HEAD = [
   { id: 'srNo', label: 'Sr No.', align: 'center' },
   { id: 'biddingNumber', label: 'Bidding Number', align: 'left' },
+  { id: 'type', label: 'Type', align: 'left' },
   { id: 'totalAmount', label: 'Total Amount', align: 'left' },
 ];
 
@@ -225,7 +223,7 @@ export default function MarketDataListPage() {
   }, [dispatch, page, rowsPerPage]);
 
   const denseHeight = dense ? 52 : 72;
-  const isNotFound = !marketList.length && !loading;
+  const isNotFound = !bidDataResult.length && !loading;
 
   return (
     <>
@@ -236,9 +234,8 @@ export default function MarketDataListPage() {
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Container maxWidth={themeStretch ? false : 'xl'}>
           <CustomBreadcrumbs
-            heading={`Market Data (${
-              selectedDate ? dayjs(selectedDate).format('DD-MM-YYYY') : 'N/A'
-            })`}
+            heading={`Market Data (${selectedDate ? dayjs(selectedDate).format('DD-MM-YYYY') : 'N/A'
+              })`}
             links={[
               { name: 'Dashboard', href: PATH_DASHBOARD.home.list },
               { name: 'Market Data', href: PATH_DASHBOARD.markets.marketdata.list },
@@ -367,9 +364,9 @@ export default function MarketDataListPage() {
                         </TableRow>
                       ) : (
                         <>
-                          {/* {bidDataResult.map((row, index) => (
+                          {bidDataResult.map((row, index) => (
                             <MarketDataTableRow
-                              key={row.id}
+                              key={row.id || row.bidsNumber || index}
                               index={
                                 pagination?.page
                                   ? (pagination.page - 1) * rowsPerPage + index + 1
@@ -377,14 +374,11 @@ export default function MarketDataListPage() {
                               }
                               row={row}
                             />
-                          ))} */}
+                          ))}
 
-                          {/* <TableEmptyRows
-                            height={denseHeight}
-                            emptyRows={Math.max(0, rowsPerPage - bidDataResult.length)}
-                          /> */}
-
-                          <TableNoData isNotFound={!isNotFound} />
+                          {bidDataResult.length === 0 && (
+                            <TableNoData isNotFound={bidDataResult.length > 0} />
+                          )}
                         </>
                       )}
                     </TableBody>
@@ -392,15 +386,15 @@ export default function MarketDataListPage() {
                 </Scrollbar>
               </TableContainer>
 
-                <TablePaginationCustom
-                  page={pagination?.page ? pagination.page - 1 : page}
-                  count={pagination?.total || 0}
-                  rowsPerPage={rowsPerPage}
-                  onPageChange={onChangePage}
-                  onRowsPerPageChange={onChangeRowsPerPage}
-                  dense={dense}
-                  onChangeDense={onChangeDense}
-                />
+              <TablePaginationCustom
+                page={pagination?.page ? pagination.page - 1 : page}
+                count={pagination?.total || 0}
+                rowsPerPage={rowsPerPage}
+                onPageChange={onChangePage}
+                onRowsPerPageChange={onChangeRowsPerPage}
+                dense={dense}
+                onChangeDense={onChangeDense}
+              />
             </Card>
           )}
         </Container>
