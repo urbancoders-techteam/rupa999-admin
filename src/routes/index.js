@@ -257,7 +257,7 @@ export default function Router() {
           ],
         },
 
-        { path: 'gametypes', element: <GameTypeFormPage />, index: true },
+        { path: 'ratecard', element: <GameTypeFormPage />, index: true },
 
         // Markets
         {
@@ -274,9 +274,9 @@ export default function Router() {
               ],
             },
             {
-              path: 'panacharts',
+              path: 'charts',
               children: [
-                { element: <Navigate to="/dashboard/markets/panacharts" replace />, index: true },
+                { element: <Navigate to="/dashboard/markets/charts" replace />, index: true },
                 { path: 'list', element: <PanaChartsListPage /> },
               ],
             },

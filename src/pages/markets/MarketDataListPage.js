@@ -70,14 +70,8 @@ const sortOrderOptions = [
 
 const TABLE_HEAD = [
   { id: 'srNo', label: 'Sr No.', align: 'center' },
-  { id: 'singleDigit', label: 'Single Digit', align: 'left' },
-  { id: 'jodiDigit', label: 'Jodi Digit', align: 'left' },
-  { id: 'singlePana', label: 'Single Pana', align: 'left' },
-  { id: 'doublePana', label: 'Double Pana', align: 'left' },
-  { id: 'triplePana', label: 'Triple Pana', align: 'left' },
-  { id: 'halfSangamA', label: 'Half Sangam A', align: 'left' },
-  { id: 'halfSangamB', label: 'Half Sangam B', align: 'left' },
-  { id: 'fullSangam', label: 'Full Sangam', align: 'left' },
+  { id: 'biddingNumber', label: 'Bidding Number', align: 'left' },
+  { id: 'totalAmount', label: 'Total Amount', align: 'left' },
 ];
 
 // ----------------------------------------------------------------------
@@ -92,7 +86,6 @@ export default function MarketDataListPage() {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const { bidDataResult, loading, pagination } = useSelector((state) => state.bid);
-  console.log('bidDataResult', bidDataResult);
   const { marketList, loading: marketLoading } = useSelector((state) => state.market);
 
   const defaultValues = {
@@ -316,21 +309,6 @@ export default function MarketDataListPage() {
                   <Grid item xs={12} sm={6} md={2.5}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <RHFAutocomplete
-                        name="sortBy"
-                        label="Field to sort by (default: totalAmount)"
-                        size="small"
-                        options={sortByOptions}
-                        getOptionLabel={(option) => option?.name || ''}
-                        isOptionEqualToValue={(option, value) => option?.key === value?.key}
-                        renderOption={(props, option) => <li {...props}>{option.name}</li>}
-                        sx={{ flex: 1 }}
-                      />
-                    </Box>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={2.5}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <RHFAutocomplete
                         name="sortOrder"
                         label="Sort Order"
                         size="small"
@@ -377,7 +355,7 @@ export default function MarketDataListPage() {
             <Card>
               <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
                 <Scrollbar>
-                  <Table size={dense ? 'medium' : 'small'} sx={{ minWidth: 1000 }}>
+                  <Table size={dense ? 'medium' : 'small'} >
                     <TableHeadCustom headLabel={TABLE_HEAD} rowCount={marketList.length} />
 
                     <TableBody>
@@ -389,7 +367,7 @@ export default function MarketDataListPage() {
                         </TableRow>
                       ) : (
                         <>
-                          {bidDataResult.map((row, index) => (
+                          {/* {bidDataResult.map((row, index) => (
                             <MarketDataTableRow
                               key={row.id}
                               index={
@@ -399,14 +377,14 @@ export default function MarketDataListPage() {
                               }
                               row={row}
                             />
-                          ))}
+                          ))} */}
 
-                          <TableEmptyRows
+                          {/* <TableEmptyRows
                             height={denseHeight}
                             emptyRows={Math.max(0, rowsPerPage - bidDataResult.length)}
-                          />
+                          /> */}
 
-                          <TableNoData isNotFound={isNotFound} />
+                          <TableNoData isNotFound={!isNotFound} />
                         </>
                       )}
                     </TableBody>

@@ -1,10 +1,12 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Button, Grid, TextField } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import { Grid, TextField } from '@mui/material';
 import PropTypes from 'prop-types';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import * as Yup from 'yup';
+
 import { RHFTextField } from '../../components/hook-form';
 import { useSnackbar } from '../../components/snackbar';
 import { bulkUpdateGameTypeRatesAsync } from '../../redux/services/game_type_rate_services';
@@ -21,6 +23,7 @@ const GameTypeSchema = Yup.object().shape({
 export default function GameTypeRowForm({ game, onUpdate, formRef }) {
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
+  const [loading, setLoading] = useState(false);
 
   const methods = useForm({
     resolver: yupResolver(GameTypeSchema),
@@ -42,6 +45,7 @@ export default function GameTypeRowForm({ game, onUpdate, formRef }) {
   }, [formRef, methods]);
 
   const onSubmit = async (data) => {
+    setLoading(true);
     try {
       const payload = {
         name: game.name,
@@ -51,9 +55,7 @@ export default function GameTypeRowForm({ game, onUpdate, formRef }) {
       };
 
       // Use bulk update which handles both create and update
-      const result = await dispatch(
-        bulkUpdateGameTypeRatesAsync({ rates: [payload] })
-      ).unwrap();
+      await dispatch(bulkUpdateGameTypeRatesAsync({ rates: [payload] })).unwrap();
 
       enqueueSnackbar('Game type rate saved successfully!', { variant: 'success' });
 
@@ -66,41 +68,72 @@ export default function GameTypeRowForm({ game, onUpdate, formRef }) {
         error?.response?.data?.message || error?.message || 'Failed to save game type rate',
         { variant: 'error' }
       );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Grid container spacing={3} alignItems="center" sx={{ mb: 3 }}>
+        <Grid
+          container
+          spacing={{ xs: 1, sm: 2.5, md: 3 }}
+          alignItems="center"
+          sx={{ mb: { md: 3, xs: 2 } }}
+        >
           <Grid item xs={3.5}>
             <TextField
               size="small"
               label="Name"
               value={game.name}
               fullWidth
-              InputProps={{ readOnly: true }}
+              InputProps={{
+                readOnly: true,
+                sx: { '& .MuiInputBase-input': { fontSize: { xs: 12, sm: 13, md: 14 } } },
+              }}
+              InputLabelProps={{ sx: { fontSize: { xs: 12, sm: 13, md: 14 } } }}
             />
           </Grid>
 
-          <Grid item xs={3.5}>
+          <Grid item xs={3}>
             <TextField
               size="small"
               label="Game Type"
               value={game.type}
               fullWidth
-              InputProps={{ readOnly: true }}
+              InputProps={{
+                readOnly: true,
+                sx: { '& .MuiInputBase-input': { fontSize: { xs: 12, sm: 13, md: 14 } } },
+              }}
+              InputLabelProps={{ sx: { fontSize: { xs: 12, sm: 13, md: 14 } } }}
             />
           </Grid>
 
-          <Grid item xs={3.5}>
-            <RHFTextField name="multiplyBy" label="Multiply By" type="number" />
+          <Grid item xs={3}>
+            <RHFTextField
+              name="multiplyBy"
+              label="Multiply By"
+              type="number"
+              InputProps={{ sx: { '& .MuiInputBase-input': { fontSize: { xs: 12, sm: 13, md: 14 } } } }}
+              InputLabelProps={{ sx: { fontSize: { xs: 12, sm: 13, md: 14 } } }}
+            />
           </Grid>
 
-          <Grid item xs={1.5}>
-            <Button type="submit" variant="contained" fullWidth sx={{ height: '100%' }}>
+          <Grid item xs={1}>
+            <LoadingButton
+              type="submit"
+              variant="contained"
+              fullWidth
+              sx={{
+                height: { xs: '34px', md: '100%' },
+                minHeight: { xs: '34px', md: 'auto' },
+                fontSize: { xs: 12, sm: 13, md: 14 },
+              }}
+              loading={loading}
+            >
               Save
-            </Button>
+            </LoadingButton>
           </Grid>
         </Grid>
       </form>

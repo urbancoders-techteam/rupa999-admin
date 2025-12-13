@@ -23,8 +23,8 @@ import {
   TableHeadCustom,
   TablePaginationCustom,
 } from '../../components/table';
+import CustomTableToolbar from '../../components/table/CustomTableToolBar';
 // sections
-import WithdrawDetailsToolbar from '../../sections/_withdraw_details/components/WithdrawDetailsToolbar';
 import WithdrawMobileViewCardLayout from '../../sections/_withdraw_details/components/WithdrawDetailsMobileViewCardLayout';
 import WinHistoryTableRow from '../../sections/_win_history/list/WinHistoryTableRow';
 
@@ -189,7 +189,7 @@ export default function StarLineWinHistoryListPage() {
                 { name: 'Start Line Win History', href: PATH_DASHBOARD.markets.winhistory.root },
               ]}
             />
-            <WithdrawDetailsToolbar
+            <CustomTableToolbar
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}
@@ -208,7 +208,7 @@ export default function StarLineWinHistoryListPage() {
                 { name: 'List' },
               ]}
             />
-            <WithdrawDetailsToolbar
+            <CustomTableToolbar
               isFiltered={isFiltered}
               filterName={filterName}
               onFilterName={handleFilterName}

@@ -20,8 +20,8 @@ import {
   TableHeadCustom,
   TablePaginationCustom,
 } from '../../components/table';
+import CustomTableToolbar from '../../components/table/CustomTableToolBar';
 // sections
-import WithdrawDetailsToolbar from '../../sections/_withdraw_details/components/WithdrawDetailsToolbar';
 import WinHistoryTableRow from '../../sections/_win_history/list/WinHistoryTableRow';
 import BidRecordMobileViewCardLayout from '../../sections/_bid_records/list/BidRecordMobileViewCardLayout';
 
@@ -200,12 +200,11 @@ const TABLE_HEAD = [
   { id: 'actions', label: 'Actions', align: 'center' },
   { id: 'id', label: 'ID', align: 'left' },
   { id: 'marketName', label: 'Market Name', align: 'left' },
-  { id: 'userName', label: 'Market type', align: 'left' },
-  { id: 'game', label: 'Game', align: 'left' },
-  { id: 'digit', label: 'Digit', align: 'left' },
-  { id: 'user', label: 'User Name', align: 'left' },
+  { id: 'userName', label: 'Market Time', align: 'left' },
+  { id: 'game', label: 'Bid Number', align: 'left' },
   { id: 'amount', label: 'Amount', align: 'left' },
-  { id: 'createdAt', label: 'Created At', align: 'left' },
+  { id: 'user', label: 'User Name', align: 'left' },
+  { id: 'mobile', label: 'Mobile', align: 'left' },
 ];
 
 
@@ -231,11 +230,10 @@ export default function BidRecordListPage() {
   const navigate = useNavigate();
 
   const [tableData, setTableData] = useState(bidRecordData);
-  const [loading, setLoading] = useState(false);
+  const loading = false;
 
   const [filterName, setFilterName] = useState(''); // Input field value
   const [searchQuery, setSearchQuery] = useState(''); // Actual search value for filtering
-  const [filterUserId, setFilterUserId] = useState('');
 
   const [filterRole, setFilterRole] = useState('all');
 
@@ -247,11 +245,10 @@ export default function BidRecordListPage() {
       applyFilter({
         inputData: tableData,
         filterName: searchQuery,
-        filterUserId,
         filterRole,
         filterStatus,
       }),
-    [tableData, searchQuery, filterUserId, filterRole, filterStatus]
+    [tableData, searchQuery, filterRole, filterStatus]
   );
 
   // Memoized paginated data
@@ -264,7 +261,7 @@ export default function BidRecordListPage() {
 
   const isMobile = useResponsive('down', 'sm');
 
-  const isFiltered = searchQuery !== '' || filterUserId !== '' || filterRole !== 'all' || filterStatus !== 'all';
+  const isFiltered = searchQuery !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
   const isNotFound =
     (!dataFiltered.length && !!searchQuery) ||
@@ -279,11 +276,6 @@ export default function BidRecordListPage() {
   const handleSearch = () => {
     setPage(0);
     setSearchQuery(filterName);
-  };
-
-  const handleFilterUserId = (event) => {
-    setPage(0);
-    setFilterUserId(event.target.value);
   };
 
   const handleDeleteRow = (id) => {
@@ -305,7 +297,6 @@ export default function BidRecordListPage() {
   const handleResetFilter = () => {
     setFilterName('');
     setSearchQuery('');
-    setFilterUserId('');
     setFilterRole('all');
     setFilterStatus('all');
     setPage(0);
@@ -329,12 +320,10 @@ export default function BidRecordListPage() {
                 { name: 'List' },
               ]}
             />
-            <WithdrawDetailsToolbar
+            <CustomTableToolbar
               isFiltered={isFiltered}
               filterName={filterName}
-              filterUserId={filterUserId}
               onFilterName={handleFilterName}
-              onFilterUserId={handleFilterUserId}
               onSearch={handleSearch}
               onResetFilter={handleResetFilter}
               sx={{ mt: 1 }}
@@ -353,12 +342,10 @@ export default function BidRecordListPage() {
               ]}
             />
 
-            <WithdrawDetailsToolbar
+            <CustomTableToolbar
               isFiltered={isFiltered}
               filterName={filterName}
-              filterUserId={filterUserId}
               onFilterName={handleFilterName}
-              onFilterUserId={handleFilterUserId}
               onSearch={handleSearch}
               onResetFilter={handleResetFilter}
               sx={{ mt: 1 }}
@@ -461,7 +448,7 @@ export default function BidRecordListPage() {
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, filterName, filterUserId, filterStatus, filterRole }) {
+function applyFilter({ inputData, filterName, filterStatus, filterRole }) {
   let filteredData = inputData;
 
   if (filterName) {
@@ -470,14 +457,6 @@ function applyFilter({ inputData, filterName, filterUserId, filterStatus, filter
         (record.marketName && record.marketName.toLowerCase().indexOf(filterName.toLowerCase()) !== -1) ||
         (record.session && record.session.toLowerCase().indexOf(filterName.toLowerCase()) !== -1) ||
         (record.number && record.number.toLowerCase().indexOf(filterName.toLowerCase()) !== -1)
-    );
-  }
-
-  if (filterUserId) {
-    filteredData = filteredData.filter(
-      (record) => 
-        record.userId && 
-        record.userId.toLowerCase().indexOf(filterUserId.toLowerCase()) !== -1
     );
   }
 
