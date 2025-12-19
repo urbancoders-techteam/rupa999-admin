@@ -11,6 +11,8 @@ MarketDataTableRow.propTypes = {
 };
 
 export default function MarketDataTableRow({ index, row }) {
+  const { id, bidsNumber, type, totalAmount } = row;
+
   const navigate = useNavigate();
 
   const id = row.id || row._id;
@@ -27,6 +29,11 @@ export default function MarketDataTableRow({ index, row }) {
     }
   };
 
+  const getTypeLabel = (typeValue) => {
+    if (!typeValue) return '—';
+    return typeValue.charAt(0).toUpperCase() + typeValue.slice(1);
+  };
+
   return (
     <TableRow hover>
       <TableCell align="center">
@@ -39,12 +46,16 @@ export default function MarketDataTableRow({ index, row }) {
           onClick={handleNavigate}
           sx={{ cursor: id ? 'pointer' : 'default', color: id ? 'primary.main' : 'text.primary' }}
         >
-          {biddingNumber}
+          {bidsNumber || '—'}
         </Typography>
       </TableCell>
 
       <TableCell align="left">
-        <Typography variant="body2">{totalAmount}</Typography>
+        <Typography variant="body2">{getTypeLabel(type)}</Typography>
+      </TableCell>
+
+      <TableCell align="left">
+        <Typography variant="body2">{totalAmount ? totalAmount.toLocaleString() : '0'}</Typography>
       </TableCell>
     </TableRow>
   );

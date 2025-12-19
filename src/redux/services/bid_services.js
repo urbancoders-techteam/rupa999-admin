@@ -41,17 +41,33 @@ export const getAllBidsAsync = createAsyncThunk(
 // Get bid data result
 export const getBidDataResultAsync = createAsyncThunk(
   'bid/getDataResult',
-  async (params = {}, toolkit) =>
-    AxiosClient({
+  async (params = {}, toolkit) => {
+    // Map 'market' to 'marketId' for API
+    const apiParams = {
+      page: params.page || 1,
+      limit: params.limit || 10,
+      marketId: params.market || params.marketId,
+      gameType: params.gameType,
+      sortBy: params.sortBy,
+      sortOrder: params.sortOrder,
+      date: params.date,
+      session: params.session,
+    };
+    
+    // Remove undefined values
+    Object.keys(apiParams).forEach(key => {
+      if (apiParams[key] === undefined || apiParams[key] === null || apiParams[key] === '') {
+        delete apiParams[key];
+      }
+    });
+
+    return AxiosClient({
       toolkit,
       url: '/bids/data-result',
       method: 'get',
-      params: {
-        page: params.page || 1,
-        limit: params.limit || 10,
-        ...params,
-      },
-    })
+      params: apiParams,
+    });
+  }
 );
 
 // Get profit bids
