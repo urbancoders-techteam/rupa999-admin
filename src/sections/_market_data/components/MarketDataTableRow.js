@@ -14,14 +14,7 @@ export default function MarketDataTableRow({ index, row }) {
   const { id, bidsNumber, type, totalAmount } = row;
 
   const navigate = useNavigate();
-
-  const id = row.id || row._id;
-  const biddingNumber = row.bidsNumber || row.biddingNumber || row.jodiDigit || '—';
-  const totalAmount =
-    row.totalAmount ??
-    row.amount ??
-    row.total ??
-    Object.values(row || {}).reduce((sum, val) => (typeof val === 'number' ? sum + val : sum), 0);
+  
 
   const handleNavigate = () => {
     if (id) {

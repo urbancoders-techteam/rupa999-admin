@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -16,15 +15,12 @@ import {
   TableContainer,
   TableRow,
   Typography,
-  TableCell,
-  TableRow,
   useMediaQuery,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
-import MarketDataTableRow from '../../sections/_market_data/components/MarketDataTableRow';
 import RHFDatePicker from '../../components/hook-form/RHFDatePicker';
 import Iconify from '../../components/iconify';
 // components
@@ -36,7 +32,7 @@ import {
   TableHeadCustom,
   TableNoData,
   TablePaginationCustom,
-  useTable
+  useTable,
 } from '../../components/table';
 // sections
 import MarketDataMobileViewCardLayout from '../../sections/_market_data/components/MarketDataMobileViewCardLayout';
@@ -44,8 +40,6 @@ import { PATH_DASHBOARD } from '../../routes/paths';
 import { marketTypeOptiData } from '../../assets/data/marketEnum';
 import { getBidDataResultAsync } from '../../redux/services/bid_services';
 import { getAllMarketsAsync } from '../../redux/services/market_services';
-import { PATH_DASHBOARD } from '../../routes/paths';
-import MarketDataMobileViewCardLayout from '../../sections/_market_data/components/MarketDataMobileViewCardLayout';
 import MarketDataTableRow from '../../sections/_market_data/components/MarketDataTableRow';
 
 // ----------------------------------------------------------------------
@@ -228,8 +222,9 @@ export default function MarketDataListPage() {
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Container maxWidth={themeStretch ? false : 'xl'}>
           <CustomBreadcrumbs
-            heading={`Market Data (${selectedDate ? dayjs(selectedDate).format('DD-MM-YYYY') : 'N/A'
-              })`}
+            heading={`Market Data (${
+              selectedDate ? dayjs(selectedDate).format('DD-MM-YYYY') : 'N/A'
+            })`}
             links={[
               { name: 'Dashboard', href: PATH_DASHBOARD.home.list },
               { name: 'Market Data', href: PATH_DASHBOARD.markets.marketdata.list },
@@ -243,12 +238,7 @@ export default function MarketDataListPage() {
               <Box>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={12} sm={6} md={2.5}>
-                    <RHFDatePicker
-                      name="date"
-                      label="Date"
-                      size="small"
-                      format="DD-MM-YYYY"
-                    />
+                    <RHFDatePicker name="date" label="Date" size="small" format="DD-MM-YYYY" />
                   </Grid>
 
                   <Grid item xs={12} sm={6} md={2.5}>
@@ -346,7 +336,7 @@ export default function MarketDataListPage() {
             <Card>
               <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
                 <Scrollbar>
-                  <Table size={dense ? 'medium' : 'small'} >
+                  <Table size={dense ? 'medium' : 'small'}>
                     <TableHeadCustom headLabel={TABLE_HEAD} rowCount={marketList.length} />
 
                     <TableBody>
