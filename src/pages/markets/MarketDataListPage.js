@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-import React, { useMemo, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 // @mui
@@ -16,13 +16,13 @@ import {
   TableCell,
   TableRow,
   useMediaQuery,
-  Tooltip,
-  IconButton,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
+import MarketDataTableRow from '../../sections/_market_data/components/MarketDataTableRow';
+import RHFDatePicker from '../../components/hook-form/RHFDatePicker';
 import Iconify from '../../components/iconify';
 // components
 import Scrollbar from '../../components/scrollbar';
@@ -31,13 +31,11 @@ import { useSettingsContext } from '../../components/settings';
 import FormProvider, { RHFAutocomplete } from '../../components/hook-form';
 import {
   TableHeadCustom,
-  TableEmptyRows,
   TableNoData,
   TablePaginationCustom,
   useTable,
 } from '../../components/table';
 // sections
-import MarketDataTableRow from '../../sections/_market_data/components/MarketDataTableRow';
 import MarketDataMobileViewCardLayout from '../../sections/_market_data/components/MarketDataMobileViewCardLayout';
 import { PATH_DASHBOARD } from '../../routes/paths';
 import { marketTypeOptiData } from '../../assets/data/marketEnum';
@@ -49,18 +47,6 @@ import { getAllMarketsAsync } from '../../redux/services/market_services';
 const marketTimeOptions = [
   { name: 'Open', key: 'open' },
   { name: 'Close', key: 'close' },
-];
-
-const sortByOptions = [
-  { name: '--', key: '' },
-  { name: 'Single Digit', key: 'singleDigit' },
-  { name: 'Jodi Digit', key: 'jodiDigit' },
-  { name: 'Single Pana', key: 'singlePana' },
-  { name: 'Double Pana', key: 'doublePana' },
-  { name: 'Triple Pana', key: 'triplePana' },
-  { name: 'Half Sangam A', key: 'halfSangamA' },
-  { name: 'Half Sangam B', key: 'halfSangamB' },
-  { name: 'Full Sangam', key: 'fullSangam' },
 ];
 
 const sortOrderOptions = [
@@ -222,10 +208,9 @@ export default function MarketDataListPage() {
         limit: 100,
       })
     );
-  }, [dispatch, page, rowsPerPage]);
+  }, [dispatch]);
 
-  const denseHeight = dense ? 52 : 72;
-  const isNotFound = !marketList.length && !loading;
+  const isNotFound = !!bidDataResult.length && !loading;
 
   return (
     <>
@@ -247,18 +232,18 @@ export default function MarketDataListPage() {
           />
 
           {/* Filter Section */}
-          <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+          <FormProvider methods={methods}>
             <Card sx={{ p: 3, mb: 3 }}>
-              <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+              <Box>
                 <Grid container spacing={2} alignItems="center">
-                  {/* <Grid item xs={12} sm={6} md={2.5}>
+                  <Grid item xs={12} sm={6} md={2.5}>
                     <RHFDatePicker
                       name="date"
                       label="Date"
                       size="small"
                       format="DD-MM-YYYY"
                     />
-                  </Grid> */}
+                  </Grid>
 
                   <Grid item xs={12} sm={6} md={2.5}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -324,10 +309,10 @@ export default function MarketDataListPage() {
                   <Grid item xs={12} sm={6} md={2}>
                     <Button
                       fullWidth
-                      type="submit"
                       variant="contained"
                       disabled={loading}
                       startIcon={<Iconify icon="eva:search-fill" />}
+                      onClick={handleSubmit(onSubmit)}
                     >
                       GET
                     </Button>
@@ -367,9 +352,9 @@ export default function MarketDataListPage() {
                         </TableRow>
                       ) : (
                         <>
-                          {/* {bidDataResult.map((row, index) => (
+                          {bidDataResult.map((row, index) => (
                             <MarketDataTableRow
-                              key={row.id}
+                              key={row._id}
                               index={
                                 pagination?.page
                                   ? (pagination.page - 1) * rowsPerPage + index + 1
@@ -377,7 +362,7 @@ export default function MarketDataListPage() {
                               }
                               row={row}
                             />
-                          ))} */}
+                          ))}
 
                           {/* <TableEmptyRows
                             height={denseHeight}

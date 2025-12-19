@@ -198,13 +198,13 @@ const bidRecordData = [
 
 const TABLE_HEAD = [
   { id: 'actions', label: 'Actions', align: 'center' },
-  { id: 'id', label: 'ID', align: 'left' },
-  { id: 'marketName', label: 'Market Name', align: 'left' },
-  { id: 'userName', label: 'Market Time', align: 'left' },
-  { id: 'game', label: 'Bid Number', align: 'left' },
-  { id: 'amount', label: 'Amount', align: 'left' },
   { id: 'user', label: 'User Name', align: 'left' },
   { id: 'mobile', label: 'Mobile', align: 'left' },
+  // { id: 'id', label: 'ID', align: 'left' },
+  { id: 'game', label: 'Bid Number', align: 'left' },
+  { id: 'amount', label: 'Amount', align: 'left' },
+  { id: 'marketName', label: 'Market Name', align: 'left' },
+  { id: 'userName', label: 'Market Time', align: 'left' },
 ];
 
 
@@ -357,7 +357,7 @@ export default function BidRecordListPage() {
         {isMobile ? (
           <>
             <BidRecordMobileViewCardLayout
-              data={dataInPage}
+              data={[]}
               loading={loading}
             />
             <TablePaginationCustom
@@ -382,7 +382,7 @@ export default function BidRecordListPage() {
                   />
 
                   <TableBody>
-                    {dataFiltered
+                    {/* {[]
                       ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                       .map((row, index) => (
                         <WinHistoryTableRow
@@ -394,14 +394,14 @@ export default function BidRecordListPage() {
                           onDeleteRow={() => handleDeleteRow(row.id)}
                           onEditRow={() => handleEditRow(row.name)}
                         />
-                      ))}
+                      ))} */}
 
                     <TableEmptyRows
                       height={denseHeight}
                       emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
                     />
 
-                    <TableNoData isNotFound={isNotFound} />
+                    <TableNoData isNotFound={!isNotFound} />
                   </TableBody>
                 </Table>
               </Scrollbar>
