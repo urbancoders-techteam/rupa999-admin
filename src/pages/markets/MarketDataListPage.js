@@ -26,7 +26,6 @@ import Iconify from '../../components/iconify';
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import FormProvider, { RHFAutocomplete } from '../../components/hook-form';
-import RHFDatePicker from '../../components/hook-form/RHFDatePicker';
 import Scrollbar from '../../components/scrollbar';
 import { useSettingsContext } from '../../components/settings';
 import {
