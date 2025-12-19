@@ -53,7 +53,7 @@ export const getBidDataResultAsync = createAsyncThunk(
       date: params.date,
       session: params.session,
     };
-    
+
     // Remove undefined values
     Object.keys(apiParams).forEach(key => {
       if (apiParams[key] === undefined || apiParams[key] === null || apiParams[key] === '') {
@@ -98,5 +98,33 @@ export const getYearlyProfitBidsAsync = createAsyncThunk(
         ...params,
       },
     })
+);
+
+// Get bid records by digit and type
+export const getBidRecordsByDigitAndTypeAsync = createAsyncThunk(
+  'bid/getBidRecordsByDigitAndType',
+  async (params = {}, toolkit) => {
+    const { id, ...queryParams } = params;
+    const apiParams = {
+      page: queryParams.page || 1,
+      limit: queryParams.limit || 10,
+      marketId: queryParams.marketId,
+      date: queryParams.date,
+    };
+
+    // Remove undefined values
+    Object.keys(apiParams).forEach(key => {
+      if (apiParams[key] === undefined || apiParams[key] === null || apiParams[key] === '') {
+        delete apiParams[key];
+      }
+    });
+
+    return AxiosClient({
+      toolkit,
+      url: `/bids/data-result/${id}/records`,
+      method: 'get',
+      params: apiParams,
+    });
+  }
 );
 

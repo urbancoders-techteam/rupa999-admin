@@ -1,9 +1,10 @@
 import { Helmet } from 'react-helmet-async';
 import { paramCase } from 'change-case';
-import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useMemo, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 // @mui
-import { Card, Table, TableBody, Container, TableContainer, Box } from '@mui/material';
+import { Card, Table, TableBody, Container, TableContainer, Box, Typography, TableRow, TableCell } from '@mui/material';
 import useResponsive from '../../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
@@ -24,177 +25,10 @@ import CustomTableToolbar from '../../components/table/CustomTableToolBar';
 // sections
 import WinHistoryTableRow from '../../sections/_win_history/list/WinHistoryTableRow';
 import BidRecordMobileViewCardLayout from '../../sections/_bid_records/list/BidRecordMobileViewCardLayout';
+// redux
+import { getBidRecordsByDigitAndTypeAsync } from '../../redux/services/bid_services';
 
 // ----------------------------------------------------------------------
-
-// Dummy data for Bid Records
-const bidRecordData = [
-  {
-    id: 1,
-    userId: 'user001',
-    marketName: 'RAJDHANI DAY',
-    userName: 'Open',
-    session: 'Jodi Digit',
-    number: '47',
-    amount: 1000,
-    winAmount: 0,
-    createdAt: '2025-11-15 10:30:25',
-  },
-  {
-    id: 2,
-    userId: 'user002',
-    marketName: 'RAJDHANI DAY',
-    userName: 'Open',
-    session: 'Single Pana',
-    number: '680',
-    amount: 500,
-    winAmount: 0,
-    createdAt: '2025-11-15 10:28:15',
-  },
-  {
-    id: 3,
-    userId: 'user001',
-    marketName: 'RAJDHANI DAY',
-    userName: 'Close',
-    session: 'Jodi Digit',
-    number: '56',
-    amount: 750,
-    winAmount: 0,
-    createdAt: '2025-11-15 10:25:42',
-  },
-  {
-    id: 4,
-    userId: 'user003',
-    marketName: 'RAJDHANI DAY',
-    userName: 'Open',
-    session: 'Jodi Digit',
-    number: '74',
-    amount: 1200,
-    winAmount: 0,
-    createdAt: '2025-11-15 10:22:18',
-  },
-  {
-    id: 5,
-    userId: 'user002',
-    marketName: 'RAJDHANI DAY',
-    userName: 'Close',
-    session: 'Single Digit',
-    number: '5',
-    amount: 800,
-    winAmount: 0,
-    createdAt: '2025-11-15 10:20:55',
-  },
-  {
-    id: 6,
-    userId: 'user001',
-    marketName: 'RAJDHANI DAY',
-    userName: 'Close',
-    session: 'Double Pana',
-    number: '123',
-    amount: 600,
-    winAmount: 0,
-    createdAt: '2025-11-15 10:18:30',
-  },
-  {
-    id: 7,
-    userId: 'user003',
-    marketName: 'RAJDHANI DAY',
-    userName: 'Close',
-    session: 'Jodi Digit',
-    number: '12',
-    amount: 950,
-    winAmount: 0,
-    createdAt: '2025-11-15 10:15:12',
-  },
-  {
-    id: 8,
-    userId: 'user002',
-    marketName: 'RAJDHANI DAY',
-    userName: 'Close',
-    session: 'Triple Pana',
-    number: '456',
-    amount: 1100,
-    winAmount: 0,
-    createdAt: '2025-11-15 10:12:45',
-  },
-  {
-    id: 9,
-    userId: 'user001',
-    marketName: 'RAJDHANI DAY',
-    userName: 'Open',
-    session: 'Single Pana',
-    number: '234',
-    amount: 700,
-    winAmount: 0,
-    createdAt: '2025-11-15 10:10:20',
-  },
-  {
-    id: 10,
-    userId: 'user003',
-    marketName: 'RAJDHANI DAY',
-    userName: 'Open',
-    session: 'Jodi Digit',
-    number: '89',
-    amount: 850,
-    winAmount: 0,
-    createdAt: '2025-11-15 10:08:05',
-  },
-  {
-    id: 11,
-    userId: 'user002',
-    marketName: 'RAJDHANI DAY',
-    userName: 'Close',
-    session: 'Half Sangam A',
-    number: '123-4',
-    amount: 1300,
-    winAmount: 0,
-    createdAt: '2025-11-15 10:05:33',
-  },
-  {
-    id: 12,
-    userId: 'user001',
-    marketName: 'RAJDHANI DAY',
-    userName: 'Close',
-    session: 'Full Sangam',
-    number: '456-789',
-    amount: 1500,
-    winAmount: 0,
-    createdAt: '2025-11-15 10:03:15',
-  },
-  {
-    id: 13,
-    userId: 'user003',
-    marketName: 'RAJDHANI DAY',
-    userName: 'Open',
-    session: 'Jodi Digit',
-    number: '23',
-    amount: 650,
-    winAmount: 0,
-    createdAt: '2025-11-15 10:00:50',
-  },
-  {
-    id: 14,
-    userId: 'user002',
-    marketName: 'RAJDHANI DAY',
-    userName: 'Open',
-    session: 'Single Digit',
-    number: '7',
-    amount: 900,
-    winAmount: 0,
-    createdAt: '2025-11-15 09:58:22',
-  },
-  {
-    id: 15,
-    userId: 'user001',
-    marketName: 'RAJDHANI DAY',
-    userName: 'Close',
-    session: 'Double Pana',
-    number: '789',
-    amount: 1050,
-    winAmount: 0,
-    createdAt: '2025-11-15 09:55:10',
-  },
-];
 
 const TABLE_HEAD = [
   { id: 'actions', label: 'Actions', align: 'center' },
@@ -226,11 +60,11 @@ export default function BidRecordListPage() {
   } = useTable();
 
   const { themeStretch } = useSettingsContext();
-
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { id } = useParams(); // Get id from route params (format: digit_type)
 
-  const [tableData, setTableData] = useState(bidRecordData);
-  const loading = false;
+  const { bidRecordsList, loading, pagination } = useSelector((state) => state.bid);
 
   const [filterName, setFilterName] = useState(''); // Input field value
   const [searchQuery, setSearchQuery] = useState(''); // Actual search value for filtering
@@ -238,6 +72,40 @@ export default function BidRecordListPage() {
   const [filterRole, setFilterRole] = useState('all');
 
   const [filterStatus, setFilterStatus] = useState('all');
+
+  // Fetch bid records when component mounts or when id/page/rowsPerPage changes
+  useEffect(() => {
+    if (id) {
+      dispatch(
+        getBidRecordsByDigitAndTypeAsync({
+          id,
+          page: page + 1, // API uses 1-based pagination
+          limit: rowsPerPage,
+        })
+      );
+    }
+  }, [dispatch, id, page, rowsPerPage]);
+
+  // Transform API data to table format
+  const tableData = useMemo(
+    () =>
+      bidRecordsList.map((bid, index) => ({
+        id: bid.id || bid._id || index + 1,
+        _id: bid._id || bid.id,
+        userId: bid.userId,
+        marketName: bid.marketName || 'N/A',
+        userName: bid.userName || 'N/A',
+        session: bid.session || 'N/A',
+        game: bid.game || bid.gameType || 'N/A',
+        number: bid.number || 'N/A',
+        amount: bid.amount || 0,
+        winAmount: bid.winAmount || 0,
+        createdAt: bid.createdAt || 'N/A',
+        mobile: bid.mobile || 'N/A',
+        ...bid,
+      })),
+    [bidRecordsList]
+  );
 
   // Memoized filtered data
   const dataFiltered = useMemo(
@@ -251,11 +119,8 @@ export default function BidRecordListPage() {
     [tableData, searchQuery, filterRole, filterStatus]
   );
 
-  // Memoized paginated data
-  const dataInPage = useMemo(
-    () => dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [dataFiltered, page, rowsPerPage]
-  );
+  // Use API pagination instead of client-side pagination
+  const dataInPage = tableData;
 
   const denseHeight = dense ? 52 : 72;
 
@@ -278,20 +143,14 @@ export default function BidRecordListPage() {
     setSearchQuery(filterName);
   };
 
-  const handleDeleteRow = (id) => {
-    const deleteRow = tableData.filter((row) => row.id !== id);
-    setSelected([]);
-    setTableData(deleteRow);
-
-    if (page > 0) {
-      if (dataInPage.length < 2) {
-        setPage(page - 1);
-      }
-    }
+  const handleDeleteRow = (rowId) => {
+    // Note: Delete functionality would need to be implemented via API
+    // For now, just remove from selected
+    setSelected(selected.filter((selectedId) => selectedId !== rowId));
   };
 
-  const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
+  const handleEditRow = (rowId) => {
+    navigate(PATH_DASHBOARD.user.edit(paramCase(rowId)));
   };
 
   const handleResetFilter = () => {
@@ -361,8 +220,8 @@ export default function BidRecordListPage() {
               loading={loading}
             />
             <TablePaginationCustom
-              count={dataFiltered.length}
-              page={page}
+              page={pagination?.page ? pagination.page - 1 : page}
+              count={pagination?.total || 0}
               rowsPerPage={rowsPerPage}
               onPageChange={onChangePage}
               onRowsPerPageChange={onChangeRowsPerPage}
@@ -382,37 +241,48 @@ export default function BidRecordListPage() {
                   />
 
                   <TableBody>
-                    {dataFiltered
-                      ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((row, index) => (
-                        <WinHistoryTableRow
-                          index={(page * rowsPerPage) + index + 1}
-                          key={row.id}
-                          row={row}
-                          selected={selected.includes(row.id)}
-                          onSelectRow={() => onSelectRow(row.id)}
-                          onDeleteRow={() => handleDeleteRow(row.id)}
-                          onEditRow={() => handleEditRow(row.name)}
+                    {loading ? (
+                      <TableRow>
+                        <TableCell colSpan={TABLE_HEAD.length} align="center" sx={{ py: 3 }}>
+                          <Typography>Loading...</Typography>
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      <>
+                        {dataFiltered.map((row, index) => (
+                          <WinHistoryTableRow
+                            index={
+                              pagination?.page
+                                ? (pagination.page - 1) * rowsPerPage + index + 1
+                                : index + 1
+                            }
+                            key={row.id || row._id || index}
+                            row={row}
+                            selected={selected.includes(row.id)}
+                            onSelectRow={() => onSelectRow(row.id)}
+                            onDeleteRow={() => handleDeleteRow(row.id)}
+                            onEditRow={() => handleEditRow(row.name)}
+                          />
+                        ))}
+
+                        <TableEmptyRows
+                          height={denseHeight}
+                          emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
                         />
-                      ))}
 
-                    <TableEmptyRows
-                      height={denseHeight}
-                      emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
-                    />
-
-                    <TableNoData isNotFound={isNotFound} />
+                        <TableNoData isNotFound={isNotFound} />
+                      </>
+                    )}
                   </TableBody>
                 </Table>
               </Scrollbar>
             </TableContainer>
             <TablePaginationCustom
-              count={dataFiltered.length}
-              page={page}
+              page={pagination?.page ? pagination.page - 1 : page}
+              count={pagination?.total || 0}
               rowsPerPage={rowsPerPage}
               onPageChange={onChangePage}
               onRowsPerPageChange={onChangeRowsPerPage}
-              //
               dense={dense}
               onChangeDense={onChangeDense}
             />

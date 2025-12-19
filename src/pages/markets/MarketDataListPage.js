@@ -25,6 +25,7 @@ import Iconify from '../../components/iconify';
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import FormProvider, { RHFAutocomplete } from '../../components/hook-form';
+import RHFDatePicker from '../../components/hook-form/RHFDatePicker';
 import Scrollbar from '../../components/scrollbar';
 import { useSettingsContext } from '../../components/settings';
 import {
@@ -50,14 +51,9 @@ const marketTimeOptions = [
 
 const sortByOptions = [
   { name: '--', key: '' },
-  { name: 'Single Digit', key: 'singleDigit' },
-  { name: 'Jodi Digit', key: 'jodiDigit' },
-  { name: 'Single Pana', key: 'singlePana' },
-  { name: 'Double Pana', key: 'doublePana' },
-  { name: 'Triple Pana', key: 'triplePana' },
-  { name: 'Half Sangam A', key: 'halfSangamA' },
-  { name: 'Half Sangam B', key: 'halfSangamB' },
-  { name: 'Full Sangam', key: 'fullSangam' },
+  { name: 'Bids Number', key: 'bidsNumber' },
+  { name: 'Total Amount', key: 'totalAmount' },
+  { name: 'Total Bids User Count', key: 'totalBidsUserCount' },
 ];
 
 const sortOrderOptions = [
@@ -105,10 +101,22 @@ export default function MarketDataListPage() {
 
   // Fetch markets on component mount
   useEffect(() => {
-    dispatch(getAllMarketsAsync({ page: 1, limit: 10 }));
+    dispatch(getAllMarketsAsync({ page: 1, limit: 100 }));
   }, [dispatch]);
 
-  const onSubmit = async (data) => {
+  // Initial data fetch on component mount with default date (today)
+  useEffect(() => {
+    const initialParams = {
+      page: 1,
+      limit: rowsPerPage,
+      date: dayjs().format('YYYY-MM-DD'), // Default to today's date
+    };
+    dispatch(getBidDataResultAsync(initialParams));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch]);
+
+  const onSubmit = async (data, e) => {
+    e?.preventDefault(); // Prevent form submission and page reload
     try {
       setPage(0); // Reset to first page when filters change
       const params = {
@@ -213,18 +221,6 @@ export default function MarketDataListPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, rowsPerPage]);
 
-  useEffect(() => {
-    dispatch(
-      getAllMarketsAsync({
-        page: 1, // API uses 1-based pagination
-        limit: 100,
-      })
-    );
-  }, [dispatch, page, rowsPerPage]);
-
-  const denseHeight = dense ? 52 : 72;
-  const isNotFound = !bidDataResult.length && !loading;
-
   return (
     <>
       <Helmet>
@@ -246,16 +242,23 @@ export default function MarketDataListPage() {
           {/* Filter Section */}
           <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
             <Card sx={{ p: 3, mb: 3 }}>
-              <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+              <Box
+                component="form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSubmit(onSubmit)(e);
+                }}
+                noValidate
+              >
                 <Grid container spacing={2} alignItems="center">
-                  {/* <Grid item xs={12} sm={6} md={2.5}>
+                  <Grid item xs={12} sm={6} md={2.5}>
                     <RHFDatePicker
                       name="date"
                       label="Date"
                       size="small"
                       format="DD-MM-YYYY"
                     />
-                  </Grid> */}
+                  </Grid>
 
                   <Grid item xs={12} sm={6} md={2.5}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -295,6 +298,21 @@ export default function MarketDataListPage() {
                         label="Market Time"
                         size="small"
                         options={marketTimeOptions}
+                        getOptionLabel={(option) => option?.name || ''}
+                        isOptionEqualToValue={(option, value) => option?.key === value?.key}
+                        renderOption={(props, option) => <li {...props}>{option.name}</li>}
+                        sx={{ flex: 1 }}
+                      />
+                    </Box>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6} md={2.5}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <RHFAutocomplete
+                        name="sortBy"
+                        label="Sort By"
+                        size="small"
+                        options={sortByOptions}
                         getOptionLabel={(option) => option?.name || ''}
                         isOptionEqualToValue={(option, value) => option?.key === value?.key}
                         renderOption={(props, option) => <li {...props}>{option.name}</li>}

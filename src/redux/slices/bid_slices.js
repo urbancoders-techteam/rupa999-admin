@@ -5,12 +5,14 @@ import {
   getBidDataResultAsync,
   getProfitBidsAsync,
   getYearlyProfitBidsAsync,
+  getBidRecordsByDigitAndTypeAsync,
 } from '../services/bid_services';
 
 const initialState = {
   winningBidsList: [],
   allBidsList: [],
   bidDataResult: [],
+  bidRecordsList: [],
   profitBidsList: {
     totalAmount: 0,
     winAmount: 0,
@@ -182,6 +184,25 @@ const bidSlice = createSlice({
             },
           ],
         };
+      });
+
+    // Get bid records by digit and type
+    builder
+      .addCase(getBidRecordsByDigitAndTypeAsync.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getBidRecordsByDigitAndTypeAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        state.bidRecordsList = action.payload?.data || [];
+        if (action.payload?.pagination) {
+          state.pagination = action.payload.pagination;
+        }
+      })
+      .addCase(getBidRecordsByDigitAndTypeAsync.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Failed to fetch bid records';
+        state.bidRecordsList = [];
       });
   },
 });
