@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 // @mui
@@ -15,12 +15,13 @@ import {
   TableContainer,
   TableRow,
   Typography,
-  useMediaQuery
+  useMediaQuery,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
+import RHFDatePicker from '../../components/hook-form/RHFDatePicker';
 import Iconify from '../../components/iconify';
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
@@ -32,14 +33,14 @@ import {
   TableHeadCustom,
   TableNoData,
   TablePaginationCustom,
-  useTable
+  useTable,
 } from '../../components/table';
 // sections
+import MarketDataMobileViewCardLayout from '../../sections/_market_data/components/MarketDataMobileViewCardLayout';
+import { PATH_DASHBOARD } from '../../routes/paths';
 import { marketTypeOptiData } from '../../assets/data/marketEnum';
 import { getBidDataResultAsync } from '../../redux/services/bid_services';
 import { getAllMarketsAsync } from '../../redux/services/market_services';
-import { PATH_DASHBOARD } from '../../routes/paths';
-import MarketDataMobileViewCardLayout from '../../sections/_market_data/components/MarketDataMobileViewCardLayout';
 import MarketDataTableRow from '../../sections/_market_data/components/MarketDataTableRow';
 
 // ----------------------------------------------------------------------
@@ -55,7 +56,6 @@ const sortByOptions = [
   { name: 'Total Amount', key: 'totalAmount' },
   { name: 'Total Bids User Count', key: 'totalBidsUserCount' },
 ];
-
 const sortOrderOptions = [
   { name: 'Ascending', key: 'asc' },
   { name: 'Descending', key: 'desc' },
@@ -221,6 +221,16 @@ export default function MarketDataListPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, rowsPerPage]);
 
+  useEffect(() => {
+    dispatch(
+      getAllMarketsAsync({
+        page: 1, // API uses 1-based pagination
+        limit: 100,
+      })
+    );
+  }, [dispatch]);
+
+  const isNotFound = !!bidDataResult.length && !loading;
   return (
     <>
       <Helmet>
@@ -230,8 +240,9 @@ export default function MarketDataListPage() {
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Container maxWidth={themeStretch ? false : 'xl'}>
           <CustomBreadcrumbs
-            heading={`Market Data (${selectedDate ? dayjs(selectedDate).format('DD-MM-YYYY') : 'N/A'
-              })`}
+            heading={`Market Data (${
+              selectedDate ? dayjs(selectedDate).format('DD-MM-YYYY') : 'N/A'
+            })`}
             links={[
               { name: 'Dashboard', href: PATH_DASHBOARD.home.list },
               { name: 'Market Data', href: PATH_DASHBOARD.markets.marketdata.list },
@@ -240,7 +251,7 @@ export default function MarketDataListPage() {
           />
 
           {/* Filter Section */}
-          <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+          <FormProvider methods={methods}>
             <Card sx={{ p: 3, mb: 3 }}>
               <Box
                 component="form"
@@ -339,10 +350,10 @@ export default function MarketDataListPage() {
                   <Grid item xs={12} sm={6} md={2}>
                     <Button
                       fullWidth
-                      type="submit"
                       variant="contained"
                       disabled={loading}
                       startIcon={<Iconify icon="eva:search-fill" />}
+                      onClick={handleSubmit(onSubmit)}
                     >
                       GET
                     </Button>
@@ -370,7 +381,7 @@ export default function MarketDataListPage() {
             <Card>
               <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
                 <Scrollbar>
-                  <Table size={dense ? 'medium' : 'small'} >
+                  <Table size={dense ? 'medium' : 'small'}>
                     <TableHeadCustom headLabel={TABLE_HEAD} rowCount={marketList.length} />
 
                     <TableBody>

@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { Box, Stack, Typography, Card, CardContent } from '@mui/material';
+import { Box, Stack, Typography, Card, CardContent, Divider } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { PATH_DASHBOARD } from '../../../routes/paths';
@@ -18,6 +18,13 @@ export default function MarketDataMobileViewCardLayout({ data = [], loading = fa
   const handleNavigate = (id) => {
     navigate(PATH_DASHBOARD.markets.marketdata.bidrecord(id));
   };
+
+  const resolveBiddingNumber = (row) => row?.biddingNumber || row?.jodiDigit || row?.number || '—';
+  const resolveTotalAmount = (row) =>
+    row?.totalAmount ??
+    row?.amount ??
+    row?.total ??
+    Object.values(row || {}).reduce((sum, val) => (typeof val === 'number' ? sum + val : sum), 0);
 
   if (loading) {
     return (
@@ -46,20 +53,18 @@ export default function MarketDataMobileViewCardLayout({ data = [], loading = fa
           }}
         >
           <CardContent>
-            <Stack spacing={1.5}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  pb: 1,
-                  borderBottom: `1px solid ${theme.palette.divider}`,
-                }}
-              >
+            <Stack spacing={1.25}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                {/* <Typography variant="subtitle2" fontWeight="bold">
+                  Game Name
+                </Typography> */}
                 <Typography variant="subtitle2" fontWeight="bold">
-                  Sr No: {index + 1}
+                  {/* {index + 1} */}
+                  Single Digit
                 </Typography>
-              </Box>
+              </Stack>
+
+              <Divider />
 
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2" color="text.secondary">
@@ -99,80 +104,26 @@ export default function MarketDataMobileViewCardLayout({ data = [], loading = fa
                 </Typography>
               </Box>
 
-              <Stack direction="row" justifyContent="space-between">
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Typography variant="body2" color="text.secondary">
-                  Single Digit:
+                  Bidding Number
                 </Typography>
-                <Typography variant="body2" fontWeight="medium">
-                  {row.singleDigit || '0'}
+                <Typography variant="body2" color="text.secondary">
+                  Total Amount
                 </Typography>
               </Stack>
 
-              <Stack direction="row" justifyContent="space-between">
-                <Typography variant="body2" color="text.secondary">
-                  Jodi Digit:
-                </Typography>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Typography
                   variant="body2"
                   fontWeight="medium"
                   onClick={() => handleNavigate(row.id)}
-                  sx={{ cursor: 'pointer', color: 'primary.main' }}
+                  sx={{ cursor: 'pointer', color: 'primary.main', textAlign: 'center' }}
                 >
-                  {row.jodiDigit || '0'}
+                  {row?.bidsNumber}
                 </Typography>
-              </Stack>
-
-              <Stack direction="row" justifyContent="space-between">
-                <Typography variant="body2" color="text.secondary">
-                  Single Pana:
-                </Typography>
-                <Typography variant="body2" fontWeight="medium">
-                  {row.singlePana || '0'}
-                </Typography>
-              </Stack>
-
-              <Stack direction="row" justifyContent="space-between">
-                <Typography variant="body2" color="text.secondary">
-                  Double Pana:
-                </Typography>
-                <Typography variant="body2" fontWeight="medium">
-                  {row.doublePana || '0'}
-                </Typography>
-              </Stack>
-
-              <Stack direction="row" justifyContent="space-between">
-                <Typography variant="body2" color="text.secondary">
-                  Triple Pana:
-                </Typography>
-                <Typography variant="body2" fontWeight="medium">
-                  {row.triplePana || '0'}
-                </Typography>
-              </Stack>
-
-              <Stack direction="row" justifyContent="space-between">
-                <Typography variant="body2" color="text.secondary">
-                  Half Sangam A:
-                </Typography>
-                <Typography variant="body2" fontWeight="medium">
-                  {row.halfSangamA || '0'}
-                </Typography>
-              </Stack>
-
-              <Stack direction="row" justifyContent="space-between">
-                <Typography variant="body2" color="text.secondary">
-                  Half Sangam B:
-                </Typography>
-                <Typography variant="body2" fontWeight="medium">
-                  {row.halfSangamB || '0'}
-                </Typography>
-              </Stack>
-
-              <Stack direction="row" justifyContent="space-between">
-                <Typography variant="body2" color="text.secondary">
-                  Full Sangam:
-                </Typography>
-                <Typography variant="body2" fontWeight="medium">
-                  {row.fullSangam || '0'}
+                <Typography variant="body2" fontWeight="medium" sx={{ textAlign: 'center' }}>
+                  {row?.totalAmount}
                 </Typography>
               </Stack>
             </Stack>
@@ -182,4 +133,3 @@ export default function MarketDataMobileViewCardLayout({ data = [], loading = fa
     </Stack>
   );
 }
-

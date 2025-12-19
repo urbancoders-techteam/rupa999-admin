@@ -14,6 +14,7 @@ export default function MarketDataTableRow({ index, row }) {
   const { id, bidsNumber, type, totalAmount } = row;
 
   const navigate = useNavigate();
+  
 
   const handleNavigate = () => {
     if (id) {

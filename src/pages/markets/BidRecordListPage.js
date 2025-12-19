@@ -1,30 +1,30 @@
-import { Helmet } from 'react-helmet-async';
 import { paramCase } from 'change-case';
-import { useState, useMemo, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 // @mui
-import { Card, Table, TableBody, Container, TableContainer, Box, Typography, TableRow, TableCell } from '@mui/material';
+import { Box, Card, Container, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
 import useResponsive from '../../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
 // _mock_
 // components
-import Scrollbar from '../../components/scrollbar';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
+import Scrollbar from '../../components/scrollbar';
 import { useSettingsContext } from '../../components/settings';
 import {
-  useTable,
   emptyRows,
-  TableNoData,
   TableEmptyRows,
   TableHeadCustom,
+  TableNoData,
   TablePaginationCustom,
+  useTable,
 } from '../../components/table';
 import CustomTableToolbar from '../../components/table/CustomTableToolBar';
 // sections
-import WinHistoryTableRow from '../../sections/_win_history/list/WinHistoryTableRow';
 import BidRecordMobileViewCardLayout from '../../sections/_bid_records/list/BidRecordMobileViewCardLayout';
+import WinHistoryTableRow from '../../sections/_win_history/list/WinHistoryTableRow';
 // redux
 import { getBidRecordsByDigitAndTypeAsync } from '../../redux/services/bid_services';
 
@@ -32,13 +32,13 @@ import { getBidRecordsByDigitAndTypeAsync } from '../../redux/services/bid_servi
 
 const TABLE_HEAD = [
   { id: 'actions', label: 'Actions', align: 'center' },
-  { id: 'id', label: 'ID', align: 'left' },
-  { id: 'marketName', label: 'Market Name', align: 'left' },
-  { id: 'userName', label: 'Market Time', align: 'left' },
-  { id: 'game', label: 'Bid Number', align: 'left' },
-  { id: 'amount', label: 'Amount', align: 'left' },
   { id: 'user', label: 'User Name', align: 'left' },
   { id: 'mobile', label: 'Mobile', align: 'left' },
+  // { id: 'id', label: 'ID', align: 'left' },
+  { id: 'game', label: 'Bid Number', align: 'left' },
+  { id: 'amount', label: 'Amount', align: 'left' },
+  { id: 'marketName', label: 'Market Name', align: 'left' },
+  { id: 'userName', label: 'Market Time', align: 'left' },
 ];
 
 
@@ -190,7 +190,7 @@ export default function BidRecordListPage() {
           </Box>
         ) : (
           <>
-          
+
             <CustomBreadcrumbs
               heading="Bid Record Data"
               links={[
@@ -216,7 +216,7 @@ export default function BidRecordListPage() {
         {isMobile ? (
           <>
             <BidRecordMobileViewCardLayout
-              data={dataInPage}
+              data={[]}
               loading={loading}
             />
             <TablePaginationCustom
@@ -273,6 +273,26 @@ export default function BidRecordListPage() {
                         <TableNoData isNotFound={isNotFound} />
                       </>
                     )}
+                    {/* {[]
+                      ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                      .map((row, index) => (
+                        <WinHistoryTableRow
+                          index={(page * rowsPerPage) + index + 1}
+                          key={row.id}
+                          row={row}
+                          selected={selected.includes(row.id)}
+                          onSelectRow={() => onSelectRow(row.id)}
+                          onDeleteRow={() => handleDeleteRow(row.id)}
+                          onEditRow={() => handleEditRow(row.name)}
+                        />
+                      ))} */}
+
+                    <TableEmptyRows
+                      height={denseHeight}
+                      emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
+                    />
+
+                    <TableNoData isNotFound={!isNotFound} />
                   </TableBody>
                 </Table>
               </Scrollbar>
@@ -323,7 +343,7 @@ function applyFilter({ inputData, filterName, filterStatus, filterRole }) {
 
   if (filterName) {
     filteredData = filteredData.filter(
-      (record) => 
+      (record) =>
         (record.marketName && record.marketName.toLowerCase().indexOf(filterName.toLowerCase()) !== -1) ||
         (record.session && record.session.toLowerCase().indexOf(filterName.toLowerCase()) !== -1) ||
         (record.number && record.number.toLowerCase().indexOf(filterName.toLowerCase()) !== -1)
