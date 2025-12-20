@@ -229,7 +229,7 @@ export default function MarketDataListPage() {
     );
   }, [dispatch]);
 
-  const isNotFound = !!bidDataResult.length && !loading;
+  const isNotFound = !bidDataResult.length && !loading;
   return (
     <>
       <Helmet>
@@ -404,9 +404,7 @@ export default function MarketDataListPage() {
                             />
                           ))}
 
-                          {bidDataResult.length === 0 && (
-                            <TableNoData isNotFound={bidDataResult.length > 0} />
-                          )}
+                            <TableNoData isNotFound={isNotFound} />
                         </>
                       )}
                     </TableBody>
