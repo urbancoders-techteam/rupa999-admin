@@ -49,16 +49,16 @@ const marketTimeOptions = [
   { name: 'Close', key: 'close' },
 ];
 
-const sortByOptions = [
-  { name: '--', key: '' },
-  { name: 'Bids Number', key: 'bidsNumber' },
-  { name: 'Total Amount', key: 'totalAmount' },
-  { name: 'Total Bids User Count', key: 'totalBidsUserCount' },
-];
-const sortOrderOptions = [
-  { name: 'Ascending', key: 'asc' },
-  { name: 'Descending', key: 'desc' },
-];
+// const sortByOptions = [
+//   { name: '--', key: '' },
+//   { name: 'Bids Number', key: 'bidsNumber' },
+//   { name: 'Total Amount', key: 'totalAmount' },
+//   { name: 'Total Bids User Count', key: 'totalBidsUserCount' },
+// ];
+// const sortOrderOptions = [
+//   { name: 'Ascending', key: 'asc' },
+//   { name: 'Descending', key: 'desc' },
+// ];
 
 const TABLE_HEAD = [
   { id: 'srNo', label: 'Sr No.', align: 'center' },
@@ -189,14 +189,14 @@ export default function MarketDataListPage() {
       }
 
       // Add sortBy filter
-      if (formValues.sortBy?.key) {
-        params.sortBy = formValues.sortBy.key;
-      }
+      // if (formValues.sortBy?.key) {
+      //   params.sortBy = formValues.sortBy.key;
+      // }
 
       // Add sortOrder filter
-      if (formValues.sortOrder?.key) {
-        params.sortOrder = formValues.sortOrder.key;
-      }
+      // if (formValues.sortOrder?.key) {
+      //   params.sortOrder = formValues.sortOrder.key;
+      // }
 
       await dispatch(getBidDataResultAsync(params)).unwrap();
     } catch (error) {
@@ -211,9 +211,9 @@ export default function MarketDataListPage() {
       formValues.date ||
       formValues.market ||
       formValues.marketType ||
-      formValues.marketTime ||
-      formValues.sortBy ||
-      formValues.sortOrder;
+      formValues.marketTime 
+      // formValues.sortBy ||
+      // formValues.sortOrder;
     if (hasFilters) {
       fetchDataWithFilters();
     }
@@ -266,7 +266,7 @@ export default function MarketDataListPage() {
                       name="date"
                       label="Date"
                       size="small"
-                      format="DD-MM-YYYY"
+                      format="DD/MM/YYYY"
                     />
                   </Grid>
 
@@ -316,7 +316,7 @@ export default function MarketDataListPage() {
                     </Box>
                   </Grid>
 
-                  <Grid item xs={12} sm={6} md={2.5}>
+                  {/* <Grid item xs={12} sm={6} md={2.5}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <RHFAutocomplete
                         name="sortBy"
@@ -329,9 +329,9 @@ export default function MarketDataListPage() {
                         sx={{ flex: 1 }}
                       />
                     </Box>
-                  </Grid>
+                  </Grid> */}
 
-                  <Grid item xs={12} sm={6} md={2.5}>
+                  {/* <Grid item xs={12} sm={6} md={2.5}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <RHFAutocomplete
                         name="sortOrder"
@@ -344,7 +344,7 @@ export default function MarketDataListPage() {
                         sx={{ flex: 1 }}
                       />
                     </Box>
-                  </Grid>
+                  </Grid> */}
 
                   <Grid item xs={12} sm={6} md={2}>
                     <Button
