@@ -9,14 +9,22 @@ import { PATH_DASHBOARD } from '../../../routes/paths';
 MarketDataMobileViewCardLayout.propTypes = {
   data: PropTypes.array,
   loading: PropTypes.bool,
+  date: PropTypes.string,
 };
 
-export default function MarketDataMobileViewCardLayout({ data = [], loading = false }) {
+export default function MarketDataMobileViewCardLayout({ data = [], loading = false, date }) {
   const theme = useTheme();
   const navigate = useNavigate();
 
   const handleNavigate = (id) => {
-    navigate(PATH_DASHBOARD.markets.marketdata.bidrecord(id));
+    const url = PATH_DASHBOARD.markets.marketdata.bidrecord(id);
+    // Add date as query parameter if provided
+    const searchParams = new URLSearchParams();
+    if (date) {
+      searchParams.set('date', date);
+    }
+    const queryString = searchParams.toString();
+    navigate(queryString ? `${url}?${queryString}` : url);
   };
 
   const resolveBiddingNumber = (row) => row?.biddingNumber || row?.jodiDigit || row?.number || '—';

@@ -3,7 +3,7 @@ import { paramCase } from 'change-case';
 import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import Scrollbar from '../../components/scrollbar';
 import { useSettingsContext } from '../../components/settings';
@@ -57,6 +57,8 @@ export default function BidRecordListPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { id } = useParams(); // Get id from route params (format: digit_type)
+  const [searchParams] = useSearchParams(); // Get query parameters
+  const date = searchParams.get('date'); // Get date from query params
 
   const { bidRecordsList, loading, pagination } = useSelector((state) => state.bid);
 
@@ -67,18 +69,23 @@ export default function BidRecordListPage() {
 
   const [filterStatus, setFilterStatus] = useState('all');
 
-  // Fetch bid records when component mounts or when id/page/rowsPerPage changes
+  // Fetch bid records when component mounts or when id/page/rowsPerPage/date changes
   useEffect(() => {
     if (id) {
-      dispatch(
-        getBidRecordsByDigitAndTypeAsync({
-          id,
-          page: page + 1, // API uses 1-based pagination
-          limit: rowsPerPage,
-        })
-      );
+      const params = {
+        id,
+        page: page + 1, // API uses 1-based pagination
+        limit: rowsPerPage,
+      };
+
+      // Add date filter if provided
+      if (date) {
+        params.date = date;
+      }
+
+      dispatch(getBidRecordsByDigitAndTypeAsync(params));
     }
-  }, [dispatch, id, page, rowsPerPage]);
+  }, [dispatch, id, page, rowsPerPage, date]);
 
   // Transform API data to table format
   const tableData = useMemo(
@@ -161,12 +168,11 @@ export default function BidRecordListPage() {
         {isMobile ? (
           <Box sx={{ position: 'sticky', top: 0, zIndex: 10, bgcolor: 'background.paper' }}>
             <CustomBreadcrumbs
-              heading="Bid Record Data"
+              heading={`Bid Record Data${pagination?.total ? ` (${pagination.total} Users)` : ''}`}
               links={[
                 { name: 'Dashboard', href: PATH_DASHBOARD.root },
                 { name: 'Market Data', href: PATH_DASHBOARD.markets.marketdata.list },
-                { name: 'Bid Record Data', href: PATH_DASHBOARD.markets.winhistory.list },
-                { name: 'List' },
+                { name: 'Bid Record Data List' },
               ]}
             />
             <CustomTableToolbar
@@ -182,12 +188,11 @@ export default function BidRecordListPage() {
           <>
 
             <CustomBreadcrumbs
-              heading="Bid Record Data"
+              heading={`Bid Record Data${pagination?.total ? ` (${pagination.total} Users)` : ''}`}
               links={[
                 { name: 'Dashboard', href: PATH_DASHBOARD.root },
                 { name: 'Market Data', href: PATH_DASHBOARD.markets.marketdata.list },
-                { name: 'Bid Record Data', href: PATH_DASHBOARD.markets.winhistory.root },
-                { name: 'List' },
+                { name: 'Bid Record Data List' },
               ]}
             />
 

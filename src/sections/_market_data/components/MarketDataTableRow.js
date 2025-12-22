@@ -8,9 +8,10 @@ import { PATH_DASHBOARD } from '../../../routes/paths';
 MarketDataTableRow.propTypes = {
   index: PropTypes.number,
   row: PropTypes.object,
+  date: PropTypes.string,
 };
 
-export default function MarketDataTableRow({ index, row }) {
+export default function MarketDataTableRow({ index, row, date }) {
   const { id, bidsNumber, type, totalAmount, totalBidsUserCount } = row;
 
   console.log("row::::::::::>>", row);
@@ -20,7 +21,14 @@ export default function MarketDataTableRow({ index, row }) {
 
   const handleNavigate = () => {
     if (id) {
-      navigate(PATH_DASHBOARD.markets.marketdata.bidrecord(id));
+      const url = PATH_DASHBOARD.markets.marketdata.bidrecord(id);
+      // Add date as query parameter if provided
+      const searchParams = new URLSearchParams();
+      if (date) {
+        searchParams.set('date', date);
+      }
+      const queryString = searchParams.toString();
+      navigate(queryString ? `${url}?${queryString}` : url);
     }
   };
 

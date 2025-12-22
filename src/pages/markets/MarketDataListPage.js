@@ -113,9 +113,11 @@ export default function MarketDataListPage() {
         limit: rowsPerPage,
       };
 
-      // Add date filter
+      // Add date filter - always include date (default to today if not provided)
       if (data.date) {
         params.date = dayjs(data.date).format('YYYY-MM-DD');
+      } else {
+        params.date = dayjs().format('YYYY-MM-DD');
       }
 
       // Add market filter (using _id from API)
@@ -158,9 +160,11 @@ export default function MarketDataListPage() {
         limit: rowsPerPage,
       };
 
-      // Add date filter
+      // Add date filter - always include date (default to today if not provided)
       if (formValues.date) {
         params.date = dayjs(formValues.date).format('YYYY-MM-DD');
+      } else {
+        params.date = dayjs().format('YYYY-MM-DD');
       }
 
       // Add market filter (using _id from API)
@@ -194,19 +198,11 @@ export default function MarketDataListPage() {
     }
   };
 
-  // Fetch data when page or rowsPerPage changes (but not on initial mount if filters are empty)
+  // Fetch data when page or rowsPerPage changes (always include date filter)
   useEffect(() => {
     const formValues = methods.getValues();
-    const hasFilters =
-      formValues.date ||
-      formValues.market ||
-      formValues.marketType ||
-      formValues.marketTime
-    // formValues.sortBy ||
-    // formValues.sortOrder;
-    if (hasFilters) {
-      fetchDataWithFilters();
-    }
+    // Always fetch when pagination changes, date is always included
+    fetchDataWithFilters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, rowsPerPage]);
 
@@ -324,7 +320,11 @@ export default function MarketDataListPage() {
           {/* Table Section */}
           {isMobile ? (
             <>
-              <MarketDataMobileViewCardLayout data={bidDataResult} loading={loading} />
+              <MarketDataMobileViewCardLayout
+                data={bidDataResult}
+                loading={loading}
+                date={selectedDate ? dayjs(selectedDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')}
+              />
               <TablePaginationCustom
                 page={pagination?.page ? pagination.page - 1 : page}
                 count={pagination?.total || 0}
@@ -356,6 +356,7 @@ export default function MarketDataListPage() {
                               key={row.id || row.bidsNumber || index}
                               index={index}
                               row={row}
+                              date={selectedDate ? dayjs(selectedDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')}
                             />
                           ))}
 
