@@ -77,7 +77,6 @@ export default function MarketDataListPage() {
     marketType: null,
     marketTime: null,
     sortBy: null,
-    sortOrder: { name: 'Ascending', key: 'asc' },
   };
 
   const methods = useForm({
@@ -140,11 +139,6 @@ export default function MarketDataListPage() {
         params.sortBy = data.sortBy.key;
       }
 
-      // Add sortOrder filter
-      if (data.sortOrder?.key) {
-        params.sortOrder = data.sortOrder.key;
-      }
-
       await dispatch(getBidDataResultAsync(params)).unwrap();
     } catch (error) {
       console.error('Failed to fetch bid data result:', error);
@@ -185,11 +179,6 @@ export default function MarketDataListPage() {
       // Add sortBy filter
       // if (formValues.sortBy?.key) {
       //   params.sortBy = formValues.sortBy.key;
-      // }
-
-      // Add sortOrder filter
-      // if (formValues.sortOrder?.key) {
-      //   params.sortOrder = formValues.sortOrder.key;
       // }
 
       await dispatch(getBidDataResultAsync(params)).unwrap();

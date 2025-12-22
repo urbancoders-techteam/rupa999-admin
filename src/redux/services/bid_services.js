@@ -49,7 +49,6 @@ export const getBidDataResultAsync = createAsyncThunk(
       marketId: params.market || params.marketId,
       gameType: params.gameType,
       sortBy: params.sortBy,
-      sortOrder: params.sortOrder,
       date: params.date,
       session: params.session,
     };
