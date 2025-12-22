@@ -53,6 +53,7 @@ const TABLE_HEAD = [
   { id: 'srNo', label: 'Sr No.', align: 'center' },
   { id: 'biddingNumber', label: 'Bidding Number', align: 'left' },
   { id: 'type', label: 'Type', align: 'left' },
+  { id: 'marketName', label: 'Market Name', align: 'left' },
   { id: 'totalBidsUserCount', label: 'User Count', align: 'left' },
   { id: 'totalAmount', label: 'Total Amount', align: 'left' },
 ];

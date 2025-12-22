@@ -12,9 +12,7 @@ MarketDataTableRow.propTypes = {
 };
 
 export default function MarketDataTableRow({ index, row, date }) {
-  const { id, bidsNumber, type, totalAmount, totalBidsUserCount } = row;
-
-  console.log("row::::::::::>>", row);
+  const { id, bidsNumber, type, totalAmount, totalBidsUserCount, marketName } = row;
 
   const navigate = useNavigate();
 
@@ -55,6 +53,10 @@ export default function MarketDataTableRow({ index, row, date }) {
 
       <TableCell align="left">
         <Typography variant="body2">{getTypeLabel(type)}</Typography>
+      </TableCell>
+
+      <TableCell align="left">
+        <Typography variant="body2">{marketName}</Typography>
       </TableCell>
 
       <TableCell align="left">
