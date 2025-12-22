@@ -1,44 +1,38 @@
+import { Box, Card, Container, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
 import { paramCase } from 'change-case';
 import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-// @mui
-import { Box, Card, Container, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
-import useResponsive from '../../hooks/useResponsive';
-// routes
-import { PATH_DASHBOARD } from '../../routes/paths';
-// _mock_
-// components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import Scrollbar from '../../components/scrollbar';
 import { useSettingsContext } from '../../components/settings';
 import {
-  emptyRows,
-  TableEmptyRows,
   TableHeadCustom,
   TableNoData,
   TablePaginationCustom,
-  useTable,
+  useTable
 } from '../../components/table';
 import CustomTableToolbar from '../../components/table/CustomTableToolBar';
+import useResponsive from '../../hooks/useResponsive';
+import { PATH_DASHBOARD } from '../../routes/paths';
 // sections
 import BidRecordMobileViewCardLayout from '../../sections/_bid_records/list/BidRecordMobileViewCardLayout';
-import WinHistoryTableRow from '../../sections/_win_history/list/WinHistoryTableRow';
+import BidRecordTableRow from '../../sections/_bid_records/list/BidRecordTableRow';
 // redux
 import { getBidRecordsByDigitAndTypeAsync } from '../../redux/services/bid_services';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'actions', label: 'Actions', align: 'center' },
+  { id: 'id', label: 'ID', align: 'left' },
+  { id: 'marketName', label: 'Market Name', align: 'left' },
   { id: 'user', label: 'User Name', align: 'left' },
   { id: 'mobile', label: 'Mobile', align: 'left' },
-  // { id: 'id', label: 'ID', align: 'left' },
-  { id: 'game', label: 'Bid Number', align: 'left' },
+  { id: 'session', label: 'Session', align: 'left' },
   { id: 'amount', label: 'Amount', align: 'left' },
-  { id: 'marketName', label: 'Market Name', align: 'left' },
-  { id: 'userName', label: 'Market Time', align: 'left' },
+  { id: 'bidNumber', label: 'Bid Number', align: 'left' },
+  { id: 'createdAt', label: 'Market Time', align: 'left' },
 ];
 
 
@@ -119,10 +113,6 @@ export default function BidRecordListPage() {
     [tableData, searchQuery, filterRole, filterStatus]
   );
 
-  // Use API pagination instead of client-side pagination
-  const dataInPage = tableData;
-
-  const denseHeight = dense ? 52 : 72;
 
   const isMobile = useResponsive('down', 'sm');
 
@@ -250,12 +240,8 @@ export default function BidRecordListPage() {
                     ) : (
                       <>
                         {dataFiltered.map((row, index) => (
-                          <WinHistoryTableRow
-                            index={
-                              pagination?.page
-                                ? (pagination.page - 1) * rowsPerPage + index + 1
-                                : index + 1
-                            }
+                          <BidRecordTableRow
+                            index={index}
                             key={row.id || row._id || index}
                             row={row}
                             selected={selected.includes(row.id)}
@@ -264,35 +250,11 @@ export default function BidRecordListPage() {
                             onEditRow={() => handleEditRow(row.name)}
                           />
                         ))}
-
-                        <TableEmptyRows
-                          height={denseHeight}
-                          emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
-                        />
-
-                        <TableNoData isNotFound={isNotFound} />
+                        {dataFiltered.length === 0 && (
+                          <TableNoData isNotFound={isNotFound} />
+                        )}
                       </>
                     )}
-                    {/* {[]
-                      ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((row, index) => (
-                        <WinHistoryTableRow
-                          index={(page * rowsPerPage) + index + 1}
-                          key={row.id}
-                          row={row}
-                          selected={selected.includes(row.id)}
-                          onSelectRow={() => onSelectRow(row.id)}
-                          onDeleteRow={() => handleDeleteRow(row.id)}
-                          onEditRow={() => handleEditRow(row.name)}
-                        />
-                      ))} */}
-
-                    <TableEmptyRows
-                      height={denseHeight}
-                      emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
-                    />
-
-                    <TableNoData isNotFound={!isNotFound} />
                   </TableBody>
                 </Table>
               </Scrollbar>

@@ -1,5 +1,5 @@
+import { TableCell, TableRow, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
-import { TableRow, TableCell, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { PATH_DASHBOARD } from '../../../routes/paths';
 
@@ -11,10 +11,12 @@ MarketDataTableRow.propTypes = {
 };
 
 export default function MarketDataTableRow({ index, row }) {
-  const { id, bidsNumber, type, totalAmount } = row;
+  const { id, bidsNumber, type, totalAmount, totalBidsUserCount } = row;
+
+  console.log("row::::::::::>>", row);
 
   const navigate = useNavigate();
-  
+
 
   const handleNavigate = () => {
     if (id) {
@@ -45,6 +47,10 @@ export default function MarketDataTableRow({ index, row }) {
 
       <TableCell align="left">
         <Typography variant="body2">{getTypeLabel(type)}</Typography>
+      </TableCell>
+
+      <TableCell align="left">
+        <Typography variant="body2">{totalBidsUserCount}</Typography>
       </TableCell>
 
       <TableCell align="left">

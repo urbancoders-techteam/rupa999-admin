@@ -1,5 +1,5 @@
+import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 // @mui
@@ -35,11 +35,11 @@ import {
   useTable,
 } from '../../components/table';
 // sections
-import MarketDataMobileViewCardLayout from '../../sections/_market_data/components/MarketDataMobileViewCardLayout';
-import { PATH_DASHBOARD } from '../../routes/paths';
 import { marketTypeOptiData } from '../../assets/data/marketEnum';
 import { getBidDataResultAsync } from '../../redux/services/bid_services';
 import { getAllMarketsAsync } from '../../redux/services/market_services';
+import { PATH_DASHBOARD } from '../../routes/paths';
+import MarketDataMobileViewCardLayout from '../../sections/_market_data/components/MarketDataMobileViewCardLayout';
 import MarketDataTableRow from '../../sections/_market_data/components/MarketDataTableRow';
 
 // ----------------------------------------------------------------------
@@ -49,21 +49,11 @@ const marketTimeOptions = [
   { name: 'Close', key: 'close' },
 ];
 
-// const sortByOptions = [
-//   { name: '--', key: '' },
-//   { name: 'Bids Number', key: 'bidsNumber' },
-//   { name: 'Total Amount', key: 'totalAmount' },
-//   { name: 'Total Bids User Count', key: 'totalBidsUserCount' },
-// ];
-// const sortOrderOptions = [
-//   { name: 'Ascending', key: 'asc' },
-//   { name: 'Descending', key: 'desc' },
-// ];
-
 const TABLE_HEAD = [
   { id: 'srNo', label: 'Sr No.', align: 'center' },
   { id: 'biddingNumber', label: 'Bidding Number', align: 'left' },
   { id: 'type', label: 'Type', align: 'left' },
+  { id: 'totalBidsUserCount', label: 'Total Bids User Count', align: 'left' },
   { id: 'totalAmount', label: 'Total Amount', align: 'left' },
 ];
 
@@ -211,9 +201,9 @@ export default function MarketDataListPage() {
       formValues.date ||
       formValues.market ||
       formValues.marketType ||
-      formValues.marketTime 
-      // formValues.sortBy ||
-      // formValues.sortOrder;
+      formValues.marketTime
+    // formValues.sortBy ||
+    // formValues.sortOrder;
     if (hasFilters) {
       fetchDataWithFilters();
     }
@@ -239,9 +229,8 @@ export default function MarketDataListPage() {
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Container maxWidth={themeStretch ? false : 'xl'}>
           <CustomBreadcrumbs
-            heading={`Market Data (${
-              selectedDate ? dayjs(selectedDate).format('DD-MM-YYYY') : 'N/A'
-            })`}
+            heading={`Market Data (${selectedDate ? dayjs(selectedDate).format('DD-MM-YYYY') : 'N/A'
+              })`}
             links={[
               { name: 'Dashboard', href: PATH_DASHBOARD.home.list },
               { name: 'Market Data', href: PATH_DASHBOARD.markets.marketdata.list },
@@ -316,36 +305,6 @@ export default function MarketDataListPage() {
                     </Box>
                   </Grid>
 
-                  {/* <Grid item xs={12} sm={6} md={2.5}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <RHFAutocomplete
-                        name="sortBy"
-                        label="Sort By"
-                        size="small"
-                        options={sortByOptions}
-                        getOptionLabel={(option) => option?.name || ''}
-                        isOptionEqualToValue={(option, value) => option?.key === value?.key}
-                        renderOption={(props, option) => <li {...props}>{option.name}</li>}
-                        sx={{ flex: 1 }}
-                      />
-                    </Box>
-                  </Grid> */}
-
-                  {/* <Grid item xs={12} sm={6} md={2.5}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <RHFAutocomplete
-                        name="sortOrder"
-                        label="Sort Order"
-                        size="small"
-                        options={sortOrderOptions}
-                        getOptionLabel={(option) => option?.name || ''}
-                        isOptionEqualToValue={(option, value) => option?.key === value?.key}
-                        renderOption={(props, option) => <li {...props}>{option.name}</li>}
-                        sx={{ flex: 1 }}
-                      />
-                    </Box>
-                  </Grid> */}
-
                   <Grid item xs={12} sm={6} md={2}>
                     <Button
                       fullWidth
@@ -395,16 +354,12 @@ export default function MarketDataListPage() {
                           {bidDataResult.map((row, index) => (
                             <MarketDataTableRow
                               key={row.id || row.bidsNumber || index}
-                              index={
-                                pagination?.page
-                                  ? (pagination.page - 1) * rowsPerPage + index + 1
-                                  : index + 1
-                              }
+                              index={index}
                               row={row}
                             />
                           ))}
 
-                            <TableNoData isNotFound={isNotFound} />
+                          <TableNoData isNotFound={isNotFound} />
                         </>
                       )}
                     </TableBody>
