@@ -36,13 +36,6 @@ export default function MarketDataMobileViewCardLayout({ data = [], loading = fa
     navigate(queryString ? `${url}?${queryString}` : url);
   };
 
-  // const resolveBiddingNumber = (row) => row?.biddingNumber || row?.jodiDigit || row?.number || '—';
-  // const resolveTotalAmount = (row) =>
-  //   row?.totalAmount ??
-  //   row?.amount ??
-  //   row?.total ??
-  //   Object.values(row || {}).reduce((sum, val) => (typeof val === 'number' ? sum + val : sum), 0);
-
   if (loading) {
     return (
       <Box sx={{ p: 2, textAlign: 'center' }}>
@@ -86,44 +79,6 @@ export default function MarketDataMobileViewCardLayout({ data = [], loading = fa
               </Stack>
 
               <Divider />
-
-              {/* <Stack direction="row" justifyContent="space-between">
-                <Typography variant="body2" color="text.secondary">
-                  Bidding Number:
-                </Typography>
-                <Typography
-                  variant="body2"
-                  fontWeight="medium"
-                  onClick={() => handleNavigate(row.id)}
-                  sx={{ cursor: 'pointer', color: 'primary.main' }}
-                >
-                  {row.bidsNumber || '—'}
-                </Typography>
-              </Stack> */}
-
-              {/* <Stack direction="row" justifyContent="space-between">
-                <Typography variant="body2" color="text.secondary">
-                  Type:
-                </Typography>
-                <Typography variant="body2" fontWeight="medium">
-                  {row.type ? row.type.charAt(0).toUpperCase() + row.type.slice(1) : '—'}
-                </Typography>
-              </Stack> */}
-
-              {/* <Stack direction="row" justifyContent="space-between">
-                <Typography variant="body2" color="text.secondary">
-                  Total Amount:
-                </Typography>
-                <Typography variant="body2" fontWeight="medium">
-                  {row.totalAmount ? row.totalAmount.toLocaleString() : '0'}
-                </Typography>
-              </Stack> */}
-
-              {/* <Box sx={{ pt: 1, borderTop: `1px solid ${theme.palette.divider}` }}>
-                <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
-                  Game Type Breakdown:
-                </Typography>
-              </Box> */}
 
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Typography variant="body2" color="text.secondary">
