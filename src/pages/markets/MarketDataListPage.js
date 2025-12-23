@@ -1,5 +1,5 @@
+import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 // @mui
@@ -35,11 +35,11 @@ import {
   useTable,
 } from '../../components/table';
 // sections
-import MarketDataMobileViewCardLayout from '../../sections/_market_data/components/MarketDataMobileViewCardLayout';
-import { PATH_DASHBOARD } from '../../routes/paths';
 import { marketTypeOptiData } from '../../assets/data/marketEnum';
 import { getBidDataResultAsync } from '../../redux/services/bid_services';
 import { getAllMarketsAsync } from '../../redux/services/market_services';
+import { PATH_DASHBOARD } from '../../routes/paths';
+import MarketDataMobileViewCardLayout from '../../sections/_market_data/components/MarketDataMobileViewCardLayout';
 import MarketDataTableRow from '../../sections/_market_data/components/MarketDataTableRow';
 
 // ----------------------------------------------------------------------
@@ -49,21 +49,12 @@ const marketTimeOptions = [
   { name: 'Close', key: 'close' },
 ];
 
-// const sortByOptions = [
-//   { name: '--', key: '' },
-//   { name: 'Bids Number', key: 'bidsNumber' },
-//   { name: 'Total Amount', key: 'totalAmount' },
-//   { name: 'Total Bids User Count', key: 'totalBidsUserCount' },
-// ];
-// const sortOrderOptions = [
-//   { name: 'Ascending', key: 'asc' },
-//   { name: 'Descending', key: 'desc' },
-// ];
-
 const TABLE_HEAD = [
   { id: 'srNo', label: 'Sr No.', align: 'center' },
   { id: 'biddingNumber', label: 'Bidding Number', align: 'left' },
   { id: 'type', label: 'Type', align: 'left' },
+  { id: 'marketName', label: 'Market Name', align: 'left' },
+  { id: 'totalBidsUserCount', label: 'User Count', align: 'left' },
   { id: 'totalAmount', label: 'Total Amount', align: 'left' },
 ];
 
@@ -87,7 +78,6 @@ export default function MarketDataListPage() {
     marketType: null,
     marketSession: null,
     sortBy: null,
-    sortOrder: { name: 'Ascending', key: 'asc' },
   };
 
   const methods = useForm({
@@ -123,9 +113,11 @@ export default function MarketDataListPage() {
         limit: rowsPerPage,
       };
 
-      // Add date filter
+      // Add date filter - always include date (default to today if not provided)
       if (data.date) {
         params.date = dayjs(data.date).format('YYYY-MM-DD');
+      } else {
+        params.date = dayjs().format('YYYY-MM-DD');
       }
 
       // Add market filter (using _id from API)
@@ -148,11 +140,6 @@ export default function MarketDataListPage() {
       //   params.sortBy = data.sortBy.key;
       // }
 
-      // // Add sortOrder filter
-      // if (data.sortOrder?.key) {
-      //   params.sortOrder = data.sortOrder.key;
-      // }
-
       await dispatch(getBidDataResultAsync(params)).unwrap();
     } catch (error) {
       console.error('Failed to fetch bid data result:', error);
@@ -168,9 +155,11 @@ export default function MarketDataListPage() {
         limit: rowsPerPage,
       };
 
-      // Add date filter
+      // Add date filter - always include date (default to today if not provided)
       if (formValues.date) {
         params.date = dayjs(formValues.date).format('YYYY-MM-DD');
+      } else {
+        params.date = dayjs().format('YYYY-MM-DD');
       }
 
       // Add market filter (using _id from API)
@@ -193,30 +182,17 @@ export default function MarketDataListPage() {
       //   params.sortBy = formValues.sortBy.key;
       // }
 
-      // Add sortOrder filter
-      // if (formValues.sortOrder?.key) {
-      //   params.sortOrder = formValues.sortOrder.key;
-      // }
-
       await dispatch(getBidDataResultAsync(params)).unwrap();
     } catch (error) {
       console.error('Failed to fetch bid data result:', error);
     }
   };
 
-  // Fetch data when page or rowsPerPage changes (but not on initial mount if filters are empty)
+  // Fetch data when page or rowsPerPage changes (always include date filter)
   useEffect(() => {
     const formValues = methods.getValues();
-    const hasFilters =
-      formValues.date ||
-      formValues.market ||
-      formValues.marketType ||
-      formValues.marketSession 
-      // formValues.sortBy ||
-      // formValues.sortOrder;
-    if (hasFilters) {
-      fetchDataWithFilters();
-    }
+    // Always fetch when pagination changes, date is always included
+    fetchDataWithFilters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, rowsPerPage]);
 
@@ -239,9 +215,8 @@ export default function MarketDataListPage() {
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Container maxWidth={themeStretch ? false : 'xl'}>
           <CustomBreadcrumbs
-            heading={`Market Data (${
-              selectedDate ? dayjs(selectedDate).format('DD-MM-YYYY') : 'N/A'
-            })`}
+            heading={`Market Data (${selectedDate ? dayjs(selectedDate).format('DD-MM-YYYY') : 'N/A'
+              })`}
             links={[
               { name: 'Dashboard', href: PATH_DASHBOARD.home.list },
               { name: 'Market Data', href: PATH_DASHBOARD.markets.marketdata.list },
@@ -316,36 +291,6 @@ export default function MarketDataListPage() {
                     </Box>
                   </Grid>
 
-                  {/* <Grid item xs={12} sm={6} md={2.5}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <RHFAutocomplete
-                        name="sortBy"
-                        label="Sort By"
-                        size="small"
-                        options={sortByOptions}
-                        getOptionLabel={(option) => option?.name || ''}
-                        isOptionEqualToValue={(option, value) => option?.key === value?.key}
-                        renderOption={(props, option) => <li {...props}>{option.name}</li>}
-                        sx={{ flex: 1 }}
-                      />
-                    </Box>
-                  </Grid> */}
-
-                  {/* <Grid item xs={12} sm={6} md={2.5}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <RHFAutocomplete
-                        name="sortOrder"
-                        label="Sort Order"
-                        size="small"
-                        options={sortOrderOptions}
-                        getOptionLabel={(option) => option?.name || ''}
-                        isOptionEqualToValue={(option, value) => option?.key === value?.key}
-                        renderOption={(props, option) => <li {...props}>{option.name}</li>}
-                        sx={{ flex: 1 }}
-                      />
-                    </Box>
-                  </Grid> */}
-
                   <Grid item xs={12} sm={6} md={2}>
                     <Button
                       fullWidth
@@ -365,7 +310,11 @@ export default function MarketDataListPage() {
           {/* Table Section */}
           {isMobile ? (
             <>
-              <MarketDataMobileViewCardLayout data={bidDataResult} loading={loading} />
+              <MarketDataMobileViewCardLayout
+                data={bidDataResult}
+                loading={loading}
+                date={selectedDate ? dayjs(selectedDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')}
+              />
               <TablePaginationCustom
                 page={pagination?.page ? pagination.page - 1 : page}
                 count={pagination?.total || 0}
@@ -395,16 +344,13 @@ export default function MarketDataListPage() {
                           {bidDataResult.map((row, index) => (
                             <MarketDataTableRow
                               key={row.id || row.bidsNumber || index}
-                              index={
-                                pagination?.page
-                                  ? (pagination.page - 1) * rowsPerPage + index + 1
-                                  : index + 1
-                              }
+                              index={index}
                               row={row}
+                              date={selectedDate ? dayjs(selectedDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')}
                             />
                           ))}
 
-                            <TableNoData isNotFound={isNotFound} />
+                          <TableNoData isNotFound={isNotFound} />
                         </>
                       )}
                     </TableBody>
