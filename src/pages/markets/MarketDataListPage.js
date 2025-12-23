@@ -190,7 +190,7 @@ export default function MarketDataListPage() {
 
   // Fetch data when page or rowsPerPage changes (always include date filter)
   useEffect(() => {
-    const formValues = methods.getValues();
+    // const formValues = methods.getValues();
     // Always fetch when pagination changes, date is always included
     fetchDataWithFilters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -226,7 +226,7 @@ export default function MarketDataListPage() {
 
           {/* Filter Section */}
           <FormProvider methods={methods}>
-            <Card sx={{ p: 3, mb: 3 }}>
+            <Card sx={{ p:{ xs: 2, sm: 3 }, mb:{ xs: 2, sm: 3 } }}>
               <Box
                 component="form"
                 onSubmit={(e) => {
@@ -235,8 +235,8 @@ export default function MarketDataListPage() {
                 }}
                 noValidate
               >
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={12} sm={6} md={2.5}>
+                <Grid container spacing={{ xs: 1, sm: 2 }} alignItems="center">
+                  <Grid item xs={6} sm={6} md={2.5}>
                     <RHFDatePicker
                       name="date"
                       label="Date"
@@ -245,7 +245,7 @@ export default function MarketDataListPage() {
                     />
                   </Grid>
 
-                  <Grid item xs={12} sm={6} md={2.5}>
+                  <Grid item xs={6} sm={6} md={2.5}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <RHFAutocomplete
                         name="market"
@@ -261,11 +261,11 @@ export default function MarketDataListPage() {
                     </Box>
                   </Grid>
 
-                  <Grid item xs={12} sm={6} md={2.5}>
+                  <Grid item xs={6} sm={6} md={2.5}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <RHFAutocomplete
                         name="marketType"
-                        label="Filter by game type"
+                        label="Market Type"
                         size="small"
                         options={marketTypeOptiData}
                         getOptionLabel={(option) => option?.name || ''}
@@ -276,7 +276,7 @@ export default function MarketDataListPage() {
                     </Box>
                   </Grid>
 
-                  <Grid item xs={12} sm={6} md={2.5}>
+                  <Grid item xs={6} sm={6} md={2.5}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <RHFAutocomplete
                         name="marketSession"
