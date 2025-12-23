@@ -1,21 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  Typography,
-  Stack,
-  Box,
-  Card,
-  Divider,
-  CircularProgress,
-} from '@mui/material';
+import { Typography, Stack, Box, Card, Divider, CircularProgress } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { fDateTime } from '../../../utils/formatTime';
 import Label from '../../../components/label';
 
-function BidRecordMobileViewCardLayout({
-  data = [],
-  loading = false,
-}) {
+function BidRecordMobileViewCardLayout({ data = [], loading = false }) {
   const theme = useTheme();
 
   const getDisplayDate = (row) => {
@@ -81,12 +71,18 @@ function BidRecordMobileViewCardLayout({
                   color={row.userName === 'Open' ? 'success' : 'warning'}
                   sx={{ textTransform: 'capitalize', fontSize: '0.75rem' }}
                 >
-                  {row.userName || 'N/A'}
+                  {row.game || 'N/A'}
                 </Label>
               </Stack>
-              <Typography variant="body2" color="text.secondary">
-                {row.game || '—'}
-              </Typography>
+              <Stack direction="row" alignItems="center" gap={0.5}>
+                <Typography variant="subtitle1" color="text.secondary">
+                  {row.userName || '—'}
+                </Typography>
+                
+                <Typography variant="subtitle2" color="text.secondary">
+                  ({row.mobile || '—'})
+                </Typography>
+              </Stack>
             </Box>
 
             <Divider sx={{ my: 1.5 }} />
@@ -124,8 +120,8 @@ function BidRecordMobileViewCardLayout({
                 <Typography variant="body2" color="text.secondary">
                   Win Amount:
                 </Typography>
-                <Typography 
-                  variant="body2" 
+                <Typography
+                  variant="body2"
                   fontWeight={500}
                   sx={{ color: row.winAmount > 0 ? 'success.main' : 'text.primary' }}
                 >
@@ -155,4 +151,3 @@ BidRecordMobileViewCardLayout.propTypes = {
 };
 
 export default BidRecordMobileViewCardLayout;
-
