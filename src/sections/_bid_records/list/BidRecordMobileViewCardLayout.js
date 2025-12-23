@@ -72,7 +72,7 @@ function BidRecordMobileViewCardLayout({
           >
             {/* Header */}
             <Box mb={1.5}>
-              <Stack direction="row" justifyContent="space-between" alignItems="center" mb={0.5}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" mb={0.2}>
                 <Typography variant="subtitle1" fontWeight={600} noWrap>
                   {row.marketName || 'N/A'}
                 </Typography>
@@ -84,8 +84,8 @@ function BidRecordMobileViewCardLayout({
                   {row.userName || 'N/A'}
                 </Label>
               </Stack>
-              <Typography variant="caption" color="text.secondary">
-                ID: {row.id || '—'}
+              <Typography variant="body2" color="text.secondary">
+                {row.game || '—'}
               </Typography>
             </Box>
 
@@ -97,7 +97,7 @@ function BidRecordMobileViewCardLayout({
                 <Typography variant="body2" color="text.secondary">
                   Game:
                 </Typography>
-                <Typography variant="body2" fontWeight={500}>
+                <Typography variant="body2" fontWeight={500} sx={{ textTransform: 'capitalize' }}>
                   {row.session || '—'}
                 </Typography>
               </Stack>

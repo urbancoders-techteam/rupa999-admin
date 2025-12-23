@@ -1,4 +1,4 @@
-import { TableCell, TableRow, Typography } from '@mui/material';
+import { TableCell, TableRow, Typography, Tooltip } from '@mui/material';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { PATH_DASHBOARD } from '../../../routes/paths';
@@ -42,13 +42,15 @@ export default function MarketDataTableRow({ index, row, date }) {
       </TableCell>
 
       <TableCell align="left">
-        <Typography
-          variant="body2"
-          onClick={handleNavigate}
-          sx={{ cursor: id ? 'pointer' : 'default', color: id ? 'primary.main' : 'text.primary' }}
-        >
-          {bidsNumber || '—'}
-        </Typography>
+          <Tooltip title="Click" arrow placement="left">
+            <Typography
+              variant="body2"
+              onClick={handleNavigate}
+              sx={{ cursor: 'pointer', color: 'primary.main' }}
+            >
+              {bidsNumber || '—'}
+            </Typography>
+          </Tooltip>
       </TableCell>
 
       <TableCell align="left">

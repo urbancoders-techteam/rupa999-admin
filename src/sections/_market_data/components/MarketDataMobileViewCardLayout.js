@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types';
-import { Box, Stack, Typography, Card, CardContent, Divider } from '@mui/material';
+import { Box, Stack, Typography, Card, CardContent, Divider, Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { PATH_DASHBOARD } from '../../../routes/paths';
+import Label from '../../../components/label';
 
 // ----------------------------------------------------------------------
 
@@ -16,6 +17,14 @@ export default function MarketDataMobileViewCardLayout({ data = [], loading = fa
   const theme = useTheme();
   const navigate = useNavigate();
 
+  const getTypeColor = (typeValue) => {
+    if (!typeValue) return 'default';
+    const lowerType = typeValue.toLowerCase();
+    if (lowerType === 'open') return 'success';
+    if (lowerType === 'close') return 'error';
+    return 'default';
+  };
+
   const handleNavigate = (id) => {
     const url = PATH_DASHBOARD.markets.marketdata.bidrecord(id);
     // Add date as query parameter if provided
@@ -27,12 +36,12 @@ export default function MarketDataMobileViewCardLayout({ data = [], loading = fa
     navigate(queryString ? `${url}?${queryString}` : url);
   };
 
-  const resolveBiddingNumber = (row) => row?.biddingNumber || row?.jodiDigit || row?.number || '—';
-  const resolveTotalAmount = (row) =>
-    row?.totalAmount ??
-    row?.amount ??
-    row?.total ??
-    Object.values(row || {}).reduce((sum, val) => (typeof val === 'number' ? sum + val : sum), 0);
+  // const resolveBiddingNumber = (row) => row?.biddingNumber || row?.jodiDigit || row?.number || '—';
+  // const resolveTotalAmount = (row) =>
+  //   row?.totalAmount ??
+  //   row?.amount ??
+  //   row?.total ??
+  //   Object.values(row || {}).reduce((sum, val) => (typeof val === 'number' ? sum + val : sum), 0);
 
   if (loading) {
     return (
@@ -63,18 +72,22 @@ export default function MarketDataMobileViewCardLayout({ data = [], loading = fa
           <CardContent>
             <Stack spacing={1.25}>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
-                {/* <Typography variant="subtitle2" fontWeight="bold">
-                  Game Name
-                </Typography> */}
                 <Typography variant="subtitle2" fontWeight="bold">
-                  {/* {index + 1} */}
-                  Single Digit
+                  {row.marketName || '—'}
                 </Typography>
+
+                <Label
+                  variant="soft"
+                  color={getTypeColor(row.type)}
+                  sx={{ textTransform: 'capitalize', fontSize: '0.75rem' }}
+                >
+                  {row.type || '—'}
+                </Label>
               </Stack>
 
               <Divider />
 
-              <Stack direction="row" justifyContent="space-between">
+              {/* <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2" color="text.secondary">
                   Bidding Number:
                 </Typography>
@@ -86,31 +99,31 @@ export default function MarketDataMobileViewCardLayout({ data = [], loading = fa
                 >
                   {row.bidsNumber || '—'}
                 </Typography>
-              </Stack>
+              </Stack> */}
 
-              <Stack direction="row" justifyContent="space-between">
+              {/* <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2" color="text.secondary">
                   Type:
                 </Typography>
                 <Typography variant="body2" fontWeight="medium">
                   {row.type ? row.type.charAt(0).toUpperCase() + row.type.slice(1) : '—'}
                 </Typography>
-              </Stack>
+              </Stack> */}
 
-              <Stack direction="row" justifyContent="space-between">
+              {/* <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2" color="text.secondary">
                   Total Amount:
                 </Typography>
                 <Typography variant="body2" fontWeight="medium">
                   {row.totalAmount ? row.totalAmount.toLocaleString() : '0'}
                 </Typography>
-              </Stack>
+              </Stack> */}
 
-              <Box sx={{ pt: 1, borderTop: `1px solid ${theme.palette.divider}` }}>
+              {/* <Box sx={{ pt: 1, borderTop: `1px solid ${theme.palette.divider}` }}>
                 <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
                   Game Type Breakdown:
                 </Typography>
-              </Box>
+              </Box> */}
 
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Typography variant="body2" color="text.secondary">
@@ -122,14 +135,22 @@ export default function MarketDataMobileViewCardLayout({ data = [], loading = fa
               </Stack>
 
               <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Typography
-                  variant="body2"
-                  fontWeight="medium"
-                  onClick={() => handleNavigate(row.id)}
-                  sx={{ cursor: 'pointer', color: 'primary.main', textAlign: 'center' }}
-                >
-                  {row?.bidsNumber}
-                </Typography>
+                {row.id ? (
+                  <Tooltip title="Click" arrow>
+                    <Typography
+                      variant="body2"
+                      fontWeight="medium"
+                      onClick={() => handleNavigate(row.id)}
+                      sx={{ cursor: 'pointer', color: 'primary.main', textAlign: 'center' }}
+                    >
+                      {row?.bidsNumber}
+                    </Typography>
+                  </Tooltip>
+                ) : (
+                  <Typography variant="body2" fontWeight="medium" sx={{ textAlign: 'center' }}>
+                    {row?.bidsNumber}
+                  </Typography>
+                )}
                 <Typography variant="body2" fontWeight="medium" sx={{ textAlign: 'center' }}>
                   {row?.totalAmount}
                 </Typography>

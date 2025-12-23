@@ -211,7 +211,7 @@ export default function BidRecordListPage() {
         {isMobile ? (
           <>
             <BidRecordMobileViewCardLayout
-              data={[]}
+              data={dataFiltered}
               loading={loading}
             />
             <TablePaginationCustom
@@ -277,28 +277,6 @@ export default function BidRecordListPage() {
         )}
       </Container>
 
-      {/* <ConfirmDialog
-        open={openConfirm}
-        onClose={handleCloseConfirm}
-        title="Delete"
-        content={
-          <>
-            Are you sure want to delete <strong> {selected.length} </strong> items?
-          </>
-        }
-        action={
-          <Button
-            variant="contained"
-            color="error"
-            onClick={() => {
-              handleDeleteRows(selected);
-              handleCloseConfirm();
-            }}
-          >
-            Delete
-          </Button>
-        }
-      /> */}
     </>
   );
 }
