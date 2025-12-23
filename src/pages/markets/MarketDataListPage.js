@@ -85,7 +85,7 @@ export default function MarketDataListPage() {
     date: dayjs(),
     market: null,
     marketType: null,
-    marketTime: null,
+    marketSession: null,
     sortBy: null,
     sortOrder: { name: 'Ascending', key: 'asc' },
   };
@@ -139,19 +139,19 @@ export default function MarketDataListPage() {
       }
 
       // Add market time filter
-      if (data.marketTime?.key) {
-        params.session = data.marketTime.key;
+      if (data.marketSession?.key) {
+        params.session = data.marketSession.key;
       }
 
-      // Add sortBy filter
-      if (data.sortBy?.key) {
-        params.sortBy = data.sortBy.key;
-      }
+      // // Add sortBy filter
+      // if (data.sortBy?.key) {
+      //   params.sortBy = data.sortBy.key;
+      // }
 
-      // Add sortOrder filter
-      if (data.sortOrder?.key) {
-        params.sortOrder = data.sortOrder.key;
-      }
+      // // Add sortOrder filter
+      // if (data.sortOrder?.key) {
+      //   params.sortOrder = data.sortOrder.key;
+      // }
 
       await dispatch(getBidDataResultAsync(params)).unwrap();
     } catch (error) {
@@ -184,8 +184,8 @@ export default function MarketDataListPage() {
       }
 
       // Add market time filter
-      if (formValues.marketTime?.key) {
-        params.session = formValues.marketTime.key;
+      if (formValues.marketSession?.key) {
+        params.session = formValues.marketSession.key;
       }
 
       // Add sortBy filter
@@ -211,7 +211,7 @@ export default function MarketDataListPage() {
       formValues.date ||
       formValues.market ||
       formValues.marketType ||
-      formValues.marketTime 
+      formValues.marketSession 
       // formValues.sortBy ||
       // formValues.sortOrder;
     if (hasFilters) {
@@ -304,8 +304,8 @@ export default function MarketDataListPage() {
                   <Grid item xs={12} sm={6} md={2.5}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <RHFAutocomplete
-                        name="marketTime"
-                        label="Market Time"
+                        name="marketSession"
+                        label="Market Session"
                         size="small"
                         options={marketTimeOptions}
                         getOptionLabel={(option) => option?.name || ''}
