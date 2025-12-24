@@ -1,7 +1,8 @@
 import SearchIcon from '@mui/icons-material/Search';
+import ClearIcon from '@mui/icons-material/Clear';
 import { alpha, Autocomplete, Button, Grid, TextField, useTheme } from '@mui/material';
 import PropTypes from 'prop-types';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllMarketsAsync } from '../../../redux/services/market_services';
@@ -38,57 +39,104 @@ export default function PanaChartToolBar({
     },
   });
 
-  const { handleSubmit, control, setValue, watch } = methods;
+  const { handleSubmit, control, setValue, watch, reset } = methods;
   
-  // Watch market type to filter markets
+  // Watch all form values to detect changes
+  const watchedValues = watch();
   const watchedMarketType = watch('marketType');
+
+  // Track applied values (values that were last submitted)
+  const [appliedValues, setAppliedValues] = useState({
+    game: selectedGame,
+    marketType: selectedMarketType || 'Main Market',
+    market: selectedMarket,
+    date: null,
+  });
+
+  // Default values for reset
+  const defaultValues = {
+    game: 'Single Pana',
+    marketType: 'Main Market',
+    market: null,
+    date: null,
+  };
+
+  // Check if current form values differ from applied values
+  const hasFiltersApplied = useMemo(() => {
+    const currentMarketId = watchedValues.market?._id || watchedValues.market?.id || null;
+    const appliedMarketId = appliedValues.market?._id || appliedValues.market?.id || null;
+    
+    return (
+      watchedValues.marketType !== appliedValues.marketType ||
+      watchedValues.game !== appliedValues.game ||
+      currentMarketId !== appliedMarketId
+    );
+  }, [watchedValues, appliedValues]);
 
   // Fetch markets on mount
   useEffect(() => {
     dispatch(getAllMarketsAsync({ page: 1, limit: 1000 }));
   }, [dispatch]);
 
+  // Initialize form with selected values only on mount
   useEffect(() => {
     setValue('game', selectedGame);
-  }, [selectedGame, setValue]);
-
-  useEffect(() => {
     setValue('market', selectedMarket);
-  }, [selectedMarket, setValue]);
-
-  useEffect(() => {
     setValue('marketType', selectedMarketType);
-  }, [selectedMarketType, setValue]);
+    // Initialize applied values only once on mount
+    setAppliedValues({
+      game: selectedGame,
+      marketType: selectedMarketType || 'Main Market',
+      market: selectedMarket,
+      date: null,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run on mount
 
   // Filter markets based on market type
   // Note: Since markets don't have an explicit type field, we'll show all markets for now
   // You may need to add a filter based on your business logic (e.g., naming convention or separate API)
   const filteredMarkets = useMemo(() => marketList || [], [marketList]);
 
-  // Auto-select first market when markets are loaded and market type is selected
-  useEffect(() => {
-    if (
-      watchedMarketType &&
-      filteredMarkets.length > 0 &&
-      !selectedMarket &&
-      onMarketChange
-    ) {
-      const firstMarket = filteredMarkets[0];
-      setValue('market', firstMarket);
-      onMarketChange(firstMarket);
-    }
-  }, [filteredMarkets, watchedMarketType, selectedMarket, setValue, onMarketChange]);
-
   const onSubmit = (data) => {
     console.log('PanaChartToolBar Data:', data);
+    // Store applied values
+    setAppliedValues({
+      game: data.game,
+      marketType: data.marketType,
+      market: data.market,
+      date: data.date,
+    });
+    // Only update parent state when Apply Filters is clicked
     if (onMarketTypeChange && data.marketType) {
       onMarketTypeChange(data.marketType);
     }
-    if (onMarketChange && data.market) {
+    if (onGameChange && data.game) {
+      onGameChange(data.game);
+    }
+    if (onMarketChange) {
       onMarketChange(data.market);
     }
     if (handleDrawerClose) handleDrawerClose();
   };
+
+  const handleClearFilters = () => {
+    // Reset form to default values
+    reset(defaultValues);
+    // Update applied values to defaults
+    setAppliedValues(defaultValues);
+    // Update parent state with default values (this will trigger API calls)
+    if (onMarketTypeChange) {
+      onMarketTypeChange(defaultValues.marketType);
+    }
+    if (onGameChange) {
+      onGameChange(defaultValues.game);
+    }
+    if (onMarketChange) {
+      onMarketChange(defaultValues.market);
+    }
+  };
+
 
   return (
     <FormProvider {...methods}>
@@ -106,22 +154,8 @@ export default function PanaChartToolBar({
                   value={field.value || ''}
                   onChange={(_, newValue) => {
                     field.onChange(newValue);
-                    if (onMarketTypeChange) {
-                      onMarketTypeChange(newValue || '');
-                    }
-                    // Reset market when market type changes, then auto-select first market
+                    // Reset market when market type changes (only in form, not parent state)
                     setValue('market', null);
-                    if (onMarketChange) {
-                      onMarketChange(null);
-                    }
-                    // Auto-select first market after a short delay to ensure markets are available
-                    setTimeout(() => {
-                      if (newValue && filteredMarkets.length > 0 && onMarketChange) {
-                        const firstMarket = filteredMarkets[0];
-                        setValue('market', firstMarket);
-                        onMarketChange(firstMarket);
-                      }
-                    }, 100);
                   }}
                   renderInput={(params) => (
                     <TextField
@@ -164,9 +198,7 @@ export default function PanaChartToolBar({
                   value={field.value || null}
                   onChange={(_, newValue) => {
                     field.onChange(newValue);
-                    if (onMarketChange && newValue) {
-                      onMarketChange(newValue);
-                    }
+                    // Don't update parent state immediately - wait for Apply Filters
                   }}
                   renderInput={(params) => (
                     <TextField
@@ -201,7 +233,7 @@ export default function PanaChartToolBar({
                   onChange={(_, newValue) => {
                     const gameValue = newValue || 'Single Pana';
                     field.onChange(gameValue);
-                    if (onGameChange) onGameChange(gameValue);
+                    // Don't update parent state immediately - wait for Apply Filters
                   }}
                   renderInput={(params) => (
                     <TextField
@@ -223,7 +255,7 @@ export default function PanaChartToolBar({
             />
           </Grid>
 
-          <Grid item xs={12} sm={12} md={3} lg={3}>
+          <Grid item xs={12} sm={6} md={1.8} lg={1.8}>
             <Button
               fullWidth
               variant="contained"
@@ -241,9 +273,34 @@ export default function PanaChartToolBar({
                 transition: 'all 0.2s ease-in-out',
               }}
             >
-              Apply Filters
+             Submit
             </Button>
           </Grid>
+
+          {/* {hasFiltersApplied && ( */}
+            <Grid item xs={12} sm={6} md={1.2} lg={1.2}>
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={handleClearFilters}
+                startIcon={<ClearIcon />}
+                sx={{
+                  height: '40px',
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  borderColor: alpha(theme.palette.error.main, 0.5),
+                  color: 'error.main',
+                  '&:hover': {
+                    borderColor: 'error.main',
+                    backgroundColor: alpha(theme.palette.error.main, 0.08),
+                  },
+                  transition: 'all 0.2s ease-in-out',
+                }}
+              >
+                Clear
+              </Button>
+            </Grid>
+          {/* // )} */}
         </Grid>
       </form>
     </FormProvider>

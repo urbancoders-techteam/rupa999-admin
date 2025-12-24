@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 // @mui
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -33,7 +32,6 @@ export default function PanaChartsListPage() {
   const { themeStretch } = useSettingsContext();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const { marketList } = useSelector((state) => state.market);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedMarketType, setSelectedMarketType] = useState('Main Market');
   const [selectedGame, setSelectedGame] = useState('Single Pana');
@@ -42,26 +40,19 @@ export default function PanaChartsListPage() {
   const handleDrawerOpen = () => setDrawerOpen(true);
   const handleDrawerClose = () => setDrawerOpen(false);
 
-  // Reset market when market type changes and auto-select first market
+  // Update market type only - don't reset market (let user control it through form)
   const handleMarketTypeChange = (marketType) => {
     setSelectedMarketType(marketType);
-    setSelectedMarket(null); // Reset market selection when market type changes
-    // Auto-select first market after reset
-    if (marketType && marketList && marketList.length > 0) {
-      setTimeout(() => {
-        const firstMarket = marketList[0];
-        setSelectedMarket(firstMarket);
-      }, 100);
-    }
+    // Don't reset market - let the form handle it when user clicks Submit
   };
 
   // Auto-select first market when markets are loaded and no market is selected
-  useEffect(() => {
-    if (selectedMarketType && marketList && marketList.length > 0 && !selectedMarket) {
-      const firstMarket = marketList[0];
-      setSelectedMarket(firstMarket);
-    }
-  }, [marketList, selectedMarketType, selectedMarket]);
+  // useEffect(() => {
+  //   if (selectedMarketType && marketList && marketList.length > 0 && !selectedMarket) {
+  //     const firstMarket = marketList[0];
+  //     setSelectedMarket(firstMarket);
+  //   }
+  // }, [marketList, selectedMarketType, selectedMarket]);
 
   return (
     <>
