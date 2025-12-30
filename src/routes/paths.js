@@ -77,6 +77,13 @@ export const PATH_DASHBOARD = {
   settings: {
     root: path(ROOTS_DASHBOARD, '/settings'),
   },
+  faq: {
+    root: path(ROOTS_DASHBOARD, '/settings/faq'),
+    list: path(ROOTS_DASHBOARD, '/settings/faq/list'),
+    new: path(ROOTS_DASHBOARD, '/settings/faq/new'),
+    edit: (id) => path(ROOTS_DASHBOARD, `/settings/faq/${id}/edit`),
+    view: (id) => path(ROOTS_DASHBOARD, `/settings/faq/${id}/view`),
+  },
   notifications: {
     root: path(ROOTS_DASHBOARD, '/settings/notifications'),
     list: path(ROOTS_DASHBOARD, '/settings/notifications/list'),

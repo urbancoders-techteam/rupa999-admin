@@ -120,13 +120,13 @@ const navConfig = [
             path: PATH_DASHBOARD.notifications.list,
           },
           {
+            title: 'FAQ',
+            path: PATH_DASHBOARD.faq.list,
+          },
+          {
             title: 'Mobile App Marque',
             path: PATH_DASHBOARD.marquemessage.form,
           },
-          // {
-          //   title: 'change password',
-          //   path: PATH_DASHBOARD.changepassword.form,
-          // },
           { title: 'slider images', path: PATH_DASHBOARD.sliderimage.root },
           {
             title: 'Help and Support',

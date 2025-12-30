@@ -57,6 +57,8 @@ import {
   UserTransactionListPage,
   WinHistoryListPage,
   WithdrawDetailsListPage,
+  FaqListPage,
+  FaqFormHandle,
 } from './elements';
 
 // ----------------------------------------------------------------------
@@ -153,6 +155,19 @@ export default function Router() {
         {
           path: 'settings',
           children: [
+            {
+              path: 'faq',
+              children: [
+                {
+                  element: <Navigate to="/dashboard/settings/faq/list" replace />,
+                  index: true,
+                },
+                { path: 'list', element: <FaqListPage /> },
+                { path: 'new', element: <FaqFormHandle /> },
+                { path: ':id/edit', element: <FaqFormHandle /> },
+                { path: ':id/view', element: <FaqFormHandle /> },
+              ],
+            },
             {
               path: 'changepassword',
               children: [

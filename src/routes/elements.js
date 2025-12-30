@@ -44,6 +44,7 @@ export const ProfitPage = Loadable(lazy(() => import('../pages/ProfitPage')));
 // DASHBOARD: General Settings | Change Password
 export const ResetPasswordPage = Loadable(lazy(() => import('../pages/auth/ResetPasswordPage')));
 
+
 // DASHBOARD: Gift
 export const GiftPage = Loadable(lazy(() => import('../pages/GiftListPage')));
 export const GiftFormHandlePage = Loadable(lazy(() => import('../sections/_gift/pages/GiftFormHandlePage')));
@@ -119,6 +120,10 @@ export const HelpAndSupportFormPage = Loadable(lazy(() => import('../pages/setti
 
 // DASHBOARD: Mobile App Marque Message
 export const MarqueMessageFormPage = Loadable(lazy(() => import('../pages/settings/MarqueMessageForm')));
+
+// DASHBOARD: FAQ
+export const FaqListPage = Loadable(lazy(() => import('../pages/settings/FaqListPage')));
+export const FaqFormHandle = Loadable(lazy(() => import('../sections/_faq/pages/FaqFormHandle')));
 
 // BASIC PAGES
 export const Page500 = Loadable(lazy(() => import('../pages/errorHandlingPage/Page500')));
