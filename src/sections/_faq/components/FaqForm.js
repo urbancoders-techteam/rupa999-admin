@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
-import { Card, Grid, Stack } from '@mui/material';
+import { Button, Card, Grid, Stack } from '@mui/material';
 import * as Yup from 'yup';
 import PropTypes from 'prop-types';
 import { useEffect, useMemo } from 'react';
@@ -21,11 +21,13 @@ const FaqSchema = Yup.object().shape({
 
 FaqForm.propTypes = {
   isView: PropTypes.bool,
+  isEdit: PropTypes.bool,
   initialData: PropTypes.object,
   onSubmit: PropTypes.func.isRequired,
+  onCancel: PropTypes.func,
 };
 
-export default function FaqForm({ isView = false, initialData = {}, onSubmit }) {
+export default function FaqForm({ isView = false, isEdit = false, initialData = {}, onSubmit, onCancel }) {
   const defaultValues = useMemo(
     () => ({
       question: initialData?.question || '',
@@ -47,10 +49,9 @@ export default function FaqForm({ isView = false, initialData = {}, onSubmit }) 
   } = methods;
 
   useEffect(() => {
-    if (isView && initialData) {
-      reset(defaultValues);
-    }
-  }, [isView, initialData, reset, defaultValues]);
+    // Always reset when default values change (e.g., switching between add/edit/view)
+    reset(defaultValues);
+  }, [reset, defaultValues]);
 
   const handleFormSubmit = async (data) => {
     try {
@@ -87,15 +88,32 @@ export default function FaqForm({ isView = false, initialData = {}, onSubmit }) 
             />
           </Grid>
 
-          {!isView && (
-            <Grid item xs={12}>
-              <Stack direction="row" spacing={2}>
+          <Grid item xs={12}>
+            <Stack direction="row" spacing={2}>
+              {isView && (
+                <Button variant="outlined" onClick={onCancel}>
+                  Back
+                </Button>
+              )}
+
+              {!isView && isEdit && (
+                <>
+                  <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
+                    Update
+                  </LoadingButton>
+                  <Button variant="outlined" color="error" onClick={onCancel}>
+                    Cancel
+                  </Button>
+                </>
+              )}
+
+              {!isView && !isEdit && (
                 <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
-                  Create FAQ
+                  Add FAQ
                 </LoadingButton>
-              </Stack>
-            </Grid>
-          )}
+              )}
+            </Stack>
+          </Grid>
         </Grid>
       </FormProvider>
     </Card>

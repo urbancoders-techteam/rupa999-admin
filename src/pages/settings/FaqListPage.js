@@ -30,29 +30,31 @@ import {
   TableSelectedAction,
   useTable,
 } from '../../components/table';
-import { deleteNotificationAsync, getAllNotificationsAsync } from '../../redux/services/notification_services';
+import { deleteFAQAsync, getAllFAQsAsync } from '../../redux/services/faq_services';
 import FaqTableRow from '../../sections/_faq/components/FaqTableRow';
 
 const TABLE_HEAD = [
   { id: 'sno', label: 'S.no', align: 'left' },
   { id: 'question', label: 'Question', align: 'left' },
   { id: 'answer', label: 'Answer', align: 'left' },
+  { id: 'createdAt', label: 'Created At', align: 'left' },
+  { id: 'updatedAt', label: 'Updated At', align: 'left' },
   { id: 'action', label: 'Action', align: 'right' },
 ];
 
 export default function FaqListPage() {
-  const { dense, page, rowsPerPage, setPage, selected, setSelected, onSelectRow, onSelectAllRows, onChangeDense, onChangePage, onChangeRowsPerPage, } = useTable();
+  const { dense, page, rowsPerPage, selected, setSelected, onSelectRow, onSelectAllRows, onChangeDense, onChangePage, onChangeRowsPerPage, } = useTable();
 
   const { themeStretch } = useSettingsContext();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
 
-  const { notificationList, loading, pagination } = useSelector((state) => state.notification);
+  const { faqList, loading, pagination } = useSelector((state) => state.faq);
 
   useEffect(() => {
     dispatch(
-      getAllNotificationsAsync({
+      getAllFAQsAsync({
         page: page + 1, // API uses 1-based pagination
         limit: rowsPerPage,
       })
@@ -60,33 +62,42 @@ export default function FaqListPage() {
   }, [dispatch, page, rowsPerPage]);
 
   // Transform API data to table format
-  const tableData = (notificationList || []).map((notification, index) => ({
-    id: notification._id,
-    _id: notification._id,
+  const tableData = (faqList || []).map((faq, index) => ({
+    id: faq._id,
+    _id: faq._id,
     sno: (page * rowsPerPage) + index + 1,
-    question: notification.question || notification.title || 'N/A',
-    answer: notification.answer || notification.description || 'N/A',
-    createdAt: notification.createdAt,
-    isActive: notification.isActive,
+    question: faq.question || faq.title || 'N/A',
+    answer: faq.answer || faq.description || 'N/A',
+    createdAt: faq.createdAt,
+    updatedAt: faq.updatedAt,
+    isActive: faq.isActive,
   }));
 
   const dataInPage = tableData;
 
   const handleDeleteRow = async (id) => {
     try {
-      await dispatch(deleteNotificationAsync(id)).unwrap();
+      await dispatch(deleteFAQAsync(id)).unwrap();
       enqueueSnackbar('FAQ deleted successfully', { variant: 'success' });
       setSelected([]);
       // Refresh list
-      // dispatch(
-      //   getAllFAQsAsync({
-      //     page: page + 1,
-      //     limit: rowsPerPage,
-      //   })
-      // );
+      dispatch(
+        getAllFAQsAsync({
+          page: page + 1,
+          limit: rowsPerPage,
+        })
+      );
     } catch (error) {
       enqueueSnackbar(error?.message || 'Failed to delete FAQ', { variant: 'error' });
     }
+  };
+
+  const handleViewRow = (id) => {
+    navigate(PATH_DASHBOARD.faq.view(id));
+  };
+
+  const handleEditRow = (id) => {
+    navigate(PATH_DASHBOARD.faq.edit(id));
   };
 
   return (
@@ -135,6 +146,8 @@ export default function FaqListPage() {
                           index={row.sno}
                           selected={selected.includes(row.id)}
                           onSelectRow={() => onSelectRow(row.id)}
+                          onViewRow={() => handleViewRow(row.id)}
+                          onEditRow={() => handleEditRow(row.id)}
                           onDeleteRow={() => handleDeleteRow(row.id)}
                         />
                       ))}
