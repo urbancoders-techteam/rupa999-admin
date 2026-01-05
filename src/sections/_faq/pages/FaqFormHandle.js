@@ -46,21 +46,20 @@ export default function FaqFormHandle() {
 
   // Fetch FAQ data if viewing or editing
   useEffect(() => {
-    if ((viewMode.isView || id) && !state) {
+    if ((mode.isView || id) && !currentFaq) {
       dispatch(getFaqByIdAsync(id));
     }
-  }, [id, dispatch]);
+  }, [id, dispatch, mode.isView, currentFaq]);
 
-  // Use state data if available, otherwise use currentFaq from Redux
+  // Use currentFaq from Redux
   const initialData = useMemo(() => {
-    if (state) return state;
     if (currentFaq) return currentFaq;
     return {};
-  }, [state, currentFaq]);
+  }, [currentFaq]);
 
   const handleSubmit = async (values) => {
     try {
-      if (id && !viewMode.isView) {
+      if (id && !mode.isView) {
         // Update existing FAQ
         await dispatch(updateFaqAsync({ id, data: values })).unwrap();
         enqueueSnackbar('FAQ updated successfully', { variant: 'success' });
@@ -98,10 +97,11 @@ export default function FaqFormHandle() {
         />
 
         <FaqForm
-          isView={viewMode.isView}
+          isView={mode.isView}
           initialData={initialData}
           onSubmit={handleSubmit}
-          isEdit={!!id && !viewMode.isView}
+          isEdit={!!id && !mode.isView}
+          onCancel={handleCancel}
         />
       </Container >
     </>

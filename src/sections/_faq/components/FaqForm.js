@@ -24,10 +24,10 @@ FaqForm.propTypes = {
   isEdit: PropTypes.bool,
   initialData: PropTypes.object,
   onSubmit: PropTypes.func.isRequired,
-  isEdit: PropTypes.bool,
+  onCancel: PropTypes.func,
 };
 
-export default function FaqForm({ isView = false, initialData = {}, onSubmit, isEdit = false }) {
+export default function FaqForm({ isView = false, initialData = {}, onSubmit, isEdit = false, onCancel }) {
   const defaultValues = useMemo(
     () => ({
       question: initialData?.question || '',
