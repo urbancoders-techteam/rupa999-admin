@@ -6,6 +6,7 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 import CustomBreadcrumbs from '../../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../../components/settings';
 import { useSnackbar } from '../../../components/snackbar';
+import { createFaqAsync, getFaqByIdAsync, updateFaqAsync } from '../../../redux/services/faq_services';
 import { PATH_DASHBOARD } from '../../../routes/paths';
 import FaqForm from '../components/FaqForm';
 
@@ -16,7 +17,7 @@ export default function FaqFormHandle() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
-//   const { currentFAQ } = useSelector((body) => body.faq);
+  const { currentFaq } = useSelector((rootState) => rootState.faq);
 
   const viewMode = useMemo(() => {
     if (id && /view/i?.test(pathname)) {
@@ -33,28 +34,35 @@ export default function FaqFormHandle() {
     };
   }, [pathname, id]);
 
-  // Fetch notification data if viewing
+  // Fetch FAQ data if viewing or editing
   useEffect(() => {
-    if (viewMode.isView && id && !state) {
-    //   dispatch(getFAQByIdAsync(id));
+    if ((viewMode.isView || id) && !state) {
+      dispatch(getFaqByIdAsync(id));
     }
   }, [id, viewMode.isView, dispatch, state]);
 
-  // Use state data if available, otherwise use currentFAQ from Redux
-//   const initialData = useMemo(() => {
-//     if (state) return state;
-//     if (currentFAQ) return currentFAQ;
-//     return {};
-//   }, [state, currentFAQ]);
+  // Use state data if available, otherwise use currentFaq from Redux
+  const initialData = useMemo(() => {
+    if (state) return state;
+    if (currentFaq) return currentFaq;
+    return {};
+  }, [state, currentFaq]);
 
   const handleSubmit = async (values) => {
     try {
-    //   await dispatch(createFAQAsync(values)).unwrap();
-      enqueueSnackbar('FAQ created successfully', { variant: 'success' });
+      if (id && !viewMode.isView) {
+        // Update existing FAQ
+        await dispatch(updateFaqAsync({ id, data: values })).unwrap();
+        enqueueSnackbar('FAQ updated successfully', { variant: 'success' });
+      } else {
+        // Create new FAQ
+        await dispatch(createFaqAsync(values)).unwrap();
+        enqueueSnackbar('FAQ created successfully', { variant: 'success' });
+      }
       navigate(PATH_DASHBOARD.faq.list);
     } catch (error) {
       const errorMessage =
-        error?.response?.data?.message || error?.message || 'Failed to create FAQ';
+        error?.response?.data?.message || error?.message || 'Failed to save FAQ';
       enqueueSnackbar(errorMessage, { variant: 'error' });
     }
   };
@@ -75,9 +83,12 @@ export default function FaqFormHandle() {
           ]}
         />
 
-        <FaqForm isView={viewMode.isView} 
-        // initialData={initialData}
-         onSubmit={handleSubmit} />
+        <FaqForm 
+          isView={viewMode.isView} 
+          initialData={initialData} 
+          onSubmit={handleSubmit}
+          isEdit={!!id && !viewMode.isView}
+        />
       </Container>
     </>
   );

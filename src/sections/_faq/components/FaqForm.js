@@ -23,9 +23,10 @@ FaqForm.propTypes = {
   isView: PropTypes.bool,
   initialData: PropTypes.object,
   onSubmit: PropTypes.func.isRequired,
+  isEdit: PropTypes.bool,
 };
 
-export default function FaqForm({ isView = false, initialData = {}, onSubmit }) {
+export default function FaqForm({ isView = false, initialData = {}, onSubmit, isEdit = false }) {
   const defaultValues = useMemo(
     () => ({
       question: initialData?.question || '',
@@ -91,7 +92,7 @@ export default function FaqForm({ isView = false, initialData = {}, onSubmit }) 
             <Grid item xs={12}>
               <Stack direction="row" spacing={2}>
                 <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
-                  Create FAQ
+                  {isEdit ? 'Update FAQ' : 'Create FAQ'}
                 </LoadingButton>
               </Stack>
             </Grid>

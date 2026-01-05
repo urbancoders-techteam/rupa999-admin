@@ -3,6 +3,7 @@ import storage from 'redux-persist/lib/storage';
 // slices
 import authReducer from './slices/auth_slices';
 import bidReducer from './slices/bid_slices';
+import faqReducer from './slices/faq_slices';
 import marketResultReducer from './slices/market_result_slices';
 import marketReducer from './slices/market_slices';
 import notificationReducer from './slices/notification_slices';
@@ -30,6 +31,7 @@ const rootReducer = combineReducers({
   marketResult: marketResultReducer,
   user: userReducer,
   notification: notificationReducer,
+  faq: faqReducer,
 });
 
 export default rootReducer;

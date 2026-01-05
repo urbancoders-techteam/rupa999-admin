@@ -30,7 +30,7 @@ import {
   TableSelectedAction,
   useTable,
 } from '../../components/table';
-import { deleteNotificationAsync, getAllNotificationsAsync } from '../../redux/services/notification_services';
+import { deleteFaqAsync, getAllFaqsAsync } from '../../redux/services/faq_services';
 import FaqTableRow from '../../sections/_faq/components/FaqTableRow';
 
 const TABLE_HEAD = [
@@ -48,11 +48,11 @@ export default function FaqListPage() {
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
 
-  const { notificationList, loading, pagination } = useSelector((state) => state.notification);
+  const { faqList, loading, pagination } = useSelector((state) => state.faq);
 
   useEffect(() => {
     dispatch(
-      getAllNotificationsAsync({
+      getAllFaqsAsync({
         page: page + 1, // API uses 1-based pagination
         limit: rowsPerPage,
       })
@@ -60,30 +60,30 @@ export default function FaqListPage() {
   }, [dispatch, page, rowsPerPage]);
 
   // Transform API data to table format
-  const tableData = (notificationList || []).map((notification, index) => ({
-    id: notification._id,
-    _id: notification._id,
+  const tableData = (faqList || []).map((faq, index) => ({
+    id: faq._id,
+    _id: faq._id,
     sno: (page * rowsPerPage) + index + 1,
-    question: notification.question || notification.title || 'N/A',
-    answer: notification.answer || notification.description || 'N/A',
-    createdAt: notification.createdAt,
-    isActive: notification.isActive,
+    question: faq.question || 'N/A',
+    answer: faq.answer || 'N/A',
+    createdAt: faq.createdAt,
+    isActive: faq.isActive,
   }));
 
   const dataInPage = tableData;
 
   const handleDeleteRow = async (id) => {
     try {
-      await dispatch(deleteNotificationAsync(id)).unwrap();
+      await dispatch(deleteFaqAsync(id)).unwrap();
       enqueueSnackbar('FAQ deleted successfully', { variant: 'success' });
       setSelected([]);
       // Refresh list
-      // dispatch(
-      //   getAllFAQsAsync({
-      //     page: page + 1,
-      //     limit: rowsPerPage,
-      //   })
-      // );
+      dispatch(
+        getAllFaqsAsync({
+          page: page + 1,
+          limit: rowsPerPage,
+        })
+      );
     } catch (error) {
       enqueueSnackbar(error?.message || 'Failed to delete FAQ', { variant: 'error' });
     }
