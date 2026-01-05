@@ -1,10 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 import {
+  createFaqAsync,
+  deleteFaqAsync,
   getAllFaqsAsync,
   getFaqByIdAsync,
-  createFaqAsync,
   updateFaqAsync,
-  deleteFaqAsync,
 } from '../services/faq_services';
 
 const initialState = {

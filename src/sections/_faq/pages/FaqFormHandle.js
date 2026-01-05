@@ -13,24 +13,34 @@ import FaqForm from '../components/FaqForm';
 export default function FaqFormHandle() {
   const { themeStretch } = useSettingsContext();
   const { id } = useParams();
-  const { pathname = '', state } = useLocation();
+  const { pathname = '' } = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
   const { currentFaq } = useSelector((rootState) => rootState.faq);
 
-  const viewMode = useMemo(() => {
+  const mode = useMemo(() => {
     if (id && /view/i?.test(pathname)) {
       return {
         title: 'FAQ: View | Rupa999',
         heading: 'View FAQ',
         isView: true,
+        isEdit: false,
+      };
+    }
+    if (id && /edit/i?.test(pathname)) {
+      return {
+        title: 'FAQ: Edit | Rupa999',
+        heading: 'Edit FAQ',
+        isView: false,
+        isEdit: true,
       };
     }
     return {
       title: 'FAQ: Create | Rupa999',
       heading: 'Create FAQ',
       isView: false,
+      isEdit: false,
     };
   }, [pathname, id]);
 
@@ -39,7 +49,7 @@ export default function FaqFormHandle() {
     if ((viewMode.isView || id) && !state) {
       dispatch(getFaqByIdAsync(id));
     }
-  }, [id, viewMode.isView, dispatch, state]);
+  }, [id, dispatch]);
 
   // Use state data if available, otherwise use currentFaq from Redux
   const initialData = useMemo(() => {
@@ -67,29 +77,33 @@ export default function FaqFormHandle() {
     }
   };
 
+  const handleCancel = () => {
+    navigate(PATH_DASHBOARD.faq.list);
+  };
+
   return (
     <>
       <Helmet>
-        <title>{viewMode.title}</title>
+        <title>{mode.title}</title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'lg'}>
         <CustomBreadcrumbs
-          heading={viewMode.heading}
+          heading={mode.heading}
           links={[
             { name: 'Dashboard', href: PATH_DASHBOARD.root },
             { name: 'FAQ', href: PATH_DASHBOARD.faq.list },
-            { name: viewMode.heading },
+            { name: mode.heading },
           ]}
         />
 
-        <FaqForm 
-          isView={viewMode.isView} 
-          initialData={initialData} 
+        <FaqForm
+          isView={viewMode.isView}
+          initialData={initialData}
           onSubmit={handleSubmit}
           isEdit={!!id && !viewMode.isView}
         />
-      </Container>
+      </Container >
     </>
   );
 }

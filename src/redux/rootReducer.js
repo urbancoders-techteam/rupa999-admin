@@ -7,6 +7,7 @@ import faqReducer from './slices/faq_slices';
 import marketResultReducer from './slices/market_result_slices';
 import marketReducer from './slices/market_slices';
 import notificationReducer from './slices/notification_slices';
+import faqReducer from './slices/faq_slices';
 import permissionReducer from './slices/permission_slices';
 import roleReducer from './slices/role_slices';
 import staffReducer from './slices/staff_slices';

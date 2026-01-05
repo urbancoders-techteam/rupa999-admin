@@ -37,11 +37,13 @@ const TABLE_HEAD = [
   { id: 'sno', label: 'S.no', align: 'left' },
   { id: 'question', label: 'Question', align: 'left' },
   { id: 'answer', label: 'Answer', align: 'left' },
+  { id: 'createdAt', label: 'Created At', align: 'left' },
+  { id: 'updatedAt', label: 'Updated At', align: 'left' },
   { id: 'action', label: 'Action', align: 'right' },
 ];
 
 export default function FaqListPage() {
-  const { dense, page, rowsPerPage, setPage, selected, setSelected, onSelectRow, onSelectAllRows, onChangeDense, onChangePage, onChangeRowsPerPage, } = useTable();
+  const { dense, page, rowsPerPage, selected, setSelected, onSelectRow, onSelectAllRows, onChangeDense, onChangePage, onChangeRowsPerPage, } = useTable();
 
   const { themeStretch } = useSettingsContext();
   const navigate = useNavigate();
@@ -87,6 +89,14 @@ export default function FaqListPage() {
     } catch (error) {
       enqueueSnackbar(error?.message || 'Failed to delete FAQ', { variant: 'error' });
     }
+  };
+
+  const handleViewRow = (id) => {
+    navigate(PATH_DASHBOARD.faq.view(id));
+  };
+
+  const handleEditRow = (id) => {
+    navigate(PATH_DASHBOARD.faq.edit(id));
   };
 
   return (
@@ -135,6 +145,8 @@ export default function FaqListPage() {
                           index={row.sno}
                           selected={selected.includes(row.id)}
                           onSelectRow={() => onSelectRow(row.id)}
+                          onViewRow={() => handleViewRow(row.id)}
+                          onEditRow={() => handleEditRow(row.id)}
                           onDeleteRow={() => handleDeleteRow(row.id)}
                         />
                       ))}
