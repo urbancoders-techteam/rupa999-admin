@@ -52,6 +52,8 @@ export default function MarketDataMobileViewCardLayout({ data = [], loading = fa
     );
   }
 
+  console.log("data::::::::::>", data);
+
   return (
     <Stack spacing={2} sx={{ p: 2 }}>
       {data.map((row, index) => (
@@ -66,7 +68,7 @@ export default function MarketDataMobileViewCardLayout({ data = [], loading = fa
             <Stack spacing={1.25}>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Typography variant="subtitle2" fontWeight="bold">
-                  {row.marketName || '—'}
+                  {row.gameType || '—'}
                 </Typography>
 
                 <Label
@@ -88,28 +90,17 @@ export default function MarketDataMobileViewCardLayout({ data = [], loading = fa
                   Total Amount
                 </Typography>
               </Stack>
-
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
-                {row.id ? (
-                  <Tooltip title="Click" arrow>
-                    <Typography
-                      variant="body2"
-                      fontWeight="medium"
-                      onClick={() => handleNavigate(row.id)}
-                      sx={{ cursor: 'pointer', color: 'primary.main', textAlign: 'center' }}
-                    >
-                      {row?.bidsNumber}
-                    </Typography>
-                  </Tooltip>
-                ) : (
-                  <Typography variant="body2" fontWeight="medium" sx={{ textAlign: 'center' }}>
-                    {row?.bidsNumber}
+              
+              {row?.bidData?.map((item) => (
+                <Stack key={item.id} direction="row" justifyContent="space-between" alignItems="center">
+                  <Typography variant="body2" color="text.secondary" textAlign="center">
+                    {item.bidsNumber}
                   </Typography>
-                )}
-                <Typography variant="body2" fontWeight="medium" sx={{ textAlign: 'center' }}>
-                  {row?.totalAmount}
-                </Typography>
-              </Stack>
+                  <Typography variant="body2" color="text.secondary" textAlign="center">
+                    {item.totalAmount}
+                  </Typography>
+                </Stack>
+              ))}
             </Stack>
           </CardContent>
         </Card>
