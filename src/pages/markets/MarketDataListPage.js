@@ -50,12 +50,12 @@ const marketTimeOptions = [
 ];
 
 const TABLE_HEAD = [
+  { id: 'expand', label: '', align: 'center', width: 40 },
   { id: 'srNo', label: 'Sr No.', align: 'center' },
-  { id: 'biddingNumber', label: 'Bidding Number', align: 'left' },
-  { id: 'type', label: 'Type', align: 'left' },
-  { id: 'marketName', label: 'Market Name', align: 'left' },
-  { id: 'totalBidsUserCount', label: 'User Count', align: 'left' },
-  { id: 'totalAmount', label: 'Total Amount', align: 'left' },
+  { id: 'gameType', label: 'Game Type', align: 'left' },
+  { id: 'session', label: 'Session', align: 'left' },
+  { id: 'bidCount', label: 'Bid Count', align: 'left' },
+  { id: 'groupTotal', label: 'Group Total', align: 'left' },
 ];
 
 // ----------------------------------------------------------------------
@@ -87,6 +87,7 @@ export default function MarketDataListPage() {
   const { handleSubmit, watch } = methods;
 
   const selectedDate = watch('date');
+  const selectedMarket = watch('market');
 
   // Fetch markets on component mount
   useEffect(() => {
@@ -196,21 +197,13 @@ export default function MarketDataListPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, rowsPerPage]);
 
-  useEffect(() => {
-    dispatch(
-      getAllMarketsAsync({
-        page: 1, // API uses 1-based pagination
-        limit: 100,
-      })
-    );
-  }, [dispatch]);
-
   const isNotFound = !bidDataResult.length && !loading;
 
   const headingDate = selectedDate ? dayjs(selectedDate).format('DD-MM-YYYY') : 'N/A';
   const dateForApi = selectedDate
     ? dayjs(selectedDate).format('YYYY-MM-DD')
     : dayjs().format('YYYY-MM-DD');
+  const marketIdForApi = selectedMarket?._id || '';
   const paginationPage = pagination?.page ? pagination.page - 1 : page;
   const tableSize = dense ? 'medium' : 'small';
 
@@ -219,7 +212,12 @@ export default function MarketDataListPage() {
   if (isMobile) {
     tableSection = (
       <>
-        <MarketDataMobileViewCardLayout data={bidDataResult} loading={loading} date={dateForApi} />
+        <MarketDataMobileViewCardLayout
+          data={bidDataResult}
+          loading={loading}
+          date={dateForApi}
+          marketId={marketIdForApi}
+        />
         <TablePaginationCustom
           page={paginationPage}
           count={pagination?.total || 0}
@@ -237,7 +235,7 @@ export default function MarketDataListPage() {
         <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
           <Scrollbar>
             <Table size={tableSize}>
-              <TableHeadCustom headLabel={TABLE_HEAD} rowCount={marketList.length} />
+              <TableHeadCustom headLabel={TABLE_HEAD} rowCount={bidDataResult.length} />
 
               <TableBody>
                 {loading ? (
@@ -250,10 +248,11 @@ export default function MarketDataListPage() {
                   <>
                     {bidDataResult.map((row, index) => (
                       <MarketDataTableRow
-                        key={row.id || row.bidsNumber || index}
+                        key={`${row?.gameType || 'game'}-${row?.type || 'type'}-${index}`}
                         index={index}
                         row={row}
                         date={dateForApi}
+                        marketId={marketIdForApi}
                       />
                     ))}
 

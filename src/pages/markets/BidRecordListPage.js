@@ -59,6 +59,7 @@ export default function BidRecordListPage() {
   const { id } = useParams(); // Get id from route params (format: digit_type)
   const [searchParams] = useSearchParams(); // Get query parameters
   const date = searchParams.get('date'); // Get date from query params
+  const marketId = searchParams.get('marketId'); // Get marketId from query params
 
   const { bidRecordsList, loading, pagination } = useSelector((state) => state.bid);
 
@@ -83,9 +84,14 @@ export default function BidRecordListPage() {
         params.date = date;
       }
 
+      // Add marketId filter if provided
+      if (marketId) {
+        params.marketId = marketId;
+      }
+
       dispatch(getBidRecordsByDigitAndTypeAsync(params));
     }
-  }, [dispatch, id, page, rowsPerPage, date]);
+  }, [dispatch, id, page, rowsPerPage, date, marketId]);
 
   // Transform API data to table format
   const tableData = useMemo(
