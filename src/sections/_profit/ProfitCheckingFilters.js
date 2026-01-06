@@ -122,20 +122,13 @@ const ProfitCheckingFilters = () => {
         ? subMenuValue.id
         : subMenuValue.id.toString();
       profitParams.marketId = marketIdStr;
-      console.log('Submitting with marketId:', marketIdStr, 'Type:', typeof marketIdStr);
-    } else {
-      console.log('No market selected');
     }
-
-    console.log('Profit params:', profitParams);
 
     // Prepare API parameters for yearly profit bids
     const yearlyParams = {};
     if (subMenuValue && subMenuValue.id) {
       yearlyParams.marketId = subMenuValue.id;
     }
-
-    console.log('Yearly params:', yearlyParams);
 
     // Call profit bids API
     dispatch(getProfitBidsAsync(profitParams));

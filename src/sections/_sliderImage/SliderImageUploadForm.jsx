@@ -71,7 +71,6 @@ export default function SliderImageUploadForm({ isEdit, currentProduct }) {
       reset();
       enqueueSnackbar(!isEdit ? 'Create success!' : 'Update success!');
       navigate(PATH_DASHBOARD.eCommerce.list);
-      console.log('DATA', data);
     } catch (error) {
       console.error(error);
     }
@@ -120,7 +119,6 @@ export default function SliderImageUploadForm({ isEdit, currentProduct }) {
                   onDrop={handleDrop}
                   onRemove={handleRemoveFile}
                   onRemoveAll={handleRemoveAllFiles}
-                  onUpload={() => console.log('ON UPLOAD')}
                 />
               </Stack>
             </Stack>

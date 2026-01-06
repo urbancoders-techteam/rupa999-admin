@@ -99,7 +99,6 @@ export default function PanaChartToolBar({
   const filteredMarkets = useMemo(() => marketList || [], [marketList]);
 
   const onSubmit = (data) => {
-    console.log('PanaChartToolBar Data:', data);
     // Store applied values
     setAppliedValues({
       game: data.game,

@@ -76,7 +76,6 @@ export default function GiftListPage() {
   const navigate = useNavigate();
 
   const [tableData, setTableData] = useState(giftListData);
-  console.log('tableData :>> ', tableData);
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
@@ -84,8 +83,6 @@ export default function GiftListPage() {
     inputData: tableData,
     comparator: getComparator(order, orderBy),
   });
-
-  console.log('dataFiltered :>> ', dataFiltered);
 
   const dataInPage = tableData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 

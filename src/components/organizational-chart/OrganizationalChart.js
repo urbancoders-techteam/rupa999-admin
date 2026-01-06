@@ -7,6 +7,8 @@ import flattenArray from '../../utils/flattenArray';
 //
 import { SimpleNode, StandardNode, GroupNode } from './node';
 
+const noop = () => {};
+
 // ----------------------------------------------------------------------
 
 OrganizationalChart.propTypes = {
@@ -33,8 +35,8 @@ export default function OrganizationalChart({ data, variant = 'simple', sx, ...o
           <StandardNode
             sx={sx}
             node={data}
-            onEdit={() => console.log('EDIT', data.name)}
-            onDelete={() => console.log('DELETE', data.name)}
+            onEdit={noop}
+            onDelete={noop}
           />
         )) ||
         (variant === 'group' && <GroupNode sx={sx} node={data} />)
@@ -71,8 +73,8 @@ export function List({ data, depth, variant, sx }) {
           <StandardNode
             sx={sx}
             node={data}
-            onEdit={() => console.log('EDIT', data.name)}
-            onDelete={() => console.log('DELETE', data.name)}
+            onEdit={noop}
+            onDelete={noop}
           />
         )) ||
         (variant === 'group' && (

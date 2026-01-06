@@ -62,7 +62,6 @@ export default function StaticDataForm({ currentData }) {
 
   const onSubmit = async (data) => {
     try {
-      console.log('Form Data:', data);
       // TODO: Replace with actual API call
       // await dispatch(updateStaticDataAsync(data)).unwrap();
       

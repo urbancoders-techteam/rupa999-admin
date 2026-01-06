@@ -198,7 +198,6 @@ export default function BulkUploadMarketResults({ selectedMarketId: propSelected
 
                 if (data.type === 'connected') {
                   // Upload started
-                  console.log('Upload started');
                 } else if (data.type === 'progress') {
                   // Update progress
                   setProgress({

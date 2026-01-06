@@ -51,7 +51,6 @@ export default function MarqueMessageForm() {
 
   const onSubmit = async (data) => {
     try {
-      console.log('Marque Message Data:', data);
       // TODO: Replace with actual API call
       // await dispatch(updateMarqueMessageAsync(data)).unwrap();
 

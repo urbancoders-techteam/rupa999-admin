@@ -32,12 +32,9 @@ export default function GeneralPredictionFormPage({ isEdit = false, isView = fal
   const [panaNumber, setPanaNumber] = useState('');
 
   const digits = panaNumber?.toString()?.split('')?.map(Number);
-  console.log('panaDigit :>> ', digits);
 
   // Calculate the total (sum)
   const totalPanaNumber = digits.reduce((acc, curr) => acc + curr, 0);
-
-  console.log('totalPanaNumber :>> ', totalPanaNumber);
 
   const UserSchema = Yup.object().shape({
     userLimit: Yup.string().required('User Limit is required'),
@@ -82,7 +79,6 @@ export default function GeneralPredictionFormPage({ isEdit = false, isView = fal
   }, [isEdit, isView, currentUser]);
 
   const onSubmit = async (data) => {
-    console.log('data :>> ', data);
     // try {
     //   const response = await dispatch(
     //     isEdit ? updateUserAsync({ id: currentUser?.id, data }) : addUserAsync(data)

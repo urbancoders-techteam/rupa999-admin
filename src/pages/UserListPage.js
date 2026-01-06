@@ -162,7 +162,7 @@ export default function UserListPage() {
 
   const isFiltered = searchQuery !== '' || filterRole !== 'all' || filterStatus !== 'all';
 
-  const isNotFound = !tableData.length && (!!searchQuery || filterStatus !== 'all');
+  const isNotFound = !userList.length && (!!searchQuery || filterStatus !== 'all');
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);

@@ -90,7 +90,6 @@ export default function GeneralCreateResultForm({
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
   const { marketList, loading: marketLoading } = useSelector((state) => state.market);
-  console.log('marketList', marketList);
   const { loading: marketResultLoading } = useSelector((state) => state.marketResult);
 
   const validationSchema = useMemo(
@@ -152,9 +151,6 @@ export default function GeneralCreateResultForm({
       })),
     [marketList]
   );
-
-  console.log('marketList', marketList);
-
 
 
   useEffect(() => {

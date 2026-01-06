@@ -138,7 +138,6 @@ const bidSlice = createSlice({
         state.loading = false;
         // API returns { message, data: { categories, series } }
         const responseData = action.payload?.data || {};
-        console.log('Yearly Profit Bids Response:', responseData);
 
         // If no data, default to current year with all zeros
         if (!responseData.series || responseData.series.length === 0) {
@@ -163,7 +162,6 @@ const bidSlice = createSlice({
             series: responseData.series || [],
           };
         }
-        console.log('Yearly Profit Bids State:', state.yearlyProfitBidsList);
       })
       .addCase(getYearlyProfitBidsAsync.rejected, (state, action) => {
         state.loading = false;

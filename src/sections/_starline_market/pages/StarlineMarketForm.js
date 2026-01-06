@@ -107,7 +107,6 @@ export default function StarlineMarketForm({ isEdit = false, isView = false, cur
   }, [isEdit, isView, currentUser, reset, defaultValues]);
 
   const onSubmit = async (data) => {
-    console.log('✅ Form Submitted:', data);
     enqueueSnackbar('Form submitted successfully!');
   };
 

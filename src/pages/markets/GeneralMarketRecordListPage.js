@@ -179,13 +179,11 @@ export default function GeneralMarketRecordListPage() {
   const handleDeleteRow = (id) => {
     // Note: Delete functionality would need to be implemented in the API
     // For now, this is a placeholder
-    console.log('Delete row:', id);
   };
 
   const handleDeleteRows = (selectedRows) => {
     // Note: Delete functionality would need to be implemented in the API
     // For now, this is a placeholder
-    console.log('Delete rows:', selectedRows);
     setSelected([]);
   };
 

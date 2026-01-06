@@ -57,7 +57,6 @@ export default function CreateResultForm() {
 
   const onSubmit = (data) => {
     // you asked to "handle this form using react-hook-form", so we submit RHF data directly
-    console.log(data);
     alert('Form Submitted Successfully!');
   };
 

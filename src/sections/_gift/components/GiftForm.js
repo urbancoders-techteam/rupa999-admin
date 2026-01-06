@@ -65,7 +65,6 @@ export default function GiftForm({ isEdit = false, isView = false, currentUser }
   }, [isEdit, isView, currentUser]);
 
   const onSubmit = async (data) => {
-    console.log('data :>> ', data);
     // try {
     //   const response = await dispatch(
     //     isEdit ? updateUserAsync({ id: currentUser?.id, data }) : addUserAsync(data)

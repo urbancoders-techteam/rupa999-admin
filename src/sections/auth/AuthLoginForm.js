@@ -61,11 +61,8 @@ export default function AuthLoginForm() {
           try {
             const permissionRes = await dispatch(getPermissionByRoleIdAsync(roleId));
 
-            console.log('permissionRes', permissionRes);
-            
             if (permissionRes.type === 'permission/permissionByRoleId/fulfilled') {
               // Permissions are automatically stored in Redux via the slice
-              console.log('Permissions loaded successfully', permissionRes.payload);
             } else if (permissionRes.type === 'permission/permissionByRoleId/rejected') {
               console.warn('Failed to fetch permissions:', permissionRes.error);
               // Continue login even if permission fetch fails

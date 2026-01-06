@@ -114,7 +114,6 @@ export default function CommonSettingFormPage({ currentSettings }) {
 
   const onSubmit = async (data) => {
     try {
-      console.log('Form Data:', data);
       // TODO: Replace with actual API call
       // await dispatch(updateCommonSettingsAsync(data)).unwrap();
 

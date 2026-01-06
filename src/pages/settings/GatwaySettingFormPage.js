@@ -139,7 +139,6 @@ export default function GatewaySettingFormPage({ currentSettings }) {
         withdrawOpenTime: dayjs(data.withdrawOpenTime).format('HH:mm'),
       };
 
-      console.log('Form Data:', formattedData);
       // TODO: Replace with actual API call
       // await dispatch(updateGatewaySettingsAsync(formattedData)).unwrap();
       

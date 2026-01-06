@@ -24,7 +24,7 @@ axios.interceptors.response.use(
   (error) => {
     const errorMessage = error.response?.data?.message || error.message || 'Something went wrong';
 
-    console.log("error>>>>>>>>>>>>", errorMessage);
+    console.error('Request failed:', errorMessage);
 
     toast.error(errorMessage, {
       position: 'top-right',

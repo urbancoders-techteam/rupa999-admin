@@ -152,13 +152,11 @@ export default function WinHistoryListPage() {
   const handleDeleteRow = (id) => {
     // Note: Delete functionality should be implemented via API if needed
     // For now, this is just a placeholder
-    console.log('Delete row:', id);
   };
 
   const handleDeleteRows = (selectedRows) => {
     // Note: Delete functionality should be implemented via API if needed
     // For now, this is just a placeholder
-    console.log('Delete rows:', selectedRows);
     setSelected([]);
     // Since we're using API data, we can't delete locally
     // This would need to be implemented via API endpoint

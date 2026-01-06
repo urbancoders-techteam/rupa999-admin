@@ -20,14 +20,6 @@ import { getMarketResultsByMarketAndGameTypeAsync } from '../../redux/services/m
 
 const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-// Helper function to get day of week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
-// We convert to Monday=0, Tuesday=1, ..., Sunday=6
-const getDayOfWeek = (dateString) => {
-  const date = new Date(dateString);
-  const day = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-  return day === 0 ? 6 : day - 1; // Convert to Monday=0, Tuesday=1, ..., Sunday=6
-};
-
 // Helper function to transform day data
 const transformDayData = (dayData) => {
   if (!dayData) {
@@ -35,10 +27,10 @@ const transformDayData = (dayData) => {
     return { top: '***', middle: '**', bottom: '***', isRed: false };
   }
 
-  const openPana = dayData.openPana;
-  const closePana = dayData.closePana;
-  const openDigit = dayData.openDigit;
-  const closeDigit = dayData.closeDigit;
+  const {openPana} = dayData;
+  const {closePana} = dayData;
+  const {openDigit} = dayData;
+  const {closeDigit} = dayData;
 
   // Top: openPana (3-digit number, or '***' if null/undefined)
   const top = openPana !== null && openPana !== undefined ? Number(openPana) : '***';
