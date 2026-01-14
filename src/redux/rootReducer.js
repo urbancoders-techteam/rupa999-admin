@@ -10,6 +10,7 @@ import notificationReducer from './slices/notification_slices';
 import permissionReducer from './slices/permission_slices';
 import roleReducer from './slices/role_slices';
 import staffReducer from './slices/staff_slices';
+import starlineMarketReducer from './slices/starline_market_slices';
 import userReducer from './slices/user_slices';
 
 // ----------------------------------------------------------------------
@@ -29,6 +30,7 @@ const rootReducer = combineReducers({
   permission: permissionReducer,
   market: marketReducer,
   marketResult: marketResultReducer,
+  starlineMarket: starlineMarketReducer,
   user: userReducer,
   notification: notificationReducer,
   faq: faqReducer,

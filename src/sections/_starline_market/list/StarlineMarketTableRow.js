@@ -18,12 +18,23 @@ import MenuPopover from '../../../components/menu-popover';
 StarlineMarketTableRow.propTypes = {
   index: PropTypes.number,
   row: PropTypes.object,
+  selected: PropTypes.bool,
+  onSelectRow: PropTypes.func,
+  onDeleteRow: PropTypes.func,
   onEditRow: PropTypes.func,
 };
 
-export default function StarlineMarketTableRow({ index, row, onEditRow }) {
+export default function StarlineMarketTableRow({
+  index,
+  row,
+  selected,
+  onSelectRow,
+  onDeleteRow,
+  onEditRow,
+}) {
   const {
     id,
+    _id,
     name,
     currentStatus,
     openTime,
@@ -42,7 +53,7 @@ export default function StarlineMarketTableRow({ index, row, onEditRow }) {
 
   return (
     <>
-      <TableRow hover sx={{ '&:last-child td, &:last-child th': { border: '1px solid gray' } }}>
+      <TableRow hover>
          <TableCell align="center">
           <IconButton
             color={openPopover ? 'inherit' : 'default'}
@@ -51,7 +62,7 @@ export default function StarlineMarketTableRow({ index, row, onEditRow }) {
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
         </TableCell>
-        <TableCell align="left">{id}</TableCell>
+        <TableCell align="left">{index}</TableCell>
 
         <TableCell align="left">
           <Typography variant="subtitle2" noWrap>
@@ -95,6 +106,19 @@ export default function StarlineMarketTableRow({ index, row, onEditRow }) {
           <Iconify icon="eva:edit-fill" />
           Edit
         </MenuItem>
+
+        {onDeleteRow && (
+          <MenuItem
+            onClick={() => {
+              onDeleteRow(_id || id);
+              handleClosePopover();
+            }}
+            sx={{ color: 'error.main' }}
+          >
+            <Iconify icon="eva:trash-2-outline" />
+            Delete
+          </MenuItem>
+        )}
       </MenuPopover>
     </>
   );

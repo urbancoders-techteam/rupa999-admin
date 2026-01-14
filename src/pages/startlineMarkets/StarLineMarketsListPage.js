@@ -1,18 +1,18 @@
 import { Helmet } from 'react-helmet-async';
 import { paramCase } from 'change-case';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 // @mui
 import { Card, Table, Button, TableBody, Container, TableContainer, Box } from '@mui/material';
 import useResponsive from '../../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
-// _mock_
-import { _marketjson } from '../../_mock/arrays/_marketjson';
 // components
 import Scrollbar from '../../components/scrollbar';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
+import { useSnackbar } from '../../components/snackbar';
 import {
   useTable,
   getComparator,
@@ -25,8 +25,13 @@ import {
 import CustomTableToolbar from '../../components/table/CustomTableToolBar';
 // sections
 import Iconify from '../../components/iconify';
-import MarketMobileViewCardLayout from '../../sections/_markets/components/MarketMobileViewCardLayout';
+import StarlineMarketMobileViewCardLayout from '../../sections/_starline_market/components/StarlineMarketMobileViewCardLayout';
 import StarlineMarketTableRow from '../../sections/_starline_market/list/StarlineMarketTableRow';
+// redux
+import {
+  getAllStarlineMarketsAsync,
+  deleteStarlineMarketAsync,
+} from '../../redux/services/starline_market_services';
 
 // ----------------------------------------------------------------------
 
@@ -61,15 +66,45 @@ export default function StarLineMarketsListPage() {
   } = useTable();
 
   const { themeStretch } = useSettingsContext();
-
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
 
-  const [tableData, setTableData] = useState(_marketjson);
+  // Redux state
+  const { marketList, pagination, loading } = useSelector((state) => state.starlineMarket);
 
   const [filterName, setFilterName] = useState(''); // Input field value
   const [searchQuery, setSearchQuery] = useState(''); // Actual search value for filtering
 
-  // Memoized filtered data
+  // Fetch starline markets on component mount and when filters change
+  useEffect(() => {
+    dispatch(
+      getAllStarlineMarketsAsync({
+        page: page + 1, // API uses 1-based pagination
+        limit: rowsPerPage,
+        search: searchQuery,
+      })
+    );
+  }, [dispatch, page, rowsPerPage, searchQuery]);
+
+  // Transform API data to table format
+  const tableData = useMemo(
+    () =>
+      marketList.map((market, index) => ({
+        id: market._id || market.id,
+        _id: market._id,
+        name: market.name,
+        openTime: market.openTime || '-',
+        currentStatus: 'OPEN NOW', // You can add logic here to determine status based on time
+        createdAt: market.createdAt ? new Date(market.createdAt).toLocaleDateString() : '-',
+        disableGame: market.disableGame || 'no',
+        autoResultOpen: market.autoResultOpen || 'disable',
+        ...market,
+      })),
+    [marketList]
+  );
+
+  // Apply client-side filtering and sorting
   const dataFiltered = useMemo(
     () =>
       applyFilter({
@@ -80,7 +115,7 @@ export default function StarLineMarketsListPage() {
     [tableData, order, orderBy, searchQuery]
   );
 
-  // Memoized paginated data
+  // Memoized paginated data (client-side pagination for now, can be moved to server-side)
   const dataInPage = useMemo(
     () => dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
     [dataFiltered, page, rowsPerPage]
@@ -92,8 +127,7 @@ export default function StarLineMarketsListPage() {
 
   const isFiltered = searchQuery !== '';
 
-  const isNotFound = !dataFiltered.length && !!searchQuery;
-
+  const isNotFound = !dataFiltered.length && !!searchQuery && !loading;
 
   const handleFilterName = (event) => {
     setFilterName(event.target.value);
@@ -104,20 +138,33 @@ export default function StarLineMarketsListPage() {
     setSearchQuery(filterName);
   };
 
-  const handleDeleteRow = (id) => {
-    const deleteRow = tableData.filter((row) => row.id !== id);
-    setSelected([]);
-    setTableData(deleteRow);
-
-    if (page > 0) {
-      if (dataInPage.length < 2) {
+  const handleDeleteRow = async (id) => {
+    try {
+      await dispatch(deleteStarlineMarketAsync(id)).unwrap();
+      enqueueSnackbar('Starline market deleted successfully!', { variant: 'success' });
+      // Refresh the list
+      dispatch(
+        getAllStarlineMarketsAsync({
+          page: page + 1,
+          limit: rowsPerPage,
+          search: searchQuery,
+        })
+      );
+      setSelected([]);
+      // Check if we need to go back a page after deletion
+      if (page > 0 && tableData.length === 1) {
         setPage(page - 1);
       }
+    } catch (error) {
+      enqueueSnackbar(error?.message || 'Failed to delete starline market', { variant: 'error' });
     }
   };
 
-  const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.market.edit(paramCase(id)));
+  const handleEditRow = (name) => {
+    const market = tableData.find((m) => m.name === name);
+    if (market?._id) {
+      navigate(PATH_DASHBOARD.starline.market.edit(paramCase(market._id)));
+    }
   };
 
   const handleResetFilter = () => {
@@ -196,7 +243,7 @@ export default function StarLineMarketsListPage() {
         {/* Render mobile card layout for small screens, otherwise render the table */}
         {isMobile ? (
           <>
-            <MarketMobileViewCardLayout
+            <StarlineMarketMobileViewCardLayout
               data={dataInPage}
               onEditRow={handleEditRow}
               onDeleteRow={(id) => handleDeleteRow(id)}
@@ -206,7 +253,7 @@ export default function StarLineMarketsListPage() {
               rowsPerPage={rowsPerPage}
             />
             <TablePaginationCustom
-              count={dataFiltered.length}
+              count={pagination?.total || dataFiltered.length}
               page={page}
               rowsPerPage={rowsPerPage}
               onPageChange={onChangePage}
@@ -224,7 +271,7 @@ export default function StarLineMarketsListPage() {
                     order={order}
                     orderBy={orderBy}
                     headLabel={TABLE_HEAD}
-                    rowCount={tableData.length}
+                    rowCount={dataFiltered.length}
                     numSelected={selected.length}
                     onSort={onSort}
                   />
@@ -247,7 +294,7 @@ export default function StarLineMarketsListPage() {
                           ))}
                         <TableEmptyRows
                           height={denseHeight}
-                          emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
+                          emptyRows={emptyRows(page, rowsPerPage, dataFiltered.length)}
                         />
                       </>
                     ) : (
@@ -258,7 +305,7 @@ export default function StarLineMarketsListPage() {
               </Scrollbar>
             </TableContainer>
             <TablePaginationCustom
-              count={dataFiltered.length}
+              count={pagination?.total || dataFiltered.length}
               page={page}
               rowsPerPage={rowsPerPage}
               onPageChange={onChangePage}

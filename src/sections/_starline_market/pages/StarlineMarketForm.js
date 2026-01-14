@@ -10,21 +10,25 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
-  Checkbox,
   FormHelperText,
 } from '@mui/material';
 import * as Yup from 'yup';
 import PropTypes from 'prop-types';
 import { useEffect, useMemo } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { Container, useTheme } from '@mui/system';
+import { useForm } from 'react-hook-form';
+import { Container } from '@mui/system';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
 import { useSnackbar } from '../../../components/snackbar';
 import FormProvider, { RHFTextField } from '../../../components/hook-form';
 import RHFTimePicker from '../../../components/hook-form/RHFTimePicker';
 import { PATH_DASHBOARD } from '../../../routes/paths';
 import { useSettingsContext } from '../../../components/settings';
+import {
+  createStarlineMarketAsync,
+  updateStarlineMarketAsync,
+} from '../../../redux/services/starline_market_services';
 
 StarlineMarketForm.propTypes = {
   isEdit: PropTypes.bool,
@@ -35,48 +39,23 @@ StarlineMarketForm.propTypes = {
 export default function StarlineMarketForm({ isEdit = false, isView = false, currentUser }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const theme = useTheme();
 
   const { enqueueSnackbar } = useSnackbar();
 
   // ✅ Validation Schema
   const UserSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
-    apiKeyName: Yup.string().required('API Key Name is required'),
     openTime: Yup.mixed().required('Open Time is required'),
-    closeTime: Yup.mixed().required('Close Time is required'),
-    openResultTime: Yup.mixed().required('Open Result Time is required'),
-    closeResultTime: Yup.mixed().required('Close Result Time is required'),
-    userLimit: Yup.string().required('User Limit is required'),
-    amount: Yup.string().required('Amount is required'),
     disableGame: Yup.string().required('Please select an option'),
-    autoResult: Yup.string().required('Please select an option'),
-    activeDays: Yup.object().test('at-least-one-day', 'Select at least one active day', (value) =>
-      Object.values(value || {}).some(Boolean)
-    ),
+    autoResultOpen: Yup.string().required('Please select an option'),
   });
 
   const defaultValues = useMemo(
     () => ({
       name: currentUser?.name || '',
-      apiKeyName: currentUser?.apiKeyName || '',
-      openTime: currentUser?.openTime || null,
-      closeTime: currentUser?.closeTime || null,
-      openResultTime: currentUser?.openResultTime || null,
-      closeResultTime: currentUser?.closeResultTime || null,
-      userLimit: currentUser?.userLimit || '',
-      amount: currentUser?.amount || '',
-      disableGame: currentUser?.disableGame || '',
-      autoResult: currentUser?.autoResult || '',
-      activeDays: currentUser?.activeDays || {
-        Sunday: false,
-        Monday: false,
-        Tuesday: false,
-        Wednesday: false,
-        Thursday: false,
-        Friday: false,
-        Saturday: false,
-      },
+      openTime: currentUser?.openTime ? dayjs(currentUser.openTime, 'HH:mm') : null,
+      disableGame: currentUser?.disableGame || 'no',
+      autoResultOpen: currentUser?.autoResultOpen || 'disable',
     }),
     [currentUser]
   );
@@ -89,7 +68,6 @@ export default function StarlineMarketForm({ isEdit = false, isView = false, cur
   const {
     reset,
     watch,
-    control,
     setValue,
     handleSubmit,
     formState: { isSubmitting, errors },
@@ -107,10 +85,29 @@ export default function StarlineMarketForm({ isEdit = false, isView = false, cur
   }, [isEdit, isView, currentUser, reset, defaultValues]);
 
   const onSubmit = async (data) => {
-    enqueueSnackbar('Form submitted successfully!');
+    try {
+      // Convert dayjs object to HH:mm format string for API
+      const submitData = {
+        ...data,
+        openTime: data.openTime ? dayjs(data.openTime).format('HH:mm') : null,
+      };
+
+      if (isEdit && currentUser?._id) {
+        await dispatch(
+          updateStarlineMarketAsync({ id: currentUser._id, data: submitData })
+        ).unwrap();
+        enqueueSnackbar('Starline market updated successfully!', { variant: 'success' });
+      } else {
+        await dispatch(createStarlineMarketAsync(submitData)).unwrap();
+        enqueueSnackbar('Starline market created successfully!', { variant: 'success' });
+      }
+      navigate(PATH_DASHBOARD.starline.market.list);
+    } catch (error) {
+      enqueueSnackbar(error?.message || 'Failed to save starline market', { variant: 'error' });
+    }
   };
 
-  const handleBack = () => navigate(PATH_DASHBOARD.marketlist.list);
+  const handleBack = () => navigate(PATH_DASHBOARD.starline.market.list);
 
   const themeStretch = useSettingsContext();
 
@@ -131,60 +128,8 @@ export default function StarlineMarketForm({ isEdit = false, isView = false, cur
             >
               <RHFTextField name="name" label="Name" disabled={isView} />
 
-              <RHFTimePicker name="openTime" label="Open Time" required />
-              {/* <RHFTimePicker name="closeTime" label="Close Time" /> */}
+              <RHFTimePicker name="openTime" label="Open Time" required disabled={isView} />
             </Box>
-
-            {/* Active Days */}
-            {/* <FormControl component="fieldset" sx={{ mt: 3 }} error={!!errors.activeDays}>
-              <FormLabel component="legend">Active Days</FormLabel>
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: {
-                    xs: 'repeat(2, 1fr)',
-                    sm: 'repeat(4, 1fr)',
-                  },
-                  gap: 1,
-                  mt: 1,
-                }}
-              >
-                {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(
-                  (day) => (
-                    <FormControlLabel
-                      key={day}
-                      control={
-                        <Controller
-                          name={`activeDays.${day}`}
-                          control={control}
-                          render={({ field }) => (
-                            <Checkbox
-                              {...field}
-                              checked={!!field.value}
-                              onChange={(e) => setValue(`activeDays.${day}`, e.target.checked)}
-                              sx={{
-                                color: theme.palette.primary.light,
-                                '&.Mui-checked': {
-                                  color: theme.palette.primary.main,
-                                },
-                                '&:hover': {
-                                  backgroundColor: theme.palette.action.hover,
-                                  borderRadius: '8px',
-                                },
-                                transition: 'all 0.25s ease',
-                                borderRadius: '8px',
-                              }}
-                            />
-                          )}
-                        />
-                      }
-                      label={day}
-                    />
-                  )
-                )}
-              </Box>
-              {errors.activeDays && <FormHelperText>{errors.activeDays.message}</FormHelperText>}
-            </FormControl> */}
 
             {/* Radio Fields */}
             <Box
@@ -203,6 +148,7 @@ export default function StarlineMarketForm({ isEdit = false, isView = false, cur
                   name="disableGame"
                   value={values.disableGame}
                   onChange={(e) => setValue('disableGame', e.target.value)}
+                  disabled={isView}
                 >
                   <FormControlLabel value="yes" control={<Radio />} label="Yes" />
                   <FormControlLabel value="no" control={<Radio />} label="No" />
@@ -212,18 +158,21 @@ export default function StarlineMarketForm({ isEdit = false, isView = false, cur
                 )}
               </FormControl>
 
-              <FormControl component="fieldset" error={!!errors.autoResult} sx={{ mt: 2 }}>
+              <FormControl component="fieldset" error={!!errors.autoResultOpen} sx={{ mt: 2 }}>
                 <FormLabel component="legend">Auto Result Open</FormLabel>
                 <RadioGroup
                   row
-                  name="autoResult"
-                  value={values.autoResult}
-                  onChange={(e) => setValue('autoResult', e.target.value)}
+                  name="autoResultOpen"
+                  value={values.autoResultOpen}
+                  onChange={(e) => setValue('autoResultOpen', e.target.value)}
+                  disabled={isView}
                 >
                   <FormControlLabel value="enable" control={<Radio />} label="Enable" />
                   <FormControlLabel value="disable" control={<Radio />} label="Disable" />
                 </RadioGroup>
-                {errors.autoResult && <FormHelperText>{errors.autoResult.message}</FormHelperText>}
+                {errors.autoResultOpen && (
+                  <FormHelperText>{errors.autoResultOpen.message}</FormHelperText>
+                )}
               </FormControl>
             </Box>
 

@@ -5,7 +5,7 @@ import { useLocation, useParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSettingsContext } from '../../../components/settings';
 import { PATH_DASHBOARD } from '../../../routes/paths';
-// import { getBannerByIdAsync } from '../../../redux/services/banner';
+import { getStarlineMarketByIdAsync } from '../../../redux/services/starline_market_services';
 import CustomBreadcrumbs from '../../../components/custom-breadcrumbs/CustomBreadcrumbs';
 import LoadingScreen from '../../../components/loading-screen/LoadingScreen';
 import MarketForm from './StarlineMarketForm';
@@ -16,14 +16,14 @@ export default function StarlineMarketFormHandle() {
   const { id } = useParams();
   const { pathname = '', state } = useLocation();
 
-  // const { bannerById, isLoading } = useSelector((sliceState) => sliceState.banner);
+  const { currentMarket, loading } = useSelector((sliceState) => sliceState.starlineMarket);
 
   const editView = useMemo(() => {
     if (id && /edit/i?.test(pathname)) {
       return {
         title: 'Starline Market: Edit | Rupa999',
         heading: 'Edit Market',
-        user: state?.name ?? '',
+        user: state?.name || currentMarket?.name || '',
         isEdit: true,
         isView: false,
       };
@@ -32,7 +32,7 @@ export default function StarlineMarketFormHandle() {
       return {
         title: 'Starline Market: View | Rupa999',
         heading: 'View Market',
-        user: state?.name ?? '',
+        user: state?.name || currentMarket?.name || '',
         isEdit: false,
         isView: true,
       };
@@ -44,11 +44,13 @@ export default function StarlineMarketFormHandle() {
       isEdit: false,
       isView: false,
     };
-  }, [pathname, id, state]);
+  }, [pathname, id, state, currentMarket]);
 
-  //   useEffect(() => {
-  //     if (id) dispatch(getBannerByIdAsync(id));
-  //   }, [id, dispatch]);
+  useEffect(() => {
+    if (id) {
+      dispatch(getStarlineMarketByIdAsync(id));
+    }
+  }, [id, dispatch]);
 
   return (
     <>
@@ -66,23 +68,23 @@ export default function StarlineMarketFormHandle() {
             },
             {
               name: 'Starline Market List',
-              href: PATH_DASHBOARD.market.list,
+              href: PATH_DASHBOARD.starline.market.list,
             },
             {
               name: editView?.heading,
-              href: PATH_DASHBOARD.market.list,
+              href: PATH_DASHBOARD.starline.market.list,
             },
           ]}
         />
-        {/* {isLoading ? (
-        <LoadingScreen />
-      ) : ( */}
-        <MarketForm
-          isEdit={editView?.isEdit}
-          isView={editView?.isView}
-          // currentBanner={editView?.isView || editView?.isEdit ? bannerById : {}}
-        />
-        {/* )} */}
+        {loading ? (
+          <LoadingScreen />
+        ) : (
+          <MarketForm
+            isEdit={editView?.isEdit}
+            isView={editView?.isView}
+            currentUser={editView?.isView || editView?.isEdit ? (currentMarket || state?.market) : null}
+          />
+        )}
       </Container>
     </>
   );
