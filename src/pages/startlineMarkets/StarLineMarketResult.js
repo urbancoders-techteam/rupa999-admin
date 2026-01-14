@@ -1,28 +1,22 @@
 import { paramCase } from 'change-case';
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 // @mui
 import {
-  Button,
   Card,
   Container,
-  IconButton,
   Table,
   TableBody,
   TableContainer,
-  Tooltip,
   useMediaQuery,
 } from '@mui/material';
 // routes
 import { useTheme } from '@mui/system';
 import { PATH_DASHBOARD } from '../../routes/paths';
-// _mock_
-import { previousResults } from '../../_mock/arrays';
 // components
-import ConfirmDialog from '../../components/confirm-dialog';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
-import Iconify from '../../components/iconify';
 import Scrollbar from '../../components/scrollbar';
 import { useSettingsContext } from '../../components/settings';
 import {
@@ -32,27 +26,27 @@ import {
   TableHeadCustom,
   TableNoData,
   TablePaginationCustom,
-  TableSelectedAction,
   useTable,
 } from '../../components/table';
 // sections
 import CustomTableToolbar from '../../components/table/CustomTableToolBar';
-import PreviousResultMobileViewCardLayout from '../../sections/_previous_results/components/PreviousResultMobileViewCardLayout';
+import StarlineMarketResultMobileViewCardLayout from '../../sections/_starline_market_results/components/StarlineMarketResultMobileViewCardLayout';
 import CreateResultForm from '../../sections/_starline_market_results/CreateResultForm';
 import StarLineMarketResultsTableRow from '../../sections/_starline_market_results/StarLineMarketResultsTableRow';
+import { useSnackbar } from '../../components/snackbar';
+import { getAllStarlineMarketResultsAsync } from '../../redux/services/starline_market_result_services';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
   { id: 'action', label: 'Action', align: 'left' },
   { id: 'id', label: 'ID', align: 'left' },
-  { id: 'name', label: 'Game Name', align: 'left' },
+  { id: 'name', label: 'Market Name', align: 'left' },
   { id: 'resultDate', label: 'Result Date', align: 'left' },
-  { id: 'openPana', label: 'Open Pana', align: 'center' },
-  { id: 'openDigits', label: 'Open Digits', align: 'center' },
+  { id: 'openPana', label: 'Pana', align: 'center' },
+  { id: 'openDigits', label: 'Digit', align: 'center' },
   { id: 'revert', label: 'Revert', align: 'left' },
   { id: 'createdAt', label: 'Created At', align: 'left' },
-
 ];
 
 // ----------------------------------------------------------------------
@@ -78,40 +72,72 @@ export default function StarLineMarketResultListPage() {
   } = useTable();
 
   const { themeStretch } = useSettingsContext();
-
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const [tableData, setTableData] = useState(previousResults);
-
-  const [openConfirm, setOpenConfirm] = useState(false);
+  // Redux state
+  const { resultList, pagination, loading } = useSelector((state) => state.starlineMarketResult);
 
   const [filterName, setFilterName] = useState(''); // Input field value
   const [searchQuery, setSearchQuery] = useState(''); // Actual search value for filtering
 
-  const dataFiltered = applyFilter({
-    inputData: tableData,
-    comparator: getComparator(order, orderBy),
-    filterName: searchQuery,
-  });
+  // Fetch starline market results on component mount and when filters change
+  useEffect(() => {
+    dispatch(
+      getAllStarlineMarketResultsAsync({
+        page: page + 1, // API uses 1-based pagination
+        limit: rowsPerPage,
+      })
+    );
+  }, [dispatch, page, rowsPerPage]);
 
-  const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  // Transform API data to table format
+  const tableData = useMemo(
+    () =>
+      resultList.map((result, index) => {
+        const market = result.marketsId;
+        return {
+          id: result._id || result.id,
+          _id: result._id,
+          name: market?.name || '-',
+          gameName: market?.name || '-',
+          resultDate: result.date ? new Date(result.date).toLocaleDateString() : '-',
+          date: result.date,
+          openPana: result.openPana || '-',
+          openDigit: result.openDigit || '-',
+          digit: result.openDigit || '-',
+          createdAt: result.createdAt ? new Date(result.createdAt).toLocaleDateString() : '-',
+          ...result,
+        };
+      }),
+    [resultList]
+  );
+
+  // Apply client-side filtering and sorting
+  const dataFiltered = useMemo(
+    () =>
+      applyFilter({
+        inputData: tableData,
+        comparator: getComparator(order, orderBy),
+        filterName: searchQuery,
+      }),
+    [tableData, order, orderBy, searchQuery]
+  );
+
+  const dataInPage = useMemo(
+    () => dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+    [dataFiltered, page, rowsPerPage]
+  );
 
   const denseHeight = dense ? 52 : 72;
 
   const isFiltered = searchQuery !== '';
 
-  const isNotFound = !dataFiltered.length && !!searchQuery;
-
-  const handleOpenConfirm = () => {
-    setOpenConfirm(true);
-  };
-
-  const handleCloseConfirm = () => {
-    setOpenConfirm(false);
-  };
+  const isNotFound = !dataFiltered.length && !!searchQuery && !loading;
 
   const handleFilterName = (event) => {
     setFilterName(event.target.value);
@@ -122,32 +148,15 @@ export default function StarLineMarketResultListPage() {
     setSearchQuery(filterName);
   };
 
-  const handleDeleteRow = (id) => {
-    const deleteRow = tableData.filter((row) => row.id !== id);
-    setSelected([]);
-    setTableData(deleteRow);
-
-    if (page > 0) {
-      if (dataInPage.length < 2) {
-        setPage(page - 1);
-      }
-    }
-  };
-
-  const handleDeleteRows = (selectedRows) => {
-    const deleteRows = tableData.filter((row) => !selectedRows.includes(row.id));
-    setSelected([]);
-    setTableData(deleteRows);
-
-    if (page > 0) {
-      if (selectedRows.length === dataInPage.length) {
-        setPage(page - 1);
-      } else if (selectedRows.length === dataFiltered.length) {
-        setPage(0);
-      } else if (selectedRows.length > dataInPage.length) {
-        const newPage = Math.ceil((tableData.length - selectedRows.length) / rowsPerPage) - 1;
-        setPage(newPage);
-      }
+  const handleRevert = async (row) => {
+    try {
+      // TODO: Implement revert functionality when API is ready
+      console.log('Revert row:', row);
+      enqueueSnackbar('Revert functionality will be implemented soon', { variant: 'info' });
+    } catch (error) {
+      enqueueSnackbar(error?.message || 'Failed to revert starline market result', {
+        variant: 'error',
+      });
     }
   };
 
@@ -180,10 +189,12 @@ export default function StarLineMarketResultListPage() {
         <CreateResultForm />
 
         {isMobile ? (
-          <PreviousResultMobileViewCardLayout
-            data={dataFiltered}
+          <StarlineMarketResultMobileViewCardLayout
+            data={dataInPage}
             onEditRow={handleEditRow}
-            onDeleteRow={(id) => handleDeleteRow(id)}
+            onRevert={handleRevert}
+            page={page}
+            rowsPerPage={rowsPerPage}
           />
         ) : (
           <Card>
@@ -196,24 +207,6 @@ export default function StarLineMarketResultListPage() {
             />
 
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
-              <TableSelectedAction
-                dense={dense}
-                numSelected={selected.length}
-                rowCount={tableData.length}
-                onSelectAllRows={(checked) =>
-                  onSelectAllRows(
-                    checked,
-                    tableData.map((row) => row.id)
-                  )
-                }
-                action={
-                  <Tooltip title="Delete">
-                    <IconButton color="primary" onClick={handleOpenConfirm}>
-                      <Iconify icon="eva:trash-2-outline" />
-                    </IconButton>
-                  </Tooltip>
-                }
-              />
 
               <Scrollbar>
                 <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
@@ -229,14 +222,15 @@ export default function StarLineMarketResultListPage() {
                   <TableBody>
                     {dataFiltered
                       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((row) => (
+                      .map((row, index) => (
                         <StarLineMarketResultsTableRow
                           key={row.id}
                           row={row}
+                          index={(page * rowsPerPage) + index + 1}
                           selected={selected.includes(row.id)}
                           onSelectRow={() => onSelectRow(row.id)}
-                          onDeleteRow={() => handleDeleteRow(row.id)}
                           onEditRow={() => handleEditRow(row.name)}
+                          onRevert={handleRevert}
                         />
                       ))}
 
@@ -253,7 +247,7 @@ export default function StarLineMarketResultListPage() {
 
             <TablePaginationCustom
               page={page}
-              count={dataFiltered.length}
+              count={pagination?.total || dataFiltered.length}
               rowsPerPage={rowsPerPage}
               onPageChange={onChangePage}
               onRowsPerPageChange={onChangeRowsPerPage}
@@ -265,28 +259,6 @@ export default function StarLineMarketResultListPage() {
         )}
       </Container>
 
-      <ConfirmDialog
-        open={openConfirm}
-        onClose={handleCloseConfirm}
-        title="Delete"
-        content={
-          <>
-            Are you sure want to delete <strong> {selected.length} </strong> items?
-          </>
-        }
-        action={
-          <Button
-            variant="contained"
-            color="error"
-            onClick={() => {
-              handleDeleteRows(selected);
-              handleCloseConfirm();
-            }}
-          >
-            Delete
-          </Button>
-        }
-      />
     </>
   );
 }

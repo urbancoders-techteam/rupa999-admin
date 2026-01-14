@@ -18,28 +18,49 @@ import Label from '../../components/label';
 // ----------------------------------------------------------------------
 
 StarLineMarketResultsTableRow.propTypes = {
+  index: PropTypes.number,
   row: PropTypes.shape({
-    id: PropTypes.number,
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    _id: PropTypes.string,
+    name: PropTypes.string,
     gameName: PropTypes.string,
     resultDate: PropTypes.string,
-    result: PropTypes.string,
+    date: PropTypes.string,
     openPana: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    closePana: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    action: PropTypes.string,
+    openDigit: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    digit: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     createdAt: PropTypes.string,
   }),
+  selected: PropTypes.bool,
+  onSelectRow: PropTypes.func,
+  onEditRow: PropTypes.func,
   onRevert: PropTypes.func,
 };
 
-export default function StarLineMarketResultsTableRow({ row, onRevert }) {
+export default function StarLineMarketResultsTableRow({
+  row,
+  index,
+  selected,
+  onSelectRow,
+  onEditRow,
+  onRevert,
+}) {
   const {
     id,
+    _id,
+    name,
     gameName,
     resultDate,
+    date,
     openPana,
-    closePana,
+    openDigit,
+    digit,
     createdAt,
   } = row;
+
+  const displayName = name || gameName || '-';
+  const displayDate = resultDate || date || '-';
+  const displayDigit = openDigit || digit || '-';
 
   const theme = useTheme();
   const [openPopover, setOpenPopover] = useState(null);
@@ -68,21 +89,15 @@ export default function StarLineMarketResultsTableRow({ row, onRevert }) {
           </IconButton>
         </TableCell>
 
-        <TableCell align="left">{id}</TableCell>
+        <TableCell align="left">{index}</TableCell>
 
         <TableCell align="left">
           <Typography variant="subtitle2" noWrap>
-            {gameName}
+            {displayName}
           </Typography>
         </TableCell>
 
-        <TableCell align="left">{resultDate}</TableCell>
-
-        {/* <TableCell align="left">
-          <Typography variant="body2" sx={{ fontWeight: 600 }}>
-            {result}
-          </Typography>
-        </TableCell> */}
+        <TableCell align="left">{displayDate}</TableCell>
 
         <TableCell align="center">
           <Label variant="soft" color="info" sx={{ px: 2, fontWeight: 500 }}>
@@ -91,12 +106,8 @@ export default function StarLineMarketResultsTableRow({ row, onRevert }) {
         </TableCell>
 
         <TableCell align="center">
-          <Label
-            variant="soft"
-            color={closePana ? 'success' : 'warning'}
-            sx={{ px: 2, fontWeight: 500 }}
-          >
-            {closePana ?? 'NULL'}
+          <Label variant="soft" color="success" sx={{ px: 2, fontWeight: 500 }}>
+            {displayDigit}
           </Label>
         </TableCell>
 
