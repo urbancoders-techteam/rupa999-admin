@@ -4,8 +4,8 @@ import { PATH_DASHBOARD } from './routes/paths';
 // API
 // ----------------------------------------------------------------------
 
-// export const HOST_API_KEY = 'https://rupaapi.aishkhan.in';
-export const HOST_API_KEY = 'http://localhost:3000';
+export const HOST_API_KEY = 'https://rupaapi.aishkhan.in';
+// export const HOST_API_KEY = 'http://localhost:3000';
 
 export const FIREBASE_API = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
