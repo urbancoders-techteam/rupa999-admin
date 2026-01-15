@@ -239,100 +239,106 @@ export default function CreateResultForm() {
               />
             </Grid>
 
-            {/* Percentage toggle */}
-            <Grid item xs={12} sm={12}>
-              <Typography
-                variant="body2"
-                sx={{ ml: 1, mb: 1, fontWeight: 500, color: 'text.secondary' }}
+            {/* Percentage toggle, Pana, and Digit in one line */}
+            <Grid item xs={12}>
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: {
+                    xs: '1fr',
+                    sm: usePercentage ? 'auto 1fr' : 'auto 1fr 1fr',
+                  },
+                  gap: 2,
+                  alignItems: 'flex-end',
+                }}
               >
-                Did you want to do with percentage?
-              </Typography>
+                {/* Percentage Toggle */}
+                <Box>
+                  <Typography
+                    variant="body2"
+                    sx={{ mb: 1, fontWeight: 500, color: 'text.secondary', whiteSpace: 'nowrap' }}
+                  >
+                    Did you want to do with percentage?
+                  </Typography>
+                  <Box sx={{ gap: 1, display: 'flex', alignItems: 'center' }}>
+                    <Button
+                      variant={usePercentage ? 'contained' : 'outlined'}
+                      color={usePercentage ? 'success' : 'inherit'}
+                      onClick={handlePercentageToggle(true)}
+                      size="small"
+                      sx={{
+                        minWidth: '70px',
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        borderRadius: 2,
+                        boxShadow: usePercentage ? '0px 2px 8px rgba(25, 135, 84, 0.4)' : 'none',
+                      }}
+                    >
+                      Yes
+                    </Button>
+                    <Button
+                      variant={!usePercentage ? 'contained' : 'outlined'}
+                      color={!usePercentage ? 'error' : 'inherit'}
+                      onClick={handlePercentageToggle(false)}
+                      size="small"
+                      sx={{
+                        minWidth: '70px',
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        borderRadius: 2,
+                        boxShadow: !usePercentage ? '0px 2px 8px rgba(220, 53, 69, 0.4)' : 'none',
+                      }}
+                    >
+                      No
+                    </Button>
+                  </Box>
+                </Box>
 
-              <Box sx={{ ml: 1, gap: 1, display: 'flex', alignItems: 'center' }}>
-                <Button
-                  variant={usePercentage ? 'contained' : 'outlined'}
-                  color={usePercentage ? 'success' : 'inherit'}
-                  onClick={handlePercentageToggle(true)}
-                  sx={{
-                    flex: 1,
-                    maxWidth: '120px',
-                    textTransform: 'none',
-                    fontWeight: 600,
-                    borderRadius: 2,
-                    boxShadow: usePercentage ? '0px 2px 8px rgba(25, 135, 84, 0.4)' : 'none',
-                  }}
-                >
-                  Yes
-                </Button>
-
-                <Button
-                  variant={!usePercentage ? 'contained' : 'outlined'}
-                  color={!usePercentage ? 'error' : 'inherit'}
-                  onClick={handlePercentageToggle(false)}
-                  sx={{
-                    flex: 1,
-                    maxWidth: '120px',
-                    textTransform: 'none',
-                    fontWeight: 600,
-                    borderRadius: 2,
-                    boxShadow: !usePercentage ? '0px 2px 8px rgba(220, 53, 69, 0.4)' : 'none',
-                  }}
-                >
-                  No
-                </Button>
-              </Box>
-            </Grid>
-
-            {/* Conditional fields */}
-            {usePercentage ? (
-              <Grid item xs={12} sm={6}>
-                <RHFTextField
-                  name="percentage"
-                  label="Percentage"
-                  placeholder="Enter Percentage"
-                  size="small"
-                  fullWidth
-                />
-              </Grid>
-            ) : (
-              <>
-                <Grid item xs={12} sm={6}>
-                  <Controller
-                    name="pana"
-                    control={control}
-                    render={({ field, fieldState: { error } }) => (
-                      <RHFTextField
-                        {...field}
-                        label="Pana"
-                        placeholder="Enter Pana (3 digits)"
-                        size="small"
-                        fullWidth
-                        error={!!error}
-                        helperText={error?.message}
-                        onChange={handlePanaChange(field)}
-                        inputProps={{
-                          maxLength: 3,
-                        }}
-                      />
-                    )}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
+                {/* Conditional fields */}
+                {usePercentage ? (
                   <RHFTextField
-                    name="digit"
-                    label="Digit"
-                    placeholder="Auto-calculated"
+                    name="percentage"
+                    label="Percentage"
+                    placeholder="Enter Percentage"
                     size="small"
                     fullWidth
-                    disabled
-                    InputProps={{
-                      readOnly: true,
-                    }}
                   />
-                </Grid>
-              </>
-            )}
+                ) : (
+                  <>
+                    <Controller
+                      name="pana"
+                      control={control}
+                      render={({ field, fieldState: { error } }) => (
+                        <RHFTextField
+                          {...field}
+                          label="Pana"
+                          placeholder="Enter Pana (3 digits)"
+                          size="small"
+                          fullWidth
+                          error={!!error}
+                          helperText={error?.message}
+                          onChange={handlePanaChange(field)}
+                          inputProps={{
+                            maxLength: 3,
+                          }}
+                        />
+                      )}
+                    />
+                    <RHFTextField
+                      name="digit"
+                      label="Digit"
+                      placeholder="Auto-calculated"
+                      size="small"
+                      fullWidth
+                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
+                    />
+                  </>
+                )}
+              </Box>
+            </Grid>
           </Grid>
 
           {/* Buttons */}
