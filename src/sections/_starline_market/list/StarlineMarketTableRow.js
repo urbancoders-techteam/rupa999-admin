@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
+import dayjs from 'dayjs';
 // @mui
 import {
   TableRow,
@@ -85,7 +86,7 @@ export default function StarlineMarketTableRow({
         </TableCell>
 
         {/* <TableCell align="left" sx={{minWidth:'100px'}}>{gameDisabled}</TableCell> */}
-        <TableCell align="left" sx={{minWidth:'100px'}}>{openTime}</TableCell>
+        <TableCell align="left" sx={{minWidth:'100px'}}>{openTime ? dayjs(openTime).format('hh:mm A') : '-'}</TableCell>
         <TableCell align="left" sx={{minWidth:'150px'}}>{createdAt}</TableCell>
 
        

@@ -53,7 +53,7 @@ export default function StarlineMarketForm({ isEdit = false, isView = false, cur
   const defaultValues = useMemo(
     () => ({
       name: currentUser?.name || '',
-      openTime: currentUser?.openTime ? dayjs(currentUser.openTime, 'HH:mm') : null,
+      openTime: currentUser?.openTime ? dayjs(currentUser.openTime) : null,
       disableGame: currentUser?.disableGame || 'no',
       autoResultOpen: currentUser?.autoResultOpen || 'disable',
     }),

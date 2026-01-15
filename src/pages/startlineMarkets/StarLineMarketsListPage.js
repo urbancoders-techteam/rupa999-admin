@@ -3,6 +3,7 @@ import { paramCase } from 'change-case';
 import { useState, useMemo, useEffect } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import dayjs from 'dayjs';
 // @mui
 import { Card, Table, Button, TableBody, Container, TableContainer, Box } from '@mui/material';
 import useResponsive from '../../hooks/useResponsive';
@@ -90,17 +91,31 @@ export default function StarLineMarketsListPage() {
   // Transform API data to table format
   const tableData = useMemo(
     () =>
-      marketList.map((market, index) => ({
-        id: market._id || market.id,
-        _id: market._id,
-        name: market.name,
-        openTime: market.openTime || '-',
-        currentStatus: 'OPEN NOW', // You can add logic here to determine status based on time
-        createdAt: market.createdAt ? new Date(market.createdAt).toLocaleDateString() : '-',
-        disableGame: market.disableGame || 'no',
-        autoResultOpen: market.autoResultOpen || 'disable',
-        ...market,
-      })),
+      marketList.map((market, index) => {
+        let formattedOpenTime = '-';
+        if (market.openTime) {
+          try {
+            const date = dayjs(market.openTime);
+            if (date.isValid()) {
+              formattedOpenTime = date.format('hh:mm A'); // 12-hour format with AM/PM
+            }
+          } catch (error) {
+            console.error('Error formatting openTime:', error);
+          }
+        }
+        
+        return {
+          id: market._id || market.id,
+          _id: market._id,
+          name: market.name,
+          openTime: formattedOpenTime,
+          currentStatus: 'OPEN NOW', // You can add logic here to determine status based on time
+          createdAt: market.createdAt ? new Date(market.createdAt).toLocaleDateString() : '-',
+          disableGame: market.disableGame || 'no',
+          autoResultOpen: market.autoResultOpen || 'disable',
+          ...market,
+        };
+      }),
     [marketList]
   );
 
