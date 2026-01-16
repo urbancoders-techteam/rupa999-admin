@@ -9,6 +9,7 @@ import {
   Card,
   Container,
   Grid,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -84,7 +85,7 @@ export default function MarketDataListPage() {
     defaultValues,
   });
 
-  const { handleSubmit, watch } = methods;
+  const { handleSubmit, watch, reset } = methods;
 
   const selectedDate = watch('date');
   const selectedMarket = watch('market');
@@ -196,6 +197,18 @@ export default function MarketDataListPage() {
     fetchDataWithFilters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, rowsPerPage]);
+
+  const handleReset = () => {
+    reset({ ...defaultValues, date: dayjs() });
+    setPage(0);
+    dispatch(
+      getBidDataResultAsync({
+        page: 1,
+        limit: rowsPerPage,
+        date: dayjs().format('YYYY-MM-DD'),
+      })
+    );
+  };
 
   const isNotFound = !bidDataResult.length && !loading;
 
@@ -362,15 +375,27 @@ export default function MarketDataListPage() {
                   </Grid>
 
                   <Grid item xs={12} sm={6} md={2}>
-                    <Button
-                      fullWidth
-                      variant="contained"
-                      disabled={loading}
-                      startIcon={<Iconify icon="eva:search-fill" />}
-                      onClick={handleSubmit(onSubmit)}
-                    >
-                      GET
-                    </Button>
+                    <Stack direction="row" spacing={1}>
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        disabled={loading}
+                        startIcon={<Iconify icon="eva:search-fill" />}
+                        onClick={handleSubmit(onSubmit)}
+                      >
+                        GET
+                      </Button>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        color="inherit"
+                        disabled={loading}
+                        startIcon={<Iconify icon="ic:round-refresh" />}
+                        onClick={handleReset}
+                      >
+                        Reset
+                      </Button>
+                    </Stack>
                   </Grid>
                 </Grid>
               </Box>
