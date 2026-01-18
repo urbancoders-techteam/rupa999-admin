@@ -124,6 +124,10 @@ const navConfig = [
             path: PATH_DASHBOARD.faq.list,
           },
           {
+            title: 'APK Upload',
+            path: PATH_DASHBOARD.apkupload.form,
+          },
+          {
             title: 'Mobile App Marque',
             path: PATH_DASHBOARD.marquemessage.form,
           },

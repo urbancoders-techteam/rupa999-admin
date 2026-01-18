@@ -44,6 +44,7 @@ import {
   CommonSettingFormPage,
   HelpAndSupportFormPage,
   MarqueMessageFormPage,
+  ApkUploadPage,
   //
   StaffListPage,
   StarlineMarketFormHandle,
@@ -193,6 +194,13 @@ export default function Router() {
               children: [
                 { element: <Navigate to="/dashboard/settings/helpsupport/form" replace />, index: true },
                 { path: 'form', element: <HelpAndSupportFormPage /> },
+              ],
+            },
+            {
+              path: 'apkupload',
+              children: [
+                { element: <Navigate to="/dashboard/settings/apkupload/form" replace />, index: true },
+                { path: 'form', element: <ApkUploadPage /> },
               ],
             },
             {

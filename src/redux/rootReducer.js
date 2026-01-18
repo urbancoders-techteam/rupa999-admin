@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 import storage from 'redux-persist/lib/storage';
 // slices
+import apkReducer from './slices/apk_slices';
 import authReducer from './slices/auth_slices';
 import bidReducer from './slices/bid_slices';
 import faqReducer from './slices/faq_slices';
@@ -36,6 +37,7 @@ const rootReducer = combineReducers({
   user: userReducer,
   notification: notificationReducer,
   faq: faqReducer,
+  apk: apkReducer,
 });
 
 export default rootReducer;
