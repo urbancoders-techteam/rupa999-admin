@@ -113,14 +113,21 @@ export default function MarketDataMobileViewCardLayout({
   return (
     <Stack spacing={2} sx={{ p: 2 }}>
       <Card
-        sx={{
-          // boxShadow: theme.shadows[2],
-          // borderRadius: 2,
-        }}
+        sx={
+          {
+            // boxShadow: theme.shadows[2],
+            // borderRadius: 2,
+          }
+        }
       >
         <Box sx={{ p: 2 }}>
           {/* Header */}
-          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+            sx={{ mb: 1.5 }}
+          >
             <Typography variant="subtitle1" fontWeight="bold">
               Bid Summary
             </Typography>
@@ -199,31 +206,28 @@ export default function MarketDataMobileViewCardLayout({
                     const item = col.bids[rowIdx];
                     if (!item) {
                       return (
-                        <Typography key={`${col.key}-empty-${rowIdx}`} variant="body2" color="text.disabled">
+                        <Typography
+                          key={`${col.key}-empty-${rowIdx}`}
+                          variant="body2"
+                          color="text.disabled"
+                        >
                           —
                         </Typography>
                       );
                     }
 
                     return (
-                      <Stack
-                        key={item.key}
-                        spacing={0.25}
-                        // sx={{
-                        //   p: 0.5,
-                        //   // borderRadius: 1,
-                        //   // backgroundColor: theme.palette.grey[50],
-                        //   height: '100%',
-                        // }}
-                      >
-                        <Tooltip title="Tap to view records" arrow placement="top">
+                      <Stack key={item.key} spacing={0.25}>
+                        <Tooltip title="Click here to view records" arrow placement="top">
                           <Typography
                             variant="body2"
                             onClick={() => handleNavigate(item.bidsNumber, col.type)}
                             sx={{
                               cursor: item.bidsNumber ? 'pointer' : 'default',
-                              color: item.bidsNumber ? 'primary.main' : 'text.secondary',
-                              fontWeight: 'bold',
+                              color: 'text.secondary',
+                              '&:hover': {
+                                color: item.bidsNumber ? 'primary.main' : 'text.secondary',
+                              },
                             }}
                           >
                             {item.bidsNumber} = ₹{item.amount.toLocaleString()}
@@ -258,7 +262,12 @@ export default function MarketDataMobileViewCardLayout({
                   Total
                 </Typography>
                 {columns.map((col) => (
-                  <Typography key={`${col.key}-total`} variant="body2" fontWeight="bold" color="primary.main">
+                  <Typography
+                    key={`${col.key}-total`}
+                    variant="body2"
+                    fontWeight="bold"
+                    color="primary.main"
+                  >
                     ₹{col.groupTotal.toLocaleString()}
                   </Typography>
                 ))}
