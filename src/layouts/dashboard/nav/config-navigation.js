@@ -74,34 +74,30 @@ const navConfig = [
         ],
       },
       {
-        title: 'Main Transaction Details',
+        title: 'Transaction Details',
         path: PATH_DASHBOARD.maintransaction.list,
         icon: ICONS.banking,
       },
 
       {
-        title: 'Main Bid History',
+        title: 'Bid History',
         path: PATH_DASHBOARD.mainbidhistory.list,
         icon: ICONS.banking,
       },
-
-      { title: 'profits', path: PATH_DASHBOARD.profit.root, icon: ICONS.analytics },
-
-      // { title: 'gift', path: PATH_DASHBOARD.gift.root, icon: ICONS.booking },
       {
-        title: 'General Withdraw History',
+        title: 'Withdraw History',
         path: PATH_DASHBOARD.generalwithdrawhistory.list,
-        icon: ICONS.banking,
-      },
-
-      {
-        title: 'Rate Card',
-        path: PATH_DASHBOARD.ratecard.root,
         icon: ICONS.banking,
       },
       {
         title: 'Deposit History',
         path: PATH_DASHBOARD.diposithistory.list,
+        icon: ICONS.banking,
+      },
+      { title: 'profits', path: PATH_DASHBOARD.profit.root, icon: ICONS.analytics },
+      {
+        title: 'Rate Card',
+        path: PATH_DASHBOARD.ratecard.root,
         icon: ICONS.banking,
       },
       {
