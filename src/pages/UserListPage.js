@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
 // @mui
 import {
   Button,
@@ -65,6 +65,8 @@ const TABLE_HEAD = [
 // ----------------------------------------------------------------------
 
 export default function UserListPage() {
+  const [searchParams] = useSearchParams();
+  const initialSearch = searchParams.get('search') || '';
   const {
     dense,
     page,
@@ -90,8 +92,8 @@ export default function UserListPage() {
 
   const [openConfirm, setOpenConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
-  const [filterName, setFilterName] = useState(''); // Input field value
-  const [searchQuery, setSearchQuery] = useState(''); // Actual search value sent to API
+  const [filterName, setFilterName] = useState(initialSearch); // Input field value
+  const [searchQuery, setSearchQuery] = useState(initialSearch); // Actual search value sent to API
   const [filterRole] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [changePasswordLoading, setChangePasswordLoading] = useState(false);
@@ -121,6 +123,16 @@ export default function UserListPage() {
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
+
+  // Sync search param on first load
+  useEffect(() => {
+    if (initialSearch) {
+      setFilterName(initialSearch);
+      setSearchQuery(initialSearch);
+    }
+    // run once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Transform API data to table format
   // Note: API already handles pagination and filtering, so we use the data directly

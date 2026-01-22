@@ -1,10 +1,12 @@
 /* eslint-disable no-nested-ternary */
-import { MenuItem, TableCell, TableRow, Typography } from '@mui/material';
+import { MenuItem, TableCell, TableRow, Typography, Link } from '@mui/material';
 import PropTypes from 'prop-types';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Iconify from '../../../components/iconify';
 import MenuPopover from '../../../components/menu-popover';
 import { fDateTime } from '../../../utils/formatTime';
+import { PATH_DASHBOARD } from '../../../routes/paths';
 
 // ----------------------------------------------------------------------
 
@@ -19,6 +21,12 @@ export default function BidRecordTableRow({ index, row, onEditRow }) {
     row;
 
   const [openPopover, setOpenPopover] = useState(null);
+  const navigate = useNavigate();
+
+  const handleUserClick = () => {
+    if (!userName) return;
+    navigate(`${PATH_DASHBOARD.user.list}?search=${encodeURIComponent(userName)}`);
+  };
 
   const handleOpenPopover = (event) => {
     setOpenPopover(event.currentTarget);
@@ -39,7 +47,16 @@ export default function BidRecordTableRow({ index, row, onEditRow }) {
           </Typography>
         </TableCell>
 
-        <TableCell align="left">{userName}</TableCell>
+        <TableCell align="left">
+          <Link
+            component="button"
+            type="button"
+            onClick={handleUserClick}
+            sx={{ fontWeight: 600, textDecoration: 'underline' }}
+          >
+            {userName}
+          </Link>
+        </TableCell>
         <TableCell align="left">{mobile || '—'}</TableCell>
 
         <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
