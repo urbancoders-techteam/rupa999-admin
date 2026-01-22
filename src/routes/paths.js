@@ -125,11 +125,6 @@ export const PATH_DASHBOARD = {
     form: path(ROOTS_DASHBOARD, '/settings/marquemessage/form'),
   },
 
-  apkupload: {
-    root: path(ROOTS_DASHBOARD, '/settings/apkupload'),
-    form: path(ROOTS_DASHBOARD, '/settings/apkupload/form'),
-  },
-
   gift: {
     root: path(ROOTS_DASHBOARD, '/gift'),
     list: path(ROOTS_DASHBOARD, '/gift/list'),

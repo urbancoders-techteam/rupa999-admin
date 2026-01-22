@@ -125,9 +125,6 @@ export const MarqueMessageFormPage = Loadable(lazy(() => import('../pages/settin
 export const FaqListPage = Loadable(lazy(() => import('../pages/settings/FaqListPage')));
 export const FaqFormHandle = Loadable(lazy(() => import('../sections/_faq/pages/FaqFormHandle')));
 
-// DASHBOARD: APK Upload
-export const ApkUploadPage = Loadable(lazy(() => import('../pages/settings/ApkUploadPage')));
-
 // BASIC PAGES
 export const Page500 = Loadable(lazy(() => import('../pages/errorHandlingPage/Page500')));
 export const Page403 = Loadable(lazy(() => import('../pages/errorHandlingPage/Page403')));

@@ -85,11 +85,13 @@ export default function StarlineMarketForm({ isEdit = false, isView = false, cur
   }, [isEdit, isView, currentUser, reset, defaultValues]);
 
   const onSubmit = async (data) => {
+
+    console.log(data.openTime);
     try {
       // Convert dayjs object to HH:mm format string for API
       const submitData = {
         ...data,
-        openTime: data.openTime ? dayjs(data.openTime).format('HH:mm') : null,
+        openTime: data.openTime ? dayjs(data.openTime).toISOString() : null,
       };
 
       if (isEdit && currentUser?._id) {
