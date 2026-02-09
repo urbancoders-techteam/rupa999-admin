@@ -94,7 +94,7 @@ export default function StarLineWinHistoryListPage() {
         id: bid._id,
         userId: bid.userId?._id,
         sno: (page * rowsPerPage) + index + 1,
-        marketName: bid.marketId?.name || 'N/A',
+        marketName: bid.marketId?.name || bid.starlineMarketId?.name || 'N/A',
         userName: bid.userId?.name || 'N/A',
         session: bid.type || 'N/A',
         number: bid.bidTable?.digit || 'N/A',
