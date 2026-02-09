@@ -43,6 +43,15 @@ import { PATH_DASHBOARD } from '../../routes/paths';
 import StarlineMarketDataMobileViewCardLayout from '../../sections/_starline_market_data/components/StarlineMarketDataMobileViewCardLayout';
 import StarlineMarketDataTableRow from '../../sections/_starline_market_data/components/StarlineMarketDataTableRow';
 
+// Filter market types for starline - only allow single digit, single pana, double pana, triple pana
+const starlineMarketTypeOptions = marketTypeOptiData.filter(
+  (option) =>
+    option.key === 'single_digit' ||
+    option.key === 'single_pana' ||
+    option.key === 'double_pana' ||
+    option.key === 'triple_pana'
+);
+
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
@@ -317,7 +326,7 @@ export default function StarlineMarketDataListPage() {
                         name="marketType"
                         label="Market Type"
                         size="small"
-                        options={marketTypeOptiData}
+                        options={starlineMarketTypeOptions}
                         getOptionLabel={(option) => option?.name || ''}
                         isOptionEqualToValue={(option, value) => option?.key === value?.key}
                         renderOption={(props, option) => <li {...props}>{option.name}</li>}
