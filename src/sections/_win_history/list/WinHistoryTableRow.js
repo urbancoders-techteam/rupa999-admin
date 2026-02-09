@@ -57,7 +57,9 @@ export default function WinHistoryTableRow({ index, row, onEditRow }) {
 
         <TableCell align="left">₹{winAmount?.toLocaleString('en-IN') || 0}</TableCell>
 
-        <TableCell align="left" maxWidth="190px">{fDateTime(createdAt)}</TableCell>
+        <TableCell align="left" maxWidth="190px">
+          {createdAt || 'N/A'}
+        </TableCell>
       </TableRow>
 
       <MenuPopover
