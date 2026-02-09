@@ -94,7 +94,7 @@ export default function MainBidHistoryTableRow({ index, row, selected }) {
     <TableRow hover>
       <TableCell align="center">
         <Typography variant="subtitle2" noWrap>
-          {index + 1 || '—'}
+          {index != null ? index : '—'}
         </Typography>
       </TableCell>
 

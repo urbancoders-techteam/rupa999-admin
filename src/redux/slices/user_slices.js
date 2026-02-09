@@ -11,6 +11,7 @@ import {
   getAllDepositHistoryAsync,
   getAllBidsAsync,
   getGeneralMarketRecordsAsync,
+  getStarlineMarketRecordsAsync,
 } from '../services/user_services';
 
 const initialState = {
@@ -65,6 +66,15 @@ const initialState = {
   generalMarketRecordsLoading: false,
   generalMarketRecordsError: null,
   generalMarketRecordsPagination: {
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+  },
+  starlineMarketRecordsList: [],
+  starlineMarketRecordsLoading: false,
+  starlineMarketRecordsError: null,
+  starlineMarketRecordsPagination: {
     page: 1,
     limit: 10,
     total: 0,
@@ -346,6 +356,38 @@ const userSlice = createSlice({
     builder.addMatcher(isAnyOf(getGeneralMarketRecordsAsync.rejected), (state, { payload }) => {
       state.generalMarketRecordsLoading = false;
       state.generalMarketRecordsError = payload?.message || 'Failed to fetch general market records';
+    });
+    // -------------
+
+    // Get Starline Market Records ----------
+    builder.addMatcher(isAnyOf(getStarlineMarketRecordsAsync.pending), (state) => {
+      state.starlineMarketRecordsLoading = true;
+      state.starlineMarketRecordsError = null;
+    });
+
+    builder.addMatcher(isAnyOf(getStarlineMarketRecordsAsync.fulfilled), (state, { payload }) => {
+      state.starlineMarketRecordsLoading = false;
+      state.starlineMarketRecordsList = payload?.data || [];
+      if (payload?.pagination) {
+        state.starlineMarketRecordsPagination = {
+          page: payload.pagination.page || 1,
+          limit: payload.pagination.limit || 10,
+          total: payload.pagination.total || 0,
+          totalPages: payload.pagination.totalPages || 0,
+        };
+      } else if (payload) {
+        state.starlineMarketRecordsPagination = {
+          page: payload.pagination?.page || 1,
+          limit: payload.pagination?.limit || 10,
+          total: payload.pagination?.total || 0,
+          totalPages: payload.pagination?.totalPages || 0,
+        };
+      }
+    });
+
+    builder.addMatcher(isAnyOf(getStarlineMarketRecordsAsync.rejected), (state, { payload }) => {
+      state.starlineMarketRecordsLoading = false;
+      state.starlineMarketRecordsError = payload?.message || 'Failed to fetch starline market records';
     });
     // -------------
 
