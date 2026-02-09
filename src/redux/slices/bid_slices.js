@@ -3,6 +3,7 @@ import {
   getAllBidsAsync,
   getAllWinningBidsAsync,
   getBidDataResultAsync,
+  getStarlineMarketDataAsync,
   getProfitBidsAsync,
   getYearlyProfitBidsAsync,
   getBidRecordsByDigitAndTypeAsync,
@@ -12,6 +13,7 @@ const initialState = {
   winningBidsList: [],
   allBidsList: [],
   bidDataResult: [],
+  starlineMarketDataResult: [],
   bidRecordsList: [],
   profitBidsList: {
     totalAmount: 0,
@@ -25,6 +27,12 @@ const initialState = {
   loading: false,
   error: null,
   pagination: {
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+  },
+  starlineMarketDataPagination: {
     page: 1,
     limit: 10,
     total: 0,
@@ -96,6 +104,24 @@ const bidSlice = createSlice({
       .addCase(getBidDataResultAsync.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || 'Failed to fetch bid data result';
+      });
+
+    // Get starline market data result
+    builder
+      .addCase(getStarlineMarketDataAsync.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getStarlineMarketDataAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        state.starlineMarketDataResult = action.payload?.data || [];
+        if (action.payload?.pagination) {
+          state.starlineMarketDataPagination = action.payload.pagination;
+        }
+      })
+      .addCase(getStarlineMarketDataAsync.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Failed to fetch starline market data';
       });
 
     // Get profit bids

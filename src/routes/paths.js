@@ -202,6 +202,11 @@ export const PATH_DASHBOARD = {
       root: path(ROOTS_DASHBOARD, '/starline/winhistory'),
       list: path(ROOTS_DASHBOARD, '/starline/winhistory/list'),
     },
+
+    marketdata: {
+      root: path(ROOTS_DASHBOARD, '/starline/marketdata'),
+      list: path(ROOTS_DASHBOARD, '/starline/marketdata/list'),
+    },
   },
 
   generalwithdrawhistory: {

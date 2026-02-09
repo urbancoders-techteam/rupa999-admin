@@ -87,6 +87,9 @@ export const StarLineMarketResultListPage = Loadable(lazy(() => import('../pages
 // DASHBOARD: Starline Market | Win History
 export const StarLineWinHistoryListPage = Loadable(lazy(() => import('../pages/startlineMarkets/StarLineWinHistoryListPage')));
 
+// DASHBOARD: Starline Market | Market Data
+export const StarlineMarketDataListPage = Loadable(lazy(() => import('../pages/startlineMarkets/StarlineMarketDataListPage')));
+
 // DASHBOARD: Withdraw History
 export const GeneralWithdrawHistoryListPage = Loadable(lazy(() => import('../pages/GeneralWithdrawHistoryListPage')));
 

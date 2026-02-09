@@ -70,6 +70,34 @@ export const getBidDataResultAsync = createAsyncThunk(
   }
 );
 
+// Get starline market data result
+export const getStarlineMarketDataAsync = createAsyncThunk(
+  'bid/getStarlineMarketData',
+  async (params = {}, toolkit) => {
+    const apiParams = {
+      page: params.page || 1,
+      limit: params.limit || 10,
+      starlineMarketId: params.starlineMarket || params.starlineMarketId,
+      gameType: params.gameType,
+      date: params.date,
+    };
+
+    // Remove undefined values
+    Object.keys(apiParams).forEach(key => {
+      if (apiParams[key] === undefined || apiParams[key] === null || apiParams[key] === '') {
+        delete apiParams[key];
+      }
+    });
+
+    return AxiosClient({
+      toolkit,
+      url: '/admin/starline-market-data',
+      method: 'get',
+      params: apiParams,
+    });
+  }
+);
+
 // Get profit bids
 export const getProfitBidsAsync = createAsyncThunk(
   'bid/getProfitBids',
