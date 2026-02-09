@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import AxiosClient from '../../utils/axios';
 
-// Get all winning bids (for admin)
+// Get all winning bids (for admin). Pass starlineOnly: true for Start Line Win History.
 export const getAllWinningBidsAsync = createAsyncThunk(
   'bid/getAllWinning',
   async (params = {}, toolkit) =>
@@ -15,6 +15,7 @@ export const getAllWinningBidsAsync = createAsyncThunk(
         userId: params.userId || '',
         marketId: params.marketId || '',
         gameType: params.gameType || '',
+        starlineOnly: params.starlineOnly === true ? 'true' : undefined,
       },
     })
 );
