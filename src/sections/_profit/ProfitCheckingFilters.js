@@ -81,6 +81,50 @@ const ProfitCheckingFilters = () => {
     ];
   }, [profitBidsList]);
 
+  const donutChartData = React.useMemo(() => {
+    const toSafeNumber = (value) => {
+      const parsedValue = Number(value);
+      return Number.isFinite(parsedValue) ? parsedValue : 0;
+    };
+
+    const clampPercent = (value) => Math.min(Math.max(value, 0), 100);
+
+    const totalAmount = toSafeNumber(profitBidsList?.totalAmount);
+    const winAmount = toSafeNumber(profitBidsList?.winAmount);
+    const profits = toSafeNumber(profitBidsList?.profits);
+
+    // Prefer totalAmount as base; fallback keeps chart meaningful for incomplete API payloads.
+    const fallbackBase = Math.max(Math.abs(totalAmount), Math.abs(winAmount), Math.abs(profits));
+    const baseAmount = Math.abs(totalAmount) > 0 ? Math.abs(totalAmount) : fallbackBase;
+
+    const totalPercent = baseAmount > 0 ? clampPercent((Math.abs(totalAmount) / baseAmount) * 100) : 0;
+    const winPercent = baseAmount > 0 ? clampPercent((Math.abs(winAmount) / baseAmount) * 100) : 0;
+    const profitPercent = baseAmount > 0 ? clampPercent((Math.abs(profits) / baseAmount) * 100) : 0;
+    const totalMoreThanWinPercent = totalAmount > 0 ? ((totalAmount - winAmount) / totalAmount) * 100 : 0;
+    const isTotalHigherThanWin = totalAmount > winAmount;
+
+    const profitLabel = profits >= 0 ? 'Loss' : 'Profits';
+    const thirdSeriesLabel = isTotalHigherThanWin
+      ? `Total Amount Win Amount se ${totalMoreThanWinPercent.toFixed(1)}% jyada hai`
+      : `${profitLabel} (${profitPercent.toFixed(1)})`;
+    const thirdSeriesValue = isTotalHigherThanWin ? totalMoreThanWinPercent : profitPercent;
+
+    return {
+      totalAmount,
+      series: [
+        { label: `Total Amount (${totalAmount})`, value: totalPercent },
+        { label: `Total Win Amount (${winAmount})`, value: winPercent },
+   
+        // Agar total amount win amount se jyada hai, toh sirf difference percent dikhao (total amount win amount se kitna jyada percent hai)
+        {
+          label: thirdSeriesLabel,
+          value: thirdSeriesValue,
+        },
+
+      ],
+    };
+  }, [profitBidsList]);
+
   // Fetch markets on mount
   useEffect(() => {
     dispatch(
@@ -266,23 +310,9 @@ const ProfitCheckingFilters = () => {
           <Grid item xs={12} md={6} lg={6}>
             <DonutChart
               title="Profit Chart"
-              total={profitBidsList?.totalAmount || 0}
+              total={donutChartData.totalAmount}
               chart={{
-                series: (() => {
-                  const totalAmount = profitBidsList?.totalAmount || 0;
-                  const winAmount = profitBidsList?.winAmount || 0;
-                  const profits = profitBidsList?.profits || 0;
-
-                  // Calculate percentages based on Total Amount (100% base)
-                  const winPercent = totalAmount > 0 ? (Math.abs(winAmount) / totalAmount) * 100 : 0;
-                  const profitPercent = totalAmount > 0 ? (Math.abs(profits) / totalAmount) * 100 : 0;
-
-                  return [
-                    { label: `Total Amount (100%)`, value: 100 },
-                    { label: `Total Win Amount (${winPercent.toFixed(1)}%)`, value: winPercent },
-                    { label: `Profit (${profitPercent.toFixed(1)}%)`, value: profitPercent },
-                  ];
-                })(),
+                series: donutChartData.series,
               }}
             />
           </Grid>
