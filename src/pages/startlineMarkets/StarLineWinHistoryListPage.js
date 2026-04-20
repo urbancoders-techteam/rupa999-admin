@@ -1,32 +1,33 @@
-import { Helmet } from 'react-helmet-async';
 import { paramCase } from 'change-case';
-import { useState, useMemo } from 'react';
+import dayjs from 'dayjs';
+import { useEffect, useMemo, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 // @mui
-import { Card, Table, Button, TableBody, Container, TableContainer, Box } from '@mui/material';
+import { Box, Button, Card, Container, Table, TableBody, TableCell, TableContainer, TableRow } from '@mui/material';
 import useResponsive from '../../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
-// _mock_
-import {marketRecordData}  from '../../_mock/arrays/_market';
 // components
-import Scrollbar from '../../components/scrollbar';
 import ConfirmDialog from '../../components/confirm-dialog';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
+import Scrollbar from '../../components/scrollbar';
 import { useSettingsContext } from '../../components/settings';
 import {
-  useTable,
-  getComparator,
   emptyRows,
-  TableNoData,
   TableEmptyRows,
   TableHeadCustom,
+  TableNoData,
   TablePaginationCustom,
+  useTable,
 } from '../../components/table';
 import CustomTableToolbar from '../../components/table/CustomTableToolBar';
 // sections
-import WithdrawMobileViewCardLayout from '../../sections/_withdraw_details/components/WithdrawDetailsMobileViewCardLayout';
 import WinHistoryTableRow from '../../sections/_win_history/list/WinHistoryTableRow';
+import WinHistoryMobileViewCardLayout from '../../sections/_win_history/list/WinHistoryMobileViewCardLayout';
+// redux
+import { getAllWinningBidsAsync } from '../../redux/services/bid_services';
 
 // ----------------------------------------------------------------------
 
@@ -35,6 +36,7 @@ const TABLE_HEAD = [
   { id: 'id', label: 'ID', align: 'left' },
   { id: 'marketName', label: 'Market Name', align: 'left' },
   { id: 'userName', label: 'Winner Name', align: 'left' },
+  { id: 'contactNumber', label: 'Phone', align: 'left' },
   { id: 'session', label: 'Session', align: 'left' },
   { id: 'amount', label: 'Amount', align: 'left' },
   { id: 'number', label: 'Number', align: 'left' },
@@ -48,8 +50,6 @@ export default function StarLineWinHistoryListPage() {
   const {
     dense,
     page,
-    order,
-    orderBy,
     rowsPerPage,
     setPage,
     //
@@ -57,7 +57,6 @@ export default function StarLineWinHistoryListPage() {
     setSelected,
     onSelectRow,
     //
-    onSort,
     onChangeDense,
     onChangePage,
     onChangeRowsPerPage,
@@ -66,35 +65,61 @@ export default function StarLineWinHistoryListPage() {
   const { themeStretch } = useSettingsContext();
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const [tableData, setTableData] = useState(marketRecordData);
+  const { winningBidsList, loading, pagination } = useSelector((state) => state.bid);
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
-  const [filterName, setFilterName] = useState(''); // Input field value
-  const [searchQuery, setSearchQuery] = useState(''); // Actual search value for filtering
-
+  const [filterName, setFilterName] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [filterRole, setFilterRole] = useState('all');
-
   const [filterStatus, setFilterStatus] = useState('all');
 
-  // Memoized filtered data
+  // Fetch starline winning bids only
+  useEffect(() => {
+    dispatch(
+      getAllWinningBidsAsync({
+        page: page + 1,
+        limit: rowsPerPage,
+        starlineOnly: true,
+      })
+    );
+  }, [dispatch, page, rowsPerPage]);
+
+  // Transform API data to table format
+  const tableData = useMemo(
+    () =>
+      winningBidsList.map((bid, index) => ({
+        id: bid._id,
+        userId: bid.userId?._id,
+        sno: (page * rowsPerPage) + index + 1,
+        marketName: bid.marketId?.name || bid.starlineMarketId?.name || 'N/A',
+        userName: bid.userId?.name || 'N/A',
+        session: bid.type || 'N/A',
+        number: bid.bidTable?.digit || 'N/A',
+        contactNumber: bid.userId?.number || 'N/A',
+        amount: bid.totalPoints || 0,
+        winAmount: bid.winAmount || 0,
+        createdAt: bid.createdAt ? dayjs(bid.createdAt).format('DD-MMM, YYYY HH:mm A') : 'N/A',
+      })),
+    [winningBidsList, page, rowsPerPage]
+  );
+
   const dataFiltered = useMemo(
     () =>
       applyFilter({
         inputData: tableData,
-        comparator: getComparator(order, orderBy),
         filterName: searchQuery,
         filterRole,
         filterStatus,
       }),
-    [tableData, order, orderBy, searchQuery, filterRole, filterStatus]
+    [tableData, searchQuery, filterRole, filterStatus]
   );
 
-  // Memoized paginated data
   const dataInPage = useMemo(
-    () => dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [dataFiltered, page, rowsPerPage]
+    () => dataFiltered.slice(0, rowsPerPage),
+    [dataFiltered, rowsPerPage]
   );
 
   const denseHeight = dense ? 52 : 72;
@@ -107,7 +132,6 @@ export default function StarLineWinHistoryListPage() {
     (!dataFiltered.length && !!searchQuery) ||
     (!dataFiltered.length && !!filterRole) ||
     (!dataFiltered.length && !!filterStatus);
-
 
   const handleCloseConfirm = () => {
     setOpenConfirm(false);
@@ -122,47 +146,16 @@ export default function StarLineWinHistoryListPage() {
     setSearchQuery(filterName);
   };
 
-  const handleDeleteRow = (id) => {
-    const deleteRow = tableData.filter((row) => row.id !== id);
-    setSelected([]);
-    setTableData(deleteRow);
-
-    if (page > 0) {
-      if (dataInPage.length < 2) {
-        setPage(page - 1);
-      }
-    }
+  const handleDeleteRow = () => {
+    // Read-only list; delete via API if needed later
   };
 
-  const handleDeleteRows = (selectedRows) => {
-    const deleteRows = tableData.filter((row) => !selectedRows.includes(row.id));
+  const handleDeleteRows = () => {
     setSelected([]);
-    setTableData(deleteRows);
-
-    if (page > 0) {
-      if (selectedRows.length === dataInPage.length) {
-        setPage(page - 1);
-      } else if (selectedRows.length === dataFiltered.length) {
-        setPage(0);
-      } else if (selectedRows.length > dataInPage.length) {
-        <TablePaginationCustom
-          count={dataFiltered.length}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={onChangePage}
-          onRowsPerPageChange={onChangeRowsPerPage}
-          //
-          dense={dense}
-          onChangeDense={onChangeDense}
-        />;
-        const newPage = Math.ceil((tableData.length - selectedRows.length) / rowsPerPage) - 1;
-        setPage(newPage);
-      }
-    }
   };
 
-  const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
+  const handleEditRow = (userId) => {
+    if (userId) navigate(PATH_DASHBOARD.user.view(paramCase(userId)));
   };
 
   const handleResetFilter = () => {
@@ -176,7 +169,7 @@ export default function StarLineWinHistoryListPage() {
   return (
     <>
       <Helmet>
-        <title> Star Line Win History : List | Rupa999 </title>
+        <title> Start Line Win History : List | Rupa999 </title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
@@ -186,7 +179,7 @@ export default function StarLineWinHistoryListPage() {
               heading="Start Line Win History"
               links={[
                 { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                { name: 'Start Line Win History', href: PATH_DASHBOARD.markets.winhistory.root },
+                { name: 'Start Line Win History', href: PATH_DASHBOARD.starline.winhistory.root },
               ]}
             />
             <CustomTableToolbar
@@ -204,7 +197,7 @@ export default function StarLineWinHistoryListPage() {
               heading="Start Line Win History"
               links={[
                 { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                { name: 'Start Line Win History', href: PATH_DASHBOARD.markets.winhistory.list },
+                { name: 'Start Line Win History', href: PATH_DASHBOARD.starline.winhistory.list },
                 { name: 'List' },
               ]}
             />
@@ -219,61 +212,78 @@ export default function StarLineWinHistoryListPage() {
           </>
         )}
 
-        {/* Render mobile card layout for small screens, otherwise render the table */}
         {isMobile ? (
-          <WithdrawMobileViewCardLayout
-            data={dataFiltered}
-            onEditRow={(id) => handleEditRow(id)}
-            onDeleteRow={(id) => handleDeleteRow(id)}
-            onSelectRow={(id) => onSelectRow(id)}
-            selected={selected}
-          />
+          <>
+            <WinHistoryMobileViewCardLayout
+              data={dataInPage}
+              onEditRow={(id) => handleEditRow(id)}
+              onDeleteRow={(id) => handleDeleteRow(id)}
+              onSelectRow={(id) => onSelectRow(id)}
+              selected={selected}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              loading={loading}
+            />
+            <TablePaginationCustom
+              count={pagination.total || 0}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={onChangePage}
+              onRowsPerPageChange={onChangeRowsPerPage}
+              dense={dense}
+              onChangeDense={onChangeDense}
+            />
+          </>
         ) : (
           <Card>
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
               <Scrollbar>
                 <Table size={!dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
                   <TableHeadCustom
-                    order={order}
-                    orderBy={orderBy}
                     headLabel={TABLE_HEAD}
                     rowCount={tableData.length}
                     numSelected={selected.length}
-                    onSort={onSort}
                   />
 
                   <TableBody>
-                    {dataFiltered
-                      ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((row, index) => (
-                        <WinHistoryTableRow
-                          index={(page * rowsPerPage) + index + 1}
-                          key={row.id}
-                          row={row}
-                          selected={selected.includes(row.id)}
-                          onSelectRow={() => onSelectRow(row.id)}
-                          onDeleteRow={() => handleDeleteRow(row.id)}
-                          onEditRow={() => handleEditRow(row.name)}
+                    {loading ? (
+                      <TableRow>
+                        <TableCell colSpan={TABLE_HEAD.length} align="center">
+                          Loading...
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      <>
+                        {dataFiltered?.map((row, index) => (
+                            <WinHistoryTableRow
+                              index={index + 1}
+                              key={row.id}
+                              row={row}
+                              selected={selected.includes(row.id)}
+                              onSelectRow={() => onSelectRow(row.id)}
+                              onDeleteRow={() => handleDeleteRow(row.id)}
+                              onEditRow={() => handleEditRow(row.userId)}
+                            />
+                          ))}
+
+                        <TableEmptyRows
+                          height={denseHeight}
+                          emptyRows={emptyRows(0, rowsPerPage, dataFiltered.length)}
                         />
-                      ))}
 
-                    <TableEmptyRows
-                      height={denseHeight}
-                      emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
-                    />
-
-                    <TableNoData isNotFound={isNotFound} />
+                        <TableNoData isNotFound={isNotFound} />
+                      </>
+                    )}
                   </TableBody>
                 </Table>
               </Scrollbar>
             </TableContainer>
             <TablePaginationCustom
-              count={dataFiltered.length}
+              count={pagination.total || 0}
               page={page}
               rowsPerPage={rowsPerPage}
               onPageChange={onChangePage}
               onRowsPerPageChange={onChangeRowsPerPage}
-              //
               dense={dense}
               onChangeDense={onChangeDense}
             />
@@ -309,30 +319,27 @@ export default function StarLineWinHistoryListPage() {
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, comparator, filterName, filterStatus, filterRole }) {
-  const stabilizedThis = inputData.map((el, index) => [el, index]);
-
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-
-  inputData = stabilizedThis.map((el) => el[0]);
+function applyFilter({ inputData, filterName, filterStatus, filterRole }) {
+  let filteredData = inputData;
 
   if (filterName) {
-    inputData = inputData.filter(
-      (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+    const searchTerm = filterName.toLowerCase();
+    filteredData = filteredData.filter(
+      (item) =>
+        (item.userName && item.userName.toLowerCase().indexOf(searchTerm) !== -1) ||
+        (item.marketName && item.marketName.toLowerCase().indexOf(searchTerm) !== -1) ||
+        (item.number && item.number.toString().indexOf(searchTerm) !== -1) ||
+        (item.session && item.session.toLowerCase().indexOf(searchTerm) !== -1)
     );
   }
 
   if (filterStatus !== 'all') {
-    inputData = inputData.filter((user) => user.status === filterStatus);
+    filteredData = filteredData.filter((item) => item.status === filterStatus);
   }
 
   if (filterRole !== 'all') {
-    inputData = inputData.filter((user) => user.role === filterRole);
+    filteredData = filteredData.filter((item) => item.role === filterRole);
   }
 
-  return inputData;
+  return filteredData;
 }

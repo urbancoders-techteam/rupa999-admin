@@ -40,6 +40,7 @@ const TABLE_HEAD = [
   { id: 'userName', label: 'User Name', align: 'left' },
   { id: 'phoneNumber', label: 'Phone', align: 'left' },
   { id: 'marketName', label: 'Market Name', align: 'left' },
+  { id: 'marketType', label: 'Market Type', align: 'left' },
   { id: 'name', label: 'Game Name', align: 'left' },
   { id: 'type', label: 'Type', align: 'left' },
   { id: 'digit', label: 'Digit', align: 'left' },

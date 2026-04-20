@@ -194,3 +194,21 @@ export const getGeneralMarketRecordsAsync = createAsyncThunk(
     })
 );
 
+// Get Starline Market Records (Admin only) - only starline bids
+export const getStarlineMarketRecordsAsync = createAsyncThunk(
+  'user/getStarlineMarketRecords',
+  async (params = {}, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: '/admin/starline-market-records',
+      method: 'get',
+      params: {
+        page: params.page || 1,
+        limit: params.limit || 10,
+        marketId: params.marketId || '',
+        search: params.search || '',
+        status: params.status || '',
+      },
+    })
+);
+

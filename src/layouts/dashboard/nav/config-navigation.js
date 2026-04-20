@@ -70,7 +70,7 @@ const navConfig = [
           { title: 'Market Record', path: PATH_DASHBOARD.starline.marketrecords.list },
           { title: 'Game Result', path: PATH_DASHBOARD.starline.marketresults.list },
           { title: 'Win History', path: PATH_DASHBOARD.starline.winhistory.list },
-          // { title: 'Data', path: PATH_DASHBOARD.starline.marketrecords.list },
+          { title: 'Data', path: PATH_DASHBOARD.starline.marketdata.list },
         ],
       },
       {

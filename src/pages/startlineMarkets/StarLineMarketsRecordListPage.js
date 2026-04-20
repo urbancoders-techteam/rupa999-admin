@@ -1,14 +1,13 @@
 import { Helmet } from 'react-helmet-async';
 import { paramCase } from 'change-case';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 // @mui
 import { Card, Table, Button, TableBody, Container, TableContainer, Box } from '@mui/material';
 import useResponsive from '../../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
-// _mock_
-import { marketRecordData } from '../../_mock/arrays/_market';
 // components
 import Scrollbar from '../../components/scrollbar';
 import ConfirmDialog from '../../components/confirm-dialog';
@@ -22,31 +21,17 @@ import {
   TableEmptyRows,
   TableHeadCustom,
   TablePaginationCustom,
+  TableSkeleton,
 } from '../../components/table';
 // sections
 import GeneralMarketRecordTableRow from '../../sections/_general_market_records/components/GeneralMarketRecordsTableRow';
 import GeneralMarketRecordMVCLayout from '../../sections/_general_market_records/components/GeneralMarketRecordMVCLayout';
 import CustomTableToolbar from '../../components/table/CustomTableToolBar';
+// redux
+import { getStarlineMarketRecordsAsync } from '../../redux/services/user_services';
+import { getAllStarlineMarketsAsync } from '../../redux/services/starline_market_services';
 
 // ----------------------------------------------------------------------
-
-const optionsData = [
-  'SRIDEVI DAY',
-  'TIME BAZAR',
-  'MADHUR DAY',
-  'MILAN DAY',
-  'RAJDHANI DAY',
-  'SUPREME DAY',
-  'KALIYAN',
-  'SRIDEVI NIGHT',
-  'MADHUR NIGHT',
-  'MILAN NIGHT',
-  'KALIYAN NIGHT',
-  'MAIN BAZAR',
-  'RAJDHANI NIGHT',
-  'KARNATAKA DAY',
-  'KARNATAKA NIGHT',
-];
 
 const TABLE_HEAD = [
   { id: 'actions', label: 'Actions', align: 'center' },
@@ -83,55 +68,80 @@ export default function StarLineMarketsRecordListPage() {
   } = useTable();
 
   const { themeStretch } = useSettingsContext();
-
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [tableData, setTableData] = useState(marketRecordData);
+  const {
+    starlineMarketRecordsList,
+    starlineMarketRecordsLoading,
+    starlineMarketRecordsPagination,
+  } = useSelector((state) => state.user);
+  const { marketList: starlineMarketList } = useSelector((state) => state.starlineMarket);
 
   const [openConfirm, setOpenConfirm] = useState(false);
-
-  const [filterName, setFilterName] = useState(''); // Input field value
-  const [searchQuery, setSearchQuery] = useState(''); // Actual search value for filtering
-
+  const [filterName, setFilterName] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedDropDown, setSelectedDropDown] = useState('');
-
   const [filterStatus, setFilterStatus] = useState('all');
-
   const [selectedDate, setSelectedDate] = useState(new Date());
+
+  // Fetch starline markets for dropdown
+  useEffect(() => {
+    dispatch(getAllStarlineMarketsAsync({ page: 1, limit: 100 }));
+  }, [dispatch]);
+
+  // Fetch starline market records (only starline bids)
+  useEffect(() => {
+    dispatch(
+      getStarlineMarketRecordsAsync({
+        page: page + 1,
+        limit: rowsPerPage,
+        search: searchQuery,
+        marketId: selectedDropDown || '',
+        status: filterStatus !== 'all' ? filterStatus : '',
+      })
+    );
+  }, [dispatch, page, rowsPerPage, searchQuery, selectedDropDown, filterStatus]);
 
   const handleDateFilter = (newValue) => {
     setSelectedDate(newValue);
   };
 
-  // Memoized filtered data
-  const dataFiltered = useMemo(
+  const tableData = useMemo(
     () =>
-      applyFilter({
-        inputData: tableData,
-        comparator: getComparator(order, orderBy),
-        filterName: searchQuery,
-        selectedDropDown,
-        filterStatus,
-      }),
-    [tableData, order, orderBy, searchQuery, selectedDropDown, filterStatus]
+      starlineMarketRecordsList.map((record, index) => ({
+        id: record.id || record._id || index + 1,
+        marketName: record.marketName || '-',
+        userName: record.userName || '-',
+        userPhone: record.userPhone || '-',
+        session: record.session || '-',
+        number: record.number || '-',
+        amount: record.amount || 0,
+        winAmount: record.winAmount || 0,
+        status: record.status || 'PENDING',
+        createdAt: record.createdAt || '-',
+        ...record,
+      })),
+    [starlineMarketRecordsList]
   );
 
-  // Memoized paginated data
-  const dataInPage = useMemo(
-    () => dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [dataFiltered, page, rowsPerPage]
+  const dataFiltered = useMemo(
+    () => {
+      const stabilizedThis = tableData.map((el, index) => [el, index]);
+      stabilizedThis.sort((a, b) => {
+        const sortOrder = getComparator(order, orderBy)(a[0], b[0]);
+        if (sortOrder !== 0) return sortOrder;
+        return a[1] - b[1];
+      });
+      return stabilizedThis.map((el) => el[0]);
+    },
+    [tableData, order, orderBy]
   );
 
   const denseHeight = dense ? 52 : 72;
-
   const isMobile = useResponsive('down', 'sm');
-
-  const isFiltered = searchQuery !== '' || selectedDropDown !== 'all' || filterStatus !== 'all';
-
-  const isNotFound =
-    (!dataFiltered.length && !!searchQuery) ||
-    (!dataFiltered.length && !!selectedDropDown) ||
-    (!dataFiltered.length && !!filterStatus);
+  const isFiltered = searchQuery !== '' || selectedDropDown !== '' || filterStatus !== 'all';
+  const isNotFound = !starlineMarketRecordsLoading && !tableData.length;
 
   const handleCloseConfirm = () => {
     setOpenConfirm(false);
@@ -146,47 +156,25 @@ export default function StarLineMarketsRecordListPage() {
     setSearchQuery(filterName);
   };
 
-  const handleSelectedDropDown = (items) => {
-    setSelectedDropDown(items);
+  const handleSelectedDropDown = (event) => {
+    setSelectedDropDown(event?.target?.value ?? '');
   };
 
-  const handleDeleteRow = (id) => {
-    const deleteRow = tableData.filter((row) => row.id !== id);
-    setSelected([]);
-    setTableData(deleteRow);
-
-    if (page > 0) {
-      if (dataInPage.length < 2) {
-        setPage(page - 1);
-      }
-    }
+  const handleDeleteRow = () => {
+    dispatch(
+      getStarlineMarketRecordsAsync({
+        page: page + 1,
+        limit: rowsPerPage,
+        search: searchQuery,
+        marketId: selectedDropDown || '',
+        status: filterStatus !== 'all' ? filterStatus : '',
+      })
+    );
   };
 
   const handleDeleteRows = (selectedRows) => {
-    const deleteRows = tableData.filter((row) => !selectedRows.includes(row.id));
     setSelected([]);
-    setTableData(deleteRows);
-
-    if (page > 0) {
-      if (selectedRows.length === dataInPage.length) {
-        setPage(page - 1);
-      } else if (selectedRows.length === dataFiltered.length) {
-        setPage(0);
-      } else if (selectedRows.length > dataInPage.length) {
-        <TablePaginationCustom
-          count={dataFiltered.length}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={onChangePage}
-          onRowsPerPageChange={onChangeRowsPerPage}
-          //
-          dense={dense}
-          onChangeDense={onChangeDense}
-        />;
-        const newPage = Math.ceil((tableData.length - selectedRows.length) / rowsPerPage) - 1;
-        setPage(newPage);
-      }
-    }
+    setOpenConfirm(false);
   };
 
   const handleEditRow = (id) => {
@@ -221,10 +209,10 @@ export default function StarLineMarketsRecordListPage() {
               isFiltered={isFiltered}
               filterName={filterName}
               selectedDate={selectedDate}
-              fileterOptions={optionsData}
+              marketOptions={starlineMarketList}
               selectedDropDown={selectedDropDown}
               onselectedDropDown={handleSelectedDropDown}
-              onDateFilter = {handleDateFilter}
+              onDateFilter={handleDateFilter}
               onFilterName={handleFilterName}
               onSearch={handleSearch}
               onResetFilter={handleResetFilter}
@@ -243,7 +231,7 @@ export default function StarLineMarketsRecordListPage() {
             <CustomTableToolbar
               isFiltered={isFiltered}
               filterName={filterName}
-              fileterOptions={optionsData}
+              marketOptions={starlineMarketList}
               selectedDropDown={selectedDropDown}
               onselectedDropDown={handleSelectedDropDown}
               onFilterName={handleFilterName}
@@ -258,10 +246,16 @@ export default function StarLineMarketsRecordListPage() {
         {isMobile ? (
           <GeneralMarketRecordMVCLayout
             data={dataFiltered}
+            loading={starlineMarketRecordsLoading}
             onEditRow={(id) => handleEditRow(id)}
-            onDeleteRow={(id) => handleDeleteRow(id)}
+            onDeleteRow={handleDeleteRow}
             onSelectRow={(id) => onSelectRow(id)}
             selected={selected}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            total={starlineMarketRecordsPagination?.total || tableData.length}
+            onPageChange={onChangePage}
+            onRowsPerPageChange={onChangeRowsPerPage}
           />
         ) : (
           <Card>
@@ -278,37 +272,42 @@ export default function StarLineMarketsRecordListPage() {
                   />
 
                   <TableBody>
-                    {dataFiltered
-                      ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((row, index) => (
-                        <GeneralMarketRecordTableRow
-                          index={(page * rowsPerPage) + index + 1}
-                          key={row.id}
-                          row={row}
-                          selected={selected.includes(row.id)}
-                          onSelectRow={() => onSelectRow(row.id)}
-                          onDeleteRow={() => handleDeleteRow(row.id)}
-                          onEditRow={() => handleEditRow(row.name)}
+                    {starlineMarketRecordsLoading ? (
+                      <TableSkeleton />
+                    ) : (
+                      <>
+                        {dataFiltered.map((row, index) => (
+                            <GeneralMarketRecordTableRow
+                              index={page * rowsPerPage + index + 1}
+                              key={row.id}
+                              row={row}
+                              selected={selected.includes(row.id)}
+                              onSelectRow={() => onSelectRow(row.id)}
+                              onDeleteRow={handleDeleteRow}
+                              onEditRow={() => handleEditRow(row.id)}
+                            />
+                          ))}
+                        <TableEmptyRows
+                          height={denseHeight}
+                          emptyRows={emptyRows(
+                            page,
+                            rowsPerPage,
+                            starlineMarketRecordsPagination?.total || tableData.length
+                          )}
                         />
-                      ))}
-
-                    <TableEmptyRows
-                      height={denseHeight}
-                      emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
-                    />
-
-                    <TableNoData isNotFound={isNotFound} />
+                        <TableNoData isNotFound={isNotFound} />
+                      </>
+                    )}
                   </TableBody>
                 </Table>
               </Scrollbar>
             </TableContainer>
             <TablePaginationCustom
-              count={dataFiltered.length}
+              count={starlineMarketRecordsPagination?.total || tableData.length}
               page={page}
               rowsPerPage={rowsPerPage}
               onPageChange={onChangePage}
               onRowsPerPageChange={onChangeRowsPerPage}
-              //
               dense={dense}
               onChangeDense={onChangeDense}
             />
@@ -334,7 +333,7 @@ export default function StarLineMarketsRecordListPage() {
               handleCloseConfirm();
             }}
           >
-            Delete
+            OK
           </Button>
         }
       />

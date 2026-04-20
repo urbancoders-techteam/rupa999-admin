@@ -5,6 +5,7 @@ import {
   createStarlineMarketResultAsync,
   updateStarlineMarketResultAsync,
   deleteStarlineMarketResultAsync,
+  revertStarlineMarketResultAsync,
 } from '../services/starline_market_result_services';
 
 const initialState = {
@@ -128,6 +129,25 @@ const starlineMarketResultSlice = createSlice({
       .addCase(deleteStarlineMarketResultAsync.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || 'Failed to delete starline market result';
+      });
+
+    // Revert starline market result
+    builder
+      .addCase(revertStarlineMarketResultAsync.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(revertStarlineMarketResultAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        const resultId = action.meta.arg;
+        state.resultList = state.resultList.filter((result) => result._id !== resultId);
+        if (state.currentResult?._id === resultId) {
+          state.currentResult = null;
+        }
+      })
+      .addCase(revertStarlineMarketResultAsync.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Failed to revert starline market result';
       });
   },
 });

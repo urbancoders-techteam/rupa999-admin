@@ -51,6 +51,7 @@ import {
   StarLineMarketsListPage,
   StarLineMarketsRecordListPage,
   StarLineWinHistoryListPage,
+  StarlineMarketDataListPage,
   UserBidHistoryListPage,
   UserFormHandle,
   UserListPage,
@@ -397,6 +398,16 @@ export default function Router() {
                   index: true,
                 },
                 { path: 'list', element: <StarLineWinHistoryListPage /> },
+              ],
+            },
+            {
+              path: 'marketdata',
+              children: [
+                {
+                  element: <Navigate to="/dashboard/starline/marketdata/list" replace />,
+                  index: true,
+                },
+                { path: 'list', element: <StarlineMarketDataListPage /> },
               ],
             },
           ],

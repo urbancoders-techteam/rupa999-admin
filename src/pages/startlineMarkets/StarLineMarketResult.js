@@ -34,7 +34,10 @@ import StarlineMarketResultMobileViewCardLayout from '../../sections/_starline_m
 import CreateResultForm from '../../sections/_starline_market_results/CreateResultForm';
 import StarLineMarketResultsTableRow from '../../sections/_starline_market_results/StarLineMarketResultsTableRow';
 import { useSnackbar } from '../../components/snackbar';
-import { getAllStarlineMarketResultsAsync } from '../../redux/services/starline_market_result_services';
+import {
+  getAllStarlineMarketResultsAsync,
+  revertStarlineMarketResultAsync,
+} from '../../redux/services/starline_market_result_services';
 
 // ----------------------------------------------------------------------
 
@@ -150,9 +153,22 @@ export default function StarLineMarketResultListPage() {
 
   const handleRevert = async (row) => {
     try {
-      // TODO: Implement revert functionality when API is ready
-      console.log('Revert row:', row);
-      enqueueSnackbar('Revert functionality will be implemented soon', { variant: 'info' });
+      const resultId = row._id || row.id;
+      if (!resultId) {
+        enqueueSnackbar('Invalid result ID', { variant: 'error' });
+        return;
+      }
+
+      await dispatch(revertStarlineMarketResultAsync(resultId)).unwrap();
+      enqueueSnackbar('Starline market result reverted successfully', { variant: 'success' });
+      
+      // Refresh the list after revert
+      dispatch(
+        getAllStarlineMarketResultsAsync({
+          page: page + 1,
+          limit: rowsPerPage,
+        })
+      );
     } catch (error) {
       enqueueSnackbar(error?.message || 'Failed to revert starline market result', {
         variant: 'error',

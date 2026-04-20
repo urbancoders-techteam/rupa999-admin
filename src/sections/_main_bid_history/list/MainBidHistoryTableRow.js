@@ -21,6 +21,8 @@ MainBidHistoryTableRow.propTypes = {
 export default function MainBidHistoryTableRow({ index, row, selected }) {
   const {
     marketId,
+    starlineMarketId,
+    marketType,
     name,
     bidTable,
     totalPoints,
@@ -30,6 +32,21 @@ export default function MainBidHistoryTableRow({ index, row, selected }) {
     status,
     createdAt,
   } = row || {};
+
+  const marketName = marketId?.name || starlineMarketId?.name;
+
+  const getMarketTypeLabel = () => {
+    const t = (marketType || '').toLowerCase();
+    if (t === 'starline') return 'STARLINE';
+    if (t === 'main' || t === 'regular') return 'MAIN';
+    return starlineMarketId ? 'STARLINE' : 'MAIN';
+  };
+
+  const getMarketTypeColor = () => {
+    const t = (marketType || '').toLowerCase();
+    if (t === 'starline') return 'secondary';
+    return 'default';
+  };
 
   const getDisplayDate = () => {
     if (date) return fDateTime(date);
@@ -77,7 +94,7 @@ export default function MainBidHistoryTableRow({ index, row, selected }) {
     <TableRow hover>
       <TableCell align="center">
         <Typography variant="subtitle2" noWrap>
-          {index + 1 || '—'}
+          {index != null ? index : '—'}
         </Typography>
       </TableCell>
 
@@ -95,8 +112,18 @@ export default function MainBidHistoryTableRow({ index, row, selected }) {
 
       <TableCell align="left">
         <Typography variant="subtitle2" noWrap>
-          {marketId?.name || '—'}
+          {marketName || '—'}
         </Typography>
+      </TableCell>
+
+      <TableCell align="left">
+        <Label
+          variant="soft"
+          color={getMarketTypeColor()}
+          sx={{ textTransform: 'uppercase', fontWeight: 'bold' }}
+        >
+          {getMarketTypeLabel()}
+        </Label>
       </TableCell>
 
       <TableCell align="left">

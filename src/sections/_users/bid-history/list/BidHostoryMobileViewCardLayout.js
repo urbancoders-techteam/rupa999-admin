@@ -81,7 +81,7 @@ function BidHostoryMobileViewCardLayout({
             {/* Header */}
             <Box mb={1.5}>
               <Typography variant="subtitle1" fontWeight={600} noWrap>
-                {row.marketId?.name || row.marketName || 'N/A'}
+                {row.marketId?.name || row.starlineMarketId?.name || row.marketName || 'N/A'}
               </Typography>
             </Box>
 
@@ -89,6 +89,15 @@ function BidHostoryMobileViewCardLayout({
 
             {/* Bid Details */}
             <Stack spacing={1}>
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="body2" color="text.secondary">
+                  Market Type:
+                </Typography>
+                <Typography variant="body2" fontWeight={500}>
+                  {(row.marketType || (row.starlineMarketId ? 'starline' : 'main')).toUpperCase()}
+                </Typography>
+              </Stack>
+
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2" color="text.secondary">
                   User Name:

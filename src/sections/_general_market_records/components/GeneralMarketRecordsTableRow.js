@@ -28,6 +28,7 @@ export default function GeneralMarketRecordTableRow({ index, row, onEditRow }) {
     winAmount,
     status,
     createdAt,
+    marketType,
   } = row;
 
   const [openPopover, setOpenPopover] = useState(null);
@@ -60,9 +61,11 @@ export default function GeneralMarketRecordTableRow({ index, row, onEditRow }) {
 
         <TableCell align="left">{userPhone}</TableCell>
 
-        <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
-          {session}
-        </TableCell>
+        {marketType?.toLowerCase() !== 'starline' && (
+          <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
+            {session}
+          </TableCell>
+        )}
 
         <TableCell align="left">{number}</TableCell>
 

@@ -239,8 +239,7 @@ function StarlineMarketResultMobileViewCardLayout({
               color="error"
               onClick={async () => {
                 if (selectedRow && onRevert) {
-                  const rowId = selectedRow._id || selectedRow.id;
-                  await onRevert(rowId);
+                  await onRevert(selectedRow);
                 }
                 handleCloseConfirm();
               }}

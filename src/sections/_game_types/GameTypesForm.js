@@ -10,6 +10,7 @@ import * as Yup from 'yup';
 import { RHFTextField } from '../../components/hook-form';
 import { useSnackbar } from '../../components/snackbar';
 import { bulkUpdateGameTypeRatesAsync } from '../../redux/services/game_type_rate_services';
+import { bulkUpdateStarlineGameTypeRatesAsync } from '../../redux/services/starline_game_type_rate_services';
 
 // ✅ Validation Schema
 const GameTypeSchema = Yup.object().shape({
@@ -20,10 +21,14 @@ const GameTypeSchema = Yup.object().shape({
     .min(1, 'Value must be at least 1'),
 });
 
-export default function GameTypeRowForm({ game, onUpdate, formRef }) {
+const BULK_UPDATE_MAIN = bulkUpdateGameTypeRatesAsync;
+const BULK_UPDATE_STARLINE = bulkUpdateStarlineGameTypeRatesAsync;
+
+export default function GameTypeRowForm({ game, onUpdate, formRef, rateCardType = 'main' }) {
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
   const [loading, setLoading] = useState(false);
+  const bulkUpdateAsync = rateCardType === 'starline' ? BULK_UPDATE_STARLINE : BULK_UPDATE_MAIN;
 
   const methods = useForm({
     resolver: yupResolver(GameTypeSchema),
@@ -55,7 +60,7 @@ export default function GameTypeRowForm({ game, onUpdate, formRef }) {
       };
 
       // Use bulk update which handles both create and update
-      await dispatch(bulkUpdateGameTypeRatesAsync({ rates: [payload] })).unwrap();
+      await dispatch(bulkUpdateAsync({ rates: [payload] })).unwrap();
 
       enqueueSnackbar('Game type rate saved successfully!', { variant: 'success' });
 
@@ -150,4 +155,5 @@ GameTypeRowForm.propTypes = {
   }).isRequired,
   onUpdate: PropTypes.func,
   formRef: PropTypes.func,
+  rateCardType: PropTypes.oneOf(['main', 'starline']),
 };

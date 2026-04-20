@@ -58,3 +58,14 @@ export const deleteStarlineMarketResultAsync = createAsyncThunk(
       method: 'delete',
     })
 );
+
+// Revert starline market result
+export const revertStarlineMarketResultAsync = createAsyncThunk(
+  'starlineMarketResult/revert',
+  async (id, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: `/starline-market-results/${id}/revert`,
+      method: 'post',
+    })
+);

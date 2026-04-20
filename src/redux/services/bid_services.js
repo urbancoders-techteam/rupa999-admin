@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import AxiosClient from '../../utils/axios';
 
-// Get all winning bids (for admin)
+// Get all winning bids (for admin). Pass starlineOnly: true for Start Line Win History.
 export const getAllWinningBidsAsync = createAsyncThunk(
   'bid/getAllWinning',
   async (params = {}, toolkit) =>
@@ -15,6 +15,7 @@ export const getAllWinningBidsAsync = createAsyncThunk(
         userId: params.userId || '',
         marketId: params.marketId || '',
         gameType: params.gameType || '',
+        starlineOnly: params.starlineOnly === true ? 'true' : undefined,
       },
     })
 );
@@ -63,6 +64,34 @@ export const getBidDataResultAsync = createAsyncThunk(
     return AxiosClient({
       toolkit,
       url: '/bids/data-result',
+      method: 'get',
+      params: apiParams,
+    });
+  }
+);
+
+// Get starline market data result
+export const getStarlineMarketDataAsync = createAsyncThunk(
+  'bid/getStarlineMarketData',
+  async (params = {}, toolkit) => {
+    const apiParams = {
+      page: params.page || 1,
+      limit: params.limit || 10,
+      starlineMarketId: params.starlineMarket || params.starlineMarketId,
+      gameType: params.gameType,
+      date: params.date,
+    };
+
+    // Remove undefined values
+    Object.keys(apiParams).forEach(key => {
+      if (apiParams[key] === undefined || apiParams[key] === null || apiParams[key] === '') {
+        delete apiParams[key];
+      }
+    });
+
+    return AxiosClient({
+      toolkit,
+      url: '/admin/starline-market-data',
       method: 'get',
       params: apiParams,
     });
