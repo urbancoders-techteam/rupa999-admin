@@ -28,6 +28,8 @@ MarketDataTableRow.propTypes = {
 export default function MarketDataTableRow({ index, row, date, marketId }) {
   const { gameType, type, bidData = [] } = row || {};
   const [open, setOpen] = useState(false);
+  const valueFontSize = { xs: '0.18rem', sm: '0.32rem', md: '0.82rem' };
+  const compactCellSx = { py: { xs: 0.35, sm: 0.75 }, px: { xs: 0.25, sm: 0.75 } };
 
   const navigate = useNavigate();
 
@@ -58,7 +60,7 @@ export default function MarketDataTableRow({ index, row, date, marketId }) {
   return (
     <>
       <TableRow hover sx={{ '& > *': { borderBottom: 'unset' } }}>
-        <TableCell align="center" sx={{ width: 40 }}>
+        <TableCell align="center" sx={{ width: { xs: 30, sm: 40 }, ...compactCellSx }}>
           <IconButton
             size="small"
             onClick={() => setOpen(!open)}
@@ -73,24 +75,28 @@ export default function MarketDataTableRow({ index, row, date, marketId }) {
           </IconButton>
         </TableCell>
 
-        <TableCell align="center">
-          <Typography variant="body2">{index + 1}</Typography>
+        <TableCell align="center" sx={compactCellSx}>
+          <Typography variant="body2" sx={{ fontSize: valueFontSize, lineHeight: 1.2 }}>{index + 1}</Typography>
         </TableCell>
 
-        <TableCell align="left">
-          <Typography variant="body2">{gameType || '—'}</Typography>
+        <TableCell align="left" sx={compactCellSx}>
+          <Typography variant="body2" sx={{ fontSize: valueFontSize, lineHeight: 1.2 }}>{gameType || '—'}</Typography>
         </TableCell>
 
-        <TableCell align="left">
-          <Typography variant="body2">{getTypeLabel(type)}</Typography>
+        <TableCell align="left" sx={compactCellSx}>
+          <Typography variant="body2" sx={{ fontSize: valueFontSize, lineHeight: 1.2 }}>{getTypeLabel(type)}</Typography>
         </TableCell>
 
-        <TableCell align="left">
-          <Typography variant="body2">{hasBidData ? bidData.length : 0}</Typography>
+        <TableCell align="left" sx={compactCellSx}>
+          <Typography variant="body2" sx={{ fontSize: valueFontSize, lineHeight: 1.2 }}>
+            {hasBidData ? bidData.length : 0}
+          </Typography>
         </TableCell>
 
-        <TableCell align="left">
-          <Typography variant="body2">{groupTotal.toLocaleString()}</Typography>
+        <TableCell align="left" sx={compactCellSx}>
+          <Typography variant="body2" sx={{ fontSize: valueFontSize, lineHeight: 1.2 }}>
+            {groupTotal.toLocaleString()}
+          </Typography>
         </TableCell>
       </TableRow>
 
@@ -99,14 +105,22 @@ export default function MarketDataTableRow({ index, row, date, marketId }) {
         <TableCell sx={{ py: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ py: 2, px: 1 }}>
-              <Typography variant="subtitle2" gutterBottom sx={{ mb: 1.5 }}>
+              <Typography
+                variant="subtitle2"
+                gutterBottom
+                sx={{ mb: 1.5, fontSize: { xs: '0.64rem', sm: '0.76rem', md: '0.82rem' } }}
+              >
                 Bid Details ({bidData.length} items)
               </Typography>
               <Table size="small" sx={{ backgroundColor: 'action.hover', borderRadius: 1 }}>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600 }}>Bidding Number</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }} align="right">Total Amount</TableCell>
+                    <TableCell sx={{ fontWeight: 600, ...compactCellSx, fontSize: valueFontSize }}>
+                      Bidding Number
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 600, ...compactCellSx, fontSize: valueFontSize }} align="right">
+                      Total Amount
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -115,12 +129,14 @@ export default function MarketDataTableRow({ index, row, date, marketId }) {
                     const amount = Number(item?.totalAmount) || 0;
                     return (
                       <TableRow key={`${digit || 'digit'}-${idx}`}>
-                        <TableCell>
+                        <TableCell sx={compactCellSx}>
                           <Tooltip title="Click to view records" arrow placement="left">
                             <Typography
                               variant="body2"
                               onClick={() => handleNavigate(digit)}
                               sx={{
+                                fontSize: valueFontSize,
+                                lineHeight: 1.2,
                                 cursor: digit ? 'pointer' : 'default',
                                 color: digit ? 'primary.main' : 'text.primary',
                                 display: 'inline-block',
@@ -131,8 +147,10 @@ export default function MarketDataTableRow({ index, row, date, marketId }) {
                             </Typography>
                           </Tooltip>
                         </TableCell>
-                        <TableCell align="right">
-                          <Typography variant="body2">₹{amount.toLocaleString()}</Typography>
+                        <TableCell align="right" sx={compactCellSx}>
+                          <Typography variant="body2" sx={{ fontSize: valueFontSize, lineHeight: 1.2 }}>
+                            ₹{amount.toLocaleString()}
+                          </Typography>
                         </TableCell>
                       </TableRow>
                     );

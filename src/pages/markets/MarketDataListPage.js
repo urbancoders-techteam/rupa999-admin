@@ -36,7 +36,6 @@ import {
   useTable,
 } from '../../components/table';
 // sections
-import { marketTypeOptiData } from '../../assets/data/marketEnum';
 import { getBidDataResultAsync } from '../../redux/services/bid_services';
 import { getAllMarketsAsync } from '../../redux/services/market_services';
 import { PATH_DASHBOARD } from '../../routes/paths';
@@ -344,7 +343,8 @@ export default function MarketDataListPage() {
                     </Box>
                   </Grid>
 
-                  <Grid item xs={6} sm={6} md={2.5}>
+                  {/* Temporarily hidden Market Type filter */}
+                  {/* <Grid item xs={6} sm={6} md={2.5}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <RHFAutocomplete
                         name="marketType"
@@ -357,7 +357,7 @@ export default function MarketDataListPage() {
                         sx={{ flex: 1 }}
                       />
                     </Box>
-                  </Grid>
+                  </Grid> */}
 
                   <Grid item xs={6} sm={6} md={2.5}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>

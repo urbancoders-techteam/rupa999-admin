@@ -7,7 +7,7 @@ import { Card, Typography, Box } from '@mui/material';
 export default function DashboardSummaryCard({
   todayLabel,
   todayValue = 0,
-  totalValue = 0,
+  totalValue,
   totalLabel,
   imageSrc = '',
   gifSrc = '',
@@ -16,6 +16,7 @@ export default function DashboardSummaryCard({
   ...other
 }) {
   const theme = useTheme();
+  const hasTotalSection = Boolean(totalLabel) || (totalValue !== undefined && totalValue !== null && totalValue !== '');
 
   return (
     <Card
@@ -60,49 +61,6 @@ export default function DashboardSummaryCard({
           width: { xs: 'calc(100% - 50px)', sm: 'calc(100% - 70px)', md: 'calc(100% - 80px)', lg: 'calc(100% - 90px)' },
         }}
       >
-        <Typography
-          sx={{
-            fontSize: { 
-              xs: '0.6875rem',  // 11px
-              sm: '0.75rem',    // 12px
-              md: '0.8125rem',  // 13px
-              lg: '0.875rem'    // 14px
-            },
-            lineHeight: { xs: 1.3, sm: 1.4, md: 1.5 },
-            color: theme.palette.text.secondary,
-            textTransform: 'capitalize',
-            fontWeight: { xs: 400, sm: 500 },
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            maxWidth: '100%',
-          }}
-        >
-          {totalLabel}
-        </Typography>
-
-        <Typography
-          sx={{
-            fontSize: { 
-              xs: '1.125rem',  // 18px
-              sm: '1.375rem',  // 22px
-              md: '1.625rem',  // 26px
-              lg: '1.875rem'   // 30px
-            },
-            fontWeight: 700,
-            color: theme.palette.text.primary,
-            lineHeight: { xs: 1.2, sm: 1.25, md: 1.3 },
-            letterSpacing: { xs: '-0.01em', sm: '-0.02em' },
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            maxWidth: '100%',
-            wordBreak: 'break-word',
-          }}
-        >
-          {totalValue}
-        </Typography>
-
         {todayLabel && (
           <Box 
             sx={{ 
@@ -116,13 +74,13 @@ export default function DashboardSummaryCard({
             <Typography
               sx={{
                 fontSize: { 
-                  xs: '0.625rem',  // 10px
-                  sm: '0.6875rem', // 11px
-                  md: '0.75rem',   // 12px
-                  lg: '0.8125rem'  // 13px
+                  xs: '1.125rem',  // 18px
+                  sm: '1.375rem',  // 22px
+                  md: '1.625rem',  // 26px
+                  lg: '1.875rem'   // 30px
                 },
+          
                 lineHeight: { xs: 1.3, sm: 1.4, md: 1.5 },
-                color: theme.palette.text.secondary,
                 fontWeight: { xs: 400, sm: 500 },
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -135,13 +93,12 @@ export default function DashboardSummaryCard({
             <Typography
               sx={{
                 fontSize: { 
-                  xs: '0.875rem',   // 14px
-                  sm: '1.125rem',   // 18px
-                  md: '1.375rem',   // 22px
-                  lg: '1.625rem'    // 26px
+                  xs: '1.125rem',  // 18px
+                  sm: '1.375rem',  // 22px
+                  md: '1.625rem',  // 26px
+                  lg: '1.875rem'   // 30px
                 },
                 lineHeight: { xs: 1.2, sm: 1.25, md: 1.3 },
-                color: theme.palette[color]?.main || theme.palette.success.main,
                 fontWeight: 700,
                 letterSpacing: { xs: '-0.01em', sm: '-0.02em' },
                 overflow: 'hidden',
@@ -155,10 +112,56 @@ export default function DashboardSummaryCard({
             </Typography>
           </Box>
         )}
+
+        {hasTotalSection && (
+          <Box sx={{ opacity: 0.65 }}>
+            <Typography
+              sx={{
+                fontSize: { 
+                  xs: '0.75rem',   // 12px
+                  sm: '0.8125rem', // 13px
+                  md: '0.875rem',  // 14px
+                  lg: '0.9375rem'  // 15px
+                },
+                lineHeight: { xs: 1.3, sm: 1.4, md: 1.5 },
+                textTransform: 'capitalize',
+                fontWeight: { xs: 600, sm: 600 },
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                maxWidth: '100%',
+              }}
+            >
+              {totalLabel}
+            </Typography>
+
+            <Typography
+              sx={{
+                fontSize: { 
+                  xs: '0.875rem',   // 14px
+                  sm: '1.125rem',   // 18px
+                  md: '1.375rem',   // 22px
+                  lg: '1.625rem'    // 26px
+                },
+                fontWeight: 700,
+                color: theme.palette.text.primary,
+                lineHeight: { xs: 1.2, sm: 1.25, md: 1.3 },
+                letterSpacing: { xs: '-0.01em', sm: '-0.02em' },
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                maxWidth: '100%',
+                wordBreak: 'break-word',
+              }}
+            >
+              {totalValue}
+            </Typography>
+          </Box>
+        )}
       </Box>
 
       {/* RIGHT SECTION (GIF/IMAGE) */}
-      <Box
+      {/* <Box
         sx={{
           width: { 
             xs: '50px',   // Smaller on mobile
@@ -214,7 +217,7 @@ export default function DashboardSummaryCard({
             No Image
           </Typography>
         )}
-      </Box>
+      </Box> */}
     </Card>
   );
 }

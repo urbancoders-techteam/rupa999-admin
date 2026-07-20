@@ -41,6 +41,7 @@ const navConfig = [
     subheader: 'Main',
     items: [
       { title: 'dashboard', path: PATH_DASHBOARD.home.root, icon: ICONS.dashboard },
+      { title: 'profits', path: PATH_DASHBOARD.profit.root, icon: ICONS.analytics },
       {
         title: 'user',
         path: PATH_DASHBOARD.user.root,
@@ -94,7 +95,6 @@ const navConfig = [
         path: PATH_DASHBOARD.diposithistory.list,
         icon: ICONS.banking,
       },
-      { title: 'profits', path: PATH_DASHBOARD.profit.root, icon: ICONS.analytics },
       {
         title: 'Rate Card',
         path: PATH_DASHBOARD.ratecard.root,

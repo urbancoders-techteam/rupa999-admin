@@ -57,48 +57,48 @@ export default function GeneralDashboardPage() {
                   }}
                 >
                   <DashboardSummaryCard
-                    totalValue={fNumber(dashboardStats?.totalMarkets || 0)}
-                    totalLabel="Total Market"
+                    todayValue={fNumber(dashboardStats?.totalMarkets || 0)}
+                    todayLabel="Total Market"
                     gifSrc={marketGif}
                   />
                   <DashboardSummaryCard
-                    todayLabel="Today New Users"
+                    todayLabel="Today's New Users"
                     todayValue={fNumber(dashboardStats?.todayNewUsers || 0)}
                     totalValue={fNumber(dashboardStats?.totalUsers || 0)}
                     totalLabel="Total Users"
                     gifSrc={totalUsersGif}
                   />
                   <DashboardSummaryCard
-                    todayLabel="Today Bid Amt"
+                    todayLabel="Today's Bid Amt"
                     todayValue={fNumber(dashboardStats?.todayBidAmount || 0)}
-                    totalValue={fNumber(dashboardStats?.totalBidAmount || 0)}
-                    totalLabel="Total Bid Amt"
+                    // todayValue={fNumber(dashboardStats?.totalBidAmount || 0)}
+                    // todayLabel="Total Bid Amt"
                     gifSrc={bidAmtGif}
                   />
                   <DashboardSummaryCard
-                    todayLabel="Today Win Amt"
+                    todayLabel="Today's Win Amt"
                     todayValue={fNumber(dashboardStats?.todayWinAmount || 0)}
                     totalValue={fNumber(dashboardStats?.totalWinAmount || 0)}
                     totalLabel="Total Win Amt"
                     gifSrc={winAmtGif}
                   />
                   <DashboardSummaryCard
-                    todayLabel="Today Deposit"
+                    todayLabel="Today's Deposit"
                     todayValue={fNumber(dashboardStats?.todayDeposit || 0)}
                     totalValue={fNumber(dashboardStats?.totalDeposit || 0)}
                     totalLabel="Total Deposit"
                     gifSrc={depositGif}
                   />
                   <DashboardSummaryCard
-                    todayLabel="Today Withdraw"
+                    todayLabel="Today's Withdraw"
                     todayValue={fNumber(dashboardStats?.todayWithdraw || 0)}
                     totalValue={fNumber(dashboardStats?.totalWithdraw || 0)}
                     totalLabel="Total Withdraw"
                     gifSrc={withdrawGif}
                   />
                   <DashboardSummaryCard
-                    totalLabel="Total Wallet Balance"
-                    totalValue={fNumber(dashboardStats?.todayWalletBalance || 0)}
+                    todayLabel="Total Wallet Balance"
+                    todayValue={fNumber(dashboardStats?.todayWalletBalance || 0)}
                     gifSrc={walletBalanceGif}
                   />
                 </Box>
