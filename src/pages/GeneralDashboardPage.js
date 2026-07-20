@@ -57,8 +57,8 @@ export default function GeneralDashboardPage() {
                   }}
                 >
                   <DashboardSummaryCard
-                    todayValue={fNumber(dashboardStats?.totalMarkets || 0)}
-                    todayLabel="Total Market"
+                    totalValue={fNumber(dashboardStats?.totalMarkets || 0)}
+                    totalLabel="Total Market"
                     gifSrc={marketGif}
                   />
                   <DashboardSummaryCard
@@ -97,8 +97,10 @@ export default function GeneralDashboardPage() {
                     gifSrc={withdrawGif}
                   />
                   <DashboardSummaryCard
-                    todayLabel="Total Wallet Balance"
-                    todayValue={fNumber(dashboardStats?.todayWalletBalance || 0)}
+                    totalLabel="Total Wallet Balance"
+                    totalValue={fNumber(
+                      dashboardStats?.totalWalletBalance ?? dashboardStats?.todayWalletBalance ?? 0
+                    )}
                     gifSrc={walletBalanceGif}
                   />
                 </Box>

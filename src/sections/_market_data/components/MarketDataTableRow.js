@@ -28,7 +28,7 @@ MarketDataTableRow.propTypes = {
 export default function MarketDataTableRow({ index, row, date, marketId }) {
   const { gameType, type, bidData = [] } = row || {};
   const [open, setOpen] = useState(false);
-  const valueFontSize = { xs: '0.18rem', sm: '0.32rem', md: '0.82rem' };
+  const valueFontSize = { xs: '0.58rem', sm: '0.72rem', md: '0.82rem' };
   const compactCellSx = { py: { xs: 0.35, sm: 0.75 }, px: { xs: 0.25, sm: 0.75 } };
 
   const navigate = useNavigate();

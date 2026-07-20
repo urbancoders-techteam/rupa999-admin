@@ -16,7 +16,9 @@ export default function DashboardSummaryCard({
   ...other
 }) {
   const theme = useTheme();
-  const hasTotalSection = Boolean(totalLabel) || (totalValue !== undefined && totalValue !== null && totalValue !== '');
+  const hasTodaySection = Boolean(todayLabel);
+  const hasTotalValue = totalValue !== undefined && totalValue !== null && totalValue !== '';
+  const hasTotalSection = Boolean(totalLabel) || hasTotalValue;
 
   return (
     <Card
@@ -58,7 +60,7 @@ export default function DashboardSummaryCard({
           alignItems: 'flex-start',
           gap: { xs: 0.5, sm: 0.75, md: 0.85 },
           overflow: 'hidden',
-          width: { xs: 'calc(100% - 50px)', sm: 'calc(100% - 70px)', md: 'calc(100% - 80px)', lg: 'calc(100% - 90px)' },
+          width: '100%',
         }}
       >
         {todayLabel && (
@@ -114,15 +116,22 @@ export default function DashboardSummaryCard({
         )}
 
         {hasTotalSection && (
-          <Box sx={{ opacity: 0.65 }}>
+          <Box sx={{ opacity: hasTodaySection ? 0.65 : 1 }}>
             <Typography
               sx={{
-                fontSize: { 
-                  xs: '0.75rem',   // 12px
-                  sm: '0.8125rem', // 13px
-                  md: '0.875rem',  // 14px
-                  lg: '0.9375rem'  // 15px
-                },
+                fontSize: hasTodaySection
+                  ? {
+                      xs: '0.75rem',   // 12px
+                      sm: '0.8125rem', // 13px
+                      md: '0.875rem',  // 14px
+                      lg: '0.9375rem'  // 15px
+                    }
+                  : {
+                      xs: '1.125rem',  // 18px
+                      sm: '1.375rem',  // 22px
+                      md: '1.625rem',  // 26px
+                      lg: '1.875rem'   // 30px
+                    },
                 lineHeight: { xs: 1.3, sm: 1.4, md: 1.5 },
                 textTransform: 'capitalize',
                 fontWeight: { xs: 600, sm: 600 },
@@ -137,12 +146,19 @@ export default function DashboardSummaryCard({
 
             <Typography
               sx={{
-                fontSize: { 
-                  xs: '0.875rem',   // 14px
-                  sm: '1.125rem',   // 18px
-                  md: '1.375rem',   // 22px
-                  lg: '1.625rem'    // 26px
-                },
+                fontSize: hasTodaySection
+                  ? {
+                      xs: '0.875rem',   // 14px
+                      sm: '1.125rem',   // 18px
+                      md: '1.375rem',   // 22px
+                      lg: '1.625rem'    // 26px
+                    }
+                  : {
+                      xs: '1.125rem',  // 18px
+                      sm: '1.375rem',  // 22px
+                      md: '1.625rem',  // 26px
+                      lg: '1.875rem'   // 30px
+                    },
                 fontWeight: 700,
                 color: theme.palette.text.primary,
                 lineHeight: { xs: 1.2, sm: 1.25, md: 1.3 },
@@ -154,7 +170,7 @@ export default function DashboardSummaryCard({
                 wordBreak: 'break-word',
               }}
             >
-              {totalValue}
+              {hasTotalValue ? totalValue : '—'}
             </Typography>
           </Box>
         )}
