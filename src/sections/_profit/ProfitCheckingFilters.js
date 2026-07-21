@@ -8,11 +8,13 @@ import YearlySalesGraph from '../../components/graph/YearlySalesGraph';
 import { getProfitBidsAsync, getYearlyProfitBidsAsync } from '../../redux/services/bid_services';
 import { getAllMarketsAsync } from '../../redux/services/market_services';
 
+const ALL_MARKETS_OPTION = { name: 'All', id: '' };
+
 const ProfitCheckingFilters = () => {
   const dispatch = useDispatch();
-  const [dropdownValue, setDropdownValue] = useState('Main Market');
-  const [subMenuValue, setSubMenuValue] = useState('');
+  const [subMenuValue, setSubMenuValue] = useState(ALL_MARKETS_OPTION);
   const [selectedTimePeriod, setSelectedTimePeriod] = useState('allyear');
+  const [selectedDate, setSelectedDate] = useState('');
 
   const { profitBidsList, yearlyProfitBidsList, loading } = useSelector((state) => state.bid);
 
@@ -30,9 +32,9 @@ const ProfitCheckingFilters = () => {
 
   const marketListData = React.useMemo(() => {
     if (!marketList || !Array.isArray(marketList) || marketList.length === 0) {
-      return [];
+      return [ALL_MARKETS_OPTION];
     }
-    return marketList
+    const markets = marketList
       .filter((market) => market && (market.name || market._id))
       .map((market) => {
         // Handle both _id (ObjectId) and id (string) formats
@@ -48,6 +50,7 @@ const ProfitCheckingFilters = () => {
           id: marketId,
         };
       });
+    return [ALL_MARKETS_OPTION, ...markets];
   }, [marketList]);
 
   // Transform profitBidsList data for HorizontalProgressGraph
@@ -153,11 +156,20 @@ const ProfitCheckingFilters = () => {
     setSelectedTimePeriod(event.target.value);
   };
 
+  const handleDateChange = (event) => {
+    setSelectedDate(event.target.value);
+  };
+
   const handleSubmit = () => {
     // Prepare API parameters for profit bids
     const profitParams = {
       period: selectedTimePeriod || 'allyear',
     };
+
+    // Specific date takes priority over the period filter on the backend
+    if (selectedDate) {
+      profitParams.date = selectedDate;
+    }
 
     // Add market ID if a market is selected
     if (subMenuValue && subMenuValue.id) {
@@ -172,6 +184,9 @@ const ProfitCheckingFilters = () => {
     const yearlyParams = {};
     if (subMenuValue && subMenuValue.id) {
       yearlyParams.marketId = subMenuValue.id;
+    }
+    if (selectedDate) {
+      yearlyParams.date = selectedDate;
     }
 
     // Call profit bids API
@@ -192,24 +207,13 @@ const ProfitCheckingFilters = () => {
       <Box sx={{ flex: 1 }}>
         {/* FILTER BAR */}
         <Grid container spacing={2} alignItems="center" sx={{ mb: 4 }}>
-          <Grid item xs={12} sm={6} md={2}>
-            <Autocomplete
-              size="small"
-              fullWidth
-              options={['Main Market', 'Starline Markets']}
-              value={dropdownValue}
-              onChange={(_, newValue) => setDropdownValue(newValue)}
-              renderInput={(params) => <TextField {...params} label="Market Types" fullWidth />}
-            />
-          </Grid>
-
           <Grid item xs={12} sm={6} md={4}>
             <Autocomplete
               size="small"
               fullWidth
               options={marketListData}
-              value={subMenuValue || null}
-              onChange={(_, newValue) => setSubMenuValue(newValue || '')}
+              value={subMenuValue || ALL_MARKETS_OPTION}
+              onChange={(_, newValue) => setSubMenuValue(newValue || ALL_MARKETS_OPTION)}
               getOptionLabel={(option) => {
                 if (typeof option === 'string') return option;
                 return option?.name || '';
@@ -223,15 +227,14 @@ const ProfitCheckingFilters = () => {
                   {...params}
                   label="Choose Markets"
                   fullWidth
-                  placeholder={marketListData.length === 0 ? 'No markets available' : 'Select a market'}
+                  placeholder="Select a market"
                 />
               )}
               noOptionsText="No markets available"
-              disabled={marketListData.length === 0}
             />
           </Grid>
 
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid item xs={12} sm={6} md={3}>
             <TextField
               select
               fullWidth
@@ -239,6 +242,7 @@ const ProfitCheckingFilters = () => {
               label="Time period filter"
               value={selectedTimePeriod || 'allyear'}
               onChange={handleTimePeriodChange}
+              disabled={Boolean(selectedDate)}
               SelectProps={{
                 MenuProps: {
                   PaperProps: {
@@ -273,6 +277,23 @@ const ProfitCheckingFilters = () => {
                 </MenuItem>
               ))}
             </TextField>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField
+              type="date"
+              fullWidth
+              size="small"
+              label="Date"
+              value={selectedDate}
+              onChange={handleDateChange}
+              InputLabelProps={{ shrink: true }}
+              sx={{
+                '& .MuiInputBase-root': {
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                },
+              }}
+            />
           </Grid>
 
           <Grid item xs={12} sm={6} md={2}>
