@@ -75,7 +75,6 @@ export default function MarketDataListPage() {
   const defaultValues = {
     date: dayjs(),
     market: null,
-    marketType: null,
     marketSession: null,
     sortBy: null,
   };
@@ -126,11 +125,6 @@ export default function MarketDataListPage() {
         params.market = data.market._id;
       }
 
-      // Add game type filter (using key from marketTypeOptiData)
-      if (data.marketType?.key) {
-        params.gameType = data.marketType.key;
-      }
-
       // Add market time filter
       if (data.marketSession?.key) {
         params.session = data.marketSession.key;
@@ -166,11 +160,6 @@ export default function MarketDataListPage() {
       // Add market filter (using _id from API)
       if (formValues.market?._id) {
         params.market = formValues.market._id;
-      }
-
-      // Add game type filter
-      if (formValues.marketType?.key) {
-        params.gameType = formValues.marketType.key;
       }
 
       // Add market time filter
@@ -317,8 +306,8 @@ export default function MarketDataListPage() {
                 }}
                 noValidate
               >
-                <Grid container spacing={{ xs: 1, sm: 2 }} alignItems="center">
-                  <Grid item xs={6} sm={6} md={2.5}>
+                <Grid container spacing={{ xs: 1.5, sm: 2 }} alignItems="center">
+                  <Grid item xs={12}>
                     <RHFDatePicker
                       name="date"
                       label="Date"
@@ -327,7 +316,7 @@ export default function MarketDataListPage() {
                     />
                   </Grid>
 
-                  <Grid item xs={6} sm={6} md={2.5}>
+                  <Grid item xs={12}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <RHFAutocomplete
                         name="market"
@@ -344,7 +333,7 @@ export default function MarketDataListPage() {
                   </Grid>
 
                   {/* Temporarily hidden Market Type filter */}
-                  {/* <Grid item xs={6} sm={6} md={2.5}>
+                  {/* <Grid item xs={12}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <RHFAutocomplete
                         name="marketType"
@@ -359,7 +348,7 @@ export default function MarketDataListPage() {
                     </Box>
                   </Grid> */}
 
-                  <Grid item xs={6} sm={6} md={2.5}>
+                  <Grid item xs={12}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <RHFAutocomplete
                         name="marketSession"
@@ -374,7 +363,7 @@ export default function MarketDataListPage() {
                     </Box>
                   </Grid>
 
-                  <Grid item xs={12} sm={6} md={2}>
+                  <Grid item xs={12}>
                     <Stack direction="row" spacing={1}>
                       <Button
                         fullWidth
