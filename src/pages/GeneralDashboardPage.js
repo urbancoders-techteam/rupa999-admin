@@ -25,13 +25,34 @@ export default function GeneralDashboardPage() {
   const dispatch = useDispatch();
   const { dashboardStats, dashboardLoading } = useSelector((state) => state.staff);
   const cardStyles = [
-    { backgroundImage: 'linear-gradient(150deg, rgba(255,245,233,0.95), rgba(255,255,255,0.95))' },
-    { backgroundImage: 'linear-gradient(150deg, rgba(236,247,255,0.95), rgba(255,255,255,0.95))' },
-    { backgroundImage: 'linear-gradient(150deg, rgba(239,250,242,0.95), rgba(255,255,255,0.95))' },
-    { backgroundImage: 'linear-gradient(150deg, rgba(245,241,255,0.95), rgba(255,255,255,0.95))' },
-    { backgroundImage: 'linear-gradient(150deg, rgba(255,241,244,0.95), rgba(255,255,255,0.95))' },
-    { backgroundImage: 'linear-gradient(150deg, rgba(240,247,255,0.95), rgba(255,255,255,0.95))' },
-    { backgroundImage: 'linear-gradient(150deg, rgba(245,248,255,0.95), rgba(255,255,255,0.95))' },
+    {
+      backgroundImage: 'linear-gradient(135deg, #FFFFFF 0%, #FFFFFF 78%, #FFEAC6 100%)',
+      borderColor: 'rgba(224, 154, 48, 0.46)',
+    },
+    {
+      backgroundImage: 'linear-gradient(135deg, #FFFFFF 0%, #FFFFFF 78%, #D9EFFF 100%)',
+      borderColor: 'rgba(55, 145, 209, 0.43)',
+    },
+    {
+      backgroundImage: 'linear-gradient(135deg, #FFFFFF 0%, #FFFFFF 78%, #DDF4E4 100%)',
+      borderColor: 'rgba(54, 155, 84, 0.42)',
+    },
+    {
+      backgroundImage: 'linear-gradient(135deg, #FFFFFF 0%, #FFFFFF 78%, #E8DCFF 100%)',
+      borderColor: 'rgba(126, 82, 201, 0.42)',
+    },
+    {
+      backgroundImage: 'linear-gradient(135deg, #FFFFFF 0%, #FFFFFF 78%, #FFE0E7 100%)',
+      borderColor: 'rgba(204, 74, 103, 0.42)',
+    },
+    {
+      backgroundImage: 'linear-gradient(135deg, #FFFFFF 0%, #FFFFFF 78%, #DEE7FF 100%)',
+      borderColor: 'rgba(65, 105, 190, 0.42)',
+    },
+    {
+      backgroundImage: 'linear-gradient(135deg, #FFFFFF 0%, #FFFFFF 78%, #FFEAB3 100%)',
+      borderColor: 'rgba(207, 157, 31, 0.44)',
+    },
   ];
 
   useEffect(() => {
@@ -57,8 +78,9 @@ export default function GeneralDashboardPage() {
                 p: { xs: 2, sm: 2.5, md: 3 },
                 borderRadius: 2.5,
                 background:
-                  'linear-gradient(120deg, rgba(255,235,238,0.7) 0%, rgba(227,242,253,0.8) 55%, rgba(232,245,233,0.75) 100%)',
-                border: '1px solid rgba(0,0,0,0.06)',
+                  'linear-gradient(120deg, #FFFFFF 0%, #F4F8FF 58%, #E3F3FF 100%)',
+                border: '1px solid rgba(53, 99, 144, 0.2)',
+                boxShadow: '0 8px 24px rgba(53, 99, 144, 0.1)',
               }}
             >
               <Typography
@@ -95,9 +117,10 @@ export default function GeneralDashboardPage() {
                   }}
                 >
                   <DashboardSummaryCard
-                    totalValue={fNumber(dashboardStats?.totalMarkets || 0)}
-                    totalLabel="Total Market"
+                    todayValue={fNumber(dashboardStats?.totalMarkets || 0)}
+                    todayLabel="Total Market"
                     gifSrc={marketGif}
+                    color="warning"
                     sx={cardStyles[0]}
                   />
                   <DashboardSummaryCard
@@ -146,8 +169,8 @@ export default function GeneralDashboardPage() {
                     sx={cardStyles[5]}
                   />
                   <DashboardSummaryCard
-                    totalLabel="Total Wallet Balance"
-                    totalValue={fNumber(
+                    todayLabel="Total Wallet Balance"
+                    todayValue={fNumber(
                       dashboardStats?.totalWalletBalance ?? dashboardStats?.todayWalletBalance ?? 0
                     )}
                     gifSrc={walletBalanceGif}

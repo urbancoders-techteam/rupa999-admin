@@ -43,9 +43,9 @@ export default function DashboardSummaryCard({
           'linear-gradient(160deg, rgba(255,255,255,0.9) 0%, rgba(245,248,255,0.75) 65%, rgba(237,242,255,0.55) 100%)',
         backdropFilter: 'blur(6px)',
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        minHeight: { xs: 152, sm: 152, md: 146, lg: 146 },
-        height: { xs: 152, sm: 152, md: 146, lg: 146 },
-        maxHeight: { xs: 152, sm: 152, md: 146, lg: 146 },
+        minHeight: { xs: 152, sm: 160, md: 176, lg: 186 },
+        height: { xs: 152, sm: 160, md: 176, lg: 186 },
+        maxHeight: { xs: 152, sm: 160, md: 176, lg: 186 },
         position: 'relative',
         overflow: 'hidden',
         '&::before': {
@@ -96,10 +96,10 @@ export default function DashboardSummaryCard({
             <Typography
               sx={{
                 fontSize: { 
-                  xs: '0.95rem',
-                  sm: '1rem',
-                  md: '1.05rem',
-                  lg: '1.1rem'
+                  xs: '1.02rem',
+                  sm: '1.05rem',
+                  md: '1.1rem',
+                  lg: '1.15rem'
                 },
                 lineHeight: 1.35,
                 whiteSpace: 'normal',
@@ -122,10 +122,10 @@ export default function DashboardSummaryCard({
             <Typography
               sx={{
                 fontSize: { 
-                  xs: '1.05rem',
-                  sm: '1.4rem',
-                  md: '1.55rem',
-                  lg: '1.7rem'
+                  xs: '1.15rem',
+                  sm: '1.45rem',
+                  md: '1.6rem',
+                  lg: '1.75rem'
                 },
                 lineHeight: { xs: 1.2, sm: 1.25, md: 1.3 },
                 fontWeight: 700,
@@ -146,7 +146,7 @@ export default function DashboardSummaryCard({
               display: 'flex',
               flexDirection: 'column',
               gap: { xs: 0.55, sm: 0.5 },
-              opacity: hasTodaySection ? 0.65 : 1,
+              opacity: hasTodaySection ? 0.82 : 1,
               mt: hasTodaySection ? { xs: 1.5, sm: 1.25 } : 0,
             }}
           >
@@ -154,20 +154,20 @@ export default function DashboardSummaryCard({
               sx={{
                 fontSize: hasTodaySection
                   ? {
-                      xs: '0.78rem',   // 12px
-                      sm: '0.8125rem', // 13px
-                      md: '0.875rem',  // 14px
-                      lg: '0.9375rem'  // 15px
+                      xs: '0.72rem',
+                      sm: '0.76rem',
+                      md: '0.82rem',
+                      lg: '0.88rem'
                     }
                   : {
-                      xs: '0.8rem',
-                      sm: '0.9rem',
-                      md: '0.98rem',
-                      lg: '1rem'
+                      xs: '0.76rem',
+                      sm: '0.84rem',
+                      md: '0.92rem',
+                      lg: '0.96rem'
                     },
                 lineHeight: { xs: 1.3, sm: 1.4, md: 1.5 },
                 textTransform: 'capitalize',
-                fontWeight: hasTodaySection ? 600 : 700,
+                fontWeight: 700,
                 whiteSpace: 'normal',
                 wordBreak: 'break-word',
                 display: '-webkit-box',
@@ -178,7 +178,7 @@ export default function DashboardSummaryCard({
                 px: { xs: 0.7, sm: 0 },
                 py: { xs: 0.25, sm: 0 },
                 borderRadius: { xs: 1, sm: 0 },
-                bgcolor: { xs: 'rgba(25,118,210,0.1)', sm: 'transparent' },
+                bgcolor: { xs: 'rgba(25,118,210,0.14)', sm: 'transparent' },
                 color: { xs: 'primary.dark', sm: 'inherit' },
               }}
             >
@@ -189,16 +189,16 @@ export default function DashboardSummaryCard({
               sx={{
                 fontSize: hasTodaySection
                   ? {
-                      xs: '0.98rem',    // 16px
-                      sm: '1.125rem',   // 18px
-                      md: '1.375rem',   // 22px
-                      lg: '1.625rem'    // 26px
+                      xs: '0.9rem',
+                      sm: '1.05rem',
+                      md: '1.25rem',
+                      lg: '1.45rem'
                     }
                   : {
-                      xs: '1.15rem',
-                      sm: '1.4rem',
-                      md: '1.55rem',
-                      lg: '1.7rem'
+                      xs: '1.05rem',
+                      sm: '1.25rem',
+                      md: '1.4rem',
+                      lg: '1.55rem'
                     },
                 fontWeight: hasTodaySection ? 700 : 800,
                 color: theme.palette.text.primary,
@@ -220,19 +220,19 @@ export default function DashboardSummaryCard({
         <Box
         sx={{
           width: {
-            xs: '48px',
-            sm: '62px',
-            md: '72px',
-            lg: '76px'
+            xs: '60px',
+            sm: '74px',
+            md: '84px',
+            lg: '88px'
           },
           height: {
-            xs: '48px',
-            sm: '62px',
-            md: '72px',
-            lg: '76px'
+            xs: '60px',
+            sm: '74px',
+            md: '84px',
+            lg: '88px'
           },
-          minWidth: { xs: '48px', sm: '62px', md: '72px', lg: '76px' },
-          maxWidth: { xs: '48px', sm: '62px', md: '72px', lg: '76px' },
+          minWidth: { xs: '60px', sm: '74px', md: '84px', lg: '88px' },
+          maxWidth: { xs: '60px', sm: '74px', md: '84px', lg: '88px' },
           flexShrink: 0,
           display: 'flex',
           alignItems: 'center',
@@ -251,8 +251,8 @@ export default function DashboardSummaryCard({
             src={mediaSource}
             alt={todayLabel || totalLabel || 'Dashboard icon'}
             sx={{
-              width: '84%',
-              height: '84%',
+              width: '90%',
+              height: '90%',
               objectFit: 'contain',
               objectPosition: 'center',
               transition: 'transform 0.25s ease',
