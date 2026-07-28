@@ -17,6 +17,7 @@ import {
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 import ChangePasswordDialog from '../../../components/change-password-dialog/ChangePasswordDialog';
+import ShowPasswordDialog from '../../../components/show-password-dialog/ShowPasswordDialog';
 import AddDeductBalanceModal from '../form/UserAddDeductForm';
 import StatusToggleCell from './StatusToggledCell';
 
@@ -27,9 +28,10 @@ function UserMobileViewCardLayout({
   onEditRow, 
   onDeleteRow, 
   onStatusChange, 
-  onChangePassword, 
-  changePasswordLoading, 
-  onViewBankDetails, 
+  onChangePassword,
+  changePasswordLoading,
+  onShowPassword,
+  onViewBankDetails,
   onAddDeductBalance, 
   addDeductBalanceLoading, 
   onTransactionRow, 
@@ -45,6 +47,10 @@ function UserMobileViewCardLayout({
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [selectedUserName, setSelectedUserName] = useState(null);
   const [selectedUserBalance, setSelectedUserBalance] = useState(0);
+  const [openShowPassword, setOpenShowPassword] = useState(false);
+  const [showPasswordLoading, setShowPasswordLoading] = useState(false);
+  const [revealedPassword, setRevealedPassword] = useState('');
+  const [showPasswordError, setShowPasswordError] = useState('');
 
   const handleSubmit = async (values) => {
     if (onAddDeductBalance && selectedUserId) {
@@ -88,6 +94,27 @@ function UserMobileViewCardLayout({
       await onChangePassword(selectedUserId, value.password, value.cpassword);
       handleCloseChangePassword();
     }
+  };
+
+  const handleOpenShowPassword = async (userId, userName) => {
+    setSelectedUserName(userName);
+    setOpenShowPassword(true);
+    setShowPasswordLoading(true);
+    setShowPasswordError('');
+    setRevealedPassword('');
+    try {
+      const password = await onShowPassword(userId);
+      setRevealedPassword(password);
+    } catch (error) {
+      setShowPasswordError(error?.message || 'Failed to retrieve password');
+    } finally {
+      setShowPasswordLoading(false);
+    }
+  };
+
+  const handleCloseShowPassword = () => {
+    setOpenShowPassword(false);
+    setSelectedUserName(null);
   };
 
   const handleFilterStatus = (event, newValue) => {
@@ -289,6 +316,10 @@ function UserMobileViewCardLayout({
                           <b>Add / Deduct Money</b>
                         </Button>
 
+                        <Button variant="outlined" onClick={() => handleOpenShowPassword(row._id, row.name)}>
+                          <b>Show Password</b>
+                        </Button>
+
                         <Button variant="outlined" onClick={() => handleOpenChangePassword(row._id, row.name)}>
                           <b>Change Password</b>
                         </Button>
@@ -347,6 +378,15 @@ function UserMobileViewCardLayout({
         loading={changePasswordLoading}
         userName={selectedUserName}
       />
+
+      <ShowPasswordDialog
+        open={openShowPassword}
+        onClose={handleCloseShowPassword}
+        loading={showPasswordLoading}
+        password={revealedPassword}
+        error={showPasswordError}
+        userName={selectedUserName}
+      />
     </Box>
   );
 }
@@ -358,6 +398,7 @@ UserMobileViewCardLayout.propTypes = {
   onStatusChange: PropTypes.func,
   onChangePassword: PropTypes.func,
   changePasswordLoading: PropTypes.bool,
+  onShowPassword: PropTypes.func,
   onViewBankDetails: PropTypes.func,
   onAddDeductBalance: PropTypes.func,
   addDeductBalanceLoading: PropTypes.bool,

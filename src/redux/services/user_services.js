@@ -80,6 +80,17 @@ export const changeUserPasswordAsync = createAsyncThunk(
     })
 );
 
+// Reveal user password (Admin only)
+export const revealUserPasswordAsync = createAsyncThunk(
+  'user/revealPassword',
+  async (id, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: `/users/${id}/reveal-password`,
+      method: 'get',
+    })
+);
+
 // Get user ledgers
 export const getUserLedgersAsync = createAsyncThunk(
   'user/getUserLedgers',

@@ -40,7 +40,7 @@ import {
 // sections
 import { useSnackbar } from '../components/snackbar';
 import CustomTableToolbar from '../components/table/CustomTableToolBar';
-import { addDeductBalanceAsync, changeUserPasswordAsync, deleteUserAsync, getAllUsersAsync, updateUserStatusAsync } from '../redux/services/user_services';
+import { addDeductBalanceAsync, changeUserPasswordAsync, deleteUserAsync, getAllUsersAsync, revealUserPasswordAsync, updateUserStatusAsync } from '../redux/services/user_services';
 import { UserTableRow } from '../sections/_users/list';
 import UserMobileViewCardLayout from '../sections/_users/list/UserMobileViewCardLayout';
 
@@ -272,6 +272,11 @@ export default function UserListPage() {
     }
   };
 
+  const handleShowPassword = async (userId) => {
+    const result = await dispatch(revealUserPasswordAsync(userId)).unwrap();
+    return result?.password;
+  };
+
   const handleAddDeductBalance = async (userId, amount, action) => {
     setAddDeductBalanceLoading(true);
     try {
@@ -366,6 +371,7 @@ export default function UserListPage() {
               onWithdrawalRequestsRow={(id, row) => handleWithdrawalRequestRow(id, row?.name)}
               onChangePassword={(id, password, cpassword) => handleChangePassword(id, password, cpassword)}
               changePasswordLoading={changePasswordLoading}
+              onShowPassword={(id) => handleShowPassword(id)}
               onAddDeductBalance={(id, amount, action) => handleAddDeductBalance(id, amount, action)}
               addDeductBalanceLoading={addDeductBalanceLoading}
               // Filter props
@@ -449,6 +455,7 @@ export default function UserListPage() {
                           onStatusChange={(_id, status) => handleStatusChange(_id, status)}
                           onChangePassword={(id, password, cpassword) => handleChangePassword(id, password, cpassword)}
                           changePasswordLoading={changePasswordLoading}
+                          onShowPassword={(id) => handleShowPassword(id)}
                           onAddDeductBalance={(id, amount, action) => handleAddDeductBalance(id, amount, action)}
                           addDeductBalanceLoading={addDeductBalanceLoading}
                         />
