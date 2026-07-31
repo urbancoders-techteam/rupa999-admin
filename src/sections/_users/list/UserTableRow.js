@@ -15,7 +15,6 @@ import ChangePasswordDialog from '../../../components/change-password-dialog/Cha
 import ConfirmDialog from '../../../components/confirm-dialog';
 import Iconify from '../../../components/iconify';
 import MenuPopover from '../../../components/menu-popover';
-import ShowPasswordDialog from '../../../components/show-password-dialog/ShowPasswordDialog';
 import { fDateTime } from '../../../utils/formatTime';
 import AddDeductBalanceModal from '../form/UserAddDeductForm';
 import StatusToggleCell from './StatusToggledCell';
@@ -57,7 +56,6 @@ UserTableRow.propTypes = {
   onViewBankDetails: PropTypes.func,
   onChangePassword: PropTypes.func,
   changePasswordLoading: PropTypes.bool,
-  onShowPassword: PropTypes.func,
   onAddDeductBalance: PropTypes.func,
   addDeductBalanceLoading: PropTypes.bool,
 };
@@ -75,7 +73,6 @@ export default function UserTableRow({
   onViewBankDetails,
   onChangePassword,
   changePasswordLoading,
-  onShowPassword,
   onAddDeductBalance,
   addDeductBalanceLoading,
 }) {
@@ -99,10 +96,6 @@ export default function UserTableRow({
   const [openAddDeduct, setOpenAddDeduct] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  const [openShowPassword, setOpenShowPassword] = useState(false);
-  const [showPasswordLoading, setShowPasswordLoading] = useState(false);
-  const [revealedPassword, setRevealedPassword] = useState('');
-  const [showPasswordError, setShowPasswordError] = useState('');
 
   const handleSubmit = async (values) => {
     if (onAddDeductBalance) {
@@ -160,24 +153,6 @@ export default function UserTableRow({
       handleCloseChangePassword();
     }
   };
-
-  const handleOpenShowPassword = async () => {
-    handleClosePopover();
-    setOpenShowPassword(true);
-    setShowPasswordLoading(true);
-    setShowPasswordError('');
-    setRevealedPassword('');
-    try {
-      const password = await onShowPassword(_id);
-      setRevealedPassword(password);
-    } catch (error) {
-      setShowPasswordError(error?.message || 'Failed to retrieve password');
-    } finally {
-      setShowPasswordLoading(false);
-    }
-  };
-
-  const handleCloseShowPassword = () => setOpenShowPassword(false);
 
   return (
     <>
@@ -287,11 +262,6 @@ export default function UserTableRow({
           Bank Details
         </MenuItem>
 
-        <MenuItem onClick={handleOpenShowPassword}>
-          <Iconify icon="mdi:eye-outline" />
-          Show Password
-        </MenuItem>
-
         <MenuItem onClick={handleOpenChangePassword}>
           <Iconify icon="mdi:lock-reset" />
           Change Password
@@ -363,16 +333,6 @@ export default function UserTableRow({
         onClose={handleCloseChangePassword}
         onSubmit={handleChangePasswordSubmit}
         loading={changePasswordLoading}
-        userName={name}
-      />
-
-      {/* Show Password Dialog */}
-      <ShowPasswordDialog
-        open={openShowPassword}
-        onClose={handleCloseShowPassword}
-        loading={showPasswordLoading}
-        password={revealedPassword}
-        error={showPasswordError}
         userName={name}
       />
     </>
