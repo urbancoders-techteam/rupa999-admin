@@ -62,11 +62,12 @@ export const deleteMarketResultAsync = createAsyncThunk(
 // Revert market result
 export const revertMarketResultAsync = createAsyncThunk(
   'marketResult/revert',
-  async (id, toolkit) =>
+  async ({ id, session }, toolkit) =>
     AxiosClient({
       toolkit,
       url: `/market-results/${id}/revert`,
       method: 'post',
+      data: { session },
     })
 );
 
