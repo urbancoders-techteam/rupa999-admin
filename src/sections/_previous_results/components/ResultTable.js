@@ -20,6 +20,7 @@ import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllWinningBidsAsync } from '../../../redux/services/bid_services';
+import { fDateTime } from '../../../utils/formatTime';
 
 ResultTable.propTypes = {
   marketId: PropTypes.string,
@@ -73,7 +74,7 @@ export default function ResultTable({ marketId }) {
     number: bid.bidTable?.digit || 'N/A',
     amount: bid.totalPoints || 0,
     winningAmount: bid.winAmount || 0,
-    createdAt: bid.createdAt ? new Date(bid.createdAt).toLocaleDateString('en-GB') : 'N/A',
+    createdAt: bid.createdAt ? fDateTime(bid.createdAt, 'DD-MMM-YYYY hh:mm A') : 'N/A',
   }));
 
   // Calculate totals (for current page only, or fetch all for accurate totals)
@@ -154,9 +155,9 @@ export default function ResultTable({ marketId }) {
                 <TableRow>
                   <TableCell>User Name</TableCell>
                   <TableCell>Market Name</TableCell>
-                  <TableCell>Number</TableCell>
-                  <TableCell>Amount</TableCell>
-                  <TableCell>Winning Amount</TableCell>
+                  <TableCell>Bid</TableCell>
+                  <TableCell>Play Amount</TableCell>
+                  <TableCell>Win Amount</TableCell>
                   <TableCell>Created At</TableCell>
                 </TableRow>
               </TableHead>

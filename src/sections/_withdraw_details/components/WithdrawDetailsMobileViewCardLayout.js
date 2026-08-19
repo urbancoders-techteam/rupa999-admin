@@ -5,6 +5,7 @@ import {
   Typography,
   Stack,
   Box,
+  Link,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -13,6 +14,7 @@ function WithdrawDetailsMobileViewCardLayout({
   data = [], 
   onAccept, 
   onReject,
+  onUserClick,
   acceptLoading = false,
   rejectLoading = false,
 }) {
@@ -60,8 +62,18 @@ function WithdrawDetailsMobileViewCardLayout({
       }}
     >
       <Stack spacing={2}>
-        {visibleData.map((row) => (
-          <Card
+        {visibleData.map((row) => {
+          const phoneNumber =
+            row.userId?.number ||
+            row.userId?.whatsappNumber ||
+            row.phone ||
+            row.Phone ||
+            row.userPhone ||
+            row.phoneNumber ||
+            '';
+
+          return (
+            <Card
             key={row.id || row.ID || row._id}
             sx={{
               p: 2,
@@ -85,9 +97,22 @@ function WithdrawDetailsMobileViewCardLayout({
                 <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
                   Phone No:
                 </Typography>
-                <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 500 }}>
-                  {row.userId?.number || row.phone || row.Phone || row.userPhone || row.phoneNumber || '—'}
-                </Typography>
+                {phoneNumber ? (
+                  <Link
+                    component="button"
+                    type="button"
+                    variant="body2"
+                    underline="hover"
+                    onClick={() => onUserClick?.(phoneNumber)}
+                    sx={{ fontWeight: 500, cursor: 'pointer', textAlign: 'right' }}
+                  >
+                    {phoneNumber}
+                  </Link>
+                ) : (
+                  <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 500 }}>
+                    —
+                  </Typography>
+                )}
               </Box>
 
               {/* Method */}
@@ -176,8 +201,9 @@ function WithdrawDetailsMobileViewCardLayout({
                 </Box>
               )}
             </Stack>
-          </Card>
-        ))}
+            </Card>
+          );
+        })}
         {loading && (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
             <CircularProgress size={32} color="primary" />
@@ -197,6 +223,7 @@ WithdrawDetailsMobileViewCardLayout.propTypes = {
   data: PropTypes.array,
   onAccept: PropTypes.func,
   onReject: PropTypes.func,
+  onUserClick: PropTypes.func,
   acceptLoading: PropTypes.bool,
   rejectLoading: PropTypes.bool,
 };

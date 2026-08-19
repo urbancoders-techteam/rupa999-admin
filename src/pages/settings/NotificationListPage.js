@@ -40,6 +40,7 @@ const TABLE_HEAD = [
   { id: 'sno', label: 'S.no', align: 'left' },
   { id: 'title', label: 'Title', align: 'left' },
   { id: 'description', label: 'Description', align: 'left' },
+  { id: 'resend', label: 'Resend', align: 'center' },
   { id: 'action', label: 'Action', align: 'right' },
 ];
 
@@ -115,6 +116,14 @@ export default function NotificationListPage() {
   const handleOpenConfirm = () => setOpenConfirm(true);
   const handleCloseConfirm = () => setOpenConfirm(false);
 
+  const handleResendNotification = (notification) => {
+    // TODO: Replace this message with the resend-to-all-users API call when available.
+    enqueueSnackbar(
+      `Resend for "${notification.title}" will be available once the API is connected.`,
+      { variant: 'info' }
+    );
+  };
+
   return (
     <>
       <Helmet>
@@ -149,13 +158,13 @@ export default function NotificationListPage() {
             />
 
             <Scrollbar>
-              <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: 600 }}>
+              <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: 700 }}>
                 <TableHeadCustom headLabel={TABLE_HEAD} rowCount={tableData.length} numSelected={selected.length} />
 
                 <TableBody>
                   {loading ? (
                     <TableRow>
-                      <TableCell colSpan={4} align="center">
+                      <TableCell colSpan={TABLE_HEAD.length} align="center">
                         Loading...
                       </TableCell>
                     </TableRow>
@@ -168,6 +177,7 @@ export default function NotificationListPage() {
                           index={row.sno}
                           selected={selected.includes(row.id)}
                           onSelectRow={() => onSelectRow(row.id)}
+                          onResend={() => handleResendNotification(row)}
                           onDeleteRow={() => handleDeleteRow(row.id)}
                         />
                       ))}

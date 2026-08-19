@@ -229,15 +229,15 @@ export default function MarketForm({ isEdit = false, isView = false, currentUser
               </FormControl>
 
               <FormControl component="fieldset" error={!!errors.hideOpen} sx={{ mt: 2 }}>
-                <FormLabel component="legend">Hide Open</FormLabel>
+                <FormLabel component="legend">Hide</FormLabel>
                 <RadioGroup
                   row
                   name="hideOpen"
                   value={values.hideOpen}
                   onChange={(e) => setValue('hideOpen', e.target.value)}
                 >
-                  <FormControlLabel value="enable" control={<Radio disabled={isView} />} label="Enable" />
-                  <FormControlLabel value="disable" control={<Radio disabled={isView} />} label="Disable" />
+                  <FormControlLabel value="enable" control={<Radio disabled={isView} />} label="Yes" />
+                  <FormControlLabel value="disable" control={<Radio disabled={isView} />} label="No" />
                 </RadioGroup>
                 {errors.hideOpen && <FormHelperText>{errors.hideOpen.message}</FormHelperText>}
               </FormControl>

@@ -43,6 +43,7 @@ import WithdrawMobileViewCardLayout from '../sections/_withdraw_details/componen
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
+  { id: 'createdAt', label: 'Request At', align: 'left' },
   { id: 'id', label: 'ID', align: 'left' },
   { id: 'marketName', label: 'Name', align: 'left' },
   { id: 'userPhone', label: 'Phone', align: 'left' },
@@ -55,7 +56,6 @@ const TABLE_HEAD = [
   { id: 'status', label: 'Status', align: 'left' },
   { id: 'reason', label: 'Faild Reason', align: 'left' },
   { id: 'actions', label: 'Actions', align: 'left' },
-  { id: 'createdAt', label: 'Created At', align: 'left' },
 ];
 
 // ----------------------------------------------------------------------
@@ -136,13 +136,13 @@ export default function GeneralWithdrawHistoryListPage() {
           ifsc: item.bankDetails?.ifscCode || 'N/A',
           status: item.status || 'pending',
           reason: item.remarks || '-',
-          createdAt: item.createdAt ? new Date(item.createdAt).toLocaleString('en-IN') : 'N/A',
           processedAt: item.processedAt ? new Date(item.processedAt).toLocaleString('en-IN') : null,
           processedBy: item.processedBy?.name || null,
           // Keep original data for reference
           bankDetails: item.bankDetails || null,
           upiDetails: item.upiDetails || null,
           ...item,
+          createdAt: item.createdAt || null,
         }));
         setTableData(transformedData);
         // Store total items from pagination
@@ -260,6 +260,14 @@ export default function GeneralWithdrawHistoryListPage() {
     navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
   };
 
+  const handleUserClick = useCallback(
+    (phoneNumber) => {
+      if (!phoneNumber || phoneNumber === 'N/A') return;
+      navigate(`${PATH_DASHBOARD.user.list}?search=${encodeURIComponent(phoneNumber)}`);
+    },
+    [navigate]
+  );
+
   const handleResetFilter = () => {
     setFilterName('');
     setSearchQuery('');
@@ -355,6 +363,7 @@ export default function GeneralWithdrawHistoryListPage() {
             onReject={(id) => handleReject(id)}
             acceptLoading={acceptLoading}
             rejectLoading={rejectLoading}
+            onUserClick={handleUserClick}
           />
         ) : (
           <Card>
@@ -391,6 +400,7 @@ export default function GeneralWithdrawHistoryListPage() {
                           onReject={() => handleReject(row._id || row.id)}
                           acceptLoading={acceptLoading[row._id || row.id] || false}
                           rejectLoading={rejectLoading[row._id || row.id] || false}
+                          onUserClick={handleUserClick}
                         />
                       ))
                     )}

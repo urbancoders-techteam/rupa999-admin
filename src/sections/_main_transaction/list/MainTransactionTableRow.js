@@ -1,7 +1,42 @@
-import { Stack, TableCell, TableRow, Typography } from '@mui/material';
+import { Link, Stack, TableCell, TableRow, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
+import { memo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { PATH_DASHBOARD } from '../../../routes/paths';
 import { fCurrency } from '../../../utils/formatNumber';
 import { fDateTimeSplit } from '../../../utils/formatTime';
+
+// ----------------------------------------------------------------------
+
+const STANDARD_CELL_SX = {
+  py: { xs: 0.75, sm: 0.875, md: 1, lg: 1.25 },
+  px: { xs: 0.5, sm: 1, md: 1.5, lg: 2 },
+};
+
+const COMPACT_CELL_SX = {
+  py: { xs: 0.5, sm: 0.75, md: 1, lg: 1.25 },
+  px: { xs: 0.25, sm: 0.75, md: 1.5, lg: 2 },
+};
+
+const MONEY_CELL_SX = {
+  ...STANDARD_CELL_SX,
+  minWidth: { xs: '50px', sm: 'auto' },
+};
+
+const MOBILE_TRUNCATE_SX = {
+  whiteSpace: { xs: 'nowrap', sm: 'normal' },
+  overflow: { xs: 'hidden', sm: 'visible' },
+  textOverflow: { xs: 'ellipsis', sm: 'clip' },
+};
+
+const FONT_SIZE = {
+  body: { xs: '0.7rem', sm: '0.8rem', md: '0.875rem', lg: '0.9375rem' },
+  dateTime: { xs: '0.65rem', sm: '0.75rem', md: '0.8125rem', lg: '0.875rem' },
+  userName: { xs: '0.65rem', sm: '0.75rem', md: '0.875rem', lg: '0.9375rem' },
+  meta: { xs: '0.625rem', sm: '0.7rem', md: '0.75rem', lg: '0.8125rem' },
+  particulars: { xs: '0.75rem', sm: '0.875rem', md: '0.9375rem', lg: '1rem' },
+  market: { xs: '0.55rem', sm: '0.75rem', md: '0.8125rem', lg: '0.75rem' },
+};
 
 // ----------------------------------------------------------------------
 
@@ -19,6 +54,7 @@ MainTransactionTableRow.propTypes = {
       userName: PropTypes.string,
       number: PropTypes.string,
       mobile: PropTypes.string,
+      whatsappNumber: PropTypes.string,
     }),
     admin: PropTypes.object,
     remarks: PropTypes.string,
@@ -27,439 +63,253 @@ MainTransactionTableRow.propTypes = {
   }),
 };
 
-export default function MainTransactionTableRow({ row, index }) {
-  const { date, particulars, debit, credit, balance, admin, marketName, gameName, user } = row;
+function MainTransactionTableRow({ row = {}, index = 0 }) {
+  const {
+    date,
+    particulars,
+    debit = 0,
+    credit = 0,
+    balance = 0,
+    admin,
+    marketName,
+    gameName,
+    user: userData,
+  } = row || {};
+  const navigate = useNavigate();
+  const user = userData || {};
+  const userMobile = user.number || user.mobile || user.whatsappNumber || '';
+  const formattedDateTime = date ? fDateTimeSplit(date) : null;
+
+  const handleUserClick = () => {
+    if (!userMobile) return;
+    navigate(`${PATH_DASHBOARD.user.list}?search=${encodeURIComponent(userMobile)}`);
+  };
 
   return (
     <TableRow
       hover
-      sx={(theme) => ({
+      sx={{
         '&:hover': {
-          backgroundColor: theme.palette.action.hover,
+          backgroundColor: 'action.hover',
         },
-      })}
+      }}
     >
-      <TableCell
-        align="center"
-        sx={(theme) => ({
-          padding: theme.spacing(1, 1.5),
-          [theme.breakpoints.down('sm')]: {
-            padding: theme.spacing(0.75, 0.5),
-          },
-          [theme.breakpoints.between('sm', 'md')]: {
-            padding: theme.spacing(0.875, 1),
-          },
-          [theme.breakpoints.up('lg')]: {
-            padding: theme.spacing(1.25, 2),
-          },
-        })}
-      >
-        <Typography
-          variant="body2"
-          sx={(theme) => ({
-            fontSize: '0.875rem',
-            [theme.breakpoints.down('sm')]: {
-              fontSize: '0.7rem',
-            },
-            [theme.breakpoints.between('sm', 'md')]: {
-              fontSize: '0.8rem',
-            },
-            [theme.breakpoints.up('lg')]: {
-              fontSize: '0.9375rem',
-            },
-          })}
-        >
-          {index + 1}.
+      <TableCell align="center" sx={STANDARD_CELL_SX}>
+        <Typography variant="body2" sx={{ fontSize: FONT_SIZE.body }}>
+          {index}.
         </Typography>
       </TableCell>
 
       <TableCell
-        sx={(theme) => ({
-          padding: theme.spacing(1, 1.5),
-          [theme.breakpoints.down('sm')]: {
-            padding: theme.spacing(0.75, 0.5),
-            minWidth: '120px',
-          },
-          [theme.breakpoints.between('sm', 'md')]: {
-            padding: theme.spacing(0.875, 1),
-          },
-          [theme.breakpoints.up('lg')]: {
-            padding: theme.spacing(1.25, 2),
-          },
-        })}
+        sx={{
+          ...STANDARD_CELL_SX,
+          minWidth: { xs: '120px', sm: 'auto' },
+        }}
       >
-        {date ? (
+        {formattedDateTime ? (
           <Stack spacing={{ xs: 0.25, sm: 0.5 }}>
             <Typography
               variant="body2"
-              sx={(theme) => ({
-                fontSize: '0.875rem',
+              sx={{
+                fontSize: FONT_SIZE.body,
                 fontWeight: 500,
                 whiteSpace: 'nowrap',
-                [theme.breakpoints.down('sm')]: {
-                  fontSize: '0.7rem',
-                },
-                [theme.breakpoints.between('sm', 'md')]: {
-                  fontSize: '0.8rem',
-                },
-                [theme.breakpoints.up('lg')]: {
-                  fontSize: '0.9375rem',
-                },
-              })}
+              }}
             >
-              {fDateTimeSplit(date).date}
+              {formattedDateTime.date}
             </Typography>
             <Typography
               variant="body2"
               color="text.secondary"
-              sx={(theme) => ({
-                fontSize: '0.8125rem',
+              sx={{
+                fontSize: FONT_SIZE.dateTime,
                 whiteSpace: 'nowrap',
-                [theme.breakpoints.down('sm')]: {
-                  fontSize: '0.65rem',
-                },
-                [theme.breakpoints.between('sm', 'md')]: {
-                  fontSize: '0.75rem',
-                },
-                [theme.breakpoints.up('lg')]: {
-                  fontSize: '0.875rem',
-                },
-              })}
+              }}
             >
-              {fDateTimeSplit(date).time}
+              {formattedDateTime.time}
             </Typography>
           </Stack>
         ) : (
-          <Typography
-            variant="body2"
-            sx={(theme) => ({
-              fontSize: '0.875rem',
-              [theme.breakpoints.down('sm')]: {
-                fontSize: '0.7rem',
-              },
-              [theme.breakpoints.between('sm', 'md')]: {
-                fontSize: '0.8rem',
-              },
-              [theme.breakpoints.up('lg')]: {
-                fontSize: '0.9375rem',
-              },
-            })}
-          >
+          <Typography variant="body2" sx={{ fontSize: FONT_SIZE.body }}>
             —
           </Typography>
         )}
       </TableCell>
 
       {/* User Name Column */}
-      {user.name && (
-        <TableCell
-          sx={(theme) => ({
-            padding: theme.spacing(1, 1.5),
-            [theme.breakpoints.down('sm')]: {
-              padding: theme.spacing(0.5, 0.25),
-              maxWidth: '130px',
-              paddingRight: '15px',
-            },
-            [theme.breakpoints.between('sm', 'md')]: {
-              padding: theme.spacing(0.75, 0.75),
-            },
-            [theme.breakpoints.up('lg')]: {
-              padding: theme.spacing(1.25, 2),
-            },
-          })}
+      <TableCell
+        sx={{
+          ...COMPACT_CELL_SX,
+          maxWidth: { xs: '130px', sm: 'none' },
+          pr: { xs: '15px', sm: 0.75, md: 1.5, lg: 2 },
+        }}
+      >
+        <Typography
+          variant="subtitle2"
+          sx={{
+            ...MOBILE_TRUNCATE_SX,
+            fontSize: FONT_SIZE.userName,
+          }}
         >
-          <Typography
-            variant="subtitle2"
-            sx={(theme) => ({
-              fontSize: '0.875rem',
-              whiteSpace: { xs: 'nowrap', sm: 'normal' },
-              overflow: { xs: 'hidden', sm: 'visible' },
-              textOverflow: { xs: 'ellipsis', sm: 'clip' },
-              [theme.breakpoints.down('sm')]: {
-                fontSize: '0.65rem',
-              },
-              [theme.breakpoints.between('sm', 'md')]: {
-                fontSize: '0.75rem',
-              },
-              [theme.breakpoints.up('lg')]: {
-                fontSize: '0.9375rem',
-              },
-            })}
+          {user.name || user.userName || '—'}
+        </Typography>
+        {userMobile ? (
+          <Link
+            component="button"
+            type="button"
+            variant="body2"
+            underline="hover"
+            onClick={handleUserClick}
+            sx={{
+              ...MOBILE_TRUNCATE_SX,
+              display: 'block',
+              maxWidth: '100%',
+              fontSize: FONT_SIZE.meta,
+              textAlign: 'left',
+              cursor: 'pointer',
+            }}
           >
-            {user?.name || user?.userName || '—'}
-          </Typography>
+            {userMobile}
+          </Link>
+        ) : (
           <Typography
             variant="body2"
             color="text.secondary"
-            sx={(theme) => ({
-              fontSize: '0.75rem',
-              whiteSpace: { xs: 'nowrap', sm: 'normal' },
-              overflow: { xs: 'hidden', sm: 'visible' },
-              textOverflow: { xs: 'ellipsis', sm: 'clip' },
-              [theme.breakpoints.down('sm')]: {
-                fontSize: '0.625rem',
-              },
-              [theme.breakpoints.between('sm', 'md')]: {
-                fontSize: '0.7rem',
-              },
-              [theme.breakpoints.up('lg')]: {
-                fontSize: '0.8125rem',
-              },
-            })}
+            sx={{
+              ...MOBILE_TRUNCATE_SX,
+              fontSize: FONT_SIZE.meta,
+            }}
           >
-            {user?.number || user?.mobile || '—'}
+            —
           </Typography>
-        </TableCell>
-      )}
-
-      <TableCell
-        sx={(theme) => ({
-          padding: theme.spacing(1, 1.5),
-          [theme.breakpoints.down('sm')]: {
-            padding: theme.spacing(0.5, 0.25),
-            maxWidth: '120px',
-            paddingRight: '10px',
-          },
-          [theme.breakpoints.between('sm', 'md')]: {
-            padding: theme.spacing(0.75, 0.75),
-          },
-          [theme.breakpoints.up('lg')]: {
-            padding: theme.spacing(1.25, 2),
-          },
-        })}
-      >
-        <Stack
-          spacing={{ xs: 0.125, sm: 0.5 }}
-          sx={{
-            overflow: 'hidden',
-          }}
-        >
-          <Typography
-            variant="subtitle1"
-            sx={(theme) => ({
-              fontSize: '0.9375rem',
-              fontWeight: 600,
-              whiteSpace: { xs: 'nowrap', sm: 'normal' },
-              overflow: { xs: 'hidden', sm: 'visible' },
-              textOverflow: { xs: 'ellipsis', sm: 'clip' },
-              [theme.breakpoints.down('sm')]: {
-                fontSize: '0.75rem',
-                fontWeight: 500,
-              },
-              [theme.breakpoints.between('sm', 'md')]: {
-                fontSize: '0.875rem',
-              },
-              [theme.breakpoints.up('lg')]: {
-                fontSize: '1rem',
-              },
-            })}
-          >
-            {particulars}
-          </Typography>
-
-          {marketName && (
-            <Typography
-              variant="subtitle2"
-              color="text.secondary"
-              sx={(theme) => ({
-                fontSize: '0.8125rem',
-                whiteSpace: { xs: 'nowrap', sm: 'normal' },
-                overflow: { xs: 'hidden', sm: 'visible' },
-                textOverflow: { xs: 'ellipsis', sm: 'clip' },
-                [theme.breakpoints.down('sm')]: {
-                  fontSize: '0.55rem',
-                },
-                [theme.breakpoints.between('sm', 'md')]: {
-                  fontSize: '0.75rem',
-                },
-                [theme.breakpoints.up('lg')]: {
-                  fontSize: '0.75rem',
-                },
-              })}
-            >
-              {marketName || '—'}
-            </Typography>
-          )}
-          {(debit && gameName) ? (
-            <Typography
-              variant="subtitle2"
-              color="text.secondary"
-              sx={(theme) => ({
-                fontSize: '0.75rem',
-                whiteSpace: { xs: 'nowrap', sm: 'normal' },
-                overflow: { xs: 'hidden', sm: 'visible' },
-                textOverflow: { xs: 'ellipsis', sm: 'clip' },
-                [theme.breakpoints.down('sm')]: {
-                  fontSize: '0.625rem',
-                },
-                [theme.breakpoints.between('sm', 'md')]: {
-                  fontSize: '0.7rem',
-                },
-                [theme.breakpoints.up('lg')]: {
-                  fontSize: '0.8125rem',
-                },
-              })}
-            >
-              {debit ? `${gameName} - ${fCurrency(debit)}` : ''}
-            </Typography>
-          ) : ''}
-        </Stack>
+        )}
       </TableCell>
 
-      <TableCell
-        align="left"
-        sx={(theme) => ({
-          padding: theme.spacing(1, 1.5),
-          [theme.breakpoints.down('sm')]: {
-            padding: theme.spacing(0.75, 0.5),
-            minWidth: '50px',
-          },
-          [theme.breakpoints.between('sm', 'md')]: {
-            padding: theme.spacing(0.875, 1),
-          },
-          [theme.breakpoints.up('lg')]: {
-            padding: theme.spacing(1.25, 2),
-          },
-        })}
-      >
-        <Typography
-          variant="body2"
-          color={debit > 0 ? 'error.main' : 'text.secondary'}
-          sx={(theme) => ({
-            fontSize: '0.875rem',
-            whiteSpace: { xs: 'nowrap', sm: 'normal' },
-            overflow: { xs: 'hidden', sm: 'visible' },
-            textOverflow: { xs: 'ellipsis', sm: 'clip' },
-            [theme.breakpoints.down('sm')]: {
-              fontSize: '0.7rem',
-            },
-            [theme.breakpoints.between('sm', 'md')]: {
-              fontSize: '0.8rem',
-            },
-            [theme.breakpoints.up('lg')]: {
-              fontSize: '0.9375rem',
-            },
-          })}
-        >
-          {debit > 0 ? fCurrency(debit) : '-'}
-        </Typography>
-      </TableCell>
-
-      <TableCell
-        align="left"
-        sx={(theme) => ({
-          padding: theme.spacing(1, 1.5),
-          [theme.breakpoints.down('sm')]: {
-            padding: theme.spacing(0.75, 0.5),
-            minWidth: '50px',
-          },
-          [theme.breakpoints.between('sm', 'md')]: {
-            padding: theme.spacing(0.875, 1),
-          },
-          [theme.breakpoints.up('lg')]: {
-            padding: theme.spacing(1.25, 2),
-          },
-        })}
-      >
+      <TableCell align="left" sx={MONEY_CELL_SX}>
         <Typography
           variant="body2"
           color={credit > 0 ? 'success.main' : 'text.secondary'}
-          sx={(theme) => ({
-            fontSize: '0.875rem',
-            whiteSpace: { xs: 'nowrap', sm: 'normal' },
-            overflow: { xs: 'hidden', sm: 'visible' },
-            textOverflow: { xs: 'ellipsis', sm: 'clip' },
-            [theme.breakpoints.down('sm')]: {
-              fontSize: '0.7rem',
-            },
-            [theme.breakpoints.between('sm', 'md')]: {
-              fontSize: '0.8rem',
-            },
-            [theme.breakpoints.up('lg')]: {
-              fontSize: '0.9375rem',
-            },
-          })}
+          sx={{
+            ...MOBILE_TRUNCATE_SX,
+            fontSize: FONT_SIZE.body,
+          }}
         >
           {fCurrency(credit > 0 ? credit : '')}
         </Typography>
       </TableCell>
 
-      <TableCell
-        align="left"
-        sx={(theme) => ({
-          padding: theme.spacing(1, 1.5),
-          [theme.breakpoints.down('sm')]: {
-            padding: theme.spacing(0.75, 0.5),
-            minWidth: '50px',
-          },
-          [theme.breakpoints.between('sm', 'md')]: {
-            padding: theme.spacing(0.875, 1),
-          },
-          [theme.breakpoints.up('lg')]: {
-            padding: theme.spacing(1.25, 2),
-          },
-        })}
-      >
+        <TableCell align="left" sx={MONEY_CELL_SX}>
         <Typography
           variant="body2"
-          fontWeight="fontWeightMedium"
-          sx={(theme) => ({
-            fontSize: '0.875rem',
-            whiteSpace: { xs: 'nowrap', sm: 'normal' },
-            overflow: { xs: 'hidden', sm: 'visible' },
-            textOverflow: { xs: 'ellipsis', sm: 'clip' },
-            [theme.breakpoints.down('sm')]: {
-              fontSize: '0.7rem',
-              fontWeight: 500,
-            },
-            [theme.breakpoints.between('sm', 'md')]: {
-              fontSize: '0.8rem',
-            },
-            [theme.breakpoints.up('lg')]: {
-              fontSize: '0.9375rem',
-            },
-          })}
+          sx={{
+            ...MOBILE_TRUNCATE_SX,
+            fontSize: FONT_SIZE.body,
+            fontWeight: 500,
+          }}
         >
           {balance ? fCurrency(balance) : '-'}
         </Typography>
       </TableCell>
 
       <TableCell
-        align="left"
-        sx={(theme) => ({
-          padding: theme.spacing(1, 1.5),
-          [theme.breakpoints.down('sm')]: {
-            padding: theme.spacing(0.75, 0.5),
-          },
-          [theme.breakpoints.between('sm', 'md')]: {
-            padding: theme.spacing(0.875, 1),
-          },
-          [theme.breakpoints.up('lg')]: {
-            padding: theme.spacing(1.25, 2),
-          },
-        })}
+        sx={{
+          ...COMPACT_CELL_SX,
+          maxWidth: { xs: '130px', sm: 'none' },
+          pr: { xs: '15px', sm: 0.75, md: 1.5, lg: 2 },
+        }}
       >
         <Typography
-          variant="body2"
-          sx={(theme) => ({
-            fontSize: '0.875rem',
-            whiteSpace: { xs: 'nowrap', sm: 'normal' },
-            overflow: { xs: 'hidden', sm: 'visible' },
-            textOverflow: { xs: 'ellipsis', sm: 'clip' },
-            [theme.breakpoints.down('sm')]: {
-              fontSize: '0.7rem',
-            },
-            [theme.breakpoints.between('sm', 'md')]: {
-              fontSize: '0.8rem',
-            },
-            [theme.breakpoints.up('lg')]: {
-              fontSize: '0.9375rem',
-            },
-          })}
+          variant="subtitle2"
+          sx={{
+            ...MOBILE_TRUNCATE_SX,
+            fontSize: FONT_SIZE.userName,
+          }}
         >
-          {admin?.name || '—'}
+          —
         </Typography>
       </TableCell>
+      
+      <TableCell
+        sx={{
+          ...COMPACT_CELL_SX,
+          maxWidth: { xs: '130px', sm: 'none' },
+          pr: { xs: '15px', sm: 0.75, md: 1.5, lg: 2 },
+        }}
+      >
+        <Typography
+          variant="subtitle2"
+          sx={{
+            ...MOBILE_TRUNCATE_SX,
+            fontSize: FONT_SIZE.userName,
+          }}
+        >
+          —
+        </Typography>
+      </TableCell>
+
+      
+
+      {/* <TableCell
+        sx={{
+          ...COMPACT_CELL_SX,
+          maxWidth: { xs: '120px', sm: 'none' },
+          pr: { xs: '10px', sm: 0.75, md: 1.5, lg: 2 },
+        }}
+      >
+        <Stack spacing={{ xs: 0.125, sm: 0.5 }} sx={{ overflow: 'hidden' }}>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              ...MOBILE_TRUNCATE_SX,
+              fontSize: FONT_SIZE.particulars,
+              fontWeight: { xs: 500, sm: 600 },
+            }}
+          >
+            {particulars || '—'}
+          </Typography>
+
+          {marketName && (
+            <Typography
+              variant="subtitle2"
+              color="text.secondary"
+              sx={{
+                ...MOBILE_TRUNCATE_SX,
+                fontSize: FONT_SIZE.market,
+              }}
+            >
+              {marketName}
+            </Typography>
+          )}
+          {Boolean(debit && gameName) && (
+            <Typography
+              variant="subtitle2"
+              color="text.secondary"
+              sx={{
+                ...MOBILE_TRUNCATE_SX,
+                fontSize: FONT_SIZE.meta,
+              }}
+            >
+              {`${gameName} - ${fCurrency(debit)}`}
+            </Typography>
+          )}
+        </Stack>
+      </TableCell> */}
+
+      {/* <TableCell align="left" sx={MONEY_CELL_SX}>
+        <Typography
+          variant="body2"
+          color={debit > 0 ? 'error.main' : 'text.secondary'}
+          sx={{
+            ...MOBILE_TRUNCATE_SX,
+            fontSize: FONT_SIZE.body,
+          }}
+        >
+          {debit > 0 ? fCurrency(debit) : '-'}
+        </Typography>
+      </TableCell> */}
+
     </TableRow>
   );
 }
+
+export default memo(MainTransactionTableRow);

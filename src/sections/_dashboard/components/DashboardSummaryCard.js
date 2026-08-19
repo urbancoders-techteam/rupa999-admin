@@ -222,17 +222,17 @@ export default function DashboardSummaryCard({
           width: {
             xs: '60px',
             sm: '74px',
-            md: '84px',
-            lg: '88px'
+            md: '56px',
+            lg: '60px'
           },
           height: {
             xs: '60px',
             sm: '74px',
-            md: '84px',
-            lg: '88px'
+            md: '56px',
+            lg: '60px'
           },
-          minWidth: { xs: '60px', sm: '74px', md: '84px', lg: '88px' },
-          maxWidth: { xs: '60px', sm: '74px', md: '84px', lg: '88px' },
+          minWidth: { xs: '60px', sm: '74px', md: '56px', lg: '60px' },
+          maxWidth: { xs: '60px', sm: '74px', md: '56px', lg: '60px' },
           flexShrink: 0,
           display: 'flex',
           alignItems: 'center',

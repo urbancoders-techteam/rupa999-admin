@@ -202,7 +202,7 @@ export default function GeneralMarketRecordListPage() {
   return (
     <>
       <Helmet>
-        <title> General Market Record : List | Rupa999 </title>
+        <title> Record : List | Rupa999 </title>
       </Helmet>
 
       <Container 
@@ -227,10 +227,10 @@ export default function GeneralMarketRecordListPage() {
             }}
           >
             <CustomBreadcrumbs
-              heading="General Market Record"
+              heading="Record"
               links={[
                 { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                { name: 'General Market Record', href: PATH_DASHBOARD.markets.marketrecords.root },
+                { name: 'Record', href: PATH_DASHBOARD.markets.marketrecords.root },
               ]}
               sx={{ mb: { xs: 1, sm: 2 } }}
             />
@@ -250,10 +250,10 @@ export default function GeneralMarketRecordListPage() {
         ) : (
           <>
             <CustomBreadcrumbs
-              heading="General Market Record"
+              heading="Record"
               links={[
                 { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                { name: 'General Market Record', href: PATH_DASHBOARD.markets.marketrecords.list },
+                { name: 'Record', href: PATH_DASHBOARD.markets.marketrecords.list },
               ]}
             />
             <CustomTableToolbar

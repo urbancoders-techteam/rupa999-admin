@@ -85,11 +85,11 @@ export const PATH_DASHBOARD = {
     view: (id) => path(ROOTS_DASHBOARD, `/settings/faq/${id}/view`),
   },
   notifications: {
-    root: path(ROOTS_DASHBOARD, '/settings/notifications'),
-    list: path(ROOTS_DASHBOARD, '/settings/notifications/list'),
-    new: path(ROOTS_DASHBOARD, '/settings/notifications/new'),
-    edit: (id) => path(ROOTS_DASHBOARD, `/settings/notifications/${id}/edit`),
-    view: (id) => path(ROOTS_DASHBOARD, `/settings/notifications/${id}/view`),
+    root: path(ROOTS_DASHBOARD, '/notifications'),
+    list: path(ROOTS_DASHBOARD, '/notifications/list'),
+    new: path(ROOTS_DASHBOARD, '/notifications/new'),
+    edit: (id) => path(ROOTS_DASHBOARD, `/notifications/${id}/edit`),
+    view: (id) => path(ROOTS_DASHBOARD, `/notifications/${id}/view`),
   },
   changepassword: {
     root: path(ROOTS_DASHBOARD, '/settings/changepassword'),

@@ -121,7 +121,7 @@ export const CommonSettingFormPage = Loadable(lazy(() => import('../pages/settin
 // DASHBOARD: Help and Support
 export const HelpAndSupportFormPage = Loadable(lazy(() => import('../pages/settings/HelpAndSupportFormPage')));
 
-// DASHBOARD: Mobile App Marque Message
+// DASHBOARD: Mobile Reel Message
 export const MarqueMessageFormPage = Loadable(lazy(() => import('../pages/settings/MarqueMessageForm')));
 
 // DASHBOARD: FAQ

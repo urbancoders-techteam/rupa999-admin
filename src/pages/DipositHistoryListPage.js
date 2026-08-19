@@ -37,11 +37,11 @@ const TABLE_HEAD = [
   { id: 'sNo', label: 'S.No.', align: 'center' },
   { id: 'date', label: 'Date', align: 'left' },
   { id: 'userName', label: 'User Name', align: 'left' },
-  { id: 'userPhone', label: 'Phone', align: 'left' },
-  { id: 'credit', label: 'Credit Amount', align: 'left' },
+  { id: 'dipositAmount', label: 'Diposit Amount', align: 'left' },
   { id: 'balance', label: 'Balance', align: 'left' },
-  { id: 'createdBy', label: 'Created By', align: 'left' },
-  { id: 'remarks', label: 'Remarks', align: 'left' },
+  { id: 'utrNo', label: 'UTR No.', align: 'left' },
+  { id: 'modeOfPayment', label: 'Mode Of Payment', align: 'left' },
+  // { id: 'remarks', label: 'Remarks', align: 'left' },
 ];
 
 // ----------------------------------------------------------------------

@@ -108,6 +108,16 @@ export default function Router() {
           ],
         },
         {
+          path: 'notifications',
+          children: [
+            { element: <Navigate to="/dashboard/notifications/list" replace />, index: true },
+            { path: 'list', element: <NotificationListPage /> },
+            { path: 'new', element: <NotificationFormHandlePage /> },
+            { path: ':id/edit', element: <NotificationFormHandlePage /> },
+            { path: ':id/view', element: <NotificationFormHandlePage /> },
+          ],
+        },
+        {
           path: 'designation',
           children: [
             { element: <Navigate to="/dashboard/designation/list" replace />, index: true },
@@ -218,16 +228,6 @@ export default function Router() {
                 },
                 { path: 'list', element: <MarketDataListPage /> },
                 // { path: ':id/view', element: <MarketFormHandlePage /> },
-              ],
-            },
-            {
-              path: 'notifications',
-              children: [
-                { element: <Navigate to="/dashboard/settings/notifications/list" replace />, index: true },
-                { path: 'list', element: <NotificationListPage /> },
-                { path: 'new', element: <NotificationFormHandlePage /> },
-                { path: ':id/edit', element: <NotificationFormHandlePage /> },
-                { path: ':id/view', element: <NotificationFormHandlePage /> },
               ],
             },
             {

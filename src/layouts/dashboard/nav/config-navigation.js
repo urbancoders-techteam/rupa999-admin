@@ -49,7 +49,7 @@ const navConfig = [
       },
 
       {
-        title: 'Main Market',
+        title: 'Market',
         path: PATH_DASHBOARD.markets.root,
         icon: ICONS.user,
         children: [
@@ -58,7 +58,7 @@ const navConfig = [
           { title: 'Records', path: PATH_DASHBOARD.markets.marketrecords.list },
           { title: 'market results', path: PATH_DASHBOARD.markets.marketresults.list },
           { title: 'Win History', path: PATH_DASHBOARD.markets.winhistory.list },
-          { title: 'Data', path: PATH_DASHBOARD.markets.marketdata.list },
+          { title: 'Game Data', path: PATH_DASHBOARD.markets.marketdata.list },
         ],
       },
 
@@ -105,6 +105,11 @@ const navConfig = [
         path: PATH_DASHBOARD.staff.root,
         icon: ICONS.user,
       },
+      {
+        title: 'Notifications',
+        path: PATH_DASHBOARD.notifications.list,
+        icon: ICONS.mail,
+      },
 
       {
         title: 'settings',
@@ -112,15 +117,11 @@ const navConfig = [
         icon: ICONS.setting,
         children: [
           {
-            title: 'Notifications',
-            path: PATH_DASHBOARD.notifications.list,
-          },
-          {
             title: 'FAQ',
             path: PATH_DASHBOARD.faq.list,
           },
           {
-            title: 'Mobile App Marque',
+            title: 'Mobile Reel',
             path: PATH_DASHBOARD.marquemessage.form,
           },
           { title: 'slider images', path: PATH_DASHBOARD.sliderimage.root },

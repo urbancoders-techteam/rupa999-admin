@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
@@ -9,6 +8,7 @@ import {
   Stack,
   Container,
   Alert,
+  Typography,
 } from '@mui/material';
 import * as Yup from 'yup';
 import { useForm } from 'react-hook-form';
@@ -20,24 +20,24 @@ import { PATH_DASHBOARD } from '../../routes/paths';
 
 // ----------------------------------------------------------------------
 
+const HEX_COLOR_REGEX = /^#[0-9A-F]{6}$/i;
+
+const MarqueMessageSchema = Yup.object().shape({
+  message: Yup.string().trim().required('Message is required'),
+  fontColor: Yup.string()
+    .required('Font color is required')
+    .matches(HEX_COLOR_REGEX, 'Enter a valid HEX color, for example #FF6600'),
+});
+
+const defaultValues = {
+  message: '',
+  fontColor: '#000000',
+};
+
+// ----------------------------------------------------------------------
+
 export default function MarqueMessageForm() {
   const { themeStretch } = useSettingsContext();
-
-  // Validation Schema
-  const MarqueMessageSchema = Yup.object().shape({
-    message1: Yup.string().required('Message 1 is required'),
-    message2: Yup.string().required('Message 2 is required'),
-    message3: Yup.string().required('Message 3 is required'),
-  });
-
-  const defaultValues = useMemo(
-    () => ({
-      message1: '',
-      message2: '',
-      message3: '',
-    }),
-    []
-  );
 
   const methods = useForm({
     resolver: yupResolver(MarqueMessageSchema),
@@ -46,24 +46,30 @@ export default function MarqueMessageForm() {
 
   const {
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = methods;
+
+  const message = watch('message');
+  const fontColor = watch('fontColor');
+  const previewColor = HEX_COLOR_REGEX.test(fontColor || '') ? fontColor : '#000000';
 
   const onSubmit = async (data) => {
     try {
       // TODO: Replace with actual API call
       // await dispatch(updateMarqueMessageAsync(data)).unwrap();
 
-      toast.success('Marque messages saved successfully!');
+      toast.success('Marquee message saved successfully!');
     } catch (error) {
-      toast.error(error?.message || 'Failed to save marque messages');
+      toast.error(error?.message || 'Failed to save marquee message');
     }
   };
 
   return (
     <>
       <Helmet>
-        <title> Mobile App Marque | Rupa999 </title>
+        <title> Mobile Reel | Rupa999 </title>
       </Helmet>
 
       <Container
@@ -74,11 +80,11 @@ export default function MarqueMessageForm() {
         }}
       >
         <CustomBreadcrumbs
-          heading="Mobile App Marque"
+          heading="Mobile Reel"
           links={[
             { name: 'Dashboard', href: PATH_DASHBOARD.root },
             { name: 'Settings', href: PATH_DASHBOARD.settings.root },
-            { name: 'Mobile App Marque', href: PATH_DASHBOARD.marquemessage.form },
+            { name: 'Mobile Reel', href: PATH_DASHBOARD.marquemessage.form },
           ]}
           sx={{ mb: { xs: 1, sm: 2 } }}
         />
@@ -103,27 +109,80 @@ export default function MarqueMessageForm() {
                 <Grid container spacing={{ xs: 2, sm: 3 }}>
                   <Grid item xs={12}>
                     <RHFTextField
-                      name="message1"
-                      label="Message 1"
-                      placeholder="Enter first marque message"
-                     
+                      name="message"
+                      label="Message"
+                      placeholder="Enter marquee message"
+                      multiline
+                      minRows={3}
                     />
                   </Grid>
 
                   <Grid item xs={12}>
-                    <RHFTextField
-                      name="message2"
-                      label="Message 2"
-                      placeholder="Enter second marque message"
-                    />
+                    <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                      Font Color
+                    </Typography>
+                    <Stack
+                      direction={{ xs: 'column', sm: 'row' }}
+                      spacing={1.5}
+                      alignItems={{ xs: 'stretch', sm: 'center' }}
+                    >
+                      <Box
+                        component="input"
+                        type="color"
+                        aria-label="Choose font color"
+                        value={previewColor}
+                        onChange={(event) =>
+                          setValue('fontColor', event.target.value.toUpperCase(), {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          })
+                        }
+                        sx={{
+                          width: { xs: '100%', sm: 72 },
+                          height: 56,
+                          p: 0.5,
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          borderRadius: 1,
+                          bgcolor: 'background.paper',
+                          cursor: 'pointer',
+                        }}
+                      />
+                      <RHFTextField
+                        name="fontColor"
+                        label="Font Color Code"
+                        placeholder="#000000"
+                        helperText="Use a 6-digit HEX code, for example #FF6600"
+                        sx={{ flex: 1 }}
+                      />
+                    </Stack>
                   </Grid>
 
                   <Grid item xs={12}>
-                    <RHFTextField
-                      name="message3"
-                      label="Message 3"
-                      placeholder="Enter third marque message"
-                    />
+                    <Box
+                      sx={{
+                        p: { xs: 2, sm: 2.5 },
+                        border: '1px dashed',
+                        borderColor: 'divider',
+                        borderRadius: 1.5,
+                        bgcolor: 'action.hover',
+                      }}
+                    >
+                      <Typography variant="caption" color="text.secondary">
+                        Preview
+                      </Typography>
+                      <Typography
+                        variant="subtitle1"
+                        sx={{
+                          mt: 0.75,
+                          color: previewColor,
+                          fontWeight: 600,
+                          wordBreak: 'break-word',
+                        }}
+                      >
+                        {message?.trim() || 'Your marquee message will appear here'}
+                      </Typography>
+                    </Box>
                   </Grid>
                 </Grid>
 

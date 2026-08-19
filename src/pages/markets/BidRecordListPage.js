@@ -1,9 +1,8 @@
 import { Box, Card, Container, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
-import { paramCase } from 'change-case';
 import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import Scrollbar from '../../components/scrollbar';
 import { useSettingsContext } from '../../components/settings';
@@ -43,11 +42,6 @@ export default function BidRecordListPage() {
     page,
     rowsPerPage,
     setPage,
-    //
-    selected,
-    setSelected,
-    onSelectRow,
-    //
     onChangeDense,
     onChangePage,
     onChangeRowsPerPage,
@@ -55,7 +49,6 @@ export default function BidRecordListPage() {
 
   const { themeStretch } = useSettingsContext();
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { id } = useParams(); // Get id from route params (format: digit_type)
   const [searchParams] = useSearchParams(); // Get query parameters
   const date = searchParams.get('date'); // Get date from query params
@@ -146,16 +139,6 @@ export default function BidRecordListPage() {
     setSearchQuery(filterName);
   };
 
-  const handleDeleteRow = (rowId) => {
-    // Note: Delete functionality would need to be implemented via API
-    // For now, just remove from selected
-    setSelected(selected.filter((selectedId) => selectedId !== rowId));
-  };
-
-  const handleEditRow = (rowId) => {
-    navigate(PATH_DASHBOARD.user.edit(paramCase(rowId)));
-  };
-
   const handleResetFilter = () => {
     setFilterName('');
     setSearchQuery('');
@@ -238,7 +221,6 @@ export default function BidRecordListPage() {
                   <TableHeadCustom
                     headLabel={TABLE_HEAD}
                     rowCount={tableData.length}
-                    numSelected={selected.length}
                   />
 
                   <TableBody>
@@ -255,10 +237,6 @@ export default function BidRecordListPage() {
                             index={index}
                             key={row.id || row._id || index}
                             row={row}
-                            selected={selected.includes(row.id)}
-                            onSelectRow={() => onSelectRow(row.id)}
-                            onDeleteRow={() => handleDeleteRow(row.id)}
-                            onEditRow={() => handleEditRow(row.name)}
                           />
                         ))}
                         {dataFiltered.length === 0 && (

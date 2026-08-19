@@ -2,16 +2,19 @@
 import { LoadingButton } from '@mui/lab';
 import {
   Box,
-  Button, Stack,
+  Button,
+  Link,
+  Stack,
   TableCell,
   TableRow,
-  Typography
+  Typography,
 } from '@mui/material';
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 import ConfirmDialog from '../../../components/confirm-dialog';
 import Iconify from '../../../components/iconify';
 import Label from '../../../components/label';
+import { fDateTimeSplit } from '../../../utils/formatTime';
 
 // ----------------------------------------------------------------------
 
@@ -22,6 +25,7 @@ GeneralWithdrawHistoryTableRow.propTypes = {
   onReject: PropTypes.func,
   acceptLoading: PropTypes.bool,
   rejectLoading: PropTypes.bool,
+  onUserClick: PropTypes.func,
 };
 
 export default function GeneralWithdrawHistoryTableRow({
@@ -29,6 +33,7 @@ export default function GeneralWithdrawHistoryTableRow({
   row,
   onAccept,
   onReject,
+  onUserClick,
   acceptLoading = false,
   rejectLoading = false,
 }) {
@@ -46,6 +51,7 @@ export default function GeneralWithdrawHistoryTableRow({
     reason,
     createdAt,
   } = row;
+  const requestAt = createdAt ? fDateTimeSplit(createdAt) : null;
 
   const [openConfirmAccept, setOpenConfirmAccept] = useState(false);
   const [openConfirmReject, setOpenConfirmReject] = useState(false);
@@ -118,6 +124,22 @@ export default function GeneralWithdrawHistoryTableRow({
           '&:hover': { backgroundColor: 'action.hover' },
         }}
       >
+        {/* Request At */}
+        <TableCell align="left" sx={{ minWidth: 140 }}>
+          {requestAt ? (
+            <Stack spacing={0.25}>
+              <Typography variant="body2" fontWeight={500} noWrap>
+                {requestAt.date}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" noWrap>
+                {requestAt.time}
+              </Typography>
+            </Stack>
+          ) : (
+            '—'
+          )}
+        </TableCell>
+
         {/* ID */}
         <TableCell align="center">
           <Typography variant="body2" fontWeight="600">
@@ -133,7 +155,22 @@ export default function GeneralWithdrawHistoryTableRow({
         </TableCell>
 
         {/* Phone */}
-        <TableCell align="left">{userPhone}</TableCell>
+        <TableCell align="left">
+          {userPhone && userPhone !== 'N/A' ? (
+            <Link
+              component="button"
+              type="button"
+              variant="body2"
+              underline="hover"
+              onClick={() => onUserClick?.(userPhone)}
+              sx={{ cursor: 'pointer', textAlign: 'left' }}
+            >
+              {userPhone}
+            </Link>
+          ) : (
+            'N/A'
+          )}
+        </TableCell>
 
         {/* Amount */}
         <TableCell align="left">₹{payableAmount}</TableCell>
@@ -206,8 +243,6 @@ export default function GeneralWithdrawHistoryTableRow({
           </Stack>
         </TableCell>
 
-        {/* Created At */}
-        <TableCell align="left">{createdAt}</TableCell>
       </TableRow>
 
       {/* Confirm Accept Dialog */}

@@ -160,6 +160,15 @@ export default function GeneralDashboardPage() {
                     sx={cardStyles[4]}
                   />
                   <DashboardSummaryCard
+                    todayLabel="Manual Deposit"
+                    todayValue={fNumber(dashboardStats?.totalDeposit || 0)}
+                    totalValue={fNumber(dashboardStats?.totalManualDeposit || 0)}
+                    totalLabel="Online Deposit"
+                    gifSrc={depositGif}
+                    color="error"
+                    sx={cardStyles[5]}
+                  />
+                  <DashboardSummaryCard
                     todayLabel="Today's Withdraw"
                     todayValue={fNumber(dashboardStats?.todayWithdraw || 0)}
                     totalValue={fNumber(dashboardStats?.totalWithdraw || 0)}
@@ -169,7 +178,7 @@ export default function GeneralDashboardPage() {
                     sx={cardStyles[5]}
                   />
                   <DashboardSummaryCard
-                    todayLabel="Total Wallet Balance"
+                    todayLabel="Total User's Wallet Balance"
                     todayValue={fNumber(
                       dashboardStats?.totalWalletBalance ?? dashboardStats?.todayWalletBalance ?? 0
                     )}
