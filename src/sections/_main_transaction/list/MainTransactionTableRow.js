@@ -42,6 +42,7 @@ const FONT_SIZE = {
 
 MainTransactionTableRow.propTypes = {
   index: PropTypes.number,
+  variant: PropTypes.oneOf(['ledger', 'deposit']),
   row: PropTypes.shape({
     _id: PropTypes.string,
     date: PropTypes.string,
@@ -60,10 +61,16 @@ MainTransactionTableRow.propTypes = {
     remarks: PropTypes.string,
     marketName: PropTypes.string,
     gameName: PropTypes.string,
+    utrNo: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    utrNumber: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    transactionId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    modeOfPayment: PropTypes.string,
+    paymentMode: PropTypes.string,
+    paymentMethod: PropTypes.string,
   }),
 };
 
-function MainTransactionTableRow({ row = {}, index = 0 }) {
+function MainTransactionTableRow({ row = {}, index = 0, variant = 'ledger' }) {
   const {
     date,
     particulars,
@@ -79,6 +86,9 @@ function MainTransactionTableRow({ row = {}, index = 0 }) {
   const user = userData || {};
   const userMobile = user.number || user.mobile || user.whatsappNumber || '';
   const formattedDateTime = date ? fDateTimeSplit(date) : null;
+  const isDepositHistory = variant === 'deposit';
+  const utrNo = row.utrNo || row.utrNumber || row.transactionId || '—';
+  const modeOfPayment = row.modeOfPayment || row.paymentMode || row.paymentMethod || '—';
 
   const handleUserClick = () => {
     if (!userMobile) return;
@@ -185,128 +195,158 @@ function MainTransactionTableRow({ row = {}, index = 0 }) {
         )}
       </TableCell>
 
-      <TableCell align="left" sx={MONEY_CELL_SX}>
-        <Typography
-          variant="body2"
-          color={credit > 0 ? 'success.main' : 'text.secondary'}
-          sx={{
-            ...MOBILE_TRUNCATE_SX,
-            fontSize: FONT_SIZE.body,
-          }}
-        >
-          {fCurrency(credit > 0 ? credit : '')}
-        </Typography>
-      </TableCell>
+      {isDepositHistory ? (
+        <>
+          <TableCell align="left" sx={MONEY_CELL_SX}>
+            <Typography
+              variant="body2"
+              color={credit > 0 ? 'success.main' : 'text.secondary'}
+              sx={{
+                ...MOBILE_TRUNCATE_SX,
+                fontSize: FONT_SIZE.body,
+              }}
+            >
+              {credit > 0 ? fCurrency(credit) : '—'}
+            </Typography>
+          </TableCell>
 
-        <TableCell align="left" sx={MONEY_CELL_SX}>
-        <Typography
-          variant="body2"
-          sx={{
-            ...MOBILE_TRUNCATE_SX,
-            fontSize: FONT_SIZE.body,
-            fontWeight: 500,
-          }}
-        >
-          {balance ? fCurrency(balance) : '-'}
-        </Typography>
-      </TableCell>
+          <TableCell align="left" sx={MONEY_CELL_SX}>
+            <Typography
+              variant="body2"
+              sx={{
+                ...MOBILE_TRUNCATE_SX,
+                fontSize: FONT_SIZE.body,
+                fontWeight: 500,
+              }}
+            >
+              {fCurrency(balance) || '₹ 0'}
+            </Typography>
+          </TableCell>
 
-      <TableCell
-        sx={{
-          ...COMPACT_CELL_SX,
-          maxWidth: { xs: '130px', sm: 'none' },
-          pr: { xs: '15px', sm: 0.75, md: 1.5, lg: 2 },
-        }}
-      >
-        <Typography
-          variant="subtitle2"
-          sx={{
-            ...MOBILE_TRUNCATE_SX,
-            fontSize: FONT_SIZE.userName,
-          }}
-        >
-          —
-        </Typography>
-      </TableCell>
-      
-      <TableCell
-        sx={{
-          ...COMPACT_CELL_SX,
-          maxWidth: { xs: '130px', sm: 'none' },
-          pr: { xs: '15px', sm: 0.75, md: 1.5, lg: 2 },
-        }}
-      >
-        <Typography
-          variant="subtitle2"
-          sx={{
-            ...MOBILE_TRUNCATE_SX,
-            fontSize: FONT_SIZE.userName,
-          }}
-        >
-          —
-        </Typography>
-      </TableCell>
+          <TableCell sx={COMPACT_CELL_SX}>
+            <Typography
+              variant="body2"
+              sx={{
+                ...MOBILE_TRUNCATE_SX,
+                fontSize: FONT_SIZE.body,
+              }}
+            >
+              {utrNo}
+            </Typography>
+          </TableCell>
 
-      
-
-      {/* <TableCell
-        sx={{
-          ...COMPACT_CELL_SX,
-          maxWidth: { xs: '120px', sm: 'none' },
-          pr: { xs: '10px', sm: 0.75, md: 1.5, lg: 2 },
-        }}
-      >
-        <Stack spacing={{ xs: 0.125, sm: 0.5 }} sx={{ overflow: 'hidden' }}>
-          <Typography
-            variant="subtitle1"
+          <TableCell sx={COMPACT_CELL_SX}>
+            <Typography
+              variant="body2"
+              sx={{
+                ...MOBILE_TRUNCATE_SX,
+                fontSize: FONT_SIZE.body,
+              }}
+            >
+              {modeOfPayment}
+            </Typography>
+          </TableCell>
+        </>
+      ) : (
+        <>
+          <TableCell
             sx={{
-              ...MOBILE_TRUNCATE_SX,
-              fontSize: FONT_SIZE.particulars,
-              fontWeight: { xs: 500, sm: 600 },
+              ...COMPACT_CELL_SX,
+              maxWidth: { xs: '120px', sm: 'none' },
+              pr: { xs: '10px', sm: 0.75, md: 1.5, lg: 2 },
             }}
           >
-            {particulars || '—'}
-          </Typography>
+            <Stack spacing={{ xs: 0.125, sm: 0.5 }} sx={{ overflow: 'hidden' }}>
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  ...MOBILE_TRUNCATE_SX,
+                  fontSize: FONT_SIZE.particulars,
+                  fontWeight: { xs: 500, sm: 600 },
+                }}
+              >
+                {particulars || '—'}
+              </Typography>
 
-          {marketName && (
+              {marketName && (
+                <Typography
+                  variant="subtitle2"
+                  color="text.secondary"
+                  sx={{
+                    ...MOBILE_TRUNCATE_SX,
+                    fontSize: FONT_SIZE.market,
+                  }}
+                >
+                  {marketName}
+                </Typography>
+              )}
+              {Boolean(debit && gameName) && (
+                <Typography
+                  variant="subtitle2"
+                  color="text.secondary"
+                  sx={{
+                    ...MOBILE_TRUNCATE_SX,
+                    fontSize: FONT_SIZE.meta,
+                  }}
+                >
+                  {`${gameName} - ${fCurrency(debit)}`}
+                </Typography>
+              )}
+            </Stack>
+          </TableCell>
+
+          <TableCell align="left" sx={MONEY_CELL_SX}>
             <Typography
-              variant="subtitle2"
-              color="text.secondary"
+              variant="body2"
+              color={debit > 0 ? 'error.main' : 'text.secondary'}
               sx={{
                 ...MOBILE_TRUNCATE_SX,
-                fontSize: FONT_SIZE.market,
+                fontSize: FONT_SIZE.body,
               }}
             >
-              {marketName}
+              {debit > 0 ? fCurrency(debit) : '—'}
             </Typography>
-          )}
-          {Boolean(debit && gameName) && (
+          </TableCell>
+
+          <TableCell align="left" sx={MONEY_CELL_SX}>
             <Typography
-              variant="subtitle2"
-              color="text.secondary"
+              variant="body2"
+              color={credit > 0 ? 'success.main' : 'text.secondary'}
               sx={{
                 ...MOBILE_TRUNCATE_SX,
-                fontSize: FONT_SIZE.meta,
+                fontSize: FONT_SIZE.body,
               }}
             >
-              {`${gameName} - ${fCurrency(debit)}`}
+              {credit > 0 ? fCurrency(credit) : '—'}
             </Typography>
-          )}
-        </Stack>
-      </TableCell> */}
+          </TableCell>
 
-      {/* <TableCell align="left" sx={MONEY_CELL_SX}>
-        <Typography
-          variant="body2"
-          color={debit > 0 ? 'error.main' : 'text.secondary'}
-          sx={{
-            ...MOBILE_TRUNCATE_SX,
-            fontSize: FONT_SIZE.body,
-          }}
-        >
-          {debit > 0 ? fCurrency(debit) : '-'}
-        </Typography>
-      </TableCell> */}
+          <TableCell align="left" sx={MONEY_CELL_SX}>
+            <Typography
+              variant="body2"
+              sx={{
+                ...MOBILE_TRUNCATE_SX,
+                fontSize: FONT_SIZE.body,
+                fontWeight: 500,
+              }}
+            >
+              {fCurrency(balance) || '₹ 0'}
+            </Typography>
+          </TableCell>
+
+          <TableCell sx={COMPACT_CELL_SX}>
+            <Typography
+              variant="body2"
+              sx={{
+                ...MOBILE_TRUNCATE_SX,
+                fontSize: FONT_SIZE.body,
+              }}
+            >
+              {admin?.name || '—'}
+            </Typography>
+          </TableCell>
+        </>
+      )}
 
     </TableRow>
   );

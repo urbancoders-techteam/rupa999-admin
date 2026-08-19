@@ -54,6 +54,12 @@ export default function GeneralDashboardPage() {
       borderColor: 'rgba(207, 157, 31, 0.44)',
     },
   ];
+  const totalDeposit = Number(dashboardStats?.totalDeposit) || 0;
+  const totalManualDeposit = Number(dashboardStats?.totalManualDeposit) || 0;
+  const totalOnlineDeposit =
+    dashboardStats?.totalOnlineDeposit == null
+      ? Math.max(totalDeposit - totalManualDeposit, 0)
+      : Number(dashboardStats.totalOnlineDeposit) || 0;
 
   useEffect(() => {
     dispatch(getDashboardStatsAsync());
@@ -161,8 +167,8 @@ export default function GeneralDashboardPage() {
                   />
                   <DashboardSummaryCard
                     todayLabel="Manual Deposit"
-                    todayValue={fNumber(dashboardStats?.totalDeposit || 0)}
-                    totalValue={fNumber(dashboardStats?.totalManualDeposit || 0)}
+                    todayValue={fNumber(totalManualDeposit)}
+                    totalValue={fNumber(totalOnlineDeposit)}
                     totalLabel="Online Deposit"
                     gifSrc={depositGif}
                     color="error"

@@ -37,7 +37,7 @@ const TABLE_HEAD = [
   { id: 'sNo', label: 'S.No.', align: 'center' },
   { id: 'date', label: 'Date', align: 'left' },
   { id: 'userName', label: 'User Name', align: 'left' },
-  { id: 'dipositAmount', label: 'Diposit Amount', align: 'left' },
+  { id: 'depositAmount', label: 'Deposit Amount', align: 'left' },
   { id: 'balance', label: 'Balance', align: 'left' },
   { id: 'utrNo', label: 'UTR No.', align: 'left' },
   { id: 'modeOfPayment', label: 'Mode Of Payment', align: 'left' },
@@ -79,6 +79,7 @@ export default function DipositHistoryListPage() {
   const tableData = useMemo(
     () =>
       allDepositHistoryList.map((transaction, index) => ({
+        ...transaction,
         id: transaction._id || index + 1,
         _id: transaction._id,
         sno: (page * rowsPerPage) + index + 1, // Calculate S.No. based on pagination
@@ -93,7 +94,16 @@ export default function DipositHistoryListPage() {
         userName: transaction.user?.name || 'N/A',
         userPhone: transaction.user?.number || transaction.user?.whatsappNumber || 'N/A',
         createdBy: transaction.admin?.name || 'System',
-        ...transaction,
+        utrNo:
+          transaction.utrNo ??
+          transaction.utrNumber ??
+          transaction.transactionId ??
+          '—',
+        modeOfPayment:
+          transaction.modeOfPayment ??
+          transaction.paymentMode ??
+          transaction.paymentMethod ??
+          '—',
       })),
     [allDepositHistoryList, page, rowsPerPage]
   );
@@ -139,7 +149,12 @@ export default function DipositHistoryListPage() {
                     <>
                       {tableData.length > 0 ? (
                         tableData.map((row, index) => (
-                          <MainTransactionTableRow key={row.id || index} row={row} index={row.sno} />
+                          <MainTransactionTableRow
+                            key={row.id || index}
+                            row={row}
+                            index={row.sno}
+                            variant="deposit"
+                          />
                         ))
                       ) : (
                         <TableNoData isNotFound={isNotFound} />
