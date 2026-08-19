@@ -195,21 +195,37 @@ function PreviousResultMobileViewCardLayout({
         open={openConfirm}
         onClose={handleCloseConfirm}
         title="Revert Result"
-        content="Are you sure you want to revert this result?"
+        content="Which part of this result do you want to revert?"
         action={
-          <Button
-            variant="contained"
-            color="error"
-            onClick={async () => {
-              if (selectedRow && onRevert) {
-                const rowId = selectedRow._id || selectedRow.id;
-                await onRevert(rowId);
-              }
-              handleCloseConfirm();
-            }}
-          >
-            Revert
-          </Button>
+          <Stack direction="row" spacing={1}>
+            <Button
+              variant="contained"
+              color="info"
+              onClick={async () => {
+                if (selectedRow && onRevert) {
+                  const rowId = selectedRow._id || selectedRow.id;
+                  await onRevert(rowId, 'open');
+                }
+                handleCloseConfirm();
+              }}
+            >
+              Revert Open
+            </Button>
+            <Button
+              variant="contained"
+              color="warning"
+              disabled={!selectedRow?.closePana}
+              onClick={async () => {
+                if (selectedRow && onRevert) {
+                  const rowId = selectedRow._id || selectedRow.id;
+                  await onRevert(rowId, 'close');
+                }
+                handleCloseConfirm();
+              }}
+            >
+              Revert Close
+            </Button>
+          </Stack>
         }
       />
     </Box>

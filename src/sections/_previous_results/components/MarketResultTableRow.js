@@ -8,6 +8,7 @@ import {
   Typography,
   styled,
   MenuItem,
+  Stack,
 } from '@mui/material';
 import { fDateTime } from '../../../utils/formatTime';
 import Iconify from '../../../components/iconify';
@@ -60,9 +61,9 @@ export default function MarketResultTableRow({ row, onRevert }) {
   const handleOpenConfirm = () => setOpenConfirm(true);
   const handleCloseConfirm = () => setOpenConfirm(false);
 
-  const handleRevert = async () => {
+  const handleRevert = async (session) => {
     if (!_id || !onRevert) return;
-    await onRevert(_id);
+    await onRevert(_id, session);
     handleCloseConfirm();
   };
 
@@ -144,11 +145,21 @@ export default function MarketResultTableRow({ row, onRevert }) {
         open={openConfirm}
         onClose={handleCloseConfirm}
         title="Revert Result"
-        content="Are you sure you want to revert this result?"
+        content="Which part of this result do you want to revert?"
         action={
-          <Button variant="contained" color="error" onClick={handleRevert}>
-            Revert
-          </Button>
+          <Stack direction="row" spacing={1}>
+            <Button variant="contained" color="info" onClick={() => handleRevert('open')}>
+              Revert Open
+            </Button>
+            <Button
+              variant="contained"
+              color="warning"
+              onClick={() => handleRevert('close')}
+              disabled={!closePana}
+            >
+              Revert Close
+            </Button>
+          </Stack>
         }
       />
     </>

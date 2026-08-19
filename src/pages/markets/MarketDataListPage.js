@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -88,26 +88,19 @@ export default function MarketDataListPage() {
   const selectedDate = watch('date');
   const selectedMarket = watch('market');
 
+  // Sheet stays blank until the admin explicitly runs a search via GET
+  const [hasSearched, setHasSearched] = useState(false);
+
   // Fetch markets on component mount
   useEffect(() => {
     dispatch(getAllMarketsAsync({ page: 1, limit: 100 }));
-  }, [dispatch]);
-
-  // Initial data fetch on component mount with default date (today)
-  useEffect(() => {
-    const initialParams = {
-      page: 1,
-      limit: rowsPerPage,
-      date: dayjs().format('YYYY-MM-DD'), // Default to today's date
-    };
-    dispatch(getBidDataResultAsync(initialParams));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
 
   const onSubmit = async (data, e) => {
     e?.preventDefault(); // Prevent form submission and page reload
     try {
       setPage(0); // Reset to first page when filters change
+      setHasSearched(true);
       const params = {
         page: 1,
         limit: rowsPerPage,
@@ -178,10 +171,9 @@ export default function MarketDataListPage() {
     }
   };
 
-  // Fetch data when page or rowsPerPage changes (always include date filter)
+  // Re-fetch on pagination changes, but only once the admin has already run a search
   useEffect(() => {
-    // const formValues = methods.getValues();
-    // Always fetch when pagination changes, date is always included
+    if (!hasSearched) return;
     fetchDataWithFilters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, rowsPerPage]);
@@ -189,16 +181,10 @@ export default function MarketDataListPage() {
   const handleReset = () => {
     reset({ ...defaultValues, date: dayjs() });
     setPage(0);
-    dispatch(
-      getBidDataResultAsync({
-        page: 1,
-        limit: rowsPerPage,
-        date: dayjs().format('YYYY-MM-DD'),
-      })
-    );
+    setHasSearched(false);
   };
 
-  const isNotFound = !bidDataResult.length && !loading;
+  const isNotFound = hasSearched && !bidDataResult.length && !loading;
 
   const headingDate = selectedDate ? dayjs(selectedDate).format('DD-MM-YYYY') : 'N/A';
   const dateForApi = selectedDate
@@ -210,7 +196,17 @@ export default function MarketDataListPage() {
 
   let tableSection = null;
 
-  if (isMobile) {
+  if (!hasSearched) {
+    tableSection = (
+      <Card>
+        <Box sx={{ p: 5, textAlign: 'center' }}>
+          <Typography variant="body1" color="text.secondary">
+            Select a date and market, then click GET to view bid data.
+          </Typography>
+        </Box>
+      </Card>
+    );
+  } else if (isMobile) {
     tableSection = (
       <>
         <MarketDataMobileViewCardLayout

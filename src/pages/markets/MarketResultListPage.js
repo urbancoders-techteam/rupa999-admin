@@ -157,12 +157,12 @@ export default function MarketResultListPage() {
     setShowWinner((prev) => !prev);
   }, []);
 
-  const handleRevert = useCallback(async (id) => {
-    if (!id) return;
+  const handleRevert = useCallback(async (id, session) => {
+    if (!id || !session) return;
 
     try {
-      await dispatch(revertMarketResultAsync(id)).unwrap();
-      enqueueSnackbar('Market result reverted successfully!', { variant: 'success' });
+      await dispatch(revertMarketResultAsync({ id, session })).unwrap();
+      enqueueSnackbar(`${session === 'open' ? 'Open' : 'Close'} result reverted successfully!`, { variant: 'success' });
       dispatch(getAllMarketResultsAsync({
         page: apiPage,
         limit: apiLimit,
