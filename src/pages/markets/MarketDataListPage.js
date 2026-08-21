@@ -206,7 +206,8 @@ export default function MarketDataListPage() {
         </Box>
       </Card>
     );
-  } else if (isMobile) {
+  } else {
+    // Same card/grid layout on every screen size (desktop and mobile)
     tableSection = (
       <>
         <MarketDataMobileViewCardLayout
@@ -225,52 +226,6 @@ export default function MarketDataListPage() {
           onChangeDense={onChangeDense}
         />
       </>
-    );
-  } else {
-    tableSection = (
-      <Card>
-        <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
-          <Scrollbar>
-            <Table size={tableSize}>
-              <TableHeadCustom headLabel={TABLE_HEAD} rowCount={bidDataResult.length} />
-
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={TABLE_HEAD.length} align="center" sx={{ py: 3 }}>
-                      <Typography>Loading...</Typography>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  <>
-                    {bidDataResult.map((row, index) => (
-                      <MarketDataTableRow
-                        key={`${row?.gameType || 'game'}-${row?.type || 'type'}-${index}`}
-                        index={index}
-                        row={row}
-                        date={dateForApi}
-                        marketId={marketIdForApi}
-                      />
-                    ))}
-
-                    <TableNoData isNotFound={isNotFound} />
-                  </>
-                )}
-              </TableBody>
-            </Table>
-          </Scrollbar>
-        </TableContainer>
-
-        <TablePaginationCustom
-          page={paginationPage}
-          count={pagination?.total || 0}
-          rowsPerPage={rowsPerPage}
-          onPageChange={onChangePage}
-          onRowsPerPageChange={onChangeRowsPerPage}
-          dense={dense}
-          onChangeDense={onChangeDense}
-        />
-      </Card>
     );
   }
 
