@@ -57,6 +57,10 @@ export default function MarketDataTableRow({ index, row, date, marketId }) {
 
   const hasBidData = Array.isArray(bidData) && bidData.length > 0;
 
+  // All digits in this section share the same Rate Card, so derive it once for the column header
+  const rateCardName = bidData[0]?.rateCardName || gameType;
+  const rateCardMultiplyBy = Number(bidData[0]?.multiplyBy) || 0;
+
   return (
     <>
       <TableRow hover sx={{ '& > *': { borderBottom: 'unset' } }}>
@@ -121,12 +125,25 @@ export default function MarketDataTableRow({ index, row, date, marketId }) {
                     <TableCell sx={{ fontWeight: 600, ...compactCellSx, fontSize: valueFontSize }} align="right">
                       Total Amount
                     </TableCell>
+                    <TableCell sx={{ fontWeight: 600, ...compactCellSx, fontSize: valueFontSize }} align="right">
+                      <Box>Winning Price</Box>
+                      {rateCardMultiplyBy > 0 && (
+                        <Box
+                          component="span"
+                          sx={{ fontWeight: 400, color: 'text.secondary', display: 'block' }}
+                        >
+                          {rateCardName} ×{rateCardMultiplyBy}
+                        </Box>
+                      )}
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {bidData.map((item, idx) => {
                     const digit = item?.bidsNumber;
                     const amount = Number(item?.totalAmount) || 0;
+                    const winningPrice =
+                      Number(item?.winningPrice) || amount * (Number(item?.multiplyBy) || 0);
                     return (
                       <TableRow key={`${digit || 'digit'}-${idx}`}>
                         <TableCell sx={compactCellSx}>
@@ -150,6 +167,11 @@ export default function MarketDataTableRow({ index, row, date, marketId }) {
                         <TableCell align="right" sx={compactCellSx}>
                           <Typography variant="body2" sx={{ fontSize: valueFontSize, lineHeight: 1.2 }}>
                             ₹{amount.toLocaleString()}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="right" sx={compactCellSx}>
+                          <Typography variant="body2" sx={{ fontSize: valueFontSize, lineHeight: 1.2, fontWeight: 600 }}>
+                            ₹{winningPrice.toLocaleString()}
                           </Typography>
                         </TableCell>
                       </TableRow>
