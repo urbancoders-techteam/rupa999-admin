@@ -10,15 +10,8 @@ import {
   Container,
   Grid,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
   Typography,
-  useMediaQuery,
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
@@ -27,35 +20,19 @@ import Iconify from '../../components/iconify';
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import FormProvider, { RHFAutocomplete } from '../../components/hook-form';
-import Scrollbar from '../../components/scrollbar';
 import { useSettingsContext } from '../../components/settings';
-import {
-  TableHeadCustom,
-  TableNoData,
-  TablePaginationCustom,
-  useTable,
-} from '../../components/table';
+import { TablePaginationCustom, useTable } from '../../components/table';
 // sections
 import { getBidDataResultAsync } from '../../redux/services/bid_services';
 import { getAllMarketsAsync } from '../../redux/services/market_services';
 import { PATH_DASHBOARD } from '../../routes/paths';
 import MarketDataMobileViewCardLayout from '../../sections/_market_data/components/MarketDataMobileViewCardLayout';
-import MarketDataTableRow from '../../sections/_market_data/components/MarketDataTableRow';
 
 // ----------------------------------------------------------------------
 
 const marketTimeOptions = [
   { name: 'Open', key: 'open' },
   { name: 'Close', key: 'close' },
-];
-
-const TABLE_HEAD = [
-  { id: 'expand', label: '', align: 'center', width: 40 },
-  { id: 'srNo', label: 'Sr No.', align: 'center' },
-  { id: 'gameType', label: 'Game Type', align: 'left' },
-  { id: 'session', label: 'Session', align: 'left' },
-  { id: 'bidCount', label: 'Bid Count', align: 'left' },
-  { id: 'groupTotal', label: 'Group Total', align: 'left' },
 ];
 
 // ----------------------------------------------------------------------
