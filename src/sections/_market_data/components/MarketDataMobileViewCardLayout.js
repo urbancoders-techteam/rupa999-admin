@@ -51,19 +51,26 @@ export default function MarketDataMobileViewCardLayout({
   // Build columns by gameType/type; each column lists its bids. One card, multi-column grid.
   const columns = useMemo(
     () =>
-      data.map((row, idx) => ({
-        key: `${row?.gameType || 'game'}-${row?.type || 'type'}-${idx}`,
-        gameType: row?.gameType || '—',
-        type: row?.type || '',
-        bids: (row?.bidData || []).map((item, bidIdx) => ({
-          key: `${row?.gameType || 'game'}-${row?.type || 'type'}-${item?.bidsNumber || bidIdx}`,
-          bidsNumber: item?.bidsNumber || '—',
-          amount: Number(item?.totalAmount || 0),
-        })),
-        groupTotal: Array.isArray(row?.bidData)
-          ? row.bidData.reduce((sum, item) => sum + (Number(item?.totalAmount) || 0), 0)
-          : 0,
-      })),
+      data.map((row, idx) => {
+        const bidData = row?.bidData || [];
+        return {
+          key: `${row?.gameType || 'game'}-${row?.type || 'type'}-${idx}`,
+          gameType: row?.gameType || '—',
+          type: row?.type || '',
+          // All digits in a column share the same Rate Card, so derive it once
+          multiplyBy: Number(bidData[0]?.multiplyBy) || 0,
+          bids: bidData.map((item, bidIdx) => ({
+            key: `${row?.gameType || 'game'}-${row?.type || 'type'}-${item?.bidsNumber || bidIdx}`,
+            bidsNumber: item?.bidsNumber || '—',
+            amount: Number(item?.totalAmount || 0),
+            winningPrice:
+              Number(item?.winningPrice) || Number(item?.totalAmount || 0) * (Number(item?.multiplyBy) || 0),
+          })),
+          groupTotal: Array.isArray(bidData)
+            ? bidData.reduce((sum, item) => sum + (Number(item?.totalAmount) || 0), 0)
+            : 0,
+        };
+      }),
     [data]
   );
 
@@ -161,6 +168,11 @@ export default function MarketDataMobileViewCardLayout({
                   <Typography variant="caption" fontWeight="bold" color="text.primary">
                     {col.gameType}
                   </Typography>
+                  {col.multiplyBy > 0 && (
+                    <Typography variant="caption" color="text.secondary">
+                      Win ×{col.multiplyBy}
+                    </Typography>
+                  )}
                   {col.type ? (
                     <Label
                       variant="soft"
@@ -233,6 +245,11 @@ export default function MarketDataMobileViewCardLayout({
                             {item.bidsNumber} = ₹{item.amount.toLocaleString()}
                           </Typography>
                         </Tooltip>
+                        {item.winningPrice > 0 && (
+                          <Typography variant="caption" fontWeight={600} color="success.main">
+                            Win: ₹{item.winningPrice.toLocaleString()}
+                          </Typography>
+                        )}
                       </Stack>
                     );
                   })}

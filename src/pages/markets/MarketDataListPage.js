@@ -43,8 +43,6 @@ export default function MarketDataListPage() {
 
   const { themeStretch } = useSettingsContext();
   const dispatch = useDispatch();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const { bidDataResult, loading, pagination } = useSelector((state) => state.bid);
   const { marketList, loading: marketLoading } = useSelector((state) => state.market);
@@ -161,15 +159,12 @@ export default function MarketDataListPage() {
     setHasSearched(false);
   };
 
-  const isNotFound = hasSearched && !bidDataResult.length && !loading;
-
   const headingDate = selectedDate ? dayjs(selectedDate).format('DD-MM-YYYY') : 'N/A';
   const dateForApi = selectedDate
     ? dayjs(selectedDate).format('YYYY-MM-DD')
     : dayjs().format('YYYY-MM-DD');
   const marketIdForApi = selectedMarket?._id || '';
   const paginationPage = pagination?.page ? pagination.page - 1 : page;
-  const tableSize = dense ? 'medium' : 'small';
 
   let tableSection = null;
 
