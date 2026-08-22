@@ -276,12 +276,12 @@ export default function UserListPage() {
     setAddDeductBalanceLoading(true);
     try {
       await dispatch(addDeductBalanceAsync({ id: userId, amount, action })).unwrap();
-      enqueueSnackbar(`Balance ${action === 'add' ? 'added' : 'deducted'} successfully`, { variant: 'success' });
+      enqueueSnackbar(`Balance ${action === 'add' ? 'deposited' : 'deducted'} successfully`, { variant: 'success' });
       // Refresh user list to get updated balance
       fetchUsers();
       return true;
     } catch (error) {
-      enqueueSnackbar(error?.message || `Failed to ${action === 'add' ? 'add' : 'deduct'} balance`, { variant: 'error' });
+      enqueueSnackbar(error?.message || `Failed to ${action === 'add' ? 'deposit' : 'deduct'} balance`, { variant: 'error' });
       throw error; // Re-throw to prevent dialog from closing on error
     } finally {
       setAddDeductBalanceLoading(false);

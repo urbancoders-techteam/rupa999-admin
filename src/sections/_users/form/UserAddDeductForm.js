@@ -87,7 +87,7 @@ export default function AddDeductBalanceModal({ open, handleClose, currentBalanc
         }}
       >
         <Typography variant="h4">
-          Add | Deduct Balance
+          Deposit | Deduct Balance
         </Typography>
         <IconButton onClick={handleClose} size="small">
           <CloseIcon />
@@ -169,7 +169,7 @@ export default function AddDeductBalanceModal({ open, handleClose, currentBalanc
                 },
               }}
             >
-              <ToggleButton value="add">Add</ToggleButton>
+              <ToggleButton value="add">Deposit</ToggleButton>
               <ToggleButton value="deduct">Deduct</ToggleButton>
             </ToggleButtonGroup>
 

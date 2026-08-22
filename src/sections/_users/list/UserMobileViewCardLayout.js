@@ -286,7 +286,7 @@ function UserMobileViewCardLayout({
 
                       <Stack spacing={1}>
                         <Button variant="contained" onClick={() => handleOpenAddDeduct(row._id, row.balance)}>
-                          <b>Add / Deduct Money</b>
+                          <b>Deposit / Deduct Money</b>
                         </Button>
 
                         <Button variant="outlined" onClick={() => handleOpenChangePassword(row._id, row.name)}>

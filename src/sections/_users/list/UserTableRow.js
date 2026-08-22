@@ -224,7 +224,7 @@ export default function UserTableRow({
       >
         <MenuItem onClick={handleOpenAddDeduct}>
           <Iconify icon="solar:wallet-bold" />
-          Add / Deduct Money
+          Deposit / Deduct Money
         </MenuItem>
 
         <MenuItem
