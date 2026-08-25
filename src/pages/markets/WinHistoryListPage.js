@@ -1,4 +1,3 @@
-import { paramCase } from 'change-case';
 import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
@@ -37,9 +36,9 @@ const TABLE_HEAD = [
   { id: 'marketName', label: 'Market Name', align: 'left' },
   { id: 'userName', label: 'Winner Name', align: 'left' },
   { id: 'contactNumber', label: 'Phone', align: 'left' },
+  { id: 'bid', label: 'Bid', align: 'left' },
   { id: 'session', label: 'Session', align: 'left' },
-  { id: 'amount', label: 'Amount', align: 'left' },
-  { id: 'number', label: 'Number', align: 'left' },
+  { id: 'amount', label: 'Play Amount', align: 'left' },
   { id: 'winAmount', label: 'Win Amount', align: 'left' },
   { id: 'createdAt', label: 'Created At', align: 'left' },
 ];
@@ -93,6 +92,7 @@ export default function WinHistoryListPage() {
     () =>
       winningBidsList.map((bid, index) => ({
         id: bid._id,
+        userId: bid.userId?._id || bid.userId,
         sno: (page * rowsPerPage) + index + 1, // Calculate S.No. based on pagination
         marketName: bid.marketId?.name || 'N/A',
         userName: bid.userId?.name || 'N/A',
@@ -162,8 +162,14 @@ export default function WinHistoryListPage() {
     // This would need to be implemented via API endpoint
   };
 
-  const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
+  const handleEditRow = (userId, userName) => {
+    if (!userId) return;
+    navigate(PATH_DASHBOARD.user.edit(userId), { state: { userName } });
+  };
+
+  const handleViewUser = (userId, userName) => {
+    if (!userId) return;
+    navigate(PATH_DASHBOARD.user.view(userId), { state: { userName } });
   };
 
   const handleResetFilter = () => {
@@ -224,7 +230,8 @@ export default function WinHistoryListPage() {
           <>
             <WinHistoryMobileViewCardLayout
               data={dataInPage}
-              onEditRow={(id) => handleEditRow(id)}
+              onEditRow={(userId) => handleEditRow(userId)}
+              onViewUser={handleViewUser}
               onDeleteRow={(id) => handleDeleteRow(id)}
               onSelectRow={(id) => onSelectRow(id)}
               selected={selected}
@@ -272,7 +279,8 @@ export default function WinHistoryListPage() {
                               selected={selected.includes(row.id)}
                               onSelectRow={() => onSelectRow(row.id)}
                               onDeleteRow={() => handleDeleteRow(row.id)}
-                              onEditRow={() => handleEditRow(row.name)}
+                              onEditRow={() => handleEditRow(row.userId, row.userName)}
+                              onViewUser={() => handleViewUser(row.userId, row.userName)}
                             />
                           ))}
 

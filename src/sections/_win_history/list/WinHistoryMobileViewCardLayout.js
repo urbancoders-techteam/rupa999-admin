@@ -16,6 +16,7 @@ import Label from '../../../components/label';
 function WinHistoryMobileViewCardLayout({
   data = [],
   onEditRow,
+  onViewUser,
   onDeleteRow,
   onSelectRow,
   selected = [],
@@ -68,7 +69,7 @@ function WinHistoryMobileViewCardLayout({
         bgcolor: 'background.paper',
       }}
     >
-      <Stack spacing={1}>
+      <Stack spacing={1.25}>
         {data.map((row, index) => {
           // Calculate serial number across pagination (same as desktop view)
           const serialNumber = row.sno || (page * rowsPerPage) + index + 1;
@@ -76,27 +77,66 @@ function WinHistoryMobileViewCardLayout({
           return (
             <Accordion
               key={row.id}
-              sx={{ borderRadius: 2, boxShadow: 'none',  }}
+              sx={{
+                borderRadius: 2,
+                boxShadow: 'none',
+                border: '1px solid',
+                borderColor: 'divider',
+                '&:before': { display: 'none' },
+                overflow: 'hidden',
+              }}
             >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ px: 2, py: 1 }}>
-                <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary', paddingRight: 1 }}>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                sx={{
+                  px: 1.5,
+                  py: 1,
+                  alignItems: 'flex-start',
+                  '& .MuiAccordionSummary-content': {
+                    my: 0.5,
+                    mr: 1,
+                    width: '100%',
+                  },
+                }}
+              >
+                <Box sx={{ width: '100%', minWidth: 0 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.5 }}>
+                    <Typography
+                      variant="caption"
+                      sx={{ fontWeight: 700, color: 'text.secondary', minWidth: 18 }}
+                    >
                       {serialNumber}.
                     </Typography>
-                    <Typography variant="subtitle2" sx={{ flex: 1, fontWeight: 700, textAlign: 'left' }} noWrap>
+                    <Typography variant="subtitle2" sx={{ flex: 1, fontWeight: 700, minWidth: 0 }} noWrap>
                       {row.userName || '—'}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.primary', textAlign: 'right', maxWidth: '60%' }}>
-                      {row.marketName || '—'}
                     </Typography>
                     <Label
                       variant="soft"
                       color={row.session === 'open' ? 'success' : 'warning'}
-                      sx={{ textTransform: 'capitalize', fontSize: '0.7rem', ml: 1 }}
+                      sx={{ textTransform: 'capitalize', fontSize: '0.7rem', flexShrink: 0 }}
                     >
                       {row.session || '—'}
                     </Label>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1.5,
+                      pl: 2.75,
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap>
+                      {row.marketName || '—'}
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                      Bid {row.number || '—'}
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'success.main' }}>
+                      Win ₹{row.winAmount?.toLocaleString('en-IN') || 0}
+                    </Typography>
                   </Box>
                 </Box>
               </AccordionSummary>
@@ -105,30 +145,47 @@ function WinHistoryMobileViewCardLayout({
                 <Stack spacing={1.5}>
                   <Divider />
 
-                  {/* Market Name */}
+                  {/* Phone */}
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                      Contact Number:
+                      Phone:
                     </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.primary', textAlign: 'right', maxWidth: '60%' }}>
-                      {row?.contactNumber || '—'}
-                    </Typography>
+                    {row.userId && onViewUser && row.contactNumber && row.contactNumber !== 'N/A' ? (
+                      <Typography
+                        variant="body2"
+                        onClick={() => onViewUser(row.userId, row.userName)}
+                        sx={{
+                          color: 'primary.main',
+                          textAlign: 'right',
+                          maxWidth: '60%',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          textDecoration: 'underline',
+                        }}
+                      >
+                        {row.contactNumber}
+                      </Typography>
+                    ) : (
+                      <Typography variant="body2" sx={{ color: 'text.primary', textAlign: 'right', maxWidth: '60%' }}>
+                        {row?.contactNumber || '—'}
+                      </Typography>
+                    )}
                   </Box>
 
-                  {/* Number */}
+                  {/* Bid */}
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                      Number:
+                      Bid:
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'text.primary', textAlign: 'right', fontWeight: 600 }}>
                       {row.number || '—'}
                     </Typography>
                   </Box>
 
-                  {/* Amount */}
+                  {/* Play Amount */}
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                      Amount:
+                      Play Amount:
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'text.primary', textAlign: 'right' }}>
                       ₹{row.amount?.toLocaleString('en-IN') || 0}
@@ -168,6 +225,7 @@ function WinHistoryMobileViewCardLayout({
 WinHistoryMobileViewCardLayout.propTypes = {
   data: PropTypes.array,
   onEditRow: PropTypes.func,
+  onViewUser: PropTypes.func,
   onDeleteRow: PropTypes.func,
   onSelectRow: PropTypes.func,
   selected: PropTypes.array,

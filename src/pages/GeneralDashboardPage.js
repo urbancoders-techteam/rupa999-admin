@@ -167,8 +167,8 @@ export default function GeneralDashboardPage() {
                   />
                   <DashboardSummaryCard
                     todayLabel="Manual Deposit"
-                    todayValue={fNumber(totalManualDeposit)}
-                    totalValue={fNumber(totalOnlineDeposit)}
+                    todayValue={fNumber(totalOnlineDeposit)}
+                    totalValue={fNumber(totalManualDeposit)}
                     totalLabel="Online Deposit"
                     gifSrc={depositGif}
                     color="error"

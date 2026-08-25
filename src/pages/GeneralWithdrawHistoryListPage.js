@@ -38,7 +38,7 @@ import CustomTableToolbar from '../components/table/CustomTableToolBar';
 
 // sections
 import GeneralWithdrawHistoryTableRow from '../sections/_general_withdraw_history/components/GeneralWithdrawHistoryTableRow';
-import WithdrawMobileViewCardLayout from '../sections/_withdraw_details/components/WithdrawDetailsMobileViewCardLayout';
+import GeneralWithdrawHistoryMobileCardLayout from '../sections/_general_withdraw_history/components/GeneralWithdrawHistoryMobileCardLayout';
 
 // ----------------------------------------------------------------------
 
@@ -353,18 +353,28 @@ export default function GeneralWithdrawHistoryListPage() {
 
         {/* Render mobile card layout for small screens, otherwise render the table */}
         {isMobile ? (
-          <WithdrawMobileViewCardLayout
-            data={tableData}
-            onEditRow={(id) => handleEditRow(id)}
-            onDeleteRow={(id) => handleDeleteRow(id)}
-            onSelectRow={(id) => onSelectRow(id)}
-            selected={selected}
-            onAccept={(id) => handleAccept(id)}
-            onReject={(id) => handleReject(id)}
-            acceptLoading={acceptLoading}
-            rejectLoading={rejectLoading}
-            onUserClick={handleUserClick}
-          />
+          <>
+            <GeneralWithdrawHistoryMobileCardLayout
+              data={dataInPage}
+              loading={loading}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onAccept={handleAccept}
+              onReject={handleReject}
+              acceptLoading={acceptLoading}
+              rejectLoading={rejectLoading}
+              onUserClick={handleUserClick}
+            />
+            <TablePaginationCustom
+              count={totalItems || tableData.length}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={onChangePage}
+              onRowsPerPageChange={onChangeRowsPerPage}
+              dense={dense}
+              onChangeDense={onChangeDense}
+            />
+          </>
         ) : (
           <Card>
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>

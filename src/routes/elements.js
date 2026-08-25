@@ -33,6 +33,12 @@ export const DesignationListPage = Loadable(lazy(() => import('../pages/Designat
 
 // DASHBOARD: User 
 export const UserListPage = Loadable(lazy(() => import('../pages/UserListPage')));
+export const ActiveGamePlayUsersListPage = Loadable(
+  lazy(() => import('../pages/ActiveGamePlayUsersListPage'))
+);
+export const InactiveUsersListPage = Loadable(
+  lazy(() => import('../pages/InactiveUsersListPage'))
+);
 export const UserFormHandle = Loadable(lazy(() => import('../sections/_users/form/UserFormHandle')));
 export const UserBidHistoryListPage = Loadable(lazy(() => import('../pages/UserBidHistoryListPage')));
 export const UserTransactionListPage = Loadable(lazy(() => import('../pages/UserTransactionListPage')));

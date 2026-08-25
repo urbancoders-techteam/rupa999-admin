@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 // @mui
 import {
@@ -11,6 +11,7 @@ import {
 import { Box } from '@mui/system';
 // redux
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import useResponsive from '../hooks/useResponsive';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
@@ -30,7 +31,7 @@ import {
 // sections
 import { getAllBidsAsync } from '../redux/services/user_services';
 import MainBidHistoryTableRow from '../sections/_main_bid_history/list/MainBidHistoryTableRow';
-import BidHostoryMobileViewCardLayout from '../sections/_users/bid-history/list/BidHostoryMobileViewCardLayout';
+import MainBidHistoryMobileCardLayout from '../sections/_main_bid_history/list/MainBidHistoryMobileCardLayout';
 import UserBidHistoryTableToolbar from '../sections/_users/bid-history/list/UserBidHistoryTableToolbar';
 
 // ----------------------------------------------------------------------
@@ -67,6 +68,7 @@ export default function MainBidHistoryListPage() {
 
   const { themeStretch } = useSettingsContext();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // Redux state
   const { allBidsList, allBidsLoading, allBidsPagination } = useSelector(
@@ -143,6 +145,14 @@ export default function MainBidHistoryListPage() {
     setFilterStatus(status);
   };
 
+  const handleViewUser = useCallback(
+    (userId, userName) => {
+      if (!userId) return;
+      navigate(PATH_DASHBOARD.user.view(userId), { state: { userName } });
+    },
+    [navigate]
+  );
+
   const handleResetFilter = () => {
     setFilterName('');
     setSearchQuery('');
@@ -206,9 +216,10 @@ export default function MainBidHistoryListPage() {
               onStatusChange={handleStatusChange}
               onResetFilter={handleResetFilter}
             />
-            <BidHostoryMobileViewCardLayout
+            <MainBidHistoryMobileCardLayout
               data={dataFiltered}
               loading={allBidsLoading}
+              onViewUser={handleViewUser}
             />
             <TablePaginationCustom
               count={allBidsPagination?.total || dataFiltered.length}
@@ -259,6 +270,7 @@ export default function MainBidHistoryListPage() {
                                 index={row.sno}
                                 row={row}
                                 selected={selected.includes(row.id)}
+                                onViewUser={handleViewUser}
                               />
                             ))
                           ) : (

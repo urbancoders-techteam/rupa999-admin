@@ -37,9 +37,9 @@ const TABLE_HEAD = [
   { id: 'marketName', label: 'Market Name', align: 'left' },
   { id: 'userName', label: 'Winner Name', align: 'left' },
   { id: 'contactNumber', label: 'Phone', align: 'left' },
+  { id: 'bid', label: 'Bid', align: 'left' },
   { id: 'session', label: 'Session', align: 'left' },
-  { id: 'amount', label: 'Amount', align: 'left' },
-  { id: 'number', label: 'Number', align: 'left' },
+  { id: 'amount', label: 'Play Amount', align: 'left' },
   { id: 'winAmount', label: 'Win Amount', align: 'left' },
   { id: 'createdAt', label: 'Created At', align: 'left' },
 ];
@@ -158,6 +158,11 @@ export default function StarLineWinHistoryListPage() {
     if (userId) navigate(PATH_DASHBOARD.user.view(paramCase(userId)));
   };
 
+  const handleViewUser = (userId) => {
+    if (!userId) return;
+    navigate(PATH_DASHBOARD.user.view(userId));
+  };
+
   const handleResetFilter = () => {
     setFilterName('');
     setSearchQuery('');
@@ -217,6 +222,7 @@ export default function StarLineWinHistoryListPage() {
             <WinHistoryMobileViewCardLayout
               data={dataInPage}
               onEditRow={(id) => handleEditRow(id)}
+              onViewUser={handleViewUser}
               onDeleteRow={(id) => handleDeleteRow(id)}
               onSelectRow={(id) => onSelectRow(id)}
               selected={selected}
@@ -263,6 +269,7 @@ export default function StarLineWinHistoryListPage() {
                               onSelectRow={() => onSelectRow(row.id)}
                               onDeleteRow={() => handleDeleteRow(row.id)}
                               onEditRow={() => handleEditRow(row.userId)}
+                              onViewUser={() => handleViewUser(row.userId)}
                             />
                           ))}
 

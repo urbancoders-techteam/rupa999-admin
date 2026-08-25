@@ -9,6 +9,8 @@ import DashboardLayout from '../layouts/dashboard';
 import { PATH_AFTER_LOGIN } from '../config-global';
 //
 import {
+  ActiveGamePlayUsersListPage,
+  InactiveUsersListPage,
   BidRecordListPage,
   DesignationListPage,
   DipositHistoryListPage,
@@ -132,6 +134,14 @@ export default function Router() {
           children: [
             { element: <Navigate to="/dashboard/user/list" replace />, index: true },
             { path: 'list', element: <UserListPage /> },
+            {
+              path: 'active-game-play-users',
+              element: <ActiveGamePlayUsersListPage />,
+            },
+            {
+              path: 'inactive-users',
+              element: <InactiveUsersListPage />,
+            },
             { path: 'new', element: <UserFormHandle /> },
             { path: ':id/edit', element: <UserFormHandle /> },
             { path: ':id/view', element: <UserFormHandle /> },

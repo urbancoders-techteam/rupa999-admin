@@ -43,9 +43,20 @@ const navConfig = [
       { title: 'dashboard', path: PATH_DASHBOARD.home.root, icon: ICONS.dashboard },
       { title: 'profits', path: PATH_DASHBOARD.profit.root, icon: ICONS.analytics },
       {
-        title: 'user',
+        title: 'Users',
         path: PATH_DASHBOARD.user.root,
         icon: ICONS.user,
+        children: [
+          { title: 'User List', path: PATH_DASHBOARD.user.list },
+          {
+            title: 'Active Game Play Users',
+            path: PATH_DASHBOARD.user.activeGamePlayUsers,
+          },
+          {
+            title: 'Inactive Users',
+            path: PATH_DASHBOARD.user.inactiveUsers,
+          },
+        ],
       },
 
       {

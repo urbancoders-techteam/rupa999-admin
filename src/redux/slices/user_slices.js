@@ -1,6 +1,8 @@
 import { createSlice, isAnyOf } from '@reduxjs/toolkit';
 import {
   deleteUserAsync,
+  getActiveGamePlayUsersAsync,
+  getInactiveUsersAsync,
   getAllUsersAsync,
   getUserByIdAsync,
   updateUserStatusAsync,
@@ -24,6 +26,24 @@ const initialState = {
   error: null,
   transactionsError: null,
   pagination: {
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+  },
+  activeGamePlayUserList: [],
+  activeGamePlayUsersLoading: false,
+  activeGamePlayUsersError: null,
+  activeGamePlayUsersPagination: {
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+  },
+  inactiveUserList: [],
+  inactiveUsersLoading: false,
+  inactiveUsersError: null,
+  inactiveUsersPagination: {
     page: 1,
     limit: 10,
     total: 0,
@@ -134,6 +154,57 @@ const userSlice = createSlice({
     });
     // -------------
 
+    // Get users who played a game during the last 24 hours ----------
+    builder.addMatcher(isAnyOf(getActiveGamePlayUsersAsync.pending), (state) => {
+      state.activeGamePlayUsersLoading = true;
+      state.activeGamePlayUsersError = null;
+    });
+
+    builder.addMatcher(isAnyOf(getActiveGamePlayUsersAsync.fulfilled), (state, { payload }) => {
+      state.activeGamePlayUsersLoading = false;
+      state.activeGamePlayUserList = payload?.data || [];
+      if (payload) {
+        state.activeGamePlayUsersPagination = {
+          page: payload.pagination.page || 1,
+          limit: payload.pagination.limit || 10,
+          total: payload.pagination.total || 0,
+          totalPages: payload.pagination.totalPages || 0,
+        };
+      }
+    });
+
+    builder.addMatcher(isAnyOf(getActiveGamePlayUsersAsync.rejected), (state, { payload }) => {
+      state.activeGamePlayUsersLoading = false;
+      state.activeGamePlayUsersError =
+        payload?.message || 'Failed to fetch active game play users';
+    });
+    // -------------
+
+    // Get inactive users ----------
+    builder.addMatcher(isAnyOf(getInactiveUsersAsync.pending), (state) => {
+      state.inactiveUsersLoading = true;
+      state.inactiveUsersError = null;
+    });
+
+    builder.addMatcher(isAnyOf(getInactiveUsersAsync.fulfilled), (state, { payload }) => {
+      state.inactiveUsersLoading = false;
+      state.inactiveUserList = payload?.data || [];
+      if (payload) {
+        state.inactiveUsersPagination = {
+          page: payload.pagination?.page || 1,
+          limit: payload.pagination?.limit || 10,
+          total: payload.pagination?.total || 0,
+          totalPages: payload.pagination?.totalPages || 0,
+        };
+      }
+    });
+
+    builder.addMatcher(isAnyOf(getInactiveUsersAsync.rejected), (state, { payload }) => {
+      state.inactiveUsersLoading = false;
+      state.inactiveUsersError = payload?.message || 'Failed to fetch inactive users';
+    });
+    // -------------
+
     // Get user by ID ----------
     builder.addMatcher(isAnyOf(getUserByIdAsync.pending), (state) => {
       state.loading = true;
@@ -159,12 +230,20 @@ const userSlice = createSlice({
 
     builder.addMatcher(isAnyOf(updateUserStatusAsync.fulfilled), (state, { payload }) => {
       state.loading = false;
-      // Update user in list if exists
       const updatedUser = payload?.user || payload?.data;
       if (updatedUser) {
         const index = state.userList.findIndex((user) => user._id === updatedUser._id);
         if (index !== -1) {
           state.userList[index] = updatedUser;
+        }
+
+        if (updatedUser.status === 'active') {
+          state.inactiveUserList = state.inactiveUserList.filter(
+            (user) => user._id !== updatedUser._id
+          );
+          if (state.inactiveUsersPagination.total > 0) {
+            state.inactiveUsersPagination.total -= 1;
+          }
         }
       }
     });

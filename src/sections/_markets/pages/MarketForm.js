@@ -218,11 +218,14 @@ export default function MarketForm({ isEdit = false, isView = false, currentUser
                   row
                   name="disableGame"
                   value={values.disableGame}
-                  onChange={(e) => setValue('disableGame', e.target.value)}
+                  onChange={(e) => setValue('disableGame', e.target.value, { shouldValidate: true })}
                 >
                   <FormControlLabel value="yes" control={<Radio disabled={isView} />} label="Yes" />
                   <FormControlLabel value="no" control={<Radio disabled={isView} />} label="No" />
                 </RadioGroup>
+                <FormHelperText sx={{ mx: 0 }}>
+                  Yes = users cannot play this market on the website or app.
+                </FormHelperText>
                 {errors.disableGame && (
                   <FormHelperText>{errors.disableGame.message}</FormHelperText>
                 )}
@@ -234,11 +237,14 @@ export default function MarketForm({ isEdit = false, isView = false, currentUser
                   row
                   name="hideOpen"
                   value={values.hideOpen}
-                  onChange={(e) => setValue('hideOpen', e.target.value)}
+                  onChange={(e) => setValue('hideOpen', e.target.value, { shouldValidate: true })}
                 >
                   <FormControlLabel value="enable" control={<Radio disabled={isView} />} label="Yes" />
                   <FormControlLabel value="disable" control={<Radio disabled={isView} />} label="No" />
                 </RadioGroup>
+                <FormHelperText sx={{ mx: 0 }}>
+                  Yes = this market is hidden from users on the website and app.
+                </FormHelperText>
                 {errors.hideOpen && <FormHelperText>{errors.hideOpen.message}</FormHelperText>}
               </FormControl>
             </Box>

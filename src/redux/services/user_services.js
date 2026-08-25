@@ -34,6 +34,38 @@ export const getAllUsersAsync = createAsyncThunk(
     })
 );
 
+// Get users who logged in and played a game in the app during the rolling last 24 hours
+export const getActiveGamePlayUsersAsync = createAsyncThunk(
+  'user/getActiveGamePlayUsers',
+  async (params = {}, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: '/users/admin/active-game-play',
+      method: 'get',
+      params: {
+        page: params.page || 1,
+        limit: params.limit || 10,
+        search: params.search || '',
+      },
+    })
+);
+
+export const getInactiveUsersAsync = createAsyncThunk(
+  'user/getInactiveUsers',
+  async (params = {}, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: '/users/admin',
+      method: 'get',
+      params: {
+        page: params.page || 1,
+        limit: params.limit || 10,
+        search: params.search || '',
+        status: 'inactive',
+      },
+    })
+);
+
 // Get user by ID
 export const getUserByIdAsync = createAsyncThunk(
   'user/getById',

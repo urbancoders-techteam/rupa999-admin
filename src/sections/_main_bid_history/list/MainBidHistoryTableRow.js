@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 // @mui
 import {
+  Link,
   TableCell,
   TableRow,
   Typography,
@@ -16,9 +17,10 @@ MainBidHistoryTableRow.propTypes = {
   index: PropTypes.number,
   row: PropTypes.object,
   selected: PropTypes.bool,
+  onViewUser: PropTypes.func,
 };
 
-export default function MainBidHistoryTableRow({ index, row, selected }) {
+export default function MainBidHistoryTableRow({ index, row, selected, onViewUser }) {
   const {
     marketId,
     starlineMarketId,
@@ -105,9 +107,22 @@ export default function MainBidHistoryTableRow({ index, row, selected }) {
       </TableCell>
 
       <TableCell align="left">
-        <Typography variant="body2" noWrap>
-          {userId?.number || '—'}
-        </Typography>
+        {userId?._id && userId?.number && onViewUser ? (
+          <Link
+            component="button"
+            type="button"
+            variant="body2"
+            underline="hover"
+            onClick={() => onViewUser(userId._id, userId.name)}
+            sx={{ cursor: 'pointer', fontWeight: 600, textAlign: 'left' }}
+          >
+            {userId.number}
+          </Link>
+        ) : (
+          <Typography variant="body2" noWrap>
+            {userId?.number || '—'}
+          </Typography>
+        )}
       </TableCell>
 
       <TableCell align="left">
