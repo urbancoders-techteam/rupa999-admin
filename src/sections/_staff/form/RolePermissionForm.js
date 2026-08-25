@@ -25,7 +25,6 @@ import { useSettingsContext } from '../../../components/settings';
 import {
   createRoleAsync,
   updateRoleAsync,
-  getRoleByIdAsync,
 } from '../../../redux/services/role_services';
 import {
   getAllRoutesAsync,
@@ -153,7 +152,7 @@ export default function RolePermissionForm({ isEdit = false, isView = false, cur
   // Load routes on mount
   useEffect(() => {
     if (!routesLoaded) {
-      dispatch(getAllRoutesAsync()).then(() => {
+      dispatch(getAllRoutesAsync({ page: 1, limit: 1000 })).then(() => {
         setRoutesLoaded(true);
       });
     }

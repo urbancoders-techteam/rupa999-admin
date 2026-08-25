@@ -41,7 +41,7 @@ import {
 // sections
 import { useSnackbar } from '../components/snackbar';
 import CustomTableToolbar from '../components/table/CustomTableToolBar';
-import { deleteStaffAsync, getAllStaffAsync, updateStaffStatusAsync } from '../redux/services/staff_services';
+import { changeStaffPasswordAsync, deleteStaffAsync, getAllStaffAsync, updateStaffStatusAsync } from '../redux/services/staff_services';
 import StaffTableRow from '../sections/_staff/list/StaffTableRow';
 import StaffMobileViewLayout from '../sections/_staff/list/StaffMobileViewLayout';
 
@@ -84,7 +84,7 @@ export default function StaffListPage() {
   const { enqueueSnackbar } = useSnackbar();
 
   // Redux state
-  const { staffList, pagination } = useSelector((state) => state.staff);
+  const { staffList } = useSelector((state) => state.staff);
 
   const [openConfirm, setOpenConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
@@ -94,9 +94,12 @@ export default function StaffListPage() {
   const [filterStatus, setFilterStatus] = useState('all');
   const [changePasswordLoading, setChangePasswordLoading] = useState(false);
 
-  // Fetch staff on component mount and when filters change
+  // This page paginates/filters client-side (see dataFiltered.slice below), so
+  // fetch the full staff list once rather than relying on the backend's
+  // default page-1/limit-10 response - otherwise only the first 10 staff ever
+  // load and later pages render empty despite the pager showing a higher total.
   useEffect(() => {
-    dispatch(getAllStaffAsync());
+    dispatch(getAllStaffAsync({ page: 1, limit: 1000 }));
   }, [dispatch]);
 
   // Transform API data to table format
@@ -158,7 +161,7 @@ export default function StaffListPage() {
       await dispatch(deleteStaffAsync(id)).unwrap();
       enqueueSnackbar('Staff deleted successfully!', { variant: 'success' });
       // Refresh the list
-      dispatch(getAllStaffAsync());
+      dispatch(getAllStaffAsync({ page: 1, limit: 1000 }));
       setSelected([]);
       if (page > 0 && dataInPage.length < 2) {
         setPage(page - 1);
@@ -196,7 +199,7 @@ export default function StaffListPage() {
       await dispatch(updateStaffStatusAsync({ id, status })).unwrap();
       enqueueSnackbar(`Staff ${status ? 'activated' : 'deactivated'} successfully!`, { variant: 'success' });
       // Refresh the list
-      dispatch(getAllStaffAsync());
+      dispatch(getAllStaffAsync({ page: 1, limit: 1000 }));
     } catch (error) {
       enqueueSnackbar(error?.message || 'Failed to update staff status', { variant: 'error' });
       throw error; // Re-throw to let StatusToggleCell revert the UI
@@ -214,11 +217,8 @@ export default function StaffListPage() {
   const handleChangePassword = async (staffId, password, cpassword) => {
     setChangePasswordLoading(true);
     try {
-      // TODO: Implement staff password change API call
-      // await dispatch(changeStaffPasswordAsync({ id: staffId, password, cpassword })).unwrap();
+      await dispatch(changeStaffPasswordAsync({ id: staffId, password, cpassword })).unwrap();
       enqueueSnackbar('Password changed successfully!', { variant: 'success' });
-      // For now, just show success message
-      await new Promise((resolve) => setTimeout(resolve, 1000));
     } catch (error) {
       enqueueSnackbar(error?.message || 'Failed to change password', { variant: 'error' });
       throw error;
@@ -486,7 +486,7 @@ export default function StaffListPage() {
             </TableContainer>
 
             <TablePaginationCustom
-              count={pagination?.total || dataFiltered.length}
+              count={dataFiltered.length}
               page={page}
               rowsPerPage={rowsPerPage}
               onPageChange={onChangePage}

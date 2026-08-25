@@ -70,6 +70,18 @@ export const getStaffProfileAsync = createAsyncThunk(
     })
 );
 
+// Change a staff member's password (admin-initiated, by admin ID)
+export const changeStaffPasswordAsync = createAsyncThunk(
+  'staff/changePassword',
+  async ({ id, password, cpassword }, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: '/admin/change-password',
+      method: 'post',
+      data: { adminId: id, newPassword: password, cpassword },
+    })
+);
+
 // Update staff status (active/inactive)
 export const updateStaffStatusAsync = createAsyncThunk(
   'staff/updateStatus',
