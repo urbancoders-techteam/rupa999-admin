@@ -10,8 +10,6 @@ import {
   Divider,
   Paper,
   Stack,
-  Tab,
-  Tabs,
   Typography
 } from '@mui/material';
 import PropTypes from 'prop-types';
@@ -19,8 +17,6 @@ import { useState } from 'react';
 import ChangePasswordDialog from '../../../components/change-password-dialog/ChangePasswordDialog';
 import AddDeductBalanceModal from '../form/UserAddDeductForm';
 import StatusToggleCell from './StatusToggledCell';
-
-const STATUS_OPTIONS = ['all', 'Active', 'InActive'];
 
 function UserMobileViewCardLayout({ 
   data, 
@@ -32,12 +28,9 @@ function UserMobileViewCardLayout({
   onViewBankDetails,
   onAddDeductBalance, 
   addDeductBalanceLoading, 
-  onTransactionRow, 
-  onWithdrawalRequestsRow, 
+  onTransactionRow,
+  onWithdrawalRequestsRow,
   onBidHistoryRow,
-  // Filter props
-  filterStatus = 'all',
-  onFilterStatus,
 }) {
 
   const [openAddDeduct, setOpenAddDeduct] = useState(false);
@@ -90,12 +83,6 @@ function UserMobileViewCardLayout({
     }
   };
 
-  const handleFilterStatus = (event, newValue) => {
-    if (onFilterStatus) {
-      onFilterStatus(event, newValue);
-    }
-  };
-
   return (
     <Box
       sx={{
@@ -106,28 +93,6 @@ function UserMobileViewCardLayout({
         bgcolor: 'background.default',
       }}
     >
-      {/* Status Filter Tabs */}
-      <Tabs
-        value={filterStatus}
-        onChange={handleFilterStatus}
-        variant="scrollable"
-        scrollButtons="auto"
-        sx={{
-          mb: 2,
-          bgcolor: 'background.neutral',
-          borderRadius: 1,
-          '& .MuiTab-root': {
-            fontSize: '0.75rem',
-            minHeight: 48,
-            px: 1.5,
-          },
-        }}
-      >
-        {STATUS_OPTIONS.map((tab) => (
-          <Tab key={tab} label={tab} value={tab} />
-        ))}
-      </Tabs>
-
       {data.length === 0 ? (
         <Box
           sx={{
@@ -364,9 +329,6 @@ UserMobileViewCardLayout.propTypes = {
   onTransactionRow: PropTypes.func,
   onWithdrawalRequestsRow: PropTypes.func,
   onBidHistoryRow: PropTypes.func,
-  // Filter props
-  filterStatus: PropTypes.string,
-  onFilterStatus: PropTypes.func,
 };
 
 export default UserMobileViewCardLayout;

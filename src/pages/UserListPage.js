@@ -7,12 +7,14 @@ import {
   Card,
   Container,
   Divider,
+  Grid,
   IconButton,
-  Tab,
+  InputAdornment,
+  MenuItem,
   Table,
   TableBody,
   TableContainer,
-  Tabs,
+  TextField,
   Tooltip,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
@@ -47,6 +49,14 @@ import UserMobileViewCardLayout from '../sections/_users/list/UserMobileViewCard
 // ----------------------------------------------------------------------
 
 const STATUS_OPTIONS = ['all', 'Active', 'InActive'];
+
+const DATE_FILTER_OPTIONS = [
+  { value: '', label: 'All Time' },
+  { value: 'today', label: 'Today' },
+  { value: 'yesterday', label: 'Yesterday' },
+  { value: 'week', label: 'This Week' },
+  { value: 'month', label: 'This Month' },
+];
 
 const TABLE_HEAD = [
   { id: 'Action', label: 'Action', align: 'left' },
@@ -96,6 +106,7 @@ export default function UserListPage() {
   const [searchQuery, setSearchQuery] = useState(initialSearch); // Actual search value sent to API
   const [filterRole] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [filterDate, setFilterDate] = useState('');
   const [changePasswordLoading, setChangePasswordLoading] = useState(false);
   const [addDeductBalanceLoading, setAddDeductBalanceLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -115,9 +126,10 @@ export default function UserListPage() {
         limit: rowsPerPage,
         search: searchQuery,
         status: filterStatus !== 'all' ? getStatusForAPI(filterStatus) : '',
+        dateFilter: filterDate,
       })
     );
-  }, [dispatch, page, rowsPerPage, searchQuery, filterStatus]);
+  }, [dispatch, page, rowsPerPage, searchQuery, filterStatus, filterDate]);
 
   // Fetch users on component mount and when filters change
   useEffect(() => {
@@ -172,9 +184,10 @@ export default function UserListPage() {
 
   const isMobile = useResponsive('down', 'sm');
 
-  const isFiltered = searchQuery !== '' || filterRole !== 'all' || filterStatus !== 'all';
+  const isFiltered =
+    searchQuery !== '' || filterRole !== 'all' || filterStatus !== 'all' || filterDate !== '';
 
-  const isNotFound = !userList.length && (!!searchQuery || filterStatus !== 'all');
+  const isNotFound = !userList.length && (!!searchQuery || filterStatus !== 'all' || filterDate !== '');
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
@@ -183,6 +196,11 @@ export default function UserListPage() {
   const handleFilterStatus = (event, newValue) => {
     setPage(0);
     setFilterStatus(newValue);
+  };
+
+  const handleFilterDate = (event) => {
+    setPage(0);
+    setFilterDate(event.target.value);
   };
 
   const handleFilterName = (event) => {
@@ -198,6 +216,7 @@ export default function UserListPage() {
     setFilterName('');
     setSearchQuery('');
     setFilterStatus('all');
+    setFilterDate('');
     setPage(0);
   };
 
@@ -356,6 +375,36 @@ export default function UserListPage() {
               onSearch={handleSearch}
               onResetFilter={handleResetFilter}
             />
+            <Box sx={{ px: 2, pb: 1, display: 'flex', gap: 1.5 }}>
+              <TextField
+                select
+                fullWidth
+                size="small"
+                label="Status"
+                value={filterStatus}
+                onChange={(event) => handleFilterStatus(event, event.target.value)}
+              >
+                {STATUS_OPTIONS.map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option === 'all' ? 'All' : option}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <TextField
+                select
+                fullWidth
+                size="small"
+                label="Registered"
+                value={filterDate}
+                onChange={handleFilterDate}
+              >
+                {DATE_FILTER_OPTIONS.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Box>
             <UserMobileViewCardLayout
               data={tableData}
               onEditRow={(id, row) => handleEditRow(id, row?.name)}
@@ -368,9 +417,6 @@ export default function UserListPage() {
               changePasswordLoading={changePasswordLoading}
               onAddDeductBalance={(id, amount, action) => handleAddDeductBalance(id, amount, action)}
               addDeductBalanceLoading={addDeductBalanceLoading}
-              // Filter props
-              filterStatus={filterStatus}
-              onFilterStatus={handleFilterStatus}
             />
             <TablePaginationCustom
               count={pagination?.total || tableData.length || 0}
@@ -384,28 +430,91 @@ export default function UserListPage() {
           </>
         ) : (
           <Card>
-            <Tabs
-              value={filterStatus}
-              onChange={handleFilterStatus}
-              sx={{
-                px: 2,
-                bgcolor: 'background.neutral',
-              }}
+            <Grid
+              container
+              spacing={{ xs: 1.5, sm: 2 }}
+              alignItems="center"
+              sx={{ px: { xs: 0, sm: 1.5, md: 2.5 }, py: { xs: 1, sm: 1.5, md: 2.5 } }}
             >
-              {STATUS_OPTIONS.map((tab) => (
-                <Tab key={tab} label={tab} value={tab} />
-              ))}
-            </Tabs>
+              <Grid item xs={12} sm={6} md={4}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  placeholder="Search..."
+                  value={filterName}
+                  onChange={handleFilterName}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={2}>
+                <TextField
+                  select
+                  fullWidth
+                  size="small"
+                  label="Status"
+                  value={filterStatus}
+                  onChange={(event) => handleFilterStatus(event, event.target.value)}
+                >
+                  {STATUS_OPTIONS.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option === 'all' ? 'All' : option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={2}>
+                <TextField
+                  select
+                  fullWidth
+                  size="small"
+                  label="Registered"
+                  value={filterDate}
+                  onChange={handleFilterDate}
+                >
+                  {DATE_FILTER_OPTIONS.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={2}>
+                <Button
+                  variant="contained"
+                  onClick={handleSearch}
+                  startIcon={<Iconify icon="eva:search-fill" />}
+                  fullWidth
+                  sx={{ height: '40px' }}
+                >
+                  Search
+                </Button>
+              </Grid>
+
+              {isFiltered && (
+                <Grid item xs={12} sm={6} md={2}>
+                  <Button
+                    fullWidth
+                    color="error"
+                    onClick={handleResetFilter}
+                    startIcon={<Iconify icon="eva:trash-2-outline" />}
+                    sx={{ height: '40px' }}
+                  >
+                    Clear
+                  </Button>
+                </Grid>
+              )}
+            </Grid>
 
             <Divider />
-
-            <CustomTableToolbar
-              isFiltered={isFiltered}
-              filterName={filterName}
-              onFilterName={handleFilterName}
-              onSearch={handleSearch}
-              onResetFilter={handleResetFilter}
-            />
 
             <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
               <TableSelectedAction

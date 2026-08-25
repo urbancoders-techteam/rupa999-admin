@@ -30,6 +30,7 @@ export const getAllUsersAsync = createAsyncThunk(
         limit: params.limit || 10,
         search: params.search || '',
         status: params.status || '',
+        dateFilter: params.dateFilter || '',
       },
     })
 );
