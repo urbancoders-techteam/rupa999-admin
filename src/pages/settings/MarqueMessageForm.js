@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
@@ -12,11 +13,13 @@ import {
 } from '@mui/material';
 import * as Yup from 'yup';
 import { useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
 import FormProvider, { RHFTextField } from '../../components/hook-form';
 import { useSettingsContext } from '../../components/settings';
+import { useSnackbar } from '../../components/snackbar';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { PATH_DASHBOARD } from '../../routes/paths';
+import { getMarqueeMessageAsync, updateMarqueeMessageAsync } from '../../redux/services/marquee_message_services';
 
 // ----------------------------------------------------------------------
 
@@ -29,15 +32,21 @@ const MarqueMessageSchema = Yup.object().shape({
     .matches(HEX_COLOR_REGEX, 'Enter a valid HEX color, for example #FF6600'),
 });
 
-const defaultValues = {
-  message: '',
-  fontColor: '#000000',
-};
-
 // ----------------------------------------------------------------------
 
 export default function MarqueMessageForm() {
   const { themeStretch } = useSettingsContext();
+  const dispatch = useDispatch();
+  const { enqueueSnackbar } = useSnackbar();
+  const [currentSettings, setCurrentSettings] = useState(null);
+
+  const defaultValues = useMemo(
+    () => ({
+      message: currentSettings?.message || '',
+      fontColor: currentSettings?.fontColor || '#000000',
+    }),
+    [currentSettings]
+  );
 
   const methods = useForm({
     resolver: yupResolver(MarqueMessageSchema),
@@ -45,6 +54,7 @@ export default function MarqueMessageForm() {
   });
 
   const {
+    reset,
     handleSubmit,
     watch,
     setValue,
@@ -55,14 +65,40 @@ export default function MarqueMessageForm() {
   const fontColor = watch('fontColor');
   const previewColor = HEX_COLOR_REGEX.test(fontColor || '') ? fontColor : '#000000';
 
+  // Fetch the current marquee message on mount
+  const fetchMarqueeMessage = useCallback(async () => {
+    try {
+      const result = await dispatch(getMarqueeMessageAsync()).unwrap();
+      if (result?.data) {
+        setCurrentSettings(result.data);
+      }
+    } catch (error) {
+      enqueueSnackbar(error?.message || 'Failed to load marquee message', { variant: 'error' });
+    }
+  }, [dispatch, enqueueSnackbar]);
+
+  useEffect(() => {
+    fetchMarqueeMessage();
+  }, [fetchMarqueeMessage]);
+
+  useEffect(() => {
+    if (currentSettings) {
+      reset({
+        message: currentSettings?.message || '',
+        fontColor: currentSettings?.fontColor || '#000000',
+      });
+    }
+  }, [currentSettings, reset]);
+
   const onSubmit = async (data) => {
     try {
-      // TODO: Replace with actual API call
-      // await dispatch(updateMarqueMessageAsync(data)).unwrap();
-
-      toast.success('Marquee message saved successfully!');
+      const result = await dispatch(updateMarqueeMessageAsync(data)).unwrap();
+      if (result?.data) {
+        setCurrentSettings(result.data);
+      }
+      enqueueSnackbar('Marquee message saved successfully!', { variant: 'success' });
     } catch (error) {
-      toast.error(error?.message || 'Failed to save marquee message');
+      enqueueSnackbar(error?.message || 'Failed to save marquee message', { variant: 'error' });
     }
   };
 
