@@ -187,12 +187,6 @@ export default function StaffListPage() {
   const handleEditRow = (id) => {
     navigate(PATH_DASHBOARD.staff.edit(id));
   };
-  const handleTransactionRow = (id) => {
-    navigate(PATH_DASHBOARD.staff.transactions(id));
-  };
-  const handleWithdrawalRequestRow = (id) => {
-    navigate(PATH_DASHBOARD.staff.withdrawaldetails(id));
-  };
 
   const handleStatusChange = async (id, status) => {
     try {
@@ -466,8 +460,6 @@ export default function StaffListPage() {
                           row={row}
                           index={row.sno}
                           // selected={selected.includes(row.id)}
-                          onTransationRow={() => handleTransactionRow(row.id)}
-                          onWithdrawalRequestRow={() => handleWithdrawalRequestRow(row._id)}
                           onDeleteRow={() => handleOpenDeleteConfirm(row._id)}
                           onEditRow={() => handleEditRow(row._id)}
                           onStatusChange={(_id, status) => handleStatusChange(_id, status)}

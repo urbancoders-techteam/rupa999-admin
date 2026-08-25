@@ -43,13 +43,11 @@ StaffTableRow.propTypes = {
   index: PropTypes.number,
   selected: PropTypes.bool,
   onEditRow: PropTypes.func,
-  onTransationRow: PropTypes.func,
-  onWithdrawalRequestRow: PropTypes.func,
   onDeleteRow: PropTypes.func,
   onStatusChange: PropTypes.func,
 };
 
-export default function StaffTableRow({ index, row, selected, onEditRow, onTransationRow, onWithdrawalRequestRow, onDeleteRow, onStatusChange }) {
+export default function StaffTableRow({ index, row, selected, onEditRow, onDeleteRow, onStatusChange }) {
   const {
     _id,
     name,
@@ -140,26 +138,6 @@ export default function StaffTableRow({ index, row, selected, onEditRow, onTrans
         >
           <Iconify icon="eva:edit-fill" />
           Edit
-        </MenuItem>
-
-        <MenuItem
-          onClick={() => {
-            onTransationRow();
-            handleClosePopover();
-          }}
-        >
-          <Iconify icon="solar:wallet-bold" />
-          Transactions
-        </MenuItem>
-
-        <MenuItem
-          onClick={() => {
-            onWithdrawalRequestRow();
-            handleClosePopover();
-          }}
-        >
-          <Iconify icon="mdi:bank-transfer" />
-          Withdrawal Details
         </MenuItem>
 
         <MenuItem

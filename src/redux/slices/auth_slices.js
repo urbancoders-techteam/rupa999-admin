@@ -16,6 +16,15 @@ const authSlice = createSlice({
     clearChangePasswordError: (state) => {
       state.changePasswordError = null;
     },
+    // Redux state isn't persisted across reloads (see rootPersistConfig
+    // whitelist), so state.auth.admin resets to {} on every refresh even
+    // though the session (token + localStorage 'admin') is still valid.
+    // Rehydrate it so isSuperAdmin/roleId-dependent UI (e.g. the sidebar
+    // permission filter) works after a reload, not just right after login.
+    restoreAdminFromStorage: (state, { payload }) => {
+      state.admin = payload || {};
+      state.token = localStorage.getItem('token') || false;
+    },
   },
   extraReducers: (builder) => {
     // Login User ----------
@@ -53,5 +62,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearAlert, clearChangePasswordError } = authSlice.actions;
+export const { clearAlert, clearChangePasswordError, restoreAdminFromStorage } = authSlice.actions;
 export default authSlice.reducer;

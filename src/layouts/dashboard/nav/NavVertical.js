@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 // @mui
 import { Box, Stack, Drawer } from '@mui/material';
 // hooks
@@ -12,6 +13,7 @@ import Logo from '../../../components/logo';
 import Scrollbar from '../../../components/scrollbar';
 import { NavSectionVertical } from '../../../components/nav-section';
 //
+import { filterNavConfigByPermission } from '../../../utils/navPermissions';
 import navConfig from './config-navigation';
 import NavDocs from './NavDocs';
 import NavAccount from './NavAccount';
@@ -28,6 +30,14 @@ export default function NavVertical({ openNav, onCloseNav }) {
   const { pathname } = useLocation();
 
   const isDesktop = useResponsive('up', 'lg');
+
+  const { admin } = useSelector((state) => state.auth);
+  const { permissions } = useSelector((state) => state.permission);
+
+  const filteredNavConfig = useMemo(
+    () => filterNavConfigByPermission(navConfig, { isSuperAdmin: admin?.isSuperAdmin, permissions }),
+    [admin?.isSuperAdmin, permissions]
+  );
 
   useEffect(() => {
     if (openNav) {
@@ -58,7 +68,7 @@ export default function NavVertical({ openNav, onCloseNav }) {
         {/* <NavAccount /> */}
       </Stack>
 
-      <NavSectionVertical data={navConfig} />
+      <NavSectionVertical data={filteredNavConfig} />
 
       <Box sx={{ flexGrow: 1 }} />
 

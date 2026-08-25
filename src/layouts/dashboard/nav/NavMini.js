@@ -1,9 +1,12 @@
+import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 // @mui
 import { Stack, Box } from '@mui/material';
 // config
 import { NAV } from '../../../config-global';
 // utils
 import { hideScrollbarX } from '../../../utils/cssStyles';
+import { filterNavConfigByPermission } from '../../../utils/navPermissions';
 // components
 import Logo from '../../../components/logo';
 import { NavSectionMini } from '../../../components/nav-section';
@@ -14,6 +17,14 @@ import NavToggleButton from './NavToggleButton';
 // ----------------------------------------------------------------------
 
 export default function NavMini() {
+  const { admin } = useSelector((state) => state.auth);
+  const { permissions } = useSelector((state) => state.permission);
+
+  const filteredNavConfig = useMemo(
+    () => filterNavConfigByPermission(navConfig, { isSuperAdmin: admin?.isSuperAdmin, permissions }),
+    [admin?.isSuperAdmin, permissions]
+  );
+
   return (
     <Box
       component="nav"
@@ -41,7 +52,7 @@ export default function NavMini() {
       >
         <Logo sx={{ mx: 'auto', my: 2 }} />
 
-        <NavSectionMini data={navConfig} />
+        <NavSectionMini data={filteredNavConfig} />
       </Stack>
     </Box>
   );

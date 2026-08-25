@@ -55,11 +55,13 @@ export default function AuthLoginForm() {
         localStorage.setItem('admin', JSON.stringify(res.payload.admin));
         
         const { isSuperAdmin = false, roleId } = res.payload.admin || {};
+        // roleId comes back populated (an object), not a plain string - extract the id
+        const roleIdValue = roleId?._id || roleId;
 
         // Fetch permissions for non-super-admin users if roleId exists
-        if (!isSuperAdmin && roleId && roleId !== null) {
+        if (!isSuperAdmin && roleIdValue) {
           try {
-            const permissionRes = await dispatch(getPermissionByRoleIdAsync(roleId));
+            const permissionRes = await dispatch(getPermissionByRoleIdAsync(roleIdValue));
 
             if (permissionRes.type === 'permission/permissionByRoleId/fulfilled') {
               // Permissions are automatically stored in Redux via the slice
