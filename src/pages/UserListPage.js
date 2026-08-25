@@ -105,8 +105,10 @@ export default function UserListPage() {
   const [filterName, setFilterName] = useState(initialSearch); // Input field value
   const [searchQuery, setSearchQuery] = useState(initialSearch); // Actual search value sent to API
   const [filterRole] = useState('all');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [filterDate, setFilterDate] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all'); // Pending value, bound to the Status dropdown
+  const [filterDate, setFilterDate] = useState(''); // Pending value, bound to the Registered dropdown
+  const [appliedStatus, setAppliedStatus] = useState('all'); // Applied on Search click; used for the API call
+  const [appliedDate, setAppliedDate] = useState(''); // Applied on Search click; used for the API call
   const [changePasswordLoading, setChangePasswordLoading] = useState(false);
   const [addDeductBalanceLoading, setAddDeductBalanceLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -125,11 +127,11 @@ export default function UserListPage() {
         page: page + 1, // API uses 1-based pagination
         limit: rowsPerPage,
         search: searchQuery,
-        status: filterStatus !== 'all' ? getStatusForAPI(filterStatus) : '',
-        dateFilter: filterDate,
+        status: appliedStatus !== 'all' ? getStatusForAPI(appliedStatus) : '',
+        dateFilter: appliedDate,
       })
     );
-  }, [dispatch, page, rowsPerPage, searchQuery, filterStatus, filterDate]);
+  }, [dispatch, page, rowsPerPage, searchQuery, appliedStatus, appliedDate]);
 
   // Fetch users on component mount and when filters change
   useEffect(() => {
@@ -185,21 +187,21 @@ export default function UserListPage() {
   const isMobile = useResponsive('down', 'sm');
 
   const isFiltered =
-    searchQuery !== '' || filterRole !== 'all' || filterStatus !== 'all' || filterDate !== '';
+    searchQuery !== '' || filterRole !== 'all' || appliedStatus !== 'all' || appliedDate !== '';
 
-  const isNotFound = !userList.length && (!!searchQuery || filterStatus !== 'all' || filterDate !== '');
+  const isNotFound = !userList.length && (!!searchQuery || appliedStatus !== 'all' || appliedDate !== '');
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
   };
 
-  const handleFilterStatus = (event, newValue) => {
-    setPage(0);
+  // Status/Date dropdowns only update the pending selection - they don't call the API
+  // until "Search" is clicked (see handleSearch), so all filters apply together.
+  const handleFilterStatus = (newValue) => {
     setFilterStatus(newValue);
   };
 
   const handleFilterDate = (event) => {
-    setPage(0);
     setFilterDate(event.target.value);
   };
 
@@ -210,13 +212,17 @@ export default function UserListPage() {
   const handleSearch = () => {
     setPage(0);
     setSearchQuery(filterName);
+    setAppliedStatus(filterStatus);
+    setAppliedDate(filterDate);
   };
 
   const handleResetFilter = () => {
     setFilterName('');
     setSearchQuery('');
     setFilterStatus('all');
+    setAppliedStatus('all');
     setFilterDate('');
+    setAppliedDate('');
     setPage(0);
   };
 
@@ -368,21 +374,14 @@ export default function UserListPage() {
 
         {isMobile ? (
           <>
-            <CustomTableToolbar
-              isFiltered={isFiltered}
-              filterName={filterName}
-              onFilterName={handleFilterName}
-              onSearch={handleSearch}
-              onResetFilter={handleResetFilter}
-            />
-            <Box sx={{ px: 2, pb: 1, display: 'flex', gap: 1.5 }}>
+            <Box sx={{mt: 5, pb: 1, display: 'flex', flexDirection: 'row', gap: 1.5 }}>
               <TextField
                 select
                 fullWidth
                 size="small"
                 label="Status"
                 value={filterStatus}
-                onChange={(event) => handleFilterStatus(event, event.target.value)}
+                onChange={(event) => handleFilterStatus(event.target.value)}
               >
                 {STATUS_OPTIONS.map((option) => (
                   <MenuItem key={option} value={option}>
@@ -405,6 +404,13 @@ export default function UserListPage() {
                 ))}
               </TextField>
             </Box>
+            <CustomTableToolbar
+              isFiltered={isFiltered}
+              filterName={filterName}
+              onFilterName={handleFilterName}
+              onSearch={handleSearch}
+              onResetFilter={handleResetFilter}
+            />
             <UserMobileViewCardLayout
               data={tableData}
               onEditRow={(id, row) => handleEditRow(id, row?.name)}
@@ -460,7 +466,7 @@ export default function UserListPage() {
                   size="small"
                   label="Status"
                   value={filterStatus}
-                  onChange={(event) => handleFilterStatus(event, event.target.value)}
+                  onChange={(event) => handleFilterStatus(event.target.value)}
                 >
                   {STATUS_OPTIONS.map((option) => (
                     <MenuItem key={option} value={option}>
