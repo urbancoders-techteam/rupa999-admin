@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
-import { memo, useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { memo } from 'react';
 // @mui
 import { useTheme } from '@mui/material/styles';
 import { AppBar, Box, Toolbar } from '@mui/material';
@@ -8,24 +7,17 @@ import { AppBar, Box, Toolbar } from '@mui/material';
 import { HEADER } from '../../../config-global';
 // utils
 import { bgBlur } from '../../../utils/cssStyles';
-import { filterNavConfigByPermission } from '../../../utils/navPermissions';
 // components
 import { NavSectionHorizontal } from '../../../components/nav-section';
 //
-import navConfig from './config-navigation';
+import useNavConfig from './useNavConfig';
 
 // ----------------------------------------------------------------------
 
 function NavHorizontal() {
   const theme = useTheme();
 
-  const { admin } = useSelector((state) => state.auth);
-  const { permissions } = useSelector((state) => state.permission);
-
-  const filteredNavConfig = useMemo(
-    () => filterNavConfigByPermission(navConfig, { isSuperAdmin: admin?.isSuperAdmin, permissions }),
-    [admin?.isSuperAdmin, permissions]
-  );
+  const navConfig = useNavConfig();
 
   return (
     <AppBar
@@ -43,7 +35,7 @@ function NavHorizontal() {
           }),
         }}
       >
-        <NavSectionHorizontal data={filteredNavConfig} />
+        <NavSectionHorizontal data={navConfig} />
       </Toolbar>
 
       <Shadow />

@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import { forwardRef } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // @mui
-import { Tooltip, Link, ListItemText } from '@mui/material';
+import { Box, Tooltip, Link, ListItemText } from '@mui/material';
 // locales
 import { useLocales } from '../../../locales';
 // auth
@@ -16,7 +16,7 @@ import { StyledItem, StyledIcon } from './styles';
 const NavItem = forwardRef(({ item, depth, open, active, isExternalLink, ...other }, ref) => {
   const { translate } = useLocales();
 
-  const { title, path, icon, children, disabled, caption, roles } = item;
+  const { title, path, icon, info, children, disabled, caption, roles } = item;
 
   const subItem = depth !== 1;
 
@@ -44,6 +44,12 @@ const NavItem = forwardRef(({ item, depth, open, active, isExternalLink, ...othe
           },
         }}
       />
+
+      {info && (
+        <Box component="span" sx={{ top: 6, right: 6, lineHeight: 0, position: 'absolute' }}>
+          {info}
+        </Box>
+      )}
 
       {caption && (
         <Tooltip title={`${translate(caption)}`} arrow placement="right">

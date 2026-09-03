@@ -37,3 +37,16 @@ export const rejectWithdrawalRequestAsync = createAsyncThunk(
     })
 );
 
+// Count of withdrawal requests still waiting on an admin decision. Asks for a
+// single row and reads the total off the pagination meta, so the sidebar badge
+// never pulls the whole pending list.
+export const getPendingWithdrawalCountAsync = createAsyncThunk(
+  'withdrawal/pendingCount',
+  async (_, toolkit) =>
+    AxiosClient({
+      toolkit,
+      url: '/admin/withdrawals',
+      method: 'get',
+      params: { status: 'pending', page: 1, limit: 1 },
+    })
+);

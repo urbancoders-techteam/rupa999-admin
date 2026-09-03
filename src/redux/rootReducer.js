@@ -14,6 +14,7 @@ import staffReducer from './slices/staff_slices';
 import starlineMarketReducer from './slices/starline_market_slices';
 import starlineMarketResultReducer from './slices/starline_market_result_slices';
 import userReducer from './slices/user_slices';
+import withdrawalReducer from './slices/withdrawal_slices';
 
 // ----------------------------------------------------------------------
 
@@ -38,6 +39,7 @@ const rootReducer = combineReducers({
   notification: notificationReducer,
   faq: faqReducer,
   apk: apkReducer,
+  withdrawal: withdrawalReducer,
 });
 
 export default rootReducer;
