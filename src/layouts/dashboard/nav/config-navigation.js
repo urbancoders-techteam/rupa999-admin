@@ -1,3 +1,5 @@
+// config
+import { STARLINE_ENABLED } from '../../../config-global';
 // routes
 import { PATH_DASHBOARD } from '../../../routes/paths';
 // components
@@ -73,18 +75,23 @@ const navConfig = [
         ],
       },
 
-      {
-        title: 'star line markets',
-        path: PATH_DASHBOARD.starline.root,
-        icon: ICONS.user,
-        children: [
-          { title: 'Market list', path: PATH_DASHBOARD.starline.market.list },
-          { title: 'Market Record', path: PATH_DASHBOARD.starline.marketrecords.list },
-          { title: 'Game Result', path: PATH_DASHBOARD.starline.marketresults.list },
-          { title: 'Win History', path: PATH_DASHBOARD.starline.winhistory.list },
-          { title: 'Data', path: PATH_DASHBOARD.starline.marketdata.list },
-        ],
-      },
+      // Replaced by the WhatsApp group link (Settings > Help and Support).
+      ...(STARLINE_ENABLED
+        ? [
+            {
+              title: 'star line markets',
+              path: PATH_DASHBOARD.starline.root,
+              icon: ICONS.user,
+              children: [
+                { title: 'Market list', path: PATH_DASHBOARD.starline.market.list },
+                { title: 'Market Record', path: PATH_DASHBOARD.starline.marketrecords.list },
+                { title: 'Game Result', path: PATH_DASHBOARD.starline.marketresults.list },
+                { title: 'Win History', path: PATH_DASHBOARD.starline.winhistory.list },
+                { title: 'Data', path: PATH_DASHBOARD.starline.marketdata.list },
+              ],
+            },
+          ]
+        : []),
       {
         title: 'Transaction Details',
         path: PATH_DASHBOARD.maintransaction.list,
@@ -139,6 +146,10 @@ const navConfig = [
           {
             title: 'Help and Support',
             path: PATH_DASHBOARD.helpsupport.form,
+          },
+          {
+            title: 'WhatsApp Group',
+            path: PATH_DASHBOARD.whatsappgroup.form,
           },
           {
             title: 'Gateway Settings',

@@ -45,6 +45,7 @@ import {
   StaticDataFormPage,
   CommonSettingFormPage,
   HelpAndSupportFormPage,
+  WhatsappGroupFormPage,
   MarqueMessageFormPage,
   //
   StaffListPage,
@@ -214,6 +215,13 @@ export default function Router() {
               children: [
                 { element: <Navigate to="/dashboard/settings/helpsupport/form" replace />, index: true },
                 { path: 'form', element: <HelpAndSupportFormPage /> },
+              ],
+            },
+            {
+              path: 'whatsappgroup',
+              children: [
+                { element: <Navigate to="/dashboard/settings/whatsappgroup/form" replace />, index: true },
+                { path: 'form', element: <WhatsappGroupFormPage /> },
               ],
             },
             {

@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { useDispatch } from 'react-redux';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 import { useSettingsContext } from '../components/settings';
+import { STARLINE_ENABLED } from '../config-global';
 import { getAllGameTypeRatesAsync } from '../redux/services/game_type_rate_services';
 import { getAllStarlineGameTypeRatesAsync } from '../redux/services/starline_game_type_rate_services';
 import { PATH_DASHBOARD } from '../routes/paths';
@@ -120,12 +121,14 @@ const GameTypeFormPage = () => {
             >
               Main
             </Button>
-            <Button
-              variant={currentTab === 1 ? 'contained' : 'outlined'}
-              onClick={() => handleTabChange(1)}
-            >
-              Starline
-            </Button>
+            {STARLINE_ENABLED && (
+              <Button
+                variant={currentTab === 1 ? 'contained' : 'outlined'}
+                onClick={() => handleTabChange(1)}
+              >
+                Starline
+              </Button>
+            )}
           </Box>
 
           {/* Main tab panel */}
@@ -163,7 +166,8 @@ const GameTypeFormPage = () => {
             id="rate-card-panel-starline"
             aria-labelledby="rate-card-tab-starline"
           >
-            {currentTab === 1 &&
+            {STARLINE_ENABLED &&
+              currentTab === 1 &&
               starlineGameTypesList?.map((game, index) => {
                 const key = `starline-${game.name}-${game.type}`;
                 return (

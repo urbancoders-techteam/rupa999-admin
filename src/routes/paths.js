@@ -112,6 +112,11 @@ export const PATH_DASHBOARD = {
     form: path(ROOTS_DASHBOARD, '/settings/helpsupport/form'),
   },
 
+  whatsappgroup: {
+    root: path(ROOTS_DASHBOARD, '/settings/whatsappgroup'),
+    form: path(ROOTS_DASHBOARD, '/settings/whatsappgroup/form'),
+  },
+
   staticdata: {
     root: path(ROOTS_DASHBOARD, '/settings/staticdata'),
     form: path(ROOTS_DASHBOARD, '/settings/staticdata/form'),

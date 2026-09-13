@@ -30,6 +30,14 @@ export const AUTH0_API = {
 
 export const MAP_API = process.env.REACT_APP_MAPBOX_API;
 
+// FEATURE FLAGS
+// ----------------------------------------------------------------------
+
+// Starline is replaced by the WhatsApp group link that admins configure under
+// Settings > Help and Support. Set this back to `true` to restore the Starline
+// menu and the Starline rate-card tab without touching any other file.
+export const STARLINE_ENABLED = false;
+
 // ROOT PATH AFTER LOGIN SUCCESSFUL
 export const PATH_AFTER_LOGIN = PATH_DASHBOARD.home.root; // as ''
 
